@@ -1,6 +1,6 @@
 import { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder } from "discord.js";
 import dotenv from "dotenv";
-import Lmao from "./Commands/Lmao.js";
+import Sex from "./Commands/Sex.js";
 import Ping from "./Commands/Ping.js";
 import Prefix from "./Commands/Prefix.js";
 import Snowflake from "./Commands/Snowflake.js";
@@ -22,7 +22,7 @@ let commands = [
     new Snowflake("snowflake"),
     new Ping("ping"),
     new Prefix("prefix"),
-    new Lmao("lmao"),
+    new Sex("sex"),
     new Help("help"),
     new Shutdown("shutdown"),
 

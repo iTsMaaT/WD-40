@@ -1,7 +1,7 @@
 import AbstractCommand from "../AbstractCommand.js";
 
 //starts from a random number, then counts everytime a precise user says lmao, no args to reset
-export default class Lmao extends AbstractCommand{
+export default class Sex extends AbstractCommand{
     execute(message,args) {
         if (args.length == 1) {
             LmaoID = args[0];
