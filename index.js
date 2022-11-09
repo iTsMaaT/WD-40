@@ -1,4 +1,5 @@
 import { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder } from "discord.js";
+import cron from "cron";
 import dotenv from "dotenv";
 import Sex from "./Commands/Sex.js";
 import Ping from "./Commands/Ping.js";
@@ -11,8 +12,8 @@ dotenv.config();
 
 global.prefix = '>';
 global.SnowflakeID = 0;
-global.LmaoID = 0;
-global.LmaoCount = 0;
+global.SexID = 0;
+global.SexCount = 0;
 
 
 global.client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
@@ -37,14 +38,25 @@ export default class --- extends AbstractCommand{
 */
 
 client.on("ready", () => {
+    
     console.log("Bot starting...");
 
     client.user.setActivity(`Time to be annoying!`);
+        
+    //Allah everyday at 2:22
+    let scheduledMessage = new cron.CronJob('00 22 02 * * *', () => {
+    // This runs every day at 02:22:00
+    client.channels.get("885302577414152233").send(":pray: Allah :pray:");
+    });
+    
+    scheduledMessage.start()
     
     setTimeout(function(){
         client.channels.cache.get("1037141235451842701").send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
         console.log("Bot started successfully.");
         },1000 * 1)
+
+        
 })
 
 client.on("messageCreate", (message) => {
@@ -62,8 +74,11 @@ client.on("messageCreate", (message) => {
     }
 
     //reacts :sick: when gros gaming or smartass is said
-    if(message.content.toLowerCase().includes("gros gaming") || message.content.toLowerCase().includes("smartass")) {
-        message.react('🤢')
+    if(message.content.toLowerCase().includes("gros gaming") || message.content.toLowerCase().includes("smartass") || message.content.toLowerCase().includes("edging")) {
+        message.react('s')
+			.then(() => message.react('t'))
+			.then(() => message.react('f'))
+            .then(() => message.react('u'));
     }
 
     //what? eveeeer
@@ -71,10 +86,10 @@ client.on("messageCreate", (message) => {
         message.reply("ever!")
     }
 
-    //Lmao count with ID
-    if(message.content.toLowerCase() == `lmao` && message.author.id == LmaoID) {
-        message.reply(`Dude this is the ${LmaoCount}th time you said that, please shut up`)
-        LmaoCount += 1;
+    //Sex count with ID
+    if(message.content.toLowerCase() == `sex` && message.author.id == SexID) {
+        message.reply(`Dude this is the ${SexCount}th time you said that, please shut up`)
+        SexCount += 1;
     }
 
     //skull reaction to skull emoji
@@ -95,6 +110,13 @@ client.on("messageCreate", (message) => {
     //reacts :gorilla: when pinging iTsMaaT
     if(message.content.include("<@411996978583699456>")) {
         message.react('🦍')
+    }
+    
+    if(message.content.include("<@411996978583699456>")) {
+        message.channel.send("Ta mère")
+    }
+    if (!member.permissions.has(PermissionsBitField.Flags.Administrator) && (message.content.toLowerCase().includes("@everyone") || message.content.toLowerCase().includes("@here"))) {
+        message.reply("Ping fail");
     }
 
 })
