@@ -76,15 +76,12 @@ client.on("messageCreate", (message) => {
         }
     }
 
-    //const member = message.guild.members.fetch(user)
-    //userMember.hasPermission(MentionEveryone)
-
     //reacts :sick: when gros gaming or smartass is said
     if(message.content.toLowerCase().includes("gros gaming") || message.content.toLowerCase().includes("smartass") || message.content.toLowerCase().includes("edging")) {
-        message.react('s')
-			.then(() => message.react('t'))
-			.then(() => message.react('f'))
-            .then(() => message.react('u'));
+        message.react('🤡')
+			//.then(() => message.react('t'))
+			//.then(() => message.react('f'))
+            //.then(() => message.react('u'));
     }
 
     //what? eveeeer
@@ -118,7 +115,7 @@ client.on("messageCreate", (message) => {
         message.react('🦍')
     }
     
-    if(message.content.includes("<@411996978583699456>")) {
+    if(message.content.includes("en pause?")) {
         message.channel.send("Ta mère")
     }
 
