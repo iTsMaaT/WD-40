@@ -47,9 +47,9 @@ client.on("ready", () => {
     client.user.setActivity(`Time to be annoying!`);
         
     //Allah everyday at 2:22
-    let scheduledMessage = new cron.CronJob('00 22 02 * * *', () => {
-    // This runs every day at 02:22:00
-    client.channels.get("885302577414152233").send(":pray: Allah :pray:");
+    let scheduledMessage = new cron.CronJob('11 11 11 * * *', () => {
+    // This runs every day at 11:11:11
+    client.channels.cache.get("885302577414152233").send(":pray: Allah :pray:");
     });
     //sarting the daily sending
     scheduledMessage.start()
@@ -79,10 +79,10 @@ client.on("messageCreate", (message) => {
 
     //reacts :sick: when gros gaming or smartass is said
     if(message.content.toLowerCase().includes("gros gaming") || message.content.toLowerCase().includes("smartass") || message.content.toLowerCase().includes("edging")) {
-        message.react('🤡')
-			//.then(() => message.react('t'))
-			//.then(() => message.react('f'))
-            //.then(() => message.react('u'));
+        message.react('🇸')
+			.then(() => message.react('🇹'))
+			.then(() => message.react('🇫'))
+            .then(() => message.react('🇺'));
     }
 
     //what? eveeeer
@@ -117,7 +117,7 @@ client.on("messageCreate", (message) => {
     }
 
     //answers your mom when asking who's at break
-    if(message.content.includes("en pause?")) {
+    if(message.content.toLowerCase().includes("en pause")) {
         message.channel.send("Ta mère")
     }
 
