@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "cron": "^2.1.0",
     "discord.js": "^14.6.0",
     "dotenv": "^16.0.3",
     "pretty-ms": "^8.0.0"

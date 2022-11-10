@@ -12,7 +12,7 @@ export default class Shutdown extends AbstractCommand{
                     client.destroy();
                 })
             }
-            else if((member.permissions.has(PermissionsBitField.Flags.Administrator))) {
+            else if(message.member.permissions.has("Administrator")) {
                 message.channel.send (`Please contact the owner of this bot to execute this command (iTsMaaT#4020 or <@411996978583699456>)`);
             }
             else {

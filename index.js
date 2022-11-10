@@ -76,6 +76,9 @@ client.on("messageCreate", (message) => {
         }
     }
 
+    //const member = message.guild.members.fetch(user)
+    //userMember.hasPermission(MentionEveryone)
+
     //reacts :sick: when gros gaming or smartass is said
     if(message.content.toLowerCase().includes("gros gaming") || message.content.toLowerCase().includes("smartass") || message.content.toLowerCase().includes("edging")) {
         message.react('s')
@@ -111,16 +114,19 @@ client.on("messageCreate", (message) => {
     }
 
     //reacts :gorilla: when pinging iTsMaaT
-    if(message.content.include("<@411996978583699456>")) {
+    if(message.content.includes("<@411996978583699456>")) {
         message.react('🦍')
     }
     
-    if(message.content.include("<@411996978583699456>")) {
+    if(message.content.includes("<@411996978583699456>")) {
         message.channel.send("Ta mère")
     }
-    if (!member.permissions.has(PermissionsBitField.Flags.Administrator) && (message.content.toLowerCase().includes("@everyone") || message.content.toLowerCase().includes("@here"))) {
+
+    //Ping fail if doesnt have @everyone perm
+    if (!message.member.permissions.has("MentionEveryone") && (message.content.includes("@everyone") || message.content.includes("@here"))) {
         message.reply("Ping fail");
     }
+    
 
 })
 client.login(process.env.TOKEN);
