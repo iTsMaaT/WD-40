@@ -123,6 +123,10 @@ client.on("messageCreate", (message) => {
     if (!message.member.permissions.has("MentionEveryone") && (message.content.includes("@everyone") || message.content.includes("@here"))) {
         message.reply("Ping fail");
     }
+
+    if(message.content.toLowerCase() == "bruh") {
+        message.reply("bruh")
+    }
     
 
 })
