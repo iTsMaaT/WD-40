@@ -8,6 +8,7 @@ import Snowflake from "./Commands/Snowflake.js";
 import Test from "./Commands/Test.js";
 import Help from "./Commands/Help.js";
 import Shutdown from "./Commands/Shutdown.js";
+import Suggestion from "./Commands/Suggestion.js";
 dotenv.config();
 
 global.prefix = '>';
@@ -26,6 +27,8 @@ let commands = [
     new Sex("sex"),
     new Help("help"),
     new Shutdown("shutdown"),
+    new Suggestion("suggestion"),
+    
 
 ]
 /*
