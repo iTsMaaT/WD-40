@@ -16,7 +16,7 @@ export default class Shutdown extends AbstractCommand{
                 message.channel.send (`Please contact the owner of this bot to execute this command (iTsMaaT#4020 or <@411996978583699456>)`);
             }
             else {
-                message.channel.send (`You are not allowed to execute that command`);
+                message.channel.send (`nah`);
             }
     }
 }

@@ -14,5 +14,8 @@ export default class Sex extends AbstractCommand{
                 message.channel.send (`Sex is reset`);
             }
         }
+        else {
+            message.channel.send(`You are not allowed to execute that command`);
+        }
     }
 }

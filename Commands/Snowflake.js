@@ -13,6 +13,9 @@ export default class Snowflake extends AbstractCommand{
                 message.channel.send (`Snowflake has been reset`);
             }
         }   
+        else {
+            message.channel.send(`You are not allowed to execute that command`);
+        }
     }
 
 }
