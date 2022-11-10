@@ -51,9 +51,10 @@ client.on("ready", () => {
     // This runs every day at 02:22:00
     client.channels.get("885302577414152233").send(":pray: Allah :pray:");
     });
-    
+    //sarting the daily sending
     scheduledMessage.start()
     
+    //start confirmation
     setTimeout(function(){
         client.channels.cache.get("1037141235451842701").send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
         console.log("Bot started successfully.");
@@ -114,7 +115,8 @@ client.on("messageCreate", (message) => {
     if(message.content.includes("<@411996978583699456>")) {
         message.react('🦍')
     }
-    
+
+    //answers your mom when asking who's at break
     if(message.content.includes("en pause?")) {
         message.channel.send("Ta mère")
     }
@@ -124,6 +126,7 @@ client.on("messageCreate", (message) => {
         message.reply("Ping fail");
     }
 
+    //answers bruh to bruh
     if(message.content.toLowerCase() == "bruh") {
         message.reply("bruh")
     }
