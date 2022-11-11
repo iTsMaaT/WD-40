@@ -130,6 +130,10 @@ client.on("messageCreate", (message) => {
     if(message.content.toLowerCase() == "bruh") {
         message.reply("bruh")
     }
+
+    if(message.content.toLowerCase() == "stuff") {
+        message.reply("https://media.discordapp.net/attachments/774305852323790873/1040424470483046462/8fa.png?width=628&height=670")
+    }
     
 
 })
