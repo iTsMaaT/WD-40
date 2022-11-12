@@ -11,7 +11,14 @@ export default class Ping extends AbstractCommand{
                     },1000 * args[1] * i)
             }
         }
-        else if(args.length == 1) {
+        else if (args.length == 1) {
+            for (let i = 0; i < args[0]; i++) {
+                setTimeout(function(){
+                    message.channel.send (`Ping : \`${client.ws.ping}ms\``);
+                    },1000 * i)
+            }
+        }
+        else if(args.length == 0) {
             message.channel.send (`
 
 My ping is \`${client.ws.ping}ms\`
