@@ -30,5 +30,3 @@ Round trip latency : \`${sent.createdTimestamp - message.createdTimestamp}ms\`
         }
     }
 }
-//Round trip latency : \`${sent.createdTimestamp - message.createdTimestamp}ms\`
-//import send from "node:process"

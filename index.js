@@ -9,6 +9,7 @@ import Test from "./Commands/Test.js";
 import Help from "./Commands/Help.js";
 import Shutdown from "./Commands/Shutdown.js";
 import Suggestion from "./Commands/Suggestion.js";
+import Sudo from "./Commands/Sudo.js";
 dotenv.config();
 
 global.prefix = '>';
@@ -28,7 +29,7 @@ let commands = [
     new Help("help"),
     new Shutdown("shutdown"),
     new Suggestion("suggestion"),
-    
+    new Sudo("sudo"),
 
 ]
 /*
