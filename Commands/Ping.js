@@ -19,11 +19,12 @@ export default class Ping extends AbstractCommand{
             }
         }
         else if(args.length == 0) {
-            message.channel.send (`
+            const sent = await interaction.send({ content: 'Pinging...', fetchReply: true });
+            message.edit (`
 
 My ping is \`${client.ws.ping}ms\`
 Uptime : \`${prettyMilliseconds(client.uptime)}\`
-            
+Round trip latency : \`${sent.createdTimestamp - message.createdTimestamp}ms\`
             `); 
         }
     }
