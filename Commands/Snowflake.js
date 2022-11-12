@@ -5,7 +5,9 @@ export default class Snowflake extends AbstractCommand{
     execute(message,args) {
         if (message.member.permissions.has("MentionEveryone")) {
             if (args.length == 1) {
-                SnowflakeID = args[0];
+                const rawid1 =  args[0].replace("@", "")
+                const rawdid2 = rawid1.replace("<", "")
+                SnowflakeID = rawdid2.replace(">", "")
                 message.channel.send (`\<\@${SnowflakeID}\> is a snowflake`);
             }
             else {
