@@ -19,8 +19,9 @@ export default class Ping extends AbstractCommand{
             }
         }
         else if(args.length == 0) {
-            const sent = await interaction.send({ content: 'Pinging...', fetchReply: true });
-            message.edit (`
+            const sent = await message.channel.send({ content: 'Pinging...', fetchReply: true });
+            
+            sent.edit (`
 
 My ping is \`${client.ws.ping}ms\`
 Uptime : \`${prettyMilliseconds(client.uptime)}\`
