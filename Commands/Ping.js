@@ -11,7 +11,7 @@ export default class Ping extends AbstractCommand{
                     },1000 * args[1] * i)
             }
         }
-        else if(args.lenght == 1) {
+        else if(args.length == 1) {
             message.channel.send (`
 
 My ping is \`${client.ws.ping}ms\`
