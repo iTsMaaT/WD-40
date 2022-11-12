@@ -86,8 +86,14 @@ client.on("messageCreate", (message) => {
     }
 
     //what? eveeeer
-    if(message.content.toLowerCase() == `what` || message.content == `what?` || message.content == `What?`) {
+    if(message.content.toLowerCase() == `what` || message.content == `what?` || message.content == `What?` || 
+       message.content.toLowerCase() == `who` || message.content == `who?` || message.content == `Who?`) {
         message.reply("ever!")
+    }
+
+    //ever what?
+    if(message.content.toLowerCase() == `ever`) {
+        message.reply("What?")
     }
 
     //Sex count with ID
@@ -131,10 +137,8 @@ client.on("messageCreate", (message) => {
         message.reply("bruh")
     }
 
-    if(message.content.toLowerCase() == "stuff") {
+    if(message.content.toLowerCase().includes("stuff")) {
         message.reply("https://media.discordapp.net/attachments/774305852323790873/1040424470483046462/8fa.png?width=628&height=670")
     }
-    
-
 })
 client.login(process.env.TOKEN);
