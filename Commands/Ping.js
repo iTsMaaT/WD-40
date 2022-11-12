@@ -16,9 +16,10 @@ export default class Ping extends AbstractCommand{
 
 My ping is \`${client.ws.ping}ms\`
 Uptime : \`${prettyMilliseconds(client.uptime)}\`
-Round trip latency : \`${sent.createdTimestamp - message.createdTimestamp}ms\`
             
             `); 
         }
     }
 }
+//Round trip latency : \`${sent.createdTimestamp - message.createdTimestamp}ms\`
+//import send from "node:process"
