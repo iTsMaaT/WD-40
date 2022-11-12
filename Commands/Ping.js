@@ -12,8 +12,11 @@ export default class Ping extends AbstractCommand{
             }
         }
         else {
-            message.channel.send (`My ping is \`${client.ws.ping}ms\`\nUptime : \`${prettyMilliseconds(client.uptime)}\``); 
+            message.channel.send (`
+My ping is \`${client.ws.ping}ms\`
+Uptime : \`${prettyMilliseconds(client.uptime)}\`
+Round trip latency : \`${sent.createdTimestamp - message.createdTimestamp}ms\`
+            `); 
         }
     }
-
 }
