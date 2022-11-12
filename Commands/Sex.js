@@ -5,7 +5,9 @@ export default class Sex extends AbstractCommand{
     execute(message,args) {
         if (message.member.permissions.has("Administrator")) {
             if (args.length == 1) {
-                SexID = args[0];
+                const rawid1 =  args[0].replace("@", "")
+                const rawdid2 = rawid1.replace("<", "")
+                SexID = rawdid2.replace(">", "")
                 message.channel.send (`\<\@${SexID}\> is too horny`);
                 SexCount = Math.floor(Math.random()*100000) + 1;
             }
