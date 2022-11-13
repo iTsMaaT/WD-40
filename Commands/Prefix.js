@@ -3,7 +3,7 @@
 module.exports={
     name:"prefix",
     description:"changes the prefix to do commands",
-    execute(message,args) {
+    execute(client,message,args) {
         if(args.length == 1) {
             prefix = args[0];
             message.channel.send (`The new prefix is \`${args[0]}\``);

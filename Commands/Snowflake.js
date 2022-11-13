@@ -3,7 +3,7 @@
 module.exports={
     name:"snowflake",
     description:"Reacts :snowflake: to every message of a user, no args to reset",
-    execute(message,args) {
+    execute(client,message,args) {
         if (message.member.permissions.has("MentionEveryone")) {
             if (args.length == 1) {
                 const rawid1 =  args[0].replace("@", "")

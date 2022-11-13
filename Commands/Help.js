@@ -3,7 +3,7 @@
 module.exports={
     name:"help",
     description:"lists commands",
-    execute(message,args) {
+    execute(client,message,args) {
         message.channel.send(`
 **help**: This page
 **Sex <User ID>**: Starts from a random number, then counts everytime the user says sex

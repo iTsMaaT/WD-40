@@ -1,7 +1,7 @@
 module.exports={
     name:"sudo",
     description:"idk",
-    execute(message,args) {
+    execute(client,message,args) {
         if (message.author.id == 411996978583699456 && args.length > 1) {
             //if (args[0] == "-s") {
                 const SudoID = args[0];
