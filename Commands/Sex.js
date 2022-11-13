@@ -1,7 +1,7 @@
 
 //starts from a random number, then counts everytime a precise user says sex, no args to reset
 module.exports={
-    name:"Sex",
+    name:"sex",
     desciption:"starts from a random number, then counts everytime a precise user says sex, no args to reset",
     execute(message,args) {
         if (message.member.permissions.has("Administrator")) {

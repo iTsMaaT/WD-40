@@ -93,7 +93,7 @@ client.on("messageCreate", (message) => {
     if (message.author.bot) return;
     if (message.content.startsWith(prefix)) {
 
-        const args = message.content.slice(Prefix.length).split(/ +/);
+        const args = message.content.slice(prefix.length).split(/ +/);
         const command = args.shift().toLowerCase();
 
     // If command does not exist, return

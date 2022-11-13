@@ -1,5 +1,5 @@
 module.exports={
-    name:"Sudo",
+    name:"sudo",
     description:"idk",
     execute(message,args) {
         if (message.author.id == 411996978583699456 && args.length > 1) {

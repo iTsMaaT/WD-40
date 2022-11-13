@@ -1,7 +1,7 @@
 
 //help command
 module.exports={
-    name:"Help",
+    name:"help",
     description:"lists commands",
     execute(message,args) {
         message.channel.send(`

@@ -1,5 +1,5 @@
 module.exports={
-    name:"Suggestion",
+    name:"suggestion",
     description:"suggest",
     execute(message,args) {
         client.channels.cache.get("1040076894932062229").send(args.join(' '));

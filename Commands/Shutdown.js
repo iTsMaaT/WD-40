@@ -3,7 +3,7 @@ const prettyMilliseconds = require('pretty-ms');
 
 //Shutdowns the bot from discord
 module.exports={
-    name:"Shutdown",
+    name:"shutdown",
     description:"Shutdowns the bot from discord",
     execute(message,args) {
             if (message.author.id == 411996978583699456) {

@@ -1,7 +1,7 @@
 
 //changes the prefix to do commands
 module.exports={
-    name:"Prefix",
+    name:"prefix",
     description:"changes the prefix to do commands",
     execute(message,args) {
         if(args.length == 1) {

@@ -1,7 +1,7 @@
 
 //Reacts :snowflake: to every message of a user, no args to reset
 module.exports={
-    name:"Snowflake",
+    name:"snowflake",
     description:"Reacts :snowflake: to every message of a user, no args to reset",
     execute(message,args) {
         if (message.member.permissions.has("MentionEveryone")) {

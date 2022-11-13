@@ -2,7 +2,7 @@ const prettyMilliseconds = require('pretty-ms');
 
 //gives ping and uptime, or can give ping a precise number of times with a custom delay inbetween
 module.exports={
-    name:"Ping",
+    name:"ping",
     description:"gives ping and uptime, or can give ping a precise number of times with a custom delay inbetween",
     async execute(message,args) {
         if (args.length == 2) {
