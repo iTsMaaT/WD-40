@@ -1,5 +1,5 @@
 const prettyMilliseconds = require('pretty-ms');
-import { userMention } from "discord.js";
+//import { userMention } from "discord.js";
 
 //Shutdowns the bot from discord
 module.exports={

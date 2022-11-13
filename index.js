@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder } = require("discord.js");
+const { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events } = require("discord.js");
 const cron = require("cron");
 const dotenv = require("dotenv");
 dotenv.config();
