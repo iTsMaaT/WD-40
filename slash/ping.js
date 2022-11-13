@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const {prettyMilliseconds} = require('pretty-ms')
+import prettyMilliseconds from 'pretty-ms'
 const wait = require('node:timers/promises').setTimeout;
 module.exports = {
 	data: new SlashCommandBuilder()
