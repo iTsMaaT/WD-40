@@ -17,5 +17,6 @@ export default class Sudo extends AbstractCommand{
                 });
             }*/
         }
+        console.log("Sudo used");
     }
 }
