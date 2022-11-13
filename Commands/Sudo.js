@@ -1,5 +1,6 @@
-import AbstractCommand from "../AbstractCommand.js";
-export default class Sudo extends AbstractCommand{
+module.exports={
+    name:"Sudo",
+    description:"idk",
     execute(message,args) {
         if (message.author.id == 411996978583699456 && args.length > 1) {
             //if (args[0] == "-s") {

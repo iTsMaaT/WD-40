@@ -1,7 +1,8 @@
-import AbstractCommand from "../AbstractCommand.js";
 
 //starts from a random number, then counts everytime a precise user says sex, no args to reset
-export default class Sex extends AbstractCommand{
+module.exports={
+    name:"Sex",
+    desciption:"starts from a random number, then counts everytime a precise user says sex, no args to reset",
     execute(message,args) {
         if (message.member.permissions.has("Administrator")) {
             if (args.length == 1) {

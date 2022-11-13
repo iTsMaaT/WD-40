@@ -1,7 +1,8 @@
-import AbstractCommand from "../AbstractCommand.js";
 
 //help command
-export default class Help extends AbstractCommand{
+module.exports={
+    name:"Help",
+    description:"lists commands",
     execute(message,args) {
         message.channel.send(`
 **help**: This page

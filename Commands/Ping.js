@@ -1,8 +1,9 @@
-import AbstractCommand from "../AbstractCommand.js";
-import prettyMilliseconds from 'pretty-ms';
+const prettyMilliseconds = require('pretty-ms');
 
 //gives ping and uptime, or can give ping a precise number of times with a custom delay inbetween
-export default class Ping extends AbstractCommand{
+module.exports={
+    name:"Ping",
+    description:"gives ping and uptime, or can give ping a precise number of times with a custom delay inbetween",
     async execute(message,args) {
         if (args.length == 2) {
             for (let i = 0; i < args[0]; i++) {

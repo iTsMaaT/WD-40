@@ -1,7 +1,8 @@
-import AbstractCommand from "../AbstractCommand.js";
 
 //changes the prefix to do commands
-export default class Prefix extends AbstractCommand{
+module.exports={
+    name:"Prefix",
+    description:"changes the prefix to do commands",
     execute(message,args) {
         if(args.length == 1) {
             prefix = args[0];

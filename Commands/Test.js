@@ -1,7 +1,8 @@
-import AbstractCommand from "../AbstractCommand.js";
 
 //test command
-export default class Test extends AbstractCommand{
+module.exports={
+    name:"Test",
+    desciption:"test command",
     execute(message,args) {
             message.channel.send("Shut the fuck up");
     }
