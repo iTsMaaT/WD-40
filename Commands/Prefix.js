@@ -8,8 +8,11 @@ export default class Prefix extends AbstractCommand{
             message.channel.send (`The new prefix is \`${args[0]}\``);
             console.log(`Prefix changed to ${args[0]}`)
         }
-        else {
+        else if(args.length == 0) {
             message.reply(`You didn't enter a prefix, dumbass`);
+        }
+        else {
+            message.reply(`You cannot have multiple prefixes retarb`);
         }
     }
 }

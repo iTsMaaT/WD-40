@@ -12,6 +12,6 @@ export default class Help extends AbstractCommand{
 **suggestion**: Give a suggestion for the bot
 
 
-`);
+        `);
     }
 }
