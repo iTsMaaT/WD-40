@@ -39,12 +39,15 @@ for (const file of commandFiles) {
     client.commands.set(command.name, command)
 }
 /*
-import AbstractCommand from "../AbstractCommand.js";
-export default class --- extends AbstractCommand{
-    execute(message,args) {
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+module.exports = {
+	data: new SlashCommandBuilder()
+		.setName('ping')
+		.setDescription('Shows bot latency'),
+	async execute(interaction, client) {
 
-    }
-}
+        },
+    };
 */
 
 client.on("ready", () => {
