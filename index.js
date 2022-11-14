@@ -9,6 +9,7 @@ global.prefix = '>';
 let SnowflakeID = 0;
 let SexID = 0;
 let SexCount = 0;
+global.CmdEnabled = 1;
 
 client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
@@ -93,6 +94,15 @@ client.on(Events.InteractionCreate, async interaction => {
 
 client.on("messageCreate", (message) => {
     if (message.author.bot) return;
+
+    if (message.content.toLowerCase() == `>disable`) {
+        CmdEnabled = 0;
+        message.reply("Responses disabled.");
+    } else if (message.content.toLowerCase() == `>enable`) {
+        CmdEnabled = 1;
+        message.reply("Responses enabled.");
+    }
+
     if (message.content.startsWith(prefix)) {
 
         const args = message.content.slice(prefix.length).split(/ +/);
@@ -111,63 +121,66 @@ client.on("messageCreate", (message) => {
         message.reply(`**Prefix** : ${prefix}\n**Help command** : ${prefix}help`);
     }
 
-    //reacts :sick: when gros gaming or smartass is said
-    if(message.content.toLowerCase().includes("gros gaming") || message.content.toLowerCase().includes("smartass") || message.content.toLowerCase().includes("edging")) {
-        message.react('🇸')
-			.then(() => message.react('🇹'))
-			.then(() => message.react('🇫'))
-            .then(() => message.react('🇺'));
-    }
+    if (CmdEnabled == 1) {
 
-    //what? eveeeer
-    if(message.content.toLowerCase() == `what` || message.content == `what?` || message.content == `What?` || 
-       message.content.toLowerCase() == `who` || message.content == `who?` || message.content == `Who?`) {
-        message.reply("ever!")
-    }
+        //reacts :sick: when gros gaming or smartass is said
+        if(message.content.toLowerCase().includes("gros gaming") || message.content.toLowerCase().includes("smartass") || message.content.toLowerCase().includes("edging")) {
+            message.react('🇸')
+                .then(() => message.react('🇹'))
+                .then(() => message.react('🇫'))
+                .then(() => message.react('🇺'));
+        }
 
-    //ever what?
-    if(message.content.toLowerCase() == `ever`) {
-        message.reply("What?")
-    }
+        //what? eveeeer
+        if(message.content.toLowerCase() == `what` || message.content == `what?` || message.content == `What?` || 
+        message.content.toLowerCase() == `who` || message.content == `who?` || message.content == `Who?`) {
+            message.reply("ever!")
+        }
 
-    //Sex count with ID
-    if(message.content.toLowerCase() == `sex` && message.author.id == SexID) {
-        message.reply(`Dude this is the ${SexCount}th time you said that, please shut up`)
-        SexCount += 1;
-    }
+        //ever what?
+        if(message.content.toLowerCase() == `ever`) {
+            message.reply("What?")
+        }
 
-    //skull reaction to skull emoji
-    if(message.content.toLowerCase() == `💀`) {
-        message.react('💀') 
-    }
-    
-    //Snowflake reaction
-    if (SnowflakeID != 0 && message.author.id == SnowflakeID) {
-           message.react('❄️');
-    }
+        //Sex count with ID
+        if(message.content.toLowerCase() == `sex` && message.author.id == SexID) {
+            message.reply(`Dude this is the ${SexCount}th time you said that, please shut up`)
+            SexCount += 1;
+        }
 
-    //reacts :gorilla: when pinging iTsMaaT
-    if(message.content.includes("<@411996978583699456>")) {
-        message.react('🦍')
-    }
+        //skull reaction to skull emoji
+        if(message.content.toLowerCase() == `💀`) {
+            message.react('💀') 
+        }
+        
+        //Snowflake reaction
+        if (SnowflakeID != 0 && message.author.id == SnowflakeID) {
+            message.react('❄️');
+        }
 
-    //answers your mom when asking who's at break
-    if(message.content.toLowerCase().includes("en pause")) {
-        message.channel.send("Ta mère")
-    }
+        //reacts :gorilla: when pinging iTsMaaT
+        if(message.content.includes("<@411996978583699456>")) {
+            message.react('🦍')
+        }
 
-    //Ping fail if doesnt have @everyone perm
-    if (!message.member.permissions.has("MentionEveryone") && (message.content.includes("@everyone") || message.content.includes("@here"))) {
-        message.reply("Ping fail");
-    }
+        //answers your mom when asking who's at break
+        if(message.content.toLowerCase().includes("en pause")) {
+            message.channel.send("Ta mère")
+        }
 
-    //answers bruh to bruh
-    if(message.content.toLowerCase() == "bruh") {
-        message.reply("bruh")
-    }
+        //Ping fail if doesnt have @everyone perm
+        if (!message.member.permissions.has("MentionEveryone") && (message.content.includes("@everyone") || message.content.includes("@here"))) {
+            message.reply("Ping fail");
+        }
 
-    if(message.content.toLowerCase().includes("stuff")) {
-        message.reply("https://media.discordapp.net/attachments/774305852323790873/1040424470483046462/8fa.png?width=628&height=670")
+        //answers bruh to bruh
+        if(message.content.toLowerCase() == "bruh") {
+            message.reply("bruh")
+        }
+
+        if(message.content.toLowerCase().includes("stuff")) {
+            message.reply("https://media.discordapp.net/attachments/774305852323790873/1040424470483046462/8fa.png?width=628&height=670")
+        }
     }
 })
 client.login(process.env.TOKEN);
