@@ -1,8 +1,9 @@
-import AbstractCommand from "../AbstractCommand.js";
 
 //Reacts :snowflake: to every message of a user, no args to reset
-export default class Snowflake extends AbstractCommand{
-    execute(message,args) {
+module.exports={
+    name:"snowflake",
+    description:"Reacts :snowflake: to every message of a user, no args to reset",
+    execute(client,message,args) {
         if (message.member.permissions.has("MentionEveryone")) {
             if (args.length == 1) {
                 const rawid1 =  args[0].replace("@", "")

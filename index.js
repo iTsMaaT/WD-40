@@ -1,37 +1,43 @@
-import { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder } from "discord.js";
-import cron from "cron";
-import dotenv from "dotenv";
-import Sex from "./Commands/Sex.js";
-import Ping from "./Commands/Ping.js";
-import Prefix from "./Commands/Prefix.js";
-import Snowflake from "./Commands/Snowflake.js";
-import Test from "./Commands/Test.js";
-import Help from "./Commands/Help.js";
-import Shutdown from "./Commands/Shutdown.js";
-import Suggestion from "./Commands/Suggestion.js";
-import Sudo from "./Commands/Sudo.js";
+const { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events } = require("discord.js");
+const cron = require("cron");
+const dotenv = require("dotenv");
 dotenv.config();
-
+const Discord = require('discord.js');
+const fs = require('fs');
+const path = require('node:path')
 global.prefix = '>';
-global.SnowflakeID = 0;
-global.SexID = 0;
-global.SexCount = 0;
+let SnowflakeID = 0;
+let SexID = 0;
+let SexCount = 0;
 
 
-global.client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
-let commands = [
-    new Test("test"),
-    new Snowflake("snowflake"),
-    new Ping("ping"),
-    new Prefix("prefix"),
-    new Sex("sex"),
-    new Help("help"),
-    new Shutdown("shutdown"),
-    new Suggestion("suggestion"),
-    new Sudo("sudo"),
+//create a collection for text commands
+client.commands = new Discord.Collection();
+//create a collection for slash commands
+client.slashcommands = new Discord.Collection();
 
-]
+const slashcommandsPath = path.join(__dirname, 'slash');
+const slashcommandFiles = fs.readdirSync(slashcommandsPath).filter(file => file.endsWith('.js'));
+
+for (const file of slashcommandFiles) {
+	const filePath = path.join(slashcommandsPath, file);
+	const slashcommand = require(filePath);
+	// Set a new item in the Collection with the key as the command name and the value as the exported module
+	if ('data' in slashcommand && 'execute' in slashcommand) {
+		client.slashcommands.set(slashcommand.data.name, slashcommand);
+	} else {
+		console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+	}
+}
+
+const commandFiles = fs.readdirSync('./Commands/').filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+    const command = require(`./Commands/${file}`);
+
+    client.commands.set(command.name, command)
+}
 /*
 import AbstractCommand from "../AbstractCommand.js";
 export default class --- extends AbstractCommand{
@@ -64,6 +70,25 @@ client.on("ready", () => {
         
 })
 
+client.on(Events.InteractionCreate, async interaction => {
+	if (!interaction.isChatInputCommand()) return;
+
+	const slash = interaction.client.slashcommands.get(interaction.commandName);
+
+	if (!slash) {
+		console.error(`No command matching ${interaction.commandName} was found.`);
+		return;
+	}
+
+	try {
+        //execute the slash command
+		await slash.execute(interaction, client);
+	} catch (error) {
+		console.error(`Error executing ${interaction.commandName}`);
+		console.error(error);
+	}
+});
+
 client.on("messageCreate", (message) => {
     if (message.author.bot) return;
     if (message.content.startsWith(prefix)) {
@@ -71,11 +96,14 @@ client.on("messageCreate", (message) => {
         const args = message.content.slice(prefix.length).split(/ +/);
         const command = args.shift().toLowerCase();
 
-        //commands
-        var cmd = commands.filter(c => c.parse(command)).shift();
-        if (cmd !== undefined) {
-            cmd.execute(message,args);
-        }
+    // If command does not exist, return
+    if (!client.commands.get(command)) {
+        return
+    }
+      
+    client.commands.get(command).execute(client, message, args)
+
+
     }
 
     //reacts :sick: when gros gaming or smartass is said

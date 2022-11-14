@@ -1,18 +1,25 @@
 {
-  "dependencies": {
-    "cron": "^2.1.0",
-    "discord.js": "^14.6.0",
-    "dotenv": "^16.0.3",
-    "pretty-ms": "^8.0.0"
-  },
-  "name": "discord-bot",
+  "name": "discord_bot",
   "version": "1.0.0",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Baggette/Discord_bot.git"
+  },
   "author": "",
   "license": "ISC",
-  "description": "",
-  "type": "module"
+  "bugs": {
+    "url": "https://github.com/Baggette/Discord_bot/issues"
+  },
+  "homepage": "https://github.com/Baggette/Discord_bot#readme",
+  "dependencies": {
+    "cron": "^2.1.0",
+    "discord.js": "^14.6.0",
+    "dotenv": "^16.0.3",
+    "pretty-ms": "^7.0.1"
+  }
 }

@@ -1,10 +1,11 @@
-import AbstractCommand from "../AbstractCommand.js";
-import prettyMilliseconds from 'pretty-ms';
-import { userMention } from "discord.js";
+const prettyMilliseconds = require('pretty-ms');
+//import { userMention } from "discord.js";
 
 //Shutdowns the bot from discord
-export default class Shutdown extends AbstractCommand{
-    execute(message,args) {
+module.exports={
+    name:"shutdown",
+    description:"Shutdowns the bot from discord",
+    execute(client,message,args) {
             if (message.author.id == 411996978583699456) {
                 console.log("Shutdown requested from discord...");
                 client.channels.cache.get("1037141235451842701").send(`Bot shutdown requested, **Uptime**: \`${prettyMilliseconds(client.uptime)}\``);

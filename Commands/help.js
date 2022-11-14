@@ -1,8 +1,9 @@
-import AbstractCommand from "../AbstractCommand.js";
 
 //help command
-export default class Help extends AbstractCommand{
-    execute(message,args) {
+module.exports={
+    name:"help",
+    description:"lists commands",
+    execute(client,message,args) {
         message.channel.send(`
 **help**: This page
 **Sex <User ID>**: Starts from a random number, then counts everytime the user says sex
