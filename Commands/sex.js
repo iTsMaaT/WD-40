@@ -6,10 +6,10 @@ module.exports={
     execute(client,message,args) {
         if (message.member.permissions.has("Administrator")) {
             if (args.length == 1) {
-                const rawid1 =  args[0].replace("@", "")
-                const rawdid2 = rawid1.replace("<", "")
-                SexID = rawdid2.replace(">", "")
-                message.channel.send (`\<\@${SexID}\> is too horny`);
+                const rawid1 =  args[0].replace("@", "");
+                const rawdid2 = rawid1.replace("<", "");
+                SexID = rawdid2.replace(">", "");
+                message.reply({ content: `\<\@${SexID}\> is too horny`, allowedMentions: { repliedUser: false }});
                 SexCount = Math.floor(Math.random()*100000) + 1;
             }
             else {

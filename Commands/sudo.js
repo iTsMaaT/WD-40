@@ -7,7 +7,7 @@ module.exports={
             if (sudoprefix == "-s") {
                 const SudoID = args.shift();
                 client.channels.cache.get(SudoID).send(args.join(' '));
-                message.reply("Sudo successful.")
+                message.reply({ content: "Sudo successful.", allowedMentions: { repliedUser: false }});
                 console.log("Sudo -s used");
             }
             else if (sudoprefix == "-r") {
@@ -16,7 +16,7 @@ module.exports={
                 client.channels.cache.get(ChannelID).messages.fetch({cache:false, message:MsgID})
                 .then(m => {
                     m.reply(args.join(' '));
-                    message.reply("Sudo successful.")
+                    message.reply({ content: "Sudo successful.", allowedMentions: { repliedUser: false }});
                     console.log("Sudo -r used");
                 }).catch(() => message.reply("Unable to find message."));
             }

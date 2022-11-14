@@ -6,8 +6,8 @@ module.exports={
     execute(client,message,args) {
         if(args.length == 1) {
             prefix = args[0];
-            message.channel.send (`The new prefix is \`${args[0]}\``);
-            console.log(`Prefix changed to ${args[0]}`)
+            message.reply({ content: `The new prefix is \`${args[0]}\``, allowedMentions: { repliedUser: false }});
+            console.log(`Prefix changed to ${args[0]}`);
         }
         else if(args.length == 0) {
             message.reply(`You didn't enter a prefix, dumbass`);

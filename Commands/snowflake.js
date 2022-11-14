@@ -9,7 +9,7 @@ module.exports={
                 const rawid1 =  args[0].replace("@", "")
                 const rawdid2 = rawid1.replace("<", "")
                 SnowflakeID = rawdid2.replace(">", "")
-                message.channel.send (`\<\@${SnowflakeID}\> is a snowflake`);
+                message.reply({ content: `\<\@${SnowflakeID}\> is a snowflake`, allowedMentions: { repliedUser: false }})
             }
             else {
                 SnowflakeID = 0;
