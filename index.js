@@ -10,7 +10,6 @@ let SnowflakeID = 0;
 let SexID = 0;
 let SexCount = 0;
 
-
 client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
 //create a collection for text commands
@@ -101,12 +100,15 @@ client.on("messageCreate", (message) => {
 
     // If command does not exist, return
     if (!client.commands.get(command)) {
-        return
+        return;
     }
       
     client.commands.get(command).execute(client, message, args)
 
+    }
 
+    if (message.content == "<@1036485458827415633>") {
+        message.reply(`**Prefix** : ${prefix}\n**Help command** : ${prefix}help`);
     }
 
     //reacts :sick: when gros gaming or smartass is said
@@ -142,11 +144,6 @@ client.on("messageCreate", (message) => {
     //Snowflake reaction
     if (SnowflakeID != 0 && message.author.id == SnowflakeID) {
            message.react('❄️');
-    }
-
-    //gives the bot prefix and help command when the bot is pinged
-    if(message.content == "<@1036485458827415633>") {
-        message.channel.send (`Bot's prefix : \`${prefix}\`\nHelp command: \`${prefix}help\``);
     }
 
     //reacts :gorilla: when pinging iTsMaaT
