@@ -21,6 +21,5 @@ module.exports={
                 }).catch(() => message.reply("Unable to find message."));
             }
         }
-        
     }
 }
