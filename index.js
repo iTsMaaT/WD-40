@@ -170,7 +170,7 @@ client.on("messageCreate", (message) => {
 
         //Ping fail if doesnt have @everyone perm
         if (!message.member.permissions.has("MentionEveryone") && (message.content.includes("@everyone") || message.content.includes("@here"))) {
-            message.reply("Ping fail");
+            message.reply("Ping fail L");
         }
 
         //answers bruh to bruh
