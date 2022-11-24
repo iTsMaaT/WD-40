@@ -193,9 +193,7 @@ client.on("messageCreate", (message) => {
 
             }).catch(() => {
                 console.log("unable to dm")
-                fetchFurry().then(embed => {
-                    message.reply({ embeds: [embed] });
-                })
+                message.reply({ embeds: [embed] });
             });
         }
     }
