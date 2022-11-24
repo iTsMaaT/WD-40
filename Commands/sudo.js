@@ -1,8 +1,8 @@
 module.exports={
     name:"sudo",
-    description:"idk",
+    description:"make the bot send a custom message / reply",
     execute(client,message,args) {
-        if (message.author.id == 411996978583699456 && args.length > 1) {
+        if (message.author.id == itsmaat && args.length > 1) {
             let sudoprefix = args.shift();
             if (sudoprefix == "-s") {
                 const SudoID = args.shift();
@@ -20,6 +20,8 @@ module.exports={
                     console.log("Sudo -r used");
                 }).catch(() => message.reply("Unable to find message."));
             }
+        } else {
+            message.reply(`You are not allowed to execute that command`);
         }
     }
 }
