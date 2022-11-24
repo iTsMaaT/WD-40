@@ -7,9 +7,9 @@ const Discord = require('discord.js');
 const fs = require('fs');
 const path = require('node:path')
 global.prefix = '>';
-let SnowflakeID = 0;
-let SexID = 0;
-let SexCount = 0;
+global.SnowflakeID = 0;
+global.SexID = 0;
+global.SexCount = 0;
 global.CmdEnabled = 1;
 
 client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
