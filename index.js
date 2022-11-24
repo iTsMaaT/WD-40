@@ -190,10 +190,12 @@ client.on("messageCreate", (message) => {
 
             fetchFurry().then(embed => {
                 message.author.send({ embeds: [embed] });
-                
+
             }).catch(() => {
                 console.log("unable to dm")
-                message.reply({ embeds: [embed], ephemeral: true });
+                fetchFurry().then(embed => {
+                    message.reply({ embeds: [embed] });
+                })
             });
         }
     }
