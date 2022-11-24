@@ -189,12 +189,11 @@ client.on("messageCreate", (message) => {
         if (message.content.toLowerCase().includes("sex") && message.author.id == USERID.mrnet || message.author.id == USERID.wittigs) {
 
             fetchFurry().then(embed => {
-                try {
-                    message.author.send({ embeds: [embed] });
-                } catch (error) {
-                    console.log("unable to dm")
-                    message.reply({ embeds: [embed], ephemeral: true });
-                }
+                message.author.send({ embeds: [embed] });
+                
+            }).catch(() => {
+                console.log("unable to dm")
+                message.reply({ embeds: [embed], ephemeral: true });
             });
         }
     }
