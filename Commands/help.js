@@ -15,7 +15,6 @@ _Admin Only_
 **Sex <User ID>**: Starts from a random number, then counts everytime the user says sex
 
 _Owner Only_
-
 **activity**: Changes the bot activity status
 **nick**: Changes the bot's username
 **shutdown**: Destroys the client's process
