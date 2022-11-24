@@ -1,6 +1,6 @@
 module.exports={
-    name:"activity",
-    description:"Changes the bot's activity status",
+    name:"nick",
+    description:"Changes the bot's nickname",
     execute(client,message,args) {
         if (args.length != 0) {
             client.user.setUsername(args.join(' '));
