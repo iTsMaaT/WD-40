@@ -5,7 +5,8 @@ const got = require("got");
 dotenv.config();
 const Discord = require('discord.js');
 const fs = require('fs');
-const path = require('node:path')
+const path = require('node:path');
+const USERID = require("./UserIDs.js");
 global.prefix = '>';
 global.SnowflakeID = 0;
 global.SexID = 0;
@@ -96,12 +97,14 @@ client.on(Events.InteractionCreate, async interaction => {
 client.on("messageCreate", (message) => {
     if (message.author.bot) return;
 
-    if (message.content.toLowerCase() == `>disable`) {
+    if (message.content.toLowerCase() == `>disable` && message.author.id == USERID.itsmaat) {
         CmdEnabled = 0;
         message.reply("Responses disabled.");
-    } else if (message.content.toLowerCase() == `>enable`) {
+    } else if (message.content.toLowerCase() == `>enable` && message.author.id == USERID.itsmaat) {
         CmdEnabled = 1;
         message.reply("Responses enabled.");
+    } else if(message.content.toLowerCase() == `>disable` || message.content.toLowerCase() == `>enable` && !message.author.id == USERID.itsmaat) {
+        message.reply(`You are not allowed to execute that command`);
     }
 
     if (message.content.startsWith(prefix)) {
@@ -183,7 +186,7 @@ client.on("messageCreate", (message) => {
             message.reply("https://media.discordapp.net/attachments/774305852323790873/1040424470483046462/8fa.png?width=628&height=670")
         }
 
-        if (message.content.toLowerCase().includes("sex") && message.author.id == 970784142486827008) {
+        if (message.content.toLowerCase().includes("sex") && message.author.id == USERID.mrnet || message.author.id == USERID.wittigs) {
             
                 fetchFurry().then(embed => {
                     try {
@@ -203,6 +206,7 @@ const fetchFurry = async () => {
     const embed = new EmbedBuilder()
     while (!furryImage.startsWith("https://i.redd.it")) {
         let response = await got('https://www.reddit.com/r/FurryPornSubreddit/random/.json');
+        //FurryPornSubreddit
         let content = JSON.parse(response.body);
         let permalink = content[0].data.children[0].data.permalink;
         let furryUrl = `https://reddit.com${permalink}`;
