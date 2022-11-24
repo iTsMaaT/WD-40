@@ -103,7 +103,7 @@ client.on("messageCreate", (message) => {
     } else if (message.content.toLowerCase() == `>enable` && message.author.id == USERID.itsmaat) {
         CmdEnabled = 1;
         message.reply("Responses enabled.");
-    } else if(message.content.toLowerCase() == `>disable` || message.content.toLowerCase() == `>enable` && !message.author.id == USERID.itsmaat) {
+    } else if (message.content.toLowerCase() == `>disable` || message.content.toLowerCase() == `>enable` && !message.author.id == USERID.itsmaat) {
         message.reply(`You are not allowed to execute that command`);
     }
 
@@ -187,15 +187,15 @@ client.on("messageCreate", (message) => {
         }
 
         if (message.content.toLowerCase().includes("sex") && message.author.id == USERID.mrnet || message.author.id == USERID.wittigs) {
-            
-                fetchFurry().then(embed => {
-                    try {
-                        message.author.send({embeds: [embed]});
-                    } catch (error) { 
-                        console.log("unable to dm")
-                        message.reply({ embeds: [embed], ephemeral: true });
-                    }
-                });
+
+            fetchFurry().then(embed => {
+                try {
+                    message.author.send({ embeds: [embed] });
+                } catch (error) {
+                    console.log("unable to dm")
+                    message.reply({ embeds: [embed], ephemeral: true });
+                }
+            });
         }
     }
 })
