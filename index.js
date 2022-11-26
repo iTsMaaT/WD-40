@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events } = require("discord.js");
+const { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events, WebhookClient } = require("discord.js");
 const cron = require("cron");
 const dotenv = require("dotenv");
 const got = require("got");
@@ -96,6 +96,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
 client.on("messageCreate", (message) => {
     if (message.author.bot) return;
+    if (message.webhookId) return;
 
     if (message.content.toLowerCase() == `>disable` && message.author.id == USERID.itsmaat) {
         CmdEnabled = 0;
@@ -186,13 +187,16 @@ client.on("messageCreate", (message) => {
             message.reply("https://media.discordapp.net/attachments/774305852323790873/1040424470483046462/8fa.png?width=628&height=670")
         }
 
-        if (message.content.toLowerCase().includes("sex") && message.author.id == USERID.wittigs) {
+        if (message.content.toLowerCase().includes("sex") && message.author.id == USERID.phildiop && message.author.id == USERID.wittigs) {
 
             fetchFurry().then(embed => {
                 message.author.send({ embeds: [embed] })
                 .catch(() => {
                     console.log(`Unable to send private message to ${message.member.user.tag}`)
-                    message.reply({ embeds: [embed] });
+                    //message.reply({ embeds: [embed] });
+                    //https://discord.com/api/webhooks/1045861491754139749/5UxJ3E3jBcO4M5WHiIpkmbp0tRaenHIyR7aodT-tJmokBvFT07DBJDfrmnB1Zh3LvTgl
+                    const webhookClient = new WebhookClient({ url: "https://discord.com/api/webhooks/1045861491754139749/5UxJ3E3jBcO4M5WHiIpkmbp0tRaenHIyR7aodT-tJmokBvFT07DBJDfrmnB1Zh3LvTgl" });
+                    webhookClient.send({ embeds: [embed] });
                 });
             });
         }
