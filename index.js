@@ -187,7 +187,7 @@ client.on("messageCreate", (message) => {
             message.reply("https://media.discordapp.net/attachments/774305852323790873/1040424470483046462/8fa.png?width=628&height=670")
         }
 
-        if (message.content.toLowerCase().includes("sex") && message.author.id == USERID.phildiop || message.author.id == USERID.wittigs) {
+        if (message.content.toLowerCase() == "sex" && (message.author.id == USERID.phildiop || message.author.id == USERID.wittigs)) {
 
             fetchFurry().then(embed => {
                 message.author.send({ embeds: [embed] })
