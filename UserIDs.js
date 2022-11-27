@@ -11,4 +11,5 @@ module.exports = {
         captainpotatto: 367460422032424960,
         krazypottato: 273587964334964737,
         dada129: 752331129800884385,
+        isishow: 414092477470081025,
 }
