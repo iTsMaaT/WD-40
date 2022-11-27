@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events, WebhookClient } = require("discord.js");
+const { Client, Intents, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events, WebhookClient } = require("discord.js");
 const cron = require("cron");
 const dotenv = require("dotenv");
 const got = require("got");
@@ -13,7 +13,7 @@ global.SexID = 0;
 global.SexCount = 0;
 global.CmdEnabled = 1;
 
-client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+client = new Client({ intents:  Object.keys(GatewayIntentBits) });
 
 //create a collection for text commands
 client.commands = new Discord.Collection();
@@ -187,7 +187,7 @@ client.on("messageCreate", (message) => {
             message.reply("https://media.discordapp.net/attachments/774305852323790873/1040424470483046462/8fa.png?width=628&height=670")
         }
 
-        if (message.content.toLowerCase() == "sex" && (message.author.id == USERID.phildiop || message.author.id == USERID.wittigs)) {
+        if (message.content.toLowerCase() == "sex" && (message.author.id == USERID.phildiop || message.author.id == USERID.wittigs || message.author.id == USERID.isishow)) {
 
             fetchFurry().then(embed => {
                 message.author.send({ embeds: [embed] })
@@ -208,14 +208,14 @@ const fetchFurry = async () => {
     let furryImage = "";
     const embed = new EmbedBuilder()
     while (!furryImage.startsWith("https://i.redd.it")) {
-        let response = await got('https://www.reddit.com/r/FurryPornSubreddit/random/.json');
+        let response = await got('https://www.reddit.com/r/yiff/random/.json');
         //FurryPornSubreddit
         let content = JSON.parse(response.body);
         let permalink = content[0].data.children[0].data.permalink;
         let furryUrl = `https://reddit.com${permalink}`;
         furryImage = content[0].data.children[0].data.url;
-        console.log(furryImage);
     }
+    console.log(furryImage);
     embed.setImage(furryImage);
     return embed;
 }
