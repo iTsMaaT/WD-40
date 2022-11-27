@@ -6,7 +6,9 @@ module.exports = {
 		.setName('ping')
 		.setDescription('Shows bot latency'),
 	async execute(interaction, client) {
-        await interaction.deferReply()
+        await interaction.deferReply();
+		const guild = await client.guilds.fetch(interaction.guildId);
+		const target = await guild.members.fetch("1036485458827415633");
 		const sent = await interaction.editReply({ content: 'Pinging...', fetchReply: true });
     
         interaction.editReply(`
@@ -14,6 +16,8 @@ module.exports = {
 My ping is \`${client.ws.ping}ms\`
 Uptime : \`${prettyMilliseconds(client.uptime)}\`
 Round trip latency : \`${sent.createdTimestamp - interaction.createdTimestamp}ms\`
+Bot's age : <t:${parseInt(target.user.createdTimestamp / 1000)}:R>
+
             `);
 	},
 };
