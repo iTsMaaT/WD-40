@@ -2,7 +2,7 @@ module.exports = {
     name: "help",
     description: "lists commands",
     execute(client, message, args) {
-        message.channel.send(`
+        message.reply({ content: `
 **help**: This page
 **ping / ping <amnt> <time>**: Tells the ping of the bot, and can do multiple times with a delay inbetween
 **prefix <new prefix>**: Changes the bot's prefix
@@ -19,6 +19,6 @@ _Owner Only_
 **shutdown**: Destroys the client's process
 
 
-        `);
+        `, allowedMentions: { repliedUser: false } });
     }
 }

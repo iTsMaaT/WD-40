@@ -13,7 +13,7 @@ module.exports = {
                 const custom_status = status.activities[0]?.state ?? "`No status`"
                 const activity_name = status.activities[1]?.name ?? "`No activity name`"
                 const activity_details = status.activities[1]?.details ?? "`No activity details`"
-                message.reply(`
+                message.reply({ content: `
 **User Informations For**: \`${message.member.user.tag}\`
             
 **User ID**: ${target.user.id}
@@ -25,7 +25,7 @@ module.exports = {
 
 
 
-            `);
+            `, allowedMentions: { repliedUser: false } });
                 /***Roles**:
                 ${target.roles.cache.map(r => r).join(" ")}*/
             } catch (err) {
