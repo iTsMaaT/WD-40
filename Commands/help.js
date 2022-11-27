@@ -8,12 +8,13 @@ module.exports = {
 **prefix <new prefix>**: Changes the bot's prefix
 **suggestion**: Give a suggestion for the bot
 **reddit <subreddit>**: Sends an image or valid gif
+**userinfo <User>**: Gives info about a user's account
 
-_Admin Only_
+__Admin Only__
 **snowflake <User ID>**: Reacts :snowflake: to any message of a user
 **Sex <User ID>**: Starts from a random number, then counts everytime the user says sex
 
-_Owner Only_
+__Owner Only__
 **activity**: Changes the bot activity status
 **nick**: Changes the bot's username
 **shutdown**: Destroys the client's process
