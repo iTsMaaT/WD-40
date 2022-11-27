@@ -4,10 +4,10 @@ module.exports = {
     execute(client, message, args) {
         if (message.member.permissions.has("Administrator")) {
             if (args.length == 1) {
-                const rawid1 = args[0].replace("@", "")
-                const rawdid2 = rawid1.replace("<", "")
-                SnowflakeID = rawdid2.replace(">", "")
-                message.reply({ content: `\<\@${SnowflakeID}\> is a snowflake`, allowedMentions: { repliedUser: false } })
+                const rawid1 = args[0].replace("@", "");
+                const rawdid2 = rawid1.replace("<", "");
+                SnowflakeID = rawdid2.replace(">", "");
+                message.reply({ content: `\<\@${SnowflakeID}\> is a snowflake`, allowedMentions: { repliedUser: false } });
             }
             else {
                 SnowflakeID = 0;

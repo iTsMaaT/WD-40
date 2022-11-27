@@ -15,7 +15,7 @@ module.exports = {
             for (let i = 0; i < args[0]; i++) {
                 setTimeout(function () {
                     message.channel.send(`Ping : \`${client.ws.ping}ms\``);
-                }, 1000 * i)
+                }, 1000 * i);
             }
         }
         else if (args.length == 0) {

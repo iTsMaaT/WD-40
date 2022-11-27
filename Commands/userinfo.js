@@ -4,15 +4,15 @@ module.exports = {
     name: "userinfo",
     description: "Gives info of a user",
     execute: async (client, message, args) => {
-        const guild = await client.guilds.fetch(message.guildId)
+        const guild = await client.guilds.fetch(message.guildId);
         if (!args[0]) {
             try {
-                const id = message.author.id
-                const target = await guild.members.fetch(id)
-                const status = await guild.presences.resolve(id)
-                const custom_status = status.activities[0]?.state ?? "`No status`"
-                const activity_name = status.activities[1]?.name ?? "`No activity name`"
-                const activity_details = status.activities[1]?.details ?? "`No activity details`"
+                const id = message.author.id;
+                const target = await guild.members.fetch(id);
+                const status = await guild.presences.resolve(id);
+                const custom_status = status.activities[0]?.state ?? "`No status`";
+                const activity_name = status.activities[1]?.name ?? "`No activity name`";
+                const activity_details = status.activities[1]?.details ?? "`No activity details`";
                 message.reply({ content: `
 **User Informations For**: \`${message.member.user.tag}\`
             
@@ -29,18 +29,18 @@ module.exports = {
                 /***Roles**:
                 ${target.roles.cache.map(r => r).join(" ")}*/
             } catch (err) {
-                message.reply(`Invalid user / id, User offline or an error occurred\n${err}`)
+                message.reply(`Invalid user / id, User offline or an error occurred\n${err}`);
             }
         } else if (args.length == 1) {
             try {
-                const rawid1 = args[0].replace("@", "")
-                const rawdid2 = rawid1.replace("<", "")
-                const id = rawdid2.replace(">", "")
-                const target = await guild.members.fetch(id)
-                const status = await guild.presences.resolve(id)
-                const custom_status = status.activities[0]?.state ?? "`No status`"
-                const activity_name = status.activities[1]?.name ?? "`No activity name`"
-                const activity_details = status.activities[1]?.details ?? "`No activity details`"
+                const rawid1 = args[0].replace("@", "");
+                const rawdid2 = rawid1.replace("<", "");
+                const id = rawdid2.replace(">", "");
+                const target = await guild.members.fetch(id);
+                const status = await guild.presences.resolve(id);
+                const custom_status = status.activities[0]?.state ?? "`No status`";
+                const activity_name = status.activities[1]?.name ?? "`No activity name`";
+                const activity_details = status.activities[1]?.details ?? "`No activity details`";
                 message.reply({content: `
 **User Informations For**: \`${target.user.tag}\`
                 
@@ -57,7 +57,7 @@ module.exports = {
                 /***Roles**:
                 ${target.roles.cache.map(r => r).join(" ")}*/
             } catch (err) {
-                message.reply(`Invalid user / id, User offline or an error occurred\n${err}`)
+                message.reply(`Invalid user / id, User offline or an error occurred\n${err}`);
             }
         }
     }
