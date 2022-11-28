@@ -11,13 +11,13 @@ module.exports = {
                 const target = await guild.members.fetch(id);
                 const status = await guild.presences.resolve(id);
                 try {
-                    global.custom_status = status.activities[0]?.state ?? "`No status`";
-                    global.activity_name = status.activities[1]?.name ?? "`No activity name`";
-                    global.activity_details = status.activities[1]?.details ?? "`No activity details`";
+                    var custom_status = status.activities[0]?.state ?? "`No status`";
+                    var activity_name = status.activities[1]?.name ?? "`No activity name`";
+                    var activity_details = status.activities[1]?.details ?? "`No activity details`";
                 } catch {
-                    global.custom_status = "`No status`";
-                    global.activity_name = "`No activity name`";
-                    global.activity_details = "`No activity details`";
+                    var custom_status = "`No status`";
+                    var activity_name = "`No activity name`";
+                    var activity_details = "`No activity details`";
                 }
                 message.reply({
                     content: `
@@ -47,13 +47,13 @@ module.exports = {
                 const target = await guild.members.fetch(id);
                 const status = await guild.presences.resolve(id);
                 try {
-                    global.custom_status = status.activities[0]?.state ?? "`No status`";
-                    global.activity_name = status.activities[1]?.name ?? "`No activity name`";
-                    global.activity_details = status.activities[1]?.details ?? "`No activity details`";
+                    var custom_status = status.activities[0]?.state ?? "`No status`";
+                    var activity_name = status.activities[1]?.name ?? "`No activity name`";
+                    var activity_details = status.activities[1]?.details ?? "`No activity details`";
                 } catch {
-                    global.custom_status = "`No status`";
-                    global.activity_name = "`No activity name`";
-                    global.activity_details = "`No activity details`";
+                    var custom_status = "`No status`";
+                    var activity_name = "`No activity name`";
+                    var activity_details = "`No activity details`";
                 }
                 message.reply({
                     content: `
