@@ -210,6 +210,7 @@ const fetchFurry = async () => {
     while (!furryImage.startsWith("https://i.redd.it")) {
         let response = await got('https://www.reddit.com/r/yiff/random/.json');
         //FurryPornSubreddit
+        //rule34.xxx/index.php?page=post&s=random
         let content = JSON.parse(response.body);
         let permalink = content[0].data.children[0].data.permalink;
         let furryUrl = `https://reddit.com${permalink}`;
