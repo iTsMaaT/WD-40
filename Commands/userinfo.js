@@ -10,10 +10,17 @@ module.exports = {
                 const id = message.author.id;
                 const target = await guild.members.fetch(id);
                 const status = await guild.presences.resolve(id);
-                const custom_status = status.activities[0]?.state ?? "`No status`";
-                const activity_name = status.activities[1]?.name ?? "`No activity name`";
-                const activity_details = status.activities[1]?.details ?? "`No activity details`";
-                message.reply({ content: `
+                try {
+                    global.custom_status = status.activities[0]?.state ?? "`No status`";
+                    global.activity_name = status.activities[1]?.name ?? "`No activity name`";
+                    global.activity_details = status.activities[1]?.details ?? "`No activity details`";
+                } catch {
+                    global.custom_status = "`No status`";
+                    global.activity_name = "`No activity name`";
+                    global.activity_details = "`No activity details`";
+                }
+                message.reply({
+                    content: `
 **User Informations For**: \`${message.member.user.tag}\`
             
 **User ID**: ${target.user.id}
@@ -25,7 +32,8 @@ module.exports = {
 
 
 
-            `, allowedMentions: { repliedUser: false } });
+            `, allowedMentions: { repliedUser: false }
+                });
                 /***Roles**:
                 ${target.roles.cache.map(r => r).join(" ")}*/
             } catch (err) {
@@ -38,10 +46,17 @@ module.exports = {
                 const id = rawdid2.replace(">", "");
                 const target = await guild.members.fetch(id);
                 const status = await guild.presences.resolve(id);
-                const custom_status = status.activities[0]?.state ?? "`No status`";
-                const activity_name = status.activities[1]?.name ?? "`No activity name`";
-                const activity_details = status.activities[1]?.details ?? "`No activity details`";
-                message.reply({content: `
+                try {
+                    global.custom_status = status.activities[0]?.state ?? "`No status`";
+                    global.activity_name = status.activities[1]?.name ?? "`No activity name`";
+                    global.activity_details = status.activities[1]?.details ?? "`No activity details`";
+                } catch {
+                    global.custom_status = "`No status`";
+                    global.activity_name = "`No activity name`";
+                    global.activity_details = "`No activity details`";
+                }
+                message.reply({
+                    content: `
 **User Informations For**: \`${target.user.tag}\`
                 
 **User ID**: ${target.user.id}
@@ -53,7 +68,8 @@ module.exports = {
     
     
     
-                `, allowedMentions: { repliedUser: false } } );
+                `, allowedMentions: { repliedUser: false }
+                });
                 /***Roles**:
                 ${target.roles.cache.map(r => r).join(" ")}*/
             } catch (err) {
