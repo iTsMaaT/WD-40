@@ -26,7 +26,7 @@ module.exports = {
                             return;
                         }
                     } catch (err) {
-                        message.reply("Non-existent Subreddit, " + err);
+                        message.reply(`Non-existent Subreddit\n\`${err}\``);
                         return;
                     }
                 }

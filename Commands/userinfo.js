@@ -57,7 +57,7 @@ module.exports = {
                 /***Roles**:
                 ${target.roles.cache.map(r => r).join(" ")}*/
             } catch (err) {
-                message.reply(`Invalid user / id, User offline or an error occurred\n${err}`);
+                message.reply(`Invalid user / id, User offline or an error occurred\n\`${err}\``);
             }
         }
     }
