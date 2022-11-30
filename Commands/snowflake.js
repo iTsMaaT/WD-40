@@ -6,11 +6,13 @@ module.exports = {
             if (args.length == 1) {
                 const rawid1 = args[0].replace("@", "");
                 const rawdid2 = rawid1.replace("<", "");
-                SnowflakeID = rawdid2.replace(">", "");
-                message.reply({ content: `\<\@${SnowflakeID}\> is a snowflake`, allowedMentions: { repliedUser: false } });
+                SnowflakeID.push(rawdid2.replace(">", ""));
+
+                message.reply({ content: `\<\@${args[0]}\> is a snowflake`, allowedMentions: { repliedUser: false } });
+                console.log(SnowflakeID)
             }
             else {
-                SnowflakeID = 0;
+                SnowflakeID = [0];
                 message.channel.send(`Snowflake has been reset`);
             }
         }

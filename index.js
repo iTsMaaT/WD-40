@@ -8,12 +8,12 @@ const fs = require('fs');
 const path = require('node:path');
 const USERID = require("./UserIDs.js");
 global.prefix = '>';
-global.SnowflakeID = 0;
+global.SnowflakeID = [];
 global.SexID = 0;
 global.SexCount = 0;
 global.CmdEnabled = 1;
 
-client = new Client({ intents:  Object.keys(GatewayIntentBits) });
+client = new Client({ intents: Object.keys(GatewayIntentBits) });
 
 //create a collection for text commands
 client.commands = new Discord.Collection();
@@ -159,7 +159,7 @@ client.on("messageCreate", (message) => {
         }
 
         //Snowflake reaction
-        if (SnowflakeID != 0 && message.author.id == SnowflakeID) {
+        if (SnowflakeID != 0 && SnowflakeID.some(element => message.author.id.includes(element))) {
             message.react('❄️');
         }
 
@@ -187,19 +187,29 @@ client.on("messageCreate", (message) => {
             message.reply("https://media.discordapp.net/attachments/774305852323790873/1040424470483046462/8fa.png?width=628&height=670")
         }
 
-        if (message.content.toLowerCase() == "sex" && (message.author.id == USERID.phildiop || message.author.id == USERID.wittigs || message.author.id == USERID.isishow)) {
+
+        
+        if (message.attachments.size > 0 || message.content.startsWith("https://") || message.content.startsWith("http://")) {
+            if(message.channel.name === 'memes') {
+                message.react('👍')
+                .then(() => message.react('👎'))
+                .then(() => message.react('♻️'));
+            }
+        }
+
+        /*if (message.content.toLowerCase() == "sex") {
 
             fetchFurry().then(embed => {
                 message.author.send({ embeds: [embed] })
                 .catch(() => {
                     console.log(`Unable to send private message to ${message.member.user.tag}`)
-                    //message.reply({ embeds: [embed] });
+                    message.reply({ embeds: [embed] });
                     //https://discord.com/api/webhooks/1045861491754139749/5UxJ3E3jBcO4M5WHiIpkmbp0tRaenHIyR7aodT-tJmokBvFT07DBJDfrmnB1Zh3LvTgl
                     const webhookClient = new WebhookClient({ url: "https://discord.com/api/webhooks/1045861491754139749/5UxJ3E3jBcO4M5WHiIpkmbp0tRaenHIyR7aodT-tJmokBvFT07DBJDfrmnB1Zh3LvTgl" });
-                    webhookClient.send({ embeds: [embed] });
-                });
+                    webhookClient.send({ embeds: [embed] }); 
+               });
             });
-        }
+        }*/
     }
 })
 client.login(process.env.TOKEN);
