@@ -35,7 +35,7 @@ module.exports = {
                 RuleImage = content[0].data.children[0].data.url;
             }
             message.reply({
-                content: `||<${RulePostUrl}>||`,
+                content: `NSFW Ahead: ||<${RulePostUrl}>||`,
                 files: [{
                     attachment: RuleImage,
                     name: `SPOILER_FILE.jpg`
@@ -52,7 +52,7 @@ module.exports = {
                     RuleImage = content[0].data.children[0].data.url;
                 }
                 message.reply({
-                    content: `||<${RulePostUrl}>||`,
+                    content: `NSFW Ahead: ||<${RulePostUrl}>||`,
                     files: [{
                         attachment: RuleImage,
                         name: `SPOILER_FILE.jpg`
