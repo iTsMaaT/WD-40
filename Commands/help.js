@@ -9,6 +9,7 @@ module.exports = {
 **suggestion**: Give a suggestion for the bot
 **reddit <subreddit>**: Sends an image or valid gif
 **userinfo <User>**: Gives info about a user's account
+**rule34**: You know what this is
 
 __Admin Only__
 **snowflake <User ID>**: Reacts :snowflake: to any message of a user
@@ -18,6 +19,20 @@ __Owner Only__
 **activity**: Changes the bot activity status
 **nick**: Changes the bot's username
 **shutdown**: Destroys the client's process
+
+- - - - - - - - - - - - - - - - - 
+
+__Auto Responses (Spoiler ahead)__
+||What/What?/Who/Who? => ever!
+ever => What?
+en pause => Ta mere
+\`@everyone\`/\`@here\` (But no mention perms) => Ping fail L
+bruh => bruh
+stuff => \\<Stuff meme image\\>
+
+Reactions
+Smartass/edging/gros gaming => s t f u
+\`@iTsMaaT\` => Gorilla||
 
 
         `, allowedMentions: { repliedUser: false } });
