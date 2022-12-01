@@ -56,7 +56,7 @@ client.on("ready", () => {
 
     console.log("Bot starting...");
 
-    client.user.setActivity(`Time to be annoying!`);
+    client.user.setActivity(`>help | Time to be annoying!`);
 
     //Allah everyday at 2:22
     let scheduledMessage = new cron.CronJob('11 11 11 * * *', () => {
@@ -74,6 +74,14 @@ client.on("ready", () => {
 
 
 })
+
+/*client.on('guildMemberAdd', () => {
+    console.log(`${member.id} (${member.user.tag}) joined ${guild.name}`)
+})
+
+client.on('guildMemberLeave', () => {
+    console.log(`${member.id} (${member.user.tag}) left ${guild.name}`)
+})*/
 
 client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return;
@@ -187,8 +195,10 @@ client.on("messageCreate", (message) => {
             message.reply("https://media.discordapp.net/attachments/774305852323790873/1040424470483046462/8fa.png?width=628&height=670")
         }
 
+        if (message.content.toLowerCase() == "sus" || message.content.toLowerCase() == "amogus" || message.content.toLowerCase() == "among us" ) {
+            message.reply("Stfu gab.");
+        }
 
-        
         if (message.attachments.size > 0 || message.content.startsWith("https://") || message.content.startsWith("http://")) {
             if(message.channel.name === 'memes') {
                 message.react('👍')
