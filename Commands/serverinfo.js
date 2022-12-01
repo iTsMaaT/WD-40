@@ -3,12 +3,12 @@ module.exports = {
     description: "Gives info of a user",
     execute: async(client, message, args) => {
         const owner = await message.guild.fetchOwner();
-        message.reply({
+        const rep = message.reply({
             content: `
 __General__
 **Server name**: \`${message.guild.name}\`
     
-**Created at**: <t:${parseInt(message.guild.createdTimestamp / 1000)}:R>
+**Created**: <t:${parseInt(message.guild.createdTimestamp / 1000)}:R>
 **Owner**: ${owner}
 **Server description**: ${message.guild.description}
 
@@ -17,8 +17,17 @@ __Users__
 **Bot count**: ${message.guild.members.cache.filter((m) => m.user.bot).size}
 **Total**: ${message.guild.members.cache.filter((m) => m.user).size}
 
-    `, allowedMentions: { repliedUser: false }
+${ message.guild.members.cache.filter((m) => m.user).size == 42 ? "This is the answer to life!" : ""}    
+`, allowedMentions: { repliedUser: false }
         })
+        if (message.guild.members.cache.filter((m) => m.user).size == 69) {
+            rep.then(m => {
+                m.react('🇳')
+                .then(() => m.react('🇮'))
+                .then(() => m.react('🇨'))
+                .then(() => m.react('🇪'));
+            });
+        }
         
     }
 }
