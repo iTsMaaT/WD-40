@@ -12,7 +12,7 @@ module.exports = {
                 console.log(SnowflakeID)
             }
             else {
-                SnowflakeID = [0];
+                SnowflakeID = [];
                 message.channel.send(`Snowflake has been reset`);
             }
         }
