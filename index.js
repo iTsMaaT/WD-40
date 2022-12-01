@@ -70,18 +70,18 @@ client.on("ready", () => {
     setTimeout(function () {
         client.channels.cache.get("1037141235451842701").send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
         console.log("Bot started successfully.");
-    }, 1000 * 1)
+    }, 1000 * 0.1)
 
 
 })
 
-/*client.on('guildMemberAdd', () => {
-    console.log(`${member.id} (${member.user.tag}) joined ${guild.name}`)
+client.on('guildMemberAdd', member => {
+    console.log(`${member.user.tag} (${member.id}) joined ${member.guild.name}`)
 })
 
-client.on('guildMemberLeave', () => {
-    console.log(`${member.id} (${member.user.tag}) left ${guild.name}`)
-})*/
+client.on('guildMemberRemove', member => {
+    console.log(`${member.user.tag} (${member.id}) left ${member.guild.name}`)
+})
 
 client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return;
@@ -104,7 +104,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
 client.on("messageCreate", (message) => {
     if (message.author.bot) return;
-    if (message.webhookId) return;
+    //if (message.webhookId) return;
 
     if (message.content.toLowerCase() == `>disable` && message.author.id == USERID.itsmaat) {
         CmdEnabled = 0;
