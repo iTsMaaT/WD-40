@@ -77,12 +77,12 @@ client.on("ready", () => {
 
 client.on('guildMemberAdd', member => {
     console.log(`${member.user.tag} (${member.id}) joined ${member.guild.name}`)
-    client.channels.cache.get("1048076076653486090").send(`${member.user.tag} (${member.id}) joined ${member.guild.name}`);
+    client.channels.cache.get("1048076076653486090").send(`${member.user.tag} (<@${member.id}>) joined ${member.guild.name}`);
 })
 
 client.on('guildMemberRemove', member => {
     console.log(`${member.user.tag} (${member.id}) left ${member.guild.name}`)
-    client.channels.cache.get("1048076076653486090").send(`${member.user.tag} (${member.id}) joined ${member.guild.name}`);
+    client.channels.cache.get("1048076076653486090").send(`${member.user.tag} (<@${member.id}>) joined ${member.guild.name}`);
 })
 
 client.on(Events.InteractionCreate, async interaction => {
