@@ -21,6 +21,7 @@
     "discord.js": "^14.6.0",
     "dotenv": "^16.0.3",
     "got": "^11.8.3",
+    "minecraft-server-util": "^5.3.1",
     "pretty-ms": "^7.0.1"
   }
 }
