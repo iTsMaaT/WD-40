@@ -202,7 +202,7 @@ client.on("messageCreate", (message) => {
         }
 
         if (message.attachments.size > 0 || message.content.startsWith("https://") || message.content.startsWith("http://")) {
-            if(message.channel.name === 'memes') {
+            if(message.channel.name.includes('meme')) {
                 message.react('👍')
                 .then(() => message.react('👎'))
                 .then(() => message.react('♻️'));
