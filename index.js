@@ -178,6 +178,11 @@ client.on("messageCreate", (message) => {
             message.react('🦍')
         }
 
+        //reacts :chipmunk: when pinging phildiop
+        if (message.content.includes("<@348281625173295114>")) {
+            message.react('🐿️')
+        }
+
         //answers your mom when asking who's at break
         if (message.content.toLowerCase().includes("en pause")) {
             message.channel.send("Ta mère")
@@ -197,15 +202,15 @@ client.on("messageCreate", (message) => {
             message.reply("https://media.discordapp.net/attachments/774305852323790873/1040424470483046462/8fa.png?width=628&height=670")
         }
 
-        if (message.content.toLowerCase() == "sus" || message.content.toLowerCase() == "amogus" || message.content.toLowerCase() == "among us" ) {
+        if (message.content.toLowerCase() == "sus" || message.content.toLowerCase() == "amogus" || message.content.toLowerCase() == "among us") {
             message.reply("No.");
         }
 
         if (message.attachments.size > 0 || message.content.startsWith("https://") || message.content.startsWith("http://")) {
-            if(message.channel.name.includes('meme')) {
+            if (message.channel.name.includes('meme')) {
                 message.react('👍')
-                .then(() => message.react('👎'))
-                .then(() => message.react('♻️'));
+                    .then(() => message.react('👎'))
+                    .then(() => message.react('♻️'));
             }
         }
 
