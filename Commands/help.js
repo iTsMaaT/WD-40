@@ -11,6 +11,7 @@ module.exports = {
 **userinfo <User>**: Gives info about a user's account
 **rule34**: You know what this is
 **reddit <subreddit>**: Sends an image or valid gif from the desired subreddit
+**mcping <server_ip> <(optional) server_port>**: Pings a minecraft server (Port 25565 when no port is specified)
 
 __Admin Only__
 **snowflake <User ID>**: Reacts :snowflake: to any message of a user
