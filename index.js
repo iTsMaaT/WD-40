@@ -203,7 +203,7 @@ client.on("messageCreate", (message) => {
         }
 
         if (message.content.toLowerCase() == "sus" || message.content.toLowerCase() == "amogus" || message.content.toLowerCase() == "among us") {
-            message.reply("No.");
+            //message.reply("No.");
         }
 
         if (message.attachments.size > 0 || message.content.startsWith("https://") || message.content.startsWith("http://")) {
