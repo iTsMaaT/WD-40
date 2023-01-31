@@ -1,7 +1,7 @@
 module.exports = {
     name: "help",
     description: "lists commands",
-    execute(client, message, args) {
+    execute(logger, client, message, args) {
         message.reply({ content: `
 **help**: This page
 **ping / ping <amnt> <time>**: Tells the ping of the bot, and can do multiple times with a delay inbetween

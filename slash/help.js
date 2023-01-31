@@ -3,7 +3,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('help')
         .setDescription('Shows commands'),
-    async execute(interaction, client) {
+    async execute(logger, interaction, client) {
 
         interaction.reply(`
 

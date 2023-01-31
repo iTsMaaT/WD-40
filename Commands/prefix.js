@@ -1,11 +1,11 @@
 module.exports = {
     name: "prefix",
     description: "changes the prefix to do commands",
-    execute(client, message, args) {
+    execute(logger, client, message, args) {
         if (args.length == 1) {
             prefix = args[0];
             message.reply({ content: `The new prefix is \`${args[0]}\``, allowedMentions: { repliedUser: false } });
-            console.log(`Prefix changed to ${args[0]}`);
+            logger.info(`Prefix changed to ${args[0]}`);
         }
         else if (args.length == 0) {
             message.reply(`You didn't enter a prefix, dumbass`);

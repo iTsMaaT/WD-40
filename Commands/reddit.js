@@ -4,7 +4,7 @@ const got = require("got");
 module.exports = {
     name: "reddit",
     desciption: "Finds an image or post from any subreddit",
-    execute: async (client, message, args) => {
+    execute: async (logger, client, message, args) => {
         if (args.length == 1) {
             if (args[0] != "eyeblech" && args[0] != "gore" && args[0] != "guro") {
                 let RedditImage = "";
@@ -29,7 +29,7 @@ module.exports = {
                             embed.setURL(`${RedditURL}`);
                             sent.edit({content: `Attempt ${RedditTries}/10`, fetchreply: true})
                             sent.edit({ embeds: [embed], allowedMentions: { repliedUser: false } });
-                            console.log(RedditImage);
+                            logger.info(RedditImage);
                             return;
                         }
                     } catch (err) {

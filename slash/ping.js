@@ -5,7 +5,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ping')
 		.setDescription('Shows bot latency'),
-	async execute(interaction, client) {
+	async execute(logger, interaction, client) {
         await interaction.deferReply();
 		const guild = await client.guilds.fetch(interaction.guildId);
 		const target = await guild.members.fetch("1036485458827415633");

@@ -1,4 +1,5 @@
 const { Client, Intents, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events, WebhookClient } = require("discord.js");
+const Logger = require("./utils/log");
 const cron = require("cron");
 const dotenv = require("dotenv");
 const got = require("got");
@@ -14,6 +15,7 @@ global.SexCount = 0;
 global.CmdEnabled = 1;
 
 client = new Client({ intents: Object.keys(GatewayIntentBits) });
+const logger = new Logger({root: __dirname});
 
 //create a collection for text commands
 client.commands = new Discord.Collection();
@@ -30,7 +32,7 @@ for (const file of slashcommandFiles) {
     if ('data' in slashcommand && 'execute' in slashcommand) {
         client.slashcommands.set(slashcommand.data.name, slashcommand);
     } else {
-        console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+       logger.warning(`The command at ${filePath} is missing a required "data" or "execute" property.`);
     }
 }
 
@@ -54,7 +56,7 @@ module.exports = {
 
 client.on("ready", () => {
 
-    console.log("Bot starting...");
+    logger.info("Bot starting...");
 
     client.user.setActivity(`>help | Time to be annoying!`);
 
@@ -69,19 +71,19 @@ client.on("ready", () => {
     //start confirmation
     setTimeout(function () {
         client.channels.cache.get("1037141235451842701").send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
-        console.log("Bot started successfully.");
+        logger.info("Bot started successfully.");
     }, 1000 * 0.1)
 
 
 })
 
 client.on('guildMemberAdd', member => {
-    console.log(`${member.user.tag} (${member.id}) joined ${member.guild.name}`)
+    logger.info(`${member.user.tag} (${member.id}) joined ${member.guild.name}`)
     client.channels.cache.get("1048076076653486090").send(`${member.user.tag} (<@${member.id}>) joined ${member.guild.name}`);
 })
 
 client.on('guildMemberRemove', member => {
-    console.log(`${member.user.tag} (${member.id}) left ${member.guild.name}`)
+    logger.info(`${member.user.tag} (${member.id}) left ${member.guild.name}`)
     client.channels.cache.get("1048076076653486090").send(`${member.user.tag} (<@${member.id}>) left ${member.guild.name}`);
 })
 
@@ -97,7 +99,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
     try {
         //execute the slash command
-        await slash.execute(interaction, client);
+        await slash.execute(logger, interaction, client);
     } catch (error) {
         console.error(`Error executing ${interaction.commandName}`);
         console.error(error);
@@ -128,7 +130,7 @@ client.on("messageCreate", (message) => {
             return;
         }
 
-        client.commands.get(command).execute(client, message, args)
+        client.commands.get(command).execute(logger, client, message, args)
 
     }
 
@@ -219,7 +221,7 @@ client.on("messageCreate", (message) => {
             fetchFurry().then(embed => {
                 message.author.send({ embeds: [embed] })
                 .catch(() => {
-                    console.log(`Unable to send private message to ${message.member.user.tag}`)
+                    logger.error(`Unable to send private message to ${message.member.user.tag}`)
                     message.reply({ embeds: [embed] });
                     //https://discord.com/api/webhooks/1045861491754139749/5UxJ3E3jBcO4M5WHiIpkmbp0tRaenHIyR7aodT-tJmokBvFT07DBJDfrmnB1Zh3LvTgl
                     const webhookClient = new WebhookClient({ url: "https://discord.com/api/webhooks/1045861491754139749/5UxJ3E3jBcO4M5WHiIpkmbp0tRaenHIyR7aodT-tJmokBvFT07DBJDfrmnB1Zh3LvTgl" });
@@ -243,7 +245,7 @@ const fetchFurry = async () => {
         let furryUrl = `https://reddit.com${permalink}`;
         furryImage = content[0].data.children[0].data.url;
     }
-    console.log(furryImage);
+    logger.info(furryImage);
     embed.setImage(furryImage);
     return embed;
 }

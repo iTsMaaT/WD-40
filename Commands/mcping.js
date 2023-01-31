@@ -7,7 +7,7 @@ const options = {
 module.exports = {
     name: 'mcping',
     description: 'Ping a minecraft server',
-    execute(client, message, args) {
+    execute(logger, client, message, args) {
         const server_ip = args[0]
         const server_port_string = args[1] ?? "25565"
         const server_port = parseInt(server_port_string)
@@ -30,7 +30,7 @@ __Server status for ${server_ip} (Port : ${server_port})__
 **Latency:** ${string.roundTripLatency}ms
     `)
         }).catch((error) => {
-            console.log(error);// if the server was unable to be pinged or something else happened
+            logger.error(error);// if the server was unable to be pinged or something else happened
             message.channel.send(`
 __There was an error preforming your command__
 The server was unable to be pinged or you mis-typed the info

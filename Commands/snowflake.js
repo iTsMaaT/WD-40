@@ -1,7 +1,7 @@
 module.exports = {
     name: "snowflake",
     description: "Reacts :snowflake: to every message of a user, no args to reset",
-    execute(client, message, args) {
+    execute(logger, client, message, args) {
         if (message.member.permissions.has("Administrator")) {
             if (args.length == 1) {
                 const rawid1 = args[0].replace("@", "");
@@ -9,7 +9,7 @@ module.exports = {
                 SnowflakeID.push(rawdid2.replace(">", ""));
 
                 message.reply({ content: `\<\@${args[0]}\> is a snowflake`, allowedMentions: { repliedUser: false } });
-                console.log(SnowflakeID)
+                logger.info(SnowflakeID)
             }
             else {
                 SnowflakeID = [];
