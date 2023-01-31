@@ -15,7 +15,7 @@ global.SexCount = 0;
 global.CmdEnabled = 1;
 
 client = new Client({ intents: Object.keys(GatewayIntentBits) });
-const logger = new Logger({root: __dirname});
+const logger = new Logger({root: __dirname, client});
 
 //create a collection for text commands
 client.commands = new Discord.Collection();

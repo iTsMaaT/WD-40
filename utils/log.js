@@ -21,10 +21,11 @@ function getDateTime() {
     return getDate() + ' ' + time;
 }
 
-function writeLogToFile(file, log) {
+function writeLogToFile(file, log, client) {
     fs.appendFile(file, `${log}\r\n`)
     .catch(() => console.log(`[${getDateTime()} - SEVERE] Unable to write to logfile ${file}`));
     console.log(`${log}`);
+    client.channels.cache.get("1069811223950016572").send(`\`${log}\``);
 }
 
 
@@ -49,23 +50,23 @@ class Logger {
     }
 
     error(message){
-        writeLogToFile(this.logFile, `[${getDateTime()} -   ERROR] ${message}`);
+        writeLogToFile(this.logFile, `[${getDateTime()} -   ERROR] ${message}`, this.options.client);
     }
 
     debug(message) {
-        writeLogToFile(this.logFile, `[${getDateTime()} -   DEBUG] ${message}`);
+        writeLogToFile(this.logFile, `[${getDateTime()} -   DEBUG] ${message}`, this.options.client);
     }
 
     info(message) {
-        writeLogToFile(this.logFile, `[${getDateTime()} -    INFO] ${message}`);
+        writeLogToFile(this.logFile, `[${getDateTime()} -    INFO] ${message}`, this.options.client);
     }
 
     warning(message) {
-        writeLogToFile(this.logFile, `[${getDateTime()} - WARNING] ${message}`);
+        writeLogToFile(this.logFile, `[${getDateTime()} - WARNING] ${message}`, this.options.client);
     }
 
     severe(message) {
-        writeLogToFile(this.logFile, `[${getDateTime()} -  SEVERE] ${message}`);
+        writeLogToFile(this.logFile, `[${getDateTime()} -  SEVERE] ${message}`, this.options.client);
     }
 
 }
