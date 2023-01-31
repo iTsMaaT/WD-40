@@ -3,7 +3,7 @@ const USERID = require("../UserIDs.js");
 module.exports = {
     name: "sudo",
     description: "make the bot send a custom message / reply",
-    execute: async(client, message, args) => {
+    execute: async(logger, client, message, args) => {
         const owner = await message.guild.fetchOwner();
         if ((message.author.id == USERID.itsmaat || message.author.id == owner.id) && args.length > 1) {
             let sudoprefix = args.shift();
@@ -11,7 +11,7 @@ module.exports = {
                 const SudoID = args.shift();
                 client.channels.cache.get(SudoID).send(args.join(' '));
                 message.reply({ content: "Sudo successful.", allowedMentions: { repliedUser: false } });
-                console.log("Sudo -s used");
+                logger.info(`Sudo -s used by ${message.author.tag} (${message.author.id}) in <#${SudoID}>, Message content : ${args.join(" ")}`);
             }
             else if (sudoprefix == "-r") {
                 const ChannelID = args.shift();
@@ -20,7 +20,7 @@ module.exports = {
                     .then(m => {
                         m.reply(args.join(' '));
                         message.reply({ content: "Sudo successful.", allowedMentions: { repliedUser: false } });
-                        console.log("Sudo -r used");
+                        logger.info(`Sudo -r used by ${message.author.tag} (${message.author.id}) in <#${ChannelID}>, Message content : ${args.join(" ")}`);
                     }).catch(() => message.reply("Unable to find message."));
             }
         } else {

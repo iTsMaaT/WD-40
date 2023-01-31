@@ -1,28 +1,24 @@
 const got = require("got");
+const Logger = require("../utils/log");
 module.exports = {
     name: "rule34",
     description: "yes",
-    execute: async (client, message, args) => {
+    execute: async (logger, client, message, args) => {
         switch (Math.floor(Math.random() * 5 + 1)) {
             case 1:
                 var RuleLink = "https://www.reddit.com/r/rule34/random/.json";
-                console.log("R34")
                 break;
             case 2:
                 var RuleLink = "https://www.reddit.com/r/rule34lol/random/.json";
-                console.log("R34lol")
                 break;
             case 3:
                 var RuleLink = "https://www.reddit.com/r/rule34rainbowsix/random/.json";
-                console.log("R34R6")
                 break;
             case 4:
                 var RuleLink = "https://www.reddit.com/r/rule34feet/random/.json";
-                console.log("R34feet")
                 break;
             case 5:
                 var RuleLink = "https://www.reddit.com/r/2booty/random/.json";
-                console.log("R34NierAutomata")
                 break;
         }
         try {
@@ -58,10 +54,11 @@ module.exports = {
                         name: `SPOILER_FILE.jpg`
                     }]
                 });
-                console.log(err);
+                logger.error(err);
             }
             catch (err) {
                 message.reply(`Error while making the file as spoiler, please try again.\n\`${err}\``)
+                logger.error(err);
             }
         }
     }

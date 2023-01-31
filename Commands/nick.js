@@ -1,7 +1,7 @@
 module.exports = {
     name: "nick",
     description: "Changes the bot's nickname",
-    execute(client, message, args) {
+    execute(logger, client, message, args) {
         if (message.author.id == itsmaat && args.length != 0) {
             client.user.setUsername(args.join(' '));
             message.reply('Nickname changed.');
