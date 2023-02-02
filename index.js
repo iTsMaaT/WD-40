@@ -61,9 +61,9 @@ client.on("ready", () => {
     client.user.setActivity(`>help | Time to be annoying!`);
 
     //Allah everyday at 2:22
-    let scheduledMessage = new cron.CronJob('11 11 11 * * *', () => {
-        // This runs every day at 11:11:11
-        client.channels.cache.get("885302577414152233").send(":pray: Allah :pray:");
+    let scheduledMessage = new cron.CronJob('30 59 02 * * *', () => {
+        // This runs every day at 02:56:30
+        client.channels.cache.get("1069811223950016572").send("- - - - - New Day - - - - -");
     });
     //sarting the daily sending
     scheduledMessage.start()
@@ -141,11 +141,15 @@ client.on("messageCreate", (message) => {
     if (CmdEnabled == 1) {
 
         //reacts :sick: when gros gaming or smartass is said
-        if (message.content.toLowerCase().includes("gros gaming") || message.content.toLowerCase().includes("smartass") || message.content.toLowerCase().includes("edging")) {
+        if (message.content.toLowerCase().includes("gros gaming") || message.content.toLowerCase().includes("smartass") || (message.content.toLowerCase().includes("edging") && !message.author.id == USERID.dada129)) {
             message.react('🇸')
                 .then(() => message.react('🇹'))
                 .then(() => message.react('🇫'))
                 .then(() => message.react('🇺'));
+        }
+
+        if (message.content.toLowerCase().includes("edging") && message.author.id == USERID.dada129) {
+            message.delete()
         }
 
         //what? eveeeer
@@ -216,19 +220,15 @@ client.on("messageCreate", (message) => {
             }
         }
 
-        /*if (message.content.toLowerCase() == "sex") {
+        if (message.content.toLowerCase() == "sex") {
 
             fetchFurry().then(embed => {
                 message.author.send({ embeds: [embed] })
                 .catch(() => {
-                    logger.error(`Unable to send private message to ${message.member.user.tag}`)
-                    message.reply({ embeds: [embed] });
-                    //https://discord.com/api/webhooks/1045861491754139749/5UxJ3E3jBcO4M5WHiIpkmbp0tRaenHIyR7aodT-tJmokBvFT07DBJDfrmnB1Zh3LvTgl
-                    const webhookClient = new WebhookClient({ url: "https://discord.com/api/webhooks/1045861491754139749/5UxJ3E3jBcO4M5WHiIpkmbp0tRaenHIyR7aodT-tJmokBvFT07DBJDfrmnB1Zh3LvTgl" });
-                    webhookClient.send({ embeds: [embed] }); 
+                    logger.error(`Unable to send private message to ${message.member.user.tag}`);
                });
             });
-        }*/
+        }
     }
 })
 client.login(process.env.TOKEN);
