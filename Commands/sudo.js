@@ -24,6 +24,7 @@ module.exports = {
                     }).catch(() => message.reply("Unable to find message."));
             }
             else if (sudoprefix == "-e") {
+                if (args.length > 2) {
                 let ChannelID = args.shift();
                 let MsgID = args.shift();
                 let letters = args.shift().toUpperCase();
@@ -38,6 +39,15 @@ module.exports = {
                 }
                 message.reply({ content: "Sudo successful.", allowedMentions: { repliedUser: false } });
                 logger.info(`Sudo -e used by ${message.author.tag} (${message.author.id}) in <#${ChannelID}>`);
+            }
+            else {
+                let ChannelID = args.shift();
+                let MsgID = args.shift();
+                client.channels.cache.get(ChannelID).messages.fetch({ cache: false, message: MsgID })
+                    .then(m => {
+                        m.reactions.removeAll()
+                    }).catch((err) => message.reply("Failed to clear reactions: " + err));
+            }
             }
         } else {
             message.reply(`You are not allowed to execute that command`);
