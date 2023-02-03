@@ -47,6 +47,7 @@ module.exports = {
                     .then(m => {
                         m.reactions.removeAll()
                     }).catch((err) => message.reply("Failed to clear reactions: " + err));
+                    message.reply({ content: "Emotes cleared.", allowedMentions: { repliedUser: false } });
             }
             }
         } else {
