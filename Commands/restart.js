@@ -13,7 +13,7 @@ module.exports = {
             /****************/
             client.channels.cache.get().send();
             /****************/
-            }, 1000 * 1)
+            }, 1000 * 3)
         }
         else if (message.member.permissions.has("Administrator")) {
             message.channel.send(`Please contact the owner of this bot to execute this command (iTsMaaT#4020 or <@411996978583699456>)`);
