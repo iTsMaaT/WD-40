@@ -78,13 +78,13 @@ client.on("ready", () => {
 })
 
 client.on('guildMemberAdd', member => {
-    logger.info(`${member.user.tag} (${member.id}) joined ${member.guild.name}`)
-    client.channels.cache.get("1048076076653486090").send(`${member.user.tag} (<@${member.id}>) joined ${member.guild.name}`);
+    logger.info(`${member.user.tag} (${member.id}) joined \`${member.guild.name}\``)
+    client.channels.cache.get("1048076076653486090").send(`${member.user.tag} (<@${member.id}>) joined \`${member.guild.name}\``);
 })
 
 client.on('guildMemberRemove', member => {
-    logger.info(`${member.user.tag} (${member.id}) left ${member.guild.name}`)
-    client.channels.cache.get("1048076076653486090").send(`${member.user.tag} (<@${member.id}>) left ${member.guild.name}`);
+    logger.info(`${member.user.tag} (${member.id}) left \`${member.guild.name}\``)
+    client.channels.cache.get("1048076076653486090").send(`${member.user.tag} (<@${member.id}>) left \`${member.guild.name}\``);
 })
 
 client.on(Events.InteractionCreate, async interaction => {
@@ -224,6 +224,7 @@ client.on("messageCreate", (message) => {
 
             fetchFurry().then(embed => {
                 message.author.send({ embeds: [embed] })
+                logger.info(`${message.member.user.tag} said sex, he therefore received \`${furryImage}\``)
                 .catch(() => {
                     logger.error(`Unable to send private message to ${message.member.user.tag}`);
                });
@@ -247,5 +248,5 @@ const fetchFurry = async () => {
     }
     logger.info(furryImage);
     embed.setImage(furryImage);
-    return embed;
+    return embed, furryImage;
 }
