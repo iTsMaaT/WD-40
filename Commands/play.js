@@ -3,6 +3,10 @@ module.exports = {
   name: "play",
   description: "Play a song",
   execute(logger, client, message, args) {
+    if (args[0].includes("open.spotify.com/")) {
+      message.reply("Spotify links are not supported.");
+      return;
+    }
     if (!message.member.voice.channel) {
       const must_be_in_vc_embed = new EmbedBuilder()
         .setColor("#FF0000")

@@ -19,11 +19,6 @@ global.SexID = 0;
 global.SexCount = 0;
 global.CmdEnabled = 1;
 
-const { SpotifyPlugin } = require("@distube/spotify");
-const distube = new DisTube(client, {
-    plugins: [new SpotifyPlugin()],
-  });
-  
 const { YtDlpPlugin } = require('@distube/yt-dlp')
 client.distube = new DisTube(client, {
   leaveOnStop: false,
