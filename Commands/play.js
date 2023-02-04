@@ -3,9 +3,7 @@ module.exports = {
   name: "play",
   description: "Play a song",
   execute(logger, client, message, args) {
-    console.log(message);
     if (!message.member.voice.channel) {
-      
       const must_be_in_vc_embed = new EmbedBuilder()
         .setColor("#FF0000")
         .setDescription(`You must be in a voice channel!`)
