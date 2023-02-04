@@ -1,20 +1,36 @@
-const { Client, Intents, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events, WebhookClient } = require("discord.js");
+const { Client, Intents, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events, WebhookClient, Partials } = require("discord.js");
 const Logger = require("./utils/log");
 const cron = require("cron");
 const dotenv = require("dotenv");
 const got = require("got");
+const { DisTube } = require('distube')
 dotenv.config();
 const Discord = require('discord.js');
 const fs = require('fs');
 const path = require('node:path');
 const USERID = require("./UserIDs.js");
+const client = new Client({
+    intents: Object.keys(GatewayIntentBits), // all intents
+    partials: [Partials.Message, Partials.Channel, Partials.Reaction]
+  });
 global.prefix = '>';
 global.SnowflakeID = [];
 global.SexID = 0;
 global.SexCount = 0;
 global.CmdEnabled = 1;
 
-client = new Client({ intents: Object.keys(GatewayIntentBits) });
+const { YtDlpPlugin } = require('@distube/yt-dlp')
+client.distube = new DisTube(client, {
+  leaveOnStop: false,
+  emitNewSongOnly: true,
+  emitAddSongWhenCreatingQueue: false,
+  emitAddListWhenCreatingQueue: false,
+  plugins: [
+    new YtDlpPlugin()
+  ]
+})
+
+
 const logger = new Logger({root: __dirname, client});
 
 //create a collection for text commands
@@ -250,3 +266,62 @@ const fetchFurry = async () => {
     embed.setImage(furryImage);
     return embed, furryImage;
 }
+
+const status = queue =>
+  `Volume: \`${queue.volume}%\` | Filter: \`${queue.filters.names.join(', ') || 'Off'}\` | Loop: \`${
+    queue.repeatMode ? (queue.repeatMode === 2 ? 'All Queue' : 'This Song') : 'Off'
+  }\` | Autoplay: \`${queue.autoplay ? 'On' : 'Off'}\``
+client.distube
+ 
+  .on('playSong', (queue, song) =>{
+  const playsong_embed = new EmbedBuilder()
+        .setColor("#FF0000")
+        .setDescription(`Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`)
+        .setTimestamp()
+    queue.textChannel.send({embeds:[playsong_embed]})
+  })
+  .on('addSong', (queue, song) =>{
+  const addsong_embed = new EmbedBuilder()
+        .setColor("#FF0000")
+        .setDescription(`Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}`)
+        .setTimestamp()
+    queue.textChannel.send({embeds:[addsong_embed]})}
+  )
+  .on('addList', (queue, playlist) =>{
+   const addlist_embed = new EmbedBuilder()
+        .setColor("#FF0000")
+        .setDescription(`Added \`${playlist.name}\` playlist (${playlist.songs.length} songs) to queue\n${status(queue)}`)
+        .setTimestamp()
+    queue.textChannel.send({embeds:[addlist_embed]})}
+  )
+  .on('error', (channel, e) => {
+    const error_embed = new EmbedBuilder()
+        .setColor("#FF0000")
+        .setDescription(`An error encountered: ${e.toString().slice(0, 1974)}`)
+        .setTimestamp()
+    if (channel) channel.send({embeds:[error_embed]})
+    else console.error(e)
+  })
+  .on('empty', channel =>{
+  const empty_embed = new EmbedBuilder()
+        .setColor("#FF0000")
+        .setDescription('Voice channel is empty! Leaving the channel...')
+        .setTimestamp() 
+        channel.send({embeds:[empty_embed]})})
+  .on('searchNoResult', (message, query) =>{
+  const no_result_embed = new EmbedBuilder()
+        .setColor("#FF0000")
+        .setDescription(`No result found for \`${query}\`!`)
+        .setTimestamp()
+    message.channel.send({embeds:[no_result_embed]})}
+  )
+  .on('finish', queue => {
+  const finished_embed = new EmbedBuilder()
+        .setColor("#FF0000")
+        .setDescription("Finished!")
+        .setTimestamp()
+        queue.textChannel.send({embeds:[finished_embed]})})
+client.distube.on('error', (channel, error) => {
+  console.error(error)
+  channel.send(`An error encoutered: ${error.slice(0, 1979)}`) // Discord limits 2000 characters in a message
+      })
