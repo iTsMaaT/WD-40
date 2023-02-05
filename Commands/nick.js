@@ -3,8 +3,13 @@ module.exports = {
     description: "Changes the bot's nickname",
     execute(logger, client, message, args) {
         if (message.author.id == itsmaat && args.length != 0) {
+            try {
             client.user.setUsername(args.join(' '));
             message.reply('Nickname changed.');
+            }
+            catch(err) {
+                message.reply(`Name change failed.\n\`${err}\``)
+            }
         }
         else if (message.author.id == itsmaat && args.length == 0) {
             client.user.setUsername(`WD-40`);
