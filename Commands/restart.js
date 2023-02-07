@@ -11,7 +11,8 @@ module.exports = {
             
             setTimeout(function () {
             /****************/
-            client.channels.cache.get().send();
+            process.exit();
+            //client.channels.cache.get().send();
             /****************/
             }, 1000 * 3)
         }
