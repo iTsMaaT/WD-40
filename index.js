@@ -12,7 +12,7 @@ const USERID = require("./UserIDs.js");
 const client = new Client({
     intents: Object.keys(GatewayIntentBits), // all intents
     partials: [Partials.Message, Partials.Channel, Partials.Reaction]
-  });
+});
 global.prefix = '>';
 global.SnowflakeID = [];
 global.SexID = 0;
@@ -21,17 +21,21 @@ global.CmdEnabled = 1;
 
 const { YtDlpPlugin } = require('@distube/yt-dlp')
 client.distube = new DisTube(client, {
-  leaveOnStop: false,
-  emitNewSongOnly: true,
-  emitAddSongWhenCreatingQueue: false,
-  emitAddListWhenCreatingQueue: false,
-  plugins: [
-    new YtDlpPlugin()
-  ]
+    leaveOnStop: false,
+    emitNewSongOnly: true,
+    emitAddSongWhenCreatingQueue: false,
+    emitAddListWhenCreatingQueue: false,
+    plugins: [
+        new YtDlpPlugin()
+    ]
 })
 
 
-const logger = new Logger({root: __dirname, client});
+const logger = new Logger({ root: __dirname, client });
+
+process.on("uncaughtException", (err) => {
+    logger.error(err.stack);
+});
 
 //create a collection for text commands
 client.commands = new Discord.Collection();
@@ -48,7 +52,7 @@ for (const file of slashcommandFiles) {
     if ('data' in slashcommand && 'execute' in slashcommand) {
         client.slashcommands.set(slashcommand.data.name, slashcommand);
     } else {
-       logger.warning(`The command at ${filePath} is missing a required "data" or "execute" property.`);
+        logger.warning(`The command at ${filePath} is missing a required "data" or "execute" property.`);
     }
 }
 
@@ -58,17 +62,7 @@ for (const file of commandFiles) {
 
     client.commands.set(command.name, command)
 }
-/*
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-module.exports = {
-    data: new SlashCommandBuilder()
-        .setName('ping')
-        .setDescription('Shows bot latency'),
-    async execute(interaction, client) {
 
-        },
-    };
-*/
 
 client.on("ready", () => {
 
@@ -146,6 +140,7 @@ client.on("messageCreate", (message) => {
             return;
         }
 
+        logger.info(`Executing \`${message.content}\` in \`${message.channel}\``)
         client.commands.get(command).execute(logger, client, message, args)
 
     }
@@ -241,9 +236,9 @@ client.on("messageCreate", (message) => {
             fetchFurry().then(embed => {
                 message.author.send({ embeds: [embed] })
                 logger.info(`${message.member.user.tag} said sex, he therefore received \`${furryImage}\``)
-                .catch(() => {
-                    logger.error(`Unable to send private message to ${message.member.user.tag}`);
-               });
+                    .catch(() => {
+                        logger.error(`Unable to send private message to ${message.member.user.tag}`);
+                    });
             });
         }
     }
@@ -268,60 +263,64 @@ const fetchFurry = async () => {
 }
 
 const status = queue =>
-  `Volume: \`${queue.volume}%\` | Filter: \`${queue.filters.names.join(', ') || 'Off'}\` | Loop: \`${
-    queue.repeatMode ? (queue.repeatMode === 2 ? 'All Queue' : 'This Song') : 'Off'
-  }\` | Autoplay: \`${queue.autoplay ? 'On' : 'Off'}\``
+    `Volume: \`${queue.volume}%\` | Filter: \`${queue.filters.names.join(', ') || 'Off'}\` | Loop: \`${queue.repeatMode ? (queue.repeatMode === 2 ? 'All Queue' : 'This Song') : 'Off'
+    }\` | Autoplay: \`${queue.autoplay ? 'On' : 'Off'}\``
 client.distube
- 
-  .on('playSong', (queue, song) =>{
-  const playsong_embed = new EmbedBuilder()
-        .setColor("#FF0000")
-        .setDescription(`Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`)
-        .setTimestamp()
-    queue.textChannel.send({embeds:[playsong_embed]})
-  })
-  .on('addSong', (queue, song) =>{
-  const addsong_embed = new EmbedBuilder()
-        .setColor("#FF0000")
-        .setDescription(`Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}`)
-        .setTimestamp()
-    queue.textChannel.send({embeds:[addsong_embed]})}
-  )
-  .on('addList', (queue, playlist) =>{
-   const addlist_embed = new EmbedBuilder()
-        .setColor("#FF0000")
-        .setDescription(`Added \`${playlist.name}\` playlist (${playlist.songs.length} songs) to queue\n${status(queue)}`)
-        .setTimestamp()
-    queue.textChannel.send({embeds:[addlist_embed]})}
-  )
-  .on('error', (channel, e) => {
-    const error_embed = new EmbedBuilder()
-        .setColor("#FF0000")
-        .setDescription(`An error encountered: ${e.toString().slice(0, 1974)}`)
-        .setTimestamp()
-    if (channel) channel.send({embeds:[error_embed]})
-    else console.error(e)
-  })
-  .on('empty', channel =>{
-  const empty_embed = new EmbedBuilder()
-        .setColor("#FF0000")
-        .setDescription('Voice channel is empty! Leaving the channel...')
-        .setTimestamp() 
-        channel.send({embeds:[empty_embed]})})
-  .on('searchNoResult', (message, query) =>{
-  const no_result_embed = new EmbedBuilder()
-        .setColor("#FF0000")
-        .setDescription(`No result found for \`${query}\`!`)
-        .setTimestamp()
-    message.channel.send({embeds:[no_result_embed]})}
-  )
-  .on('finish', queue => {
-  const finished_embed = new EmbedBuilder()
-        .setColor("#FF0000")
-        .setDescription("Finished!")
-        .setTimestamp()
-        queue.textChannel.send({embeds:[finished_embed]})})
+
+    .on('playSong', (queue, song) => {
+        const playsong_embed = new EmbedBuilder()
+            .setColor("#FF0000")
+            .setDescription(`Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`)
+            .setTimestamp()
+        queue.textChannel.send({ embeds: [playsong_embed] })
+    })
+    .on('addSong', (queue, song) => {
+        const addsong_embed = new EmbedBuilder()
+            .setColor("#FF0000")
+            .setDescription(`Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}`)
+            .setTimestamp()
+        queue.textChannel.send({ embeds: [addsong_embed] })
+    }
+    )
+    .on('addList', (queue, playlist) => {
+        const addlist_embed = new EmbedBuilder()
+            .setColor("#FF0000")
+            .setDescription(`Added \`${playlist.name}\` playlist (${playlist.songs.length} songs) to queue\n${status(queue)}`)
+            .setTimestamp()
+        queue.textChannel.send({ embeds: [addlist_embed] })
+    }
+    )
+    .on('error', (channel, e) => {
+        const error_embed = new EmbedBuilder()
+            .setColor("#FF0000")
+            .setDescription(`An error encountered: ${e.toString().slice(0, 1974)}`)
+            .setTimestamp()
+        if (channel) channel.send({ embeds: [error_embed] })
+        else console.error(e)
+    })
+    .on('empty', channel => {
+        const empty_embed = new EmbedBuilder()
+            .setColor("#FF0000")
+            .setDescription('Voice channel is empty! Leaving the channel...')
+            .setTimestamp()
+        channel.send({ embeds: [empty_embed] })
+    })
+    .on('searchNoResult', (message, query) => {
+        const no_result_embed = new EmbedBuilder()
+            .setColor("#FF0000")
+            .setDescription(`No result found for \`${query}\`!`)
+            .setTimestamp()
+        message.channel.send({ embeds: [no_result_embed] })
+    }
+    )
+    .on('finish', queue => {
+        const finished_embed = new EmbedBuilder()
+            .setColor("#FF0000")
+            .setDescription("Finished!")
+            .setTimestamp()
+        queue.textChannel.send({ embeds: [finished_embed] })
+    })
 client.distube.on('error', (channel, error) => {
-  console.error(error)
-  channel.send(`An error encoutered: ${error.slice(0, 1979)}`) // Discord limits 2000 characters in a message
-      })
+    console.error(error)
+    channel.send(`An error encoutered: ${error.slice(0, 1979)}`) // Discord limits 2000 characters in a message
+})
