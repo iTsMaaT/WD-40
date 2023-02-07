@@ -34,6 +34,7 @@ module.exports = {
                         }
                     } catch (err) {
                         sent.edit(`Non-existent Subreddit\n\`${err}\``);
+                        logger.error(`Non-existent Subreddit\n\`${err}\``);
                         return;
                     }
                 }
