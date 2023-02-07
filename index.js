@@ -33,6 +33,10 @@ client.distube = new DisTube(client, {
 
 const logger = new Logger({ root: __dirname, client });
 
+process.on("uncaughtException", (err) => {
+    logger.error(err.stack);
+});
+
 //create a collection for text commands
 client.commands = new Discord.Collection();
 //create a collection for slash commands
@@ -58,17 +62,7 @@ for (const file of commandFiles) {
 
     client.commands.set(command.name, command)
 }
-/*
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-module.exports = {
-    data: new SlashCommandBuilder()
-        .setName('ping')
-        .setDescription('Shows bot latency'),
-    async execute(interaction, client) {
 
-        },
-    };
-*/
 
 client.on("ready", () => {
 
@@ -137,21 +131,17 @@ client.on("messageCreate", (message) => {
     }
 
     if (message.content.startsWith(prefix)) {
-        try {
 
-            const args = message.content.slice(prefix.length).split(/ +/);
-            const command = args.shift().toLowerCase();
+        const args = message.content.slice(prefix.length).split(/ +/);
+        const command = args.shift().toLowerCase();
 
-            // If command does not exist, return
-            if (!client.commands.get(command)) {
-                return;
-            }
-
-            client.commands.get(command).execute(logger, client, message, args)
+        // If command does not exist, return
+        if (!client.commands.get(command)) {
+            return;
         }
-        catch (err) {
-            logger.severe(`Problem with ${command} in ${message.channel}\n \`${err}\``)
-        }
+
+        logger.info(`Executing \`${message.content}\` in \`${message.channel}\``)
+        client.commands.get(command).execute(logger, client, message, args)
 
     }
 

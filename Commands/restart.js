@@ -5,13 +5,12 @@ module.exports = {
     execute(logger, client, message, args) {
         if (message.author.id == 411996978583699456) {
             logger.severe("Restart requested from discord...");
-            logger.severe("Bot crash incoming");
-            message.reply("Intentionnal crash incoming.");
+            message.reply("Restarting the bot.");
             client.channels.cache.get("1037141235451842701").send("Restart requested from discord...");
             
             setTimeout(function () {
             /****************/
-            process.exit();
+            process.exit(1);
             //client.channels.cache.get().send();
             /****************/
             }, 1000 * 3)
