@@ -140,7 +140,7 @@ client.on("messageCreate", (message) => {
             return;
         }
 
-        logger.info(`Executing \`${message.content}\` in \`${message.channel}\``)
+        logger.info(`Executing [${message.content}] in [${message.channel}]`)
         client.commands.get(command).execute(logger, client, message, args)
 
     }
