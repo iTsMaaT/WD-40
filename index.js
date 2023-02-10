@@ -3,7 +3,7 @@ const Logger = require("./utils/log");
 const cron = require("cron");
 const dotenv = require("dotenv");
 const got = require("got");
-const { DisTube } = require('distube')
+const { DisTube } = require('distube');
 dotenv.config();
 const Discord = require('discord.js');
 const fs = require('fs');
@@ -19,13 +19,20 @@ global.SexID = 0;
 global.SexCount = 0;
 global.CmdEnabled = 1;
 
-const { YtDlpPlugin } = require('@distube/yt-dlp')
+const ffmpeg = require('ffmpeg');
+const { YtDlpPlugin } = require('@distube/yt-dlp');
+const { SpotifyPlugin } = require('@distube/spotify');
 client.distube = new DisTube(client, {
     leaveOnStop: false,
     emitNewSongOnly: true,
     emitAddSongWhenCreatingQueue: false,
     emitAddListWhenCreatingQueue: false,
+    nsfw: true,
+    youtubeCookie: process.env.YOUTUBECOOKIE,
     plugins: [
+        new SpotifyPlugin({
+          emitEventsAfterFetching: true
+        }),
         new YtDlpPlugin()
     ]
 })
@@ -321,6 +328,5 @@ client.distube
         queue.textChannel.send({ embeds: [finished_embed] })
     })
 client.distube.on('error', (channel, error) => {
-    console.error(error)
-    channel.send(`An error encoutered: ${error.slice(0, 1979)}`) // Discord limits 2000 characters in a message
+    logger.error(`An error encoutered: ${error}`)
 })
