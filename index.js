@@ -63,11 +63,16 @@ for (const file of slashcommandFiles) {
     }
 }
 
-const commandFiles = fs.readdirSync('./Commands/').filter(file => file.endsWith('.js'));
-for (const file of commandFiles) {
-    const command = require(`./Commands/${file}`);
-
-    client.commands.set(command.name, command)
+const commandFiles = fs.readdirSync('./Commands/');
+while(commandFiles.length > 0) {
+    let file = commandFiles.shift();
+    if(file.endsWith('.js')){
+        const command = require(`./Commands/${file}`);
+        client.commands.set(command.name, command)
+    } else {
+        let newFiles = fs.readdirSync('./Commands/'+file);
+        newFiles.forEach(f => commandFiles.push(file + '/' +f));
+    }
 }
 
 
