@@ -4,16 +4,17 @@ module.exports = {
     execute(logger, client, message, args) {
         if (message.member.permissions.has("Administrator")) {
             if (args.length == 1) {
-                const rawid1 = args[0].replace("@", "");
-                const rawdid2 = rawid1.replace("<", "");
-                SnowflakeID.push(rawdid2.replace(">", ""));
-
-                message.reply({ content: `\<\@${args[0]}\> is a snowflake`, allowedMentions: { repliedUser: false } });
-                logger.info(SnowflakeID)
-            }
-            else {
-                SnowflakeID = [];
-                message.channel.send(`Snowflake has been reset`);
+                let rawid = args[0].replace("@", "");
+                rawdid = rawid.replace("<", "");
+                rawid = rawdid.replace(">", "");
+                let enabled = snowflakeData.getValue(`${message.guildId}|${rawid}`) ?? false;
+                if(!enabled){
+                    snowflakeData.setValue(`${message.guildId}|${rawid}`, true);
+                    message.reply({ content: `\<\@${rawid}\> is a snowflake`, allowedMentions: { repliedUser: false } });
+                } else {
+                    snowflakeData.deleteKey(`${message.guildId}|${rawid}`);
+                    message.reply({ content: `\<\@${rawid}\> is no longer a snowflake (good for him)`, allowedMentions: { repliedUser: false } });
+                }
             }
         }
         else {

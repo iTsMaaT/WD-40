@@ -1,5 +1,6 @@
 const { Client, Intents, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events, WebhookClient, Partials } = require("discord.js");
 const Logger = require("./utils/log");
+const SaveFile = require("./utils/save_file");
 const cron = require("cron");
 const dotenv = require("dotenv");
 const got = require("got");
@@ -39,6 +40,8 @@ client.distube = new DisTube(client, {
 
 
 const logger = new Logger({ root: __dirname, client });
+global.prefixData = new SaveFile({root: __dirname, fileName: 'prefixes.json'});
+global.snowflakeData = new SaveFile({root: __dirname, fileName: 'snowflake.json'});
 
 process.on("uncaughtException", (err) => {
     logger.error(err.stack);
@@ -142,6 +145,7 @@ client.on("messageCreate", (message) => {
         message.reply(`You are not allowed to execute that command`);
     }
 
+    let prefix = prefixData.getValue(message.guildId) ?? global.prefix;
     if (message.content.startsWith(prefix)) {
 
         const args = message.content.slice(prefix.length).split(/ +/);
@@ -198,7 +202,7 @@ client.on("messageCreate", (message) => {
         }
 
         //Snowflake reaction
-        if (SnowflakeID != 0 && SnowflakeID.some(element => message.author.id.includes(element))) {
+        if (snowflakeData.getData() != {} && (snowflakeData.getValue(`${message.guildId}|${message.author.id}`) ?? false)) {
             message.react('❄️');
         }
 
@@ -285,6 +289,7 @@ client.distube
             .setDescription(`Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`)
             .setTimestamp()
         queue.textChannel.send({ embeds: [playsong_embed] })
+        logger.music(`Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`);
     })
     .on('addSong', (queue, song) => {
         const addsong_embed = new EmbedBuilder()

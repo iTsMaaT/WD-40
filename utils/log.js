@@ -1,5 +1,13 @@
 const path = require('node:path');
-const fs = require('node:fs/promises');
+const fs = require('node:fs');
+
+function checkIfFolderExists(path) {
+    try{
+        fs.readdirSync(path)
+    } catch(e ){
+        fs.mkdirSync(path);
+    }
+}
 
 function getDate() {
     // Récupère la date
@@ -22,8 +30,11 @@ function getDateTime() {
 }
 
 function writeLogToFile(file, log, client) {
-    fs.appendFile(file, `${log}\r\n`)
-    .catch(() => console.log(`[${getDateTime()} - SEVERE] Unable to write to logfile ${file}`));
+    try{
+        fs.appendFileSync(file, `${log}\r\n`);
+    } catch(ex) {
+        console.log(`[${getDateTime()} - SEVERE] Unable to write to logfile ${file}`)
+    }
     console.log(`${log}`);
     client.channels.cache.get("1069811223950016572").send(`\`\`\`${log}\`\`\``);
 }
@@ -35,18 +46,19 @@ class Logger {
         this.options = options;
         this.logFolder = path.join(this.options.root, 'logs');
         let date = getDate();
-        fs.readFile(path.join(this.logFolder, `${date}.log.txt`)).then(() => {
+        checkIfFolderExists(this.logFolder);
+        try{
+            fs.readFileSync(path.join(this.logFolder, `${date}.log.txt`));
             this.logFile = path.join(this.logFolder, `${getDateTime().replaceAll(':', '.')}.log.txt`);
-        }).catch(() => {
+        } catch(ex) {
             this.logFile = path.join(this.logFolder, `${date}.log.txt`);
-        }).finally(() => {
-            console.log(`Started logger in file: ${this.logFile}`);
-            try{
-                fs.writeFile(this.logFile, "", (err) => {});
-            } catch(e){
-                console.log(`Cannot write logfile (${this.logFile})`);
-            }
-        });
+        }
+        console.log(`Started logger in file: ${this.logFile}`);
+        try{
+            fs.writeFileSync(this.logFile, "", {encoding: 'utf8'});
+        } catch(e){
+            console.log(`Cannot write logfile (${this.logFile})`);
+        }
     }
 
     error(message){
@@ -67,6 +79,10 @@ class Logger {
 
     severe(message) {
         writeLogToFile(this.logFile, `[${getDateTime()} -  SEVERE] ${message}`, this.options.client);
+    }
+
+    music(message) {
+        writeLogToFile(this.logFile, `[${getDateTime()} -   MUSIC] ${message}`, this.options.client);
     }
 
 }
