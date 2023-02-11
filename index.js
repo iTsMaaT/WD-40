@@ -45,6 +45,7 @@ global.snowflakeData = new SaveFile({root: __dirname, fileName: 'snowflake.json'
 
 process.on("uncaughtException", (err) => {
     logger.error(err.stack);
+    client.channels.cache.get("1037141235451842701").send(`Error caught <@411996978583699456>! <#1069811223950016572>`);
 });
 
 //create a collection for text commands
@@ -289,7 +290,7 @@ client.distube
             .setDescription(`Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`)
             .setTimestamp()
         queue.textChannel.send({ embeds: [playsong_embed] })
-        logger.music(`Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`);
+        logger.music(`Playing ${song.name} - ${song.formattedDuration}\nRequested by: ${song.user}\n${status(queue)}`);
     })
     .on('addSong', (queue, song) => {
         const addsong_embed = new EmbedBuilder()
