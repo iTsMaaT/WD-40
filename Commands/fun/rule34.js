@@ -1,5 +1,4 @@
 const got = require("got");
-const Logger = require("../utils/log");
 module.exports = {
     name: "rule34",
     description: "yes",
