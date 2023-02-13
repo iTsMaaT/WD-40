@@ -80,6 +80,7 @@ while(commandFiles.length > 0) {
 }
 
 
+
 client.on("ready", () => {
 
     logger.info("Bot starting...");
@@ -157,8 +158,13 @@ client.on("messageCreate", (message) => {
             return;
         }
 
-        logger.info(`Executing [${message.content}] in [${message.channel}]`)
-        client.commands.get(command).execute(logger, client, message, args)
+        //logger.info(`Executing [${message.content}] in [${message.channel}]`)
+        //client.commands.get(command).execute(logger, client, message, args)
+        let commandO = client.commands.get(command);
+        if(commandO) {
+            logger.info(`Executing [${message.content}] in [${message.channel}]`)
+            commandO.execute(logger, client, message, args)
+        }
 
     }
 
