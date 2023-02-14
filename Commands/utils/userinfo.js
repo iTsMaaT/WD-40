@@ -3,6 +3,7 @@ const { channelLink } = require("discord.js")
 module.exports = {
     name: "userinfo",
     description: "Gives info of a user",
+    category: "utils",
     execute: async (logger, client, message, args) => {
         const guild = await client.guilds.fetch(message.guildId);
         if (!args[0]) {

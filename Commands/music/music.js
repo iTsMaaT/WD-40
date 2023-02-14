@@ -2,6 +2,7 @@ const { EmbedBuilder } = require("discord.js")
 module.exports = {
     name: "music",
     description: "See the music commands",
+    category: "music",
     execute(logger, client, message, args) {
         const embed = new EmbedBuilder()
             .setColor("#FF0000")

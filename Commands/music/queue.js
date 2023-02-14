@@ -3,6 +3,7 @@ const fs = require('fs');
 module.exports={
     name:"queue",
     description:"Shows the current queue for songs",
+    category: "music",
     execute(logger, client, message, args){
         const play = "▶️"
         const pause = "⏸️"

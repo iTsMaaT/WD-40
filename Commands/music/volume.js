@@ -1,7 +1,8 @@
 const {EmbedBuilder} = require("discord.js")
 module.exports={
     name:"volume",
-    desciption:"Adjust the volume of the music",
+    description:"Adjust the volume of the music",
+    category: "music",
     execute(logger, client, message, args){
             
         if (!message.member.voice.channel) {

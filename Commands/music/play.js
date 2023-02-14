@@ -2,6 +2,7 @@ const { EmbedBuilder } = require("discord.js")
 module.exports = {
   name: "play",
   description: "Play a song",
+  category: "music",
   execute(logger, client, message, args) {
     /*if (args[0].includes("open.spotify.com/")) {
       message.reply("Spotify links are not supported.");

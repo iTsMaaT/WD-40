@@ -1,7 +1,8 @@
 module.exports = {
   name: 'playskip',
-  aliases: ['ps'],
+  description: "Skips the entire queue to play a song",
   inVoiceChannel: true,
+  category: "music",
   run: async (logger, client, message, args) => {
     const string = args.join(' ')
     if (!string) return message.channel.send(`${client.emotes.error} | Please enter a song url or query to search.`)

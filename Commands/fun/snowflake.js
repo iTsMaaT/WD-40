@@ -1,6 +1,7 @@
 module.exports = {
     name: "snowflake",
     description: "Reacts :snowflake: to every message of a user, no args to reset",
+    category: "fun",
     execute(logger, client, message, args) {
         if (message.member.permissions.has("Administrator")) {
             if (args.length == 1) {
