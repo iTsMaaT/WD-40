@@ -2,6 +2,7 @@ const USERID = require("../../UserIDs.js");
 module.exports = {
     name: "nick",
     description: "Changes the bot's nickname",
+    category: "utils",
     execute: async (logger, client, message, args) => {
         if (message.author.id == USERID.itsmaat && args.length != 0) {
             try {

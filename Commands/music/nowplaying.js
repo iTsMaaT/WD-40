@@ -2,6 +2,7 @@ const {EmbedBuilder} = require("discord.js")
 module.exports={
     name:"nowplaying",
     description:"See what song is currently playing",
+    category: "music",
     execute(logger, client, message, args){
         const queue = client.distube.getQueue(message)
         const no_music_embed = new EmbedBuilder()

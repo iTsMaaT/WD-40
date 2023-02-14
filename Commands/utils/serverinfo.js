@@ -1,6 +1,7 @@
 module.exports = {
     name: "serverinfo",
     description: "Gives info of a user",
+    category: "utils",
     execute: async(logger, client, message, args) => {
         const owner = await message.guild.fetchOwner();
         message.reply({

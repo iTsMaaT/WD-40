@@ -2,6 +2,7 @@ const {EmbedBuilder} = require("discord.js")
 module.exports={
     name:"resume",
     description:"Resume a paused song",
+    category: "music",
     execute(logger, client, message, args){
       if (!message.member.voice.channel) {
         const must_be_in_vc_embed = new EmbedBuilder()

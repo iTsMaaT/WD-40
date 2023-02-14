@@ -1,6 +1,7 @@
 module.exports = {
     name: "prefix",
-    description: "changes the prefix to do commands",
+    description: "Changes the prefix to do commands",
+    category: "utils",
     execute(logger, client, message, args) {
         if (args.length == 1) {
             if(args[0] !== global.prefix){

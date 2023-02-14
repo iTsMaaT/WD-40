@@ -36,7 +36,7 @@ function writeLogToFile(file, log, client) {
         console.log(`[${getDateTime()} - SEVERE] Unable to write to logfile ${file}`)
     }
     console.log(`${log}`);
-    client.channels.cache.get("1069811223950016572").send(`\`\`\`${log}\`\`\``);
+    client?.channels?.cache?.get("1069811223950016572")?.send(`\`\`\`${log}\`\`\``);
 }
 
 

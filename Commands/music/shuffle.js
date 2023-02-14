@@ -1,5 +1,7 @@
 module.exports = {
     name: 'shuffle',
+    description: "Shuffles the playlist",
+    category: "music",
     inVoiceChannel: true,
     run: async (logger, client, message, args) => {
       const queue = client.distube.getQueue(message)

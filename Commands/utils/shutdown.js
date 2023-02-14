@@ -1,7 +1,9 @@
 const prettyMilliseconds = require('pretty-ms');
 module.exports = {
     name: "shutdown",
+    category: "utils",
     description: "Shutdowns the bot from discord",
+    private: true,
     execute(logger, client, message, args) {
         if (message.author.id == 411996978583699456) {
             logger.severe("Shutdown requested from discord...");

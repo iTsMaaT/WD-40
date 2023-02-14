@@ -1,5 +1,7 @@
 module.exports = {
   name: 'autoplay',
+  description: "Will find similar music to try and continue playing songs after the queue",
+  category: "music",
   inVoiceChannel: true,
   run: async (logger, client, message, args) => {
     const queue = client.distube.getQueue(message)

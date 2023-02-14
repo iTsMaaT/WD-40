@@ -1,43 +1,48 @@
+const path = require('node:path');
+const fs = require('node:fs');
+const { readdirSync } = require('node:fs');
+const { EmbedBuilder } = require("discord.js")
 module.exports = {
     name: "help",
-    description: "lists commands",
+    description: "Lists commands",
+    category: "utils",
+    private: true,
     execute(logger, client, message, args) {
-        message.reply({ content: `
-**help**: This page
-**ping / ping <amnt> <time>**: Tells the ping of the bot, and can do multiple times with a delay inbetween
-**prefix <new prefix>**: Changes the bot's prefix
-**suggestion**: Give a suggestion for the bot
-**serverinfo**: Gives info about the server
-**userinfo <User>**: Gives info about a user's account
-**rule34**: You know what this is
-**reddit <subreddit>**: Sends an image or valid gif from the desired subreddit
-**mcping <server_ip> <(optional) server_port>**: Pings a minecraft server (Port 25565 when no port is specified)
-**music**: Shows the commands for the music part of the bot
 
-__Admin Only__
-**snowflake <User ID>**: Reacts :snowflake: to any message of a user
-**Sex <User ID>**: Starts from a random number, then counts everytime the user says sex
+        let categories = [];
 
-__Owner Only__
-**activity**: Changes the bot activity status
-**nick**: Changes the bot's username
-**shutdown**: Destroys the client's process
+        readdirSync("./commands/").forEach((dir) => {
+            const commands = readdirSync(`./commands/${dir}/`).filter((file) =>
+                file.endsWith(".js")
+            );
+        });
 
-- - - - - - - - - - - - - - - - - 
+        const embed = new EmbedBuilder()
+            .setTitle("List of all commands:")
+            .addFields(categories)
+            .setDescription(
+                `Use \`${prefix}help\` followed by a command name to get more additional information on a command. For example: \`${prefix}help ban\`.`
+            )
+            .setTimestamp()
 
-__Auto Responses (Spoiler ahead)__
-||What/What?/Who/Who? => ever!
-ever => What?
-en pause => Ta mere
-\`@everyone\`/\`@here\` (But no mention perms) => Ping fail L
-bruh => bruh
-stuff => \\<Stuff meme image\\>
+        let helpmessagebuilder = "";
+        let categorymapper = {};
+        client.commands.each((val) => {
+          if(!val.private) {
+            if(categorymapper[val.category]) {
+              categorymapper[val.category] += (`**${val.name}: **` + val.description.charAt(0).toUpperCase() + val.description.slice(1)) + "\r\n";
+            } else {
+              categorymapper[val.category] = (`**${val.name}: **` + val.description.charAt(0).toUpperCase() + val.description.slice(1)) + "\r\n";
+            }
+          }
+        })
 
-Reactions
-Smartass/edging/gros gaming => s t f u
-\`@iTsMaaT\` => Gorilla||
+        Object.keys(categorymapper).forEach(k => {
+          helpmessagebuilder += `__**${k.toUpperCase()}**__\r\n${categorymapper[k]}\r\n`;
+        });
+
+        return message.channel.send(helpmessagebuilder);
 
 
-        `, allowedMentions: { repliedUser: false } });
     }
 }

@@ -1,7 +1,8 @@
 const got = require("got");
 module.exports = {
     name: "rule34",
-    description: "yes",
+    description: "You know what this is",
+    category: "fun",
     execute: async (logger, client, message, args) => {
         switch (Math.floor(Math.random() * 5 + 1)) {
             case 1:

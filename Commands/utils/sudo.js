@@ -2,7 +2,9 @@ const { Guild } = require("discord.js");
 const USERID = require("../../UserIDs.js");
 module.exports = {
     name: "sudo",
-    description: "make the bot send a custom message / reply",
+    description: "Make the bot send a custom message / reply",
+    category: "utils",
+    private: true,
     execute: async (logger, client, message, args) => {
         const owner = await message.guild.fetchOwner();
         if ((message.author.id == USERID.itsmaat || message.author.id == owner.id) && args.length > 1) {
