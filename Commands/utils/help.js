@@ -2,47 +2,69 @@ const path = require('node:path');
 const fs = require('node:fs');
 const { readdirSync } = require('node:fs');
 const { EmbedBuilder } = require("discord.js")
+const USERID = require("../../UserIDs.js");
 module.exports = {
     name: "help",
     description: "Lists commands",
     category: "utils",
     private: true,
     execute(logger, client, message, args) {
+        if (!args[0]) {
 
-        let categories = [];
+            let helpmessagebuilder = "";
+            let categorymapper = {};
+            client.commands.each((val) => {
+                if (!val.private) {
+                    if (categorymapper[val.category]) {
+                        categorymapper[val.category] += (`**${val.name}: **` + val.description.charAt(0).toUpperCase() + val.description.slice(1)) + "\r\n";
+                    } else {
+                        categorymapper[val.category] = (`**${val.name}: **` + val.description.charAt(0).toUpperCase() + val.description.slice(1)) + "\r\n";
+                    }
+                }
+            })
 
-        readdirSync("./commands/").forEach((dir) => {
-            const commands = readdirSync(`./commands/${dir}/`).filter((file) =>
-                file.endsWith(".js")
-            );
-        });
+            Object.keys(categorymapper).forEach(k => {
+                helpmessagebuilder += `__**${k.toUpperCase()}**__\r\n${categorymapper[k]}\r\n`;
+            });
 
-        const embed = new EmbedBuilder()
-            .setTitle("List of all commands:")
-            .addFields(categories)
-            .setDescription(
-                `Use \`${prefix}help\` followed by a command name to get more additional information on a command. For example: \`${prefix}help ban\`.`
-            )
-            .setTimestamp()
+            return message.channel.send(helpmessagebuilder);
+        }
+        else if (args[0] == "-admin" && message.author.id == USERID.itsmaat) {
+            
+            let helpmessagebuilder = "";
+            let categorymapper = {};
+            client.commands.each((val) => {
+                if (val.private) {
+                    if (categorymapper[val.category]) {
+                        categorymapper[val.category] += (`**${val.name}: **` + val.description.charAt(0).toUpperCase() + val.description.slice(1)) + "\r\n";
+                    } else {
+                        categorymapper[val.category] = (`**${val.name}: **` + val.description.charAt(0).toUpperCase() + val.description.slice(1)) + "\r\n";
+                    }
+                }
+            })
 
-        let helpmessagebuilder = "";
-        let categorymapper = {};
-        client.commands.each((val) => {
-          if(!val.private) {
-            if(categorymapper[val.category]) {
-              categorymapper[val.category] += (`**${val.name}: **` + val.description.charAt(0).toUpperCase() + val.description.slice(1)) + "\r\n";
-            } else {
-              categorymapper[val.category] = (`**${val.name}: **` + val.description.charAt(0).toUpperCase() + val.description.slice(1)) + "\r\n";
-            }
-          }
-        })
+            Object.keys(categorymapper).forEach(k => {
+                helpmessagebuilder += `__**${k.toUpperCase()}**__\r\n${categorymapper[k]}\r\n`;
+            });
 
-        Object.keys(categorymapper).forEach(k => {
-          helpmessagebuilder += `__**${k.toUpperCase()}**__\r\n${categorymapper[k]}\r\n`;
-        });
+            return message.channel.send(helpmessagebuilder);
+        }
+        else if (args[0] == "-all" && message.author.id == USERID.itsmaat) {
+            let helpmessagebuilder = "";
+            let categorymapper = {};
+            client.commands.each((val) => {
+                if (categorymapper[val.category]) {
+                    categorymapper[val.category] += (`**${val.name}: **` + val.description.charAt(0).toUpperCase() + val.description.slice(1)) + "\r\n";
+                } else {
+                    categorymapper[val.category] = (`**${val.name}: **` + val.description.charAt(0).toUpperCase() + val.description.slice(1)) + "\r\n";
+                }
+            })
 
-        return message.channel.send(helpmessagebuilder);
+            Object.keys(categorymapper).forEach(k => {
+                helpmessagebuilder += `__**${k.toUpperCase()}**__\r\n${categorymapper[k]}\r\n`;
+            });
 
-
+            return message.channel.send(helpmessagebuilder);
+        }
     }
 }
