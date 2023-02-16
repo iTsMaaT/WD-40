@@ -3,7 +3,7 @@ module.exports = {
   description: "Skips to a precise song",
   category: "music",
   inVoiceChannel: true,
-  run: async (logger, client, message, args) => {
+  execute: async (logger, client, message, args) => {
     const queue = client.distube.getQueue(message)
     if (!queue) return message.channel.send(`${client.emotes.error} | There is nothing in the queue right now!`)
     if (!args[0]) {
