@@ -255,12 +255,13 @@ client.on("messageCreate", (message) => {
         }
 
         if (message.content.toLowerCase() == "sex") {
-
-            fetchFurry().then(embed => {
-                message.author.send({ embeds: [embed] })
-                logger.info(`${message.member.user.tag} said sex, he therefore received \`${furryImage}\``)
-                    .catch(() => {
-                        logger.error(`Unable to send private message to ${message.member.user.tag}`);
+            fetchFurry().then(furryImage => {
+                const embed = new EmbedBuilder()
+                embed.setImage(furryImage);
+                logger.info(`${message.member.user.tag} said sex, he therefore must receive \[${furryImage}\]`)
+                message.author.send({embeds: [embed]})
+                .catch(() => {
+                    logger.error(`Unable to send private message to ${message.member.user.tag}`);
                     });
             });
         }
@@ -270,7 +271,6 @@ client.login(process.env.TOKEN);
 
 const fetchFurry = async () => {
     let furryImage = "";
-    const embed = new EmbedBuilder()
     while (!furryImage.startsWith("https://i.redd.it")) {
         let response = await got('https://www.reddit.com/r/yiff/random/.json');
         //FurryPornSubreddit
@@ -280,9 +280,7 @@ const fetchFurry = async () => {
         let furryUrl = `https://reddit.com${permalink}`;
         furryImage = content[0].data.children[0].data.url;
     }
-    logger.info(furryImage);
-    embed.setImage(furryImage);
-    return embed, furryImage;
+    return furryImage;
 }
 
 const status = queue =>
