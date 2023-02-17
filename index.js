@@ -19,6 +19,7 @@ global.SnowflakeID = [];
 global.SexID = 0;
 global.SexCount = 0;
 global.CmdEnabled = 1;
+global.BaseActivityStatus = ">help | Time to be annoying!"
 
 const ffmpeg = require('ffmpeg');
 const { YtDlpPlugin } = require('@distube/yt-dlp');
