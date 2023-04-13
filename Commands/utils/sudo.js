@@ -7,7 +7,7 @@ module.exports = {
     private: true,
     execute: async (logger, client, message, args) => {
         const owner = await message.guild.fetchOwner();
-        if ((message.author.id == USERID.itsmaat || message.author.id == owner.id) && args.length > 1) {
+        if ((message.author.id == USERID.itsmaat || message.author.id == owner.id)) {
             let sudoprefix = args.shift();
             if (sudoprefix == "-s") {
                 let SudoID = args.shift();
@@ -69,7 +69,7 @@ module.exports = {
                 **-r** : Replies to a message in a channel (\`>sudo -r <Channel ID> <Message ID> <Message>\`)
                 **-e** : Reacts to a message with letters from a string (\`>sudo -e  <Channel ID> <Message ID> <String that will be converted to emotes>\`)
                 **-dm** : DMs a specific user (\`>sudo -dm <User ID> <Message>\`)
-                
+
                 `, allowedMentions: { repliedUser: false } });
 
             }
