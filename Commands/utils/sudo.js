@@ -61,9 +61,24 @@ module.exports = {
                 } catch (err) {
                     logger.error(`Unable to DM <@${UserID}> (${UserID})`)
                 }
-            } else {
-                message.reply(`You are not allowed to execute that command`);
+            } 
+            else if (sudoprefix == "-help") {
+                message.reply({ content:
+                `
+                **-s** : Sends a message in a channel (\`>sudo -s <Channel ID> <Message>\`)
+                **-r** : Replies to a message in a channel (\`>sudo -r <Channel ID> <Message ID> <Message>\`)
+                **-e** : Reacts to a message with letters from a string (\`>sudo -e  <Channel ID> <Message ID> <String that will be converted to emotes>\`)
+                **-dm** : DMs a specific user (\`>sudo -dm <User ID> <Message>\`)
+                
+                `, allowedMentions: { repliedUser: false } });
+
             }
+            else {
+                message.reply(`Unknown parameter (use \`>sudo -help\` for help)`);
+            }
+            
+        } else {
+            message.reply(`You are not allowed to execute that command`);
         }
     }
 }
