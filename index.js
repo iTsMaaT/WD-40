@@ -19,11 +19,13 @@ global.SnowflakeID = [];
 global.SexID = 0;
 global.SexCount = 0;
 global.CmdEnabled = 1;
+global.superuser = 0;
 global.BaseActivityStatus = ">help | Time to be annoying!"
 
 const ffmpeg = require('ffmpeg');
 const { YtDlpPlugin } = require('@distube/yt-dlp');
 const { SpotifyPlugin } = require('@distube/spotify');
+const UserIDs = require("./UserIDs.js");
 client.distube = new DisTube(client, {
     leaveOnStop: false,
     emitNewSongOnly: true,
@@ -136,6 +138,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
 client.on("messageCreate", (message) => {
     if (message.author.bot) return;
+    if (superuser && message.author.id != USERID.itsmaat) return;
     //if (message.webhookId) return;
 
     if (message.content.toLowerCase() == `>disable` && message.author.id == USERID.itsmaat) {
@@ -146,6 +149,16 @@ client.on("messageCreate", (message) => {
         message.reply("Responses enabled.");
     } else if (message.content.toLowerCase() == `>disable` || message.content.toLowerCase() == `>enable` && !message.author.id == USERID.itsmaat) {
         message.reply(`You are not allowed to execute that command`);
+    }
+
+    if (message.content.toLowerCase() == `>superuser` && message.author.id == USERID.itsmaat) {
+        if (superuser == 0) {
+            superuser = 1;
+            message.reply("Only you can execute commands now.");
+        } else {
+            superuser = 0;
+            message.reply("Everyone can execute commands");
+        }
     }
 
     let prefix = prefixData.getValue(message.guildId) ?? global.prefix;
@@ -159,8 +172,9 @@ client.on("messageCreate", (message) => {
             return;
         }
 
-        logger.info(`Executing [${message.content}] in [${message.channel}]`)
+        logger.info(`Executing [${message.content}] in [${message.channel}] by [${message.member.user.tag} (${message.author.id})]`)
         client.commands.get(command).execute(logger, client, message, args)
+
         /*let commandO = client.commands.get(command);
         if(commandO) {
             logger.info(`Executing [${message.content}] in [${message.channel}]`)
@@ -321,12 +335,12 @@ client.distube
         if (channel) channel.send({ embeds: [error_embed] })
         else console.error(e)
     })
-    .on('empty', channel => {
+    .on('empty', queue => {
         const empty_embed = new EmbedBuilder()
             .setColor("#FF0000")
             .setDescription('Voice channel is empty! Leaving the channel...')
             .setTimestamp()
-        channel.send({ embeds: [empty_embed] })
+            queue.textChannel.send({ embeds: [empty_embed] })
     })
     .on('searchNoResult', (message, query) => {
         const no_result_embed = new EmbedBuilder()
