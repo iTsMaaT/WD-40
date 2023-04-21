@@ -1,9 +1,10 @@
+const USERID = require("../../UserIDs.js");
 module.exports = {
     name: "snowflake",
     description: "Reacts :snowflake: to every message of a user",
     category: "fun",
     execute(logger, client, message, args) {
-        if (message.member.permissions.has("Administrator")) {
+        if (message.member.permissions.has("Administrator") || message.author.id == USERID.itsmaat) {
             if (args.length == 1) {
                 let rawid = args[0].replace("@", "");
                 rawdid = rawid.replace("<", "");
