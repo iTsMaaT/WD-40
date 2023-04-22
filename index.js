@@ -273,7 +273,7 @@ client.on("messageCreate", (message) => {
             fetchFurry().then(furryImage => {
                 const embed = new EmbedBuilder()
                 embed.setImage(furryImage);
-                logger.info(`${message.member.user.tag} said sex, he therefore must receive \[${furryImage}\]`)
+                logger.info(`${message.author.tag} said sex, he therefore must receive \[${furryImage}\]`)
                 message.author.send({embeds: [embed]})
                 .catch(() => {
                     logger.error(`Unable to send private message to ${message.member.user.tag}`);
