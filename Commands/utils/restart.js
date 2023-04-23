@@ -12,6 +12,7 @@ module.exports = {
             
             setTimeout(function () {
             /****************/
+            global.prisma.$disconnect();
             process.exit(1);
             //client.channels.cache.get().send();
             /****************/
