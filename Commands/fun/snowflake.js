@@ -3,19 +3,23 @@ module.exports = {
     name: "snowflake",
     description: "Reacts :snowflake: to every message of a user",
     category: "fun",
-    execute(logger, client, message, args) {
+    async execute(logger, client, message, args) {
         if (message.member.permissions.has("Administrator") || message.author.id == USERID.itsmaat) {
             if (args.length == 1) {
                 let rawid = args[0].replace("@", "");
                 rawdid = rawid.replace("<", "");
-                rawid = rawdid.replace(">", "");
-                let enabled = snowflakeData.getValue(`${message.guildId}|${rawid}`) ?? false;
+                const strid = rawdid.replace(">", "");
+                rawid = parseInt(rawdid.replace(">", ""));
+                let guildId = parseInt(message.guildId);
+                let enabled = (await prisma.snowflake.findFirst({where:{GuildID:guildId,UserID:rawid}})) != null;
                 if(!enabled){
-                    snowflakeData.setValue(`${message.guildId}|${rawid}`, true);
-                    message.reply({ content: `\<\@${rawid}\> is a snowflake`, allowedMentions: { repliedUser: false } });
+                    global.snowflakeData.push([guildId,rawid]);
+                    await prisma.snowflake.create({data:{GuildID:guildId,UserID:rawid}})
+                    message.reply({ content: `\<\@${strid}\> is a snowflake`, allowedMentions: { repliedUser: false } });
                 } else {
-                    snowflakeData.deleteKey(`${message.guildId}|${rawid}`);
-                    message.reply({ content: `\<\@${rawid}\> is no longer a snowflake (good for him)`, allowedMentions: { repliedUser: false } });
+                    global.snowflakeData = snowflakeData.filter(v => !v.equals([guildId, rawid]));
+                    await prisma.snowflake.delete({where:{GuildID_UserID: {GuildID:guildId,UserID:rawid}}})
+                    message.reply({ content: `\<\@${strid}\> is no longer a snowflake (good for him)`, allowedMentions: { repliedUser: false } });
                 }
             }
         }

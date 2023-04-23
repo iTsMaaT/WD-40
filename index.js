@@ -24,6 +24,11 @@ global.CmdEnabled = 1;
 global.superuser = 0;
 global.BaseActivityStatus = ">help | Time to be annoying!"
 
+// Add array.equals()
+Array.prototype.equals = function(b) {
+    return this.length == b.length && this.every((v, i) => v === b[i]);
+}
+
 const ffmpeg = require('ffmpeg');
 const { YtDlpPlugin } = require('@distube/yt-dlp');
 const { SpotifyPlugin } = require('@distube/spotify');
@@ -46,7 +51,12 @@ client.distube = new DisTube(client, {
 
 const logger = new Logger({ root: __dirname, client });
 global.prefixData = new SaveFile({root: __dirname, fileName: 'prefixes.json'});
-global.snowflakeData = new SaveFile({root: __dirname, fileName: 'snowflake.json'});
+global.snowflakeData = [];
+prisma.snowflake.findMany().then(v => {
+    let result = v.map(v => [parseInt(v.GuildID),parseInt(v.UserID)]);
+    global.snowflakeData = global.snowflakeData.concat(result);
+});
+
 
 process.on("uncaughtException", (err) => {
     logger.error(err.stack);
@@ -263,8 +273,14 @@ client.on("messageCreate", (message) => {
         }
 
         //Snowflake reaction
-        if (snowflakeData.getData() != {} && (snowflakeData.getValue(`${message.guildId}|${message.author.id}`) ?? false)) {
-            message.react('❄️');
+        if (snowflakeData != []) {
+            let expected = [parseInt(message.guildId),parseInt(message.author.id)];
+            let exists = snowflakeData.filter(v => {
+                return v.equals(expected);
+            }).length >= 1;
+            if(exists) {
+                message.react('❄️');
+            }
         }
 
         //reacts :gorilla: when pinging iTsMaaT
