@@ -1,5 +1,6 @@
 const path = require('node:path');
 const fs = require('node:fs');
+const { Prisma } = require('@prisma/client');
 
 function checkIfFolderExists(path) {
     try{
@@ -29,11 +30,17 @@ function getDateTime() {
     return getDate() + ' ' + time;
 }
 
-function writeLogToFile(file, log, client) {
+async function writeLogToFile(log, client, type) {
     try{
-        fs.appendFileSync(file, `${log}\r\n`);
+        await global.prisma.logs.create({
+            data: {
+                Value: log,
+                Type: type
+            }
+        })
     } catch(ex) {
-        console.log(`[${getDateTime()} - SEVERE] Unable to write to logfile ${file}`)
+        console.log(`[${getDateTime()} - SEVERE] Unable to write to database`)
+        console.log(ex)
     }
     console.log(`${log}`);
     client?.channels?.cache?.get("1069811223950016572")?.send(`\`\`\`${log}\`\`\``);
@@ -44,45 +51,30 @@ class Logger {
 
     constructor(options) {
         this.options = options;
-        this.logFolder = path.join(this.options.root, 'logs');
-        let date = getDate();
-        checkIfFolderExists(this.logFolder);
-        try{
-            fs.readFileSync(path.join(this.logFolder, `${date}.log.txt`));
-            this.logFile = path.join(this.logFolder, `${getDateTime().replaceAll(':', '.')}.log.txt`);
-        } catch(ex) {
-            this.logFile = path.join(this.logFolder, `${date}.log.txt`);
-        }
-        console.log(`Started logger in file: ${this.logFile}`);
-        try{
-            fs.writeFileSync(this.logFile, "", {encoding: 'utf8'});
-        } catch(e){
-            console.log(`Cannot write logfile (${this.logFile})`);
-        }
     }
 
     error(message){
-        writeLogToFile(this.logFile, `[${getDateTime()} -   ERROR] ${message}`, this.options.client);
+        writeLogToFile(`[${getDateTime()} -   ERROR] ${message}`, this.options.client, "ERROR");
     }
 
     debug(message) {
-        writeLogToFile(this.logFile, `[${getDateTime()} -   DEBUG] ${message}`, this.options.client);
+        writeLogToFile(`[${getDateTime()} -   DEBUG] ${message}`, this.options.client, "DEBUG");
     }
 
     info(message) {
-        writeLogToFile(this.logFile, `[${getDateTime()} -    INFO] ${message}`, this.options.client);
+        writeLogToFile(`[${getDateTime()} -    INFO] ${message}`, this.options.client, "INFO");
     }
 
     warning(message) {
-        writeLogToFile(this.logFile, `[${getDateTime()} - WARNING] ${message}`, this.options.client);
+        writeLogToFile(`[${getDateTime()} - WARNING] ${message}`, this.options.client, "WARNING");
     }
 
     severe(message) {
-        writeLogToFile(this.logFile, `[${getDateTime()} -  SEVERE] ${message}`, this.options.client);
+        writeLogToFile(`[${getDateTime()} -  SEVERE] ${message}`, this.options.client, "SEVERE");
     }
 
     music(message) {
-        writeLogToFile(this.logFile, `[${getDateTime()} -   MUSIC] ${message}`, this.options.client);
+        writeLogToFile(`[${getDateTime()} -   MUSIC] ${message}`, this.options.client, "MUSIC");
     }
 
 }

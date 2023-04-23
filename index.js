@@ -1,3 +1,4 @@
+const { PrismaClient } = require("@prisma/client");
 const { Client, Intents, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events, WebhookClient, Partials } = require("discord.js");
 const Logger = require("./utils/log");
 const SaveFile = require("./utils/save_file");
@@ -14,6 +15,7 @@ const client = new Client({
     intents: Object.keys(GatewayIntentBits), // all intents
     partials: [Partials.Message, Partials.Channel, Partials.Reaction]
 });
+global.prisma = new PrismaClient();
 global.prefix = '>';
 global.SnowflakeID = [];
 global.SexID = 0;
@@ -139,6 +141,7 @@ client.on('guildUnavailable', (guild) => {
 client.on('invalidated', () => {
     logger.severe("The client was invalidated, restarting the bot...");
     setTimeout(function () {
+        global.prisma.$disconnect();
         process.exit(1);
         }, 1000 * 3)
 });

@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+//npx prisma db push
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model GuildSettings {
+  GuildID   BigInt  @id
+  Prefix    String  @db.VarChar(3) @default(">")
+  GuildName String  @db.VarChar(255)
+  Active    Boolean @default(true)
+}
+
+model Snowflake {
+  GuildID   BigInt
+  UserID    BigInt
+  @@id([GuildID,UserID])
+  @@unique([GuildID,UserID])
+}
+
+enum LogType {
+  ERROR
+  SEVERE
+  WARNING
+  INFO
+  DEBUG
+  MUSIC
+}
+model Logs {
+  Date    DateTime  @id @default(now())
+  Value   String    @db.Text
+  Type    LogType   @default(INFO)
+}
+
