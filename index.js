@@ -117,6 +117,42 @@ client.on('guildMemberRemove', member => {
     client.channels.cache.get("1048076076653486090").send(`${member.user.tag} (<@${member.id}>) left \`${member.guild.name}\``);
 })
 
+client.on('guildCreate', guild => {
+    logger.info(`The bot has been added to \`${guild.name}\``)
+    client.channels.cache.get("1048076076653486090").send(`The bot has been added to \`${guild.name}\``);
+})
+
+
+client.on('guildDelete', guild => {
+    logger.info(`The bot has been removed from \`${guild.name}\``)
+    client.channels.cache.get("1048076076653486090").send(`The bot has been removed from \`${guild.name}\``);
+})
+
+client.on('debug', debug => {
+    console.log(debug);
+});
+
+client.on('guildUnavailable', (guild) => {
+    logger.severe(`A guild is unavailable, likely because of a server outage: ${guild}`);
+});
+
+client.on('invalidated', () => {
+    logger.severe("The client was invalidated, restarting the bot...");
+    setTimeout(function () {
+        process.exit(1);
+        }, 1000 * 3)
+});
+
+client.on('rateLimit', (rateLimitData) => {
+    logger.warning(`The bot is rate-limited: ${rateLimitData}`);
+});
+
+client.on('warn', (info) => {
+    logger.warning(`Warning: ${info}`);
+});
+
+
+
 client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return;
 
@@ -172,7 +208,7 @@ client.on("messageCreate", (message) => {
             return;
         }
 
-        logger.info(`Executing [${message.content}] in [${message.channel}] by [${message.member.user.tag} (${message.author.id})]`)
+        logger.info(`Executing [${message.content}] in [${message.channel.name} (${message.channel.id})] by [${message.member.user.tag} (${message.author.id})]`)
         client.commands.get(command).execute(logger, client, message, args)
 
         /*let commandO = client.commands.get(command);
