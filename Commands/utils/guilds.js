@@ -8,7 +8,7 @@ module.exports = {
         if (message.author.id == USERID.itsmaat) {
             let content = client.guilds.cache.map(guild => `${guild.name} (\`${guild.id}\`)`).join("\n");
             message.reply({ content, allowedMentions: { repliedUser: false } });
-            logger.info("The bot is in :" + content)
+            
 
             /* Antoine stupide (it works ig)
             console.log(client.guilds.cache.map(guild => guild.name).reduce((previous,current) => {
