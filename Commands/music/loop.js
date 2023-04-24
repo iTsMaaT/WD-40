@@ -1,7 +1,7 @@
 const {EmbedBuilder} = require("discord.js")
 module.exports={
     name:"loop",
-    description:"Loop a desired song",
+    description:"Loop a desired song or queue",
     category: "music",
     execute(logger, client, message, args){
       if (!message.member.voice.channel) {
