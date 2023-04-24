@@ -7,11 +7,13 @@ module.exports = {
     category: "fun",
     execute: async (logger, client, message, args) => {
         if (args.length == 1) {
+            //Gore subreddits blacklist
             if (args[0] != "eyeblech" && args[0] != "gore" && args[0] != "guro") {
                 let RedditImage = "";
                 var RedditTries = 1;
                 const sent = await message.channel.send({content: `Attempt ${RedditTries}/10`, fetchreply: true})
                 const embed = new EmbedBuilder();
+                //Tries to fetch a post 10 times
                 for (let i = 0; i <= 10; i++) {
                     try {
                         let response = await got(`https://www.reddit.com/r/${args[0]}/random/.json`);
@@ -21,6 +23,7 @@ module.exports = {
                         let RedditTitle = content[0].data.children[0].data.title;
                         RedditImage = content[0].data.children[0].data.url;
                         RedditTries += 1;
+                        //Updates the counter
                         if (RedditTries % 2 == 0 && RedditTries <= 10) {
                         sent.edit({content: `Attempt ${RedditTries}/10`, fetchreply: true})
                         }
@@ -34,6 +37,7 @@ module.exports = {
                             return;
                         }
                     } catch (err) {
+                        //Catches the error, probably a non-existent or banned subreddit
                         sent.edit(`Non-existent Subreddit\n\`${err}\``);
                         logger.error(`Non-existent Subreddit\n\`${err}\``);
                         return;
@@ -44,5 +48,5 @@ module.exports = {
                 message.reply("No.");
             }
         }
-    }  //!RedditImage.startsWith("https://i.redd.it")
+    }
 }

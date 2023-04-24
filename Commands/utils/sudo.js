@@ -7,7 +7,10 @@ module.exports = {
     private: true,
     execute: async (logger, client, message, args) => {
         const owner = await message.guild.fetchOwner();
+
+        //Only server owner and iTsMaaT are allowed to execute this command
         if ((message.author.id == USERID.itsmaat || message.author.id == owner.id)) {
+            //Sends a message in a given channel
             let sudoprefix = args.shift();
             if (sudoprefix == "-s") {
                 let SudoID = args.shift();
@@ -15,6 +18,7 @@ module.exports = {
                 message.reply({ content: "Sudo successful.", allowedMentions: { repliedUser: false } });
                 logger.info(`Sudo -s used by ${message.author.tag} (${message.author.id}) in <#${SudoID}>, Message content : ${args.join(" ")}`);
             }
+            //Replies to a given message in a given channel
             else if (sudoprefix == "-r") {
                 let ChannelID = args.shift();
                 let MsgID = args.shift();
@@ -25,6 +29,7 @@ module.exports = {
                         logger.info(`Sudo -r used by ${message.author.tag} (${message.author.id}) in <#${ChannelID}>, Message content : ${args.join(" ")}`);
                     }).catch(() => message.reply("Unable to find message."));
             }
+            //Reacts to a given message in a given channel
             else if (sudoprefix == "-e") {
                 if (args.length > 2) {
                     let ChannelID = args.shift();
@@ -52,6 +57,7 @@ module.exports = {
                     message.reply({ content: "Emotes cleared.", allowedMentions: { repliedUser: false } });
                 }
             }
+            //DMs a given user
             else if (sudoprefix == "-dm") {
                 try {
                     let UserID = args.shift();
@@ -63,6 +69,7 @@ module.exports = {
                 }
             } 
             else if (sudoprefix == "-help") {
+                //Help for the sudo
                 message.reply({ content:
                 `
 **-s** : Sends a message in a channel (\`>sudo -s <Channel ID> <Message>\`)
@@ -77,10 +84,12 @@ module.exports = {
 
             }
             else {
+                //Unknown parameter error
                 message.reply(`Unknown parameter (use \`>sudo -help\` for help)`);
             }
             
         } else {
+            //If normal user, blocks access to the command
             message.reply(`You are not allowed to execute that command`);
         }
     }

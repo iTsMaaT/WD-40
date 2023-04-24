@@ -18,8 +18,6 @@ const client = new Client({
 global.prisma = new PrismaClient();
 global.prefix = '>';
 global.SnowflakeID = [];
-global.SexID = 0;
-global.SexCount = 0;
 global.CmdEnabled = 1;
 global.superuser = 0;
 global.BaseActivityStatus = ">help | Time to be annoying!"
@@ -48,7 +46,7 @@ client.distube = new DisTube(client, {
     ]
 })
 
-
+//Logger system and databases
 const logger = new Logger({ root: __dirname, client });
 global.prefixData = new SaveFile({root: __dirname, fileName: 'prefixes.json'});
 global.snowflakeData = [];
@@ -57,7 +55,7 @@ prisma.snowflake.findMany().then(v => {
     global.snowflakeData = global.snowflakeData.concat(result);
 });
 
-
+//Error handler
 process.on("uncaughtException", (err) => {
     logger.error(err.stack);
     client?.channels?.cache?.get("1037141235451842701")?.send(`Error caught <@411996978583699456>! <#1069811223950016572>`);
@@ -68,9 +66,12 @@ client.commands = new Discord.Collection();
 //create a collection for slash commands
 client.slashcommands = new Discord.Collection();
 
+//Slash command finder
 const slashcommandsPath = path.join(__dirname, 'slash');
 const slashcommandFiles = fs.readdirSync(slashcommandsPath).filter(file => file.endsWith('.js'));
 
+
+//Slash command handler
 for (const file of slashcommandFiles) {
     const filePath = path.join(slashcommandsPath, file);
     const slashcommand = require(filePath);
@@ -82,6 +83,7 @@ for (const file of slashcommandFiles) {
     }
 }
 
+//Text command handler
 const commandFiles = fs.readdirSync('./Commands/');
 while(commandFiles.length > 0) {
     let file = commandFiles.shift();
@@ -94,60 +96,59 @@ while(commandFiles.length > 0) {
     }
 }
 
-
-
+//Bot setup on startup
 client.on("ready", () => {
 
     logger.info("Bot starting...");
 
     client.user.setActivity(`>help | Time to be annoying!`);
 
-    //Allah everyday at 2:22
+    //- - - New Day - - -
     let scheduledMessage = new cron.CronJob('30 59 02 * * *', () => {
-        // This runs every day at 02:56:30
+        // This runs every day at 02:59:30
         client.channels.cache.get("1069811223950016572").send("- - - - - New Day - - - - -");
     });
     //sarting the daily sending
-    scheduledMessage.start()
+    scheduledMessage.start();
 
     //start confirmation
     setTimeout(function () {
         client.channels.cache.get("1037141235451842701").send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
         logger.info("Bot started successfully.");
-    }, 1000 * 0.1)
+    }, 1000 * 0.1);
+});
 
-
-})
-
+//Member join and leave logging
 client.on('guildMemberAdd', member => {
     logger.info(`${member.user.tag} (${member.id}) joined \`${member.guild.name}\``)
     client.channels.cache.get("1048076076653486090").send(`${member.user.tag} (<@${member.id}>) joined \`${member.guild.name}\``);
-})
-
+});
 client.on('guildMemberRemove', member => {
     logger.info(`${member.user.tag} (${member.id}) left \`${member.guild.name}\``)
     client.channels.cache.get("1048076076653486090").send(`${member.user.tag} (<@${member.id}>) left \`${member.guild.name}\``);
-})
+});
 
+//Bot join and leave logging
 client.on('guildCreate', guild => {
     logger.info(`The bot has been added to \`${guild.name}\``)
     client.channels.cache.get("1048076076653486090").send(`The bot has been added to \`${guild.name}\``);
-})
-
-
+});
 client.on('guildDelete', guild => {
     logger.info(`The bot has been removed from \`${guild.name}\``)
     client.channels.cache.get("1048076076653486090").send(`The bot has been removed from \`${guild.name}\``);
-})
+});
 
+//Debug event
 client.on('debug', debug => {
     console.log(debug);
 });
 
+//Guild unavailability (outage)
 client.on('guildUnavailable', (guild) => {
     logger.severe(`A guild is unavailable, likely because of a server outage: ${guild}`);
 });
 
+//Restarting the bot when it becomes invalidated
 client.on('invalidated', () => {
     logger.severe("The client was invalidated, restarting the bot...");
     setTimeout(function () {
@@ -156,16 +157,17 @@ client.on('invalidated', () => {
         }, 1000 * 3)
 });
 
+//Warning if rate-limited
 client.on('rateLimit', (rateLimitData) => {
     logger.warning(`The bot is rate-limited: ${rateLimitData}`);
 });
 
+//Warning info
 client.on('warn', (info) => {
     logger.warning(`Warning: ${info}`);
 });
 
-
-
+//Slash command executing
 client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return;
 
@@ -190,6 +192,7 @@ client.on("messageCreate", (message) => {
     if (superuser && message.author.id != USERID.itsmaat) return;
     //if (message.webhookId) return;
 
+    //Enable/disable command (Disables auto-responses)
     if (message.content.toLowerCase() == `>disable` && message.author.id == USERID.itsmaat) {
         CmdEnabled = 0;
         message.reply("Responses disabled.");
@@ -200,6 +203,7 @@ client.on("messageCreate", (message) => {
         message.reply(`You are not allowed to execute that command`);
     }
 
+    //Superuser command (Only iTsMaaT can execute commands)
     if (message.content.toLowerCase() == `>superuser` && message.author.id == USERID.itsmaat) {
         if (superuser == 0) {
             superuser = 1;
@@ -210,6 +214,7 @@ client.on("messageCreate", (message) => {
         }
     }
 
+    //Text command executing
     let prefix = prefixData.getValue(message.guildId) ?? global.prefix;
     if (message.content.startsWith(prefix)) {
 
@@ -221,24 +226,20 @@ client.on("messageCreate", (message) => {
             return;
         }
 
-        logger.info(`Executing [${message.content}] in [${message.channel.name} (${message.channel.id})] by [${message.member.user.tag} (${message.author.id})]`)
-        client.commands.get(command).execute(logger, client, message, args)
-
-        /*let commandO = client.commands.get(command);
-        if(commandO) {
-            logger.info(`Executing [${message.content}] in [${message.channel}]`)
-            commandO.execute(logger, client, message, args)
-        }*/
-
+        //Logging every executed commands
+        logger.info(`Executing [${message.content}] in [${message.channel.name} (${message.channel.id})] by [${message.member.user.tag} (${message.author.id})]`);
+        client.commands.get(command).execute(logger, client, message, args);
     }
 
+    //Gives the prefix if the bot is pinged
     if (message.content == "<@1036485458827415633>") {
         message.reply(`**Prefix** : ${prefix}\n**Help command** : ${prefix}help`);
     }
 
+    //Auto-responses
     if (CmdEnabled == 1) {
 
-        //reacts :sick: when gros gaming or smartass is said
+        //reacts S-T-F-U when gros gaming or smartass is said
         if (message.content.toLowerCase().includes("gros gaming") || message.content.toLowerCase().includes("smartass") || (message.content.toLowerCase().includes("edging") && !message.author.id == USERID.dada129)) {
             message.react('🇸')
                 .then(() => message.react('🇹'))
@@ -246,30 +247,25 @@ client.on("messageCreate", (message) => {
                 .then(() => message.react('🇺'));
         }
 
+        //Deletes the message if it has edging and is said by dada
         if (message.content.toLowerCase().includes("edging") && message.author.id == USERID.dada129) {
-            message.delete()
+            message.delete();
         }
 
         //what? eveeeer
         if (message.content.toLowerCase() == `what` || message.content == `what?` || message.content == `What?` ||
             message.content.toLowerCase() == `who` || message.content == `who?` || message.content == `Who?`) {
-            message.reply("ever!")
+            message.reply("ever!");
         }
 
         //ever what?
         if (message.content.toLowerCase() == `ever`) {
-            message.reply("What?")
-        }
-
-        //Sex count with ID
-        if (message.content.toLowerCase() == `sex` && message.author.id == SexID) {
-            message.reply(`Dude this is the ${SexCount}th time you said that, please shut up`)
-            SexCount += 1;
+            message.reply("What?");
         }
 
         //skull reaction to skull emoji
         if (message.content.toLowerCase() == `💀`) {
-            message.react('💀')
+            message.react('💀');
         }
 
         //Snowflake reaction
@@ -285,17 +281,17 @@ client.on("messageCreate", (message) => {
 
         //reacts :gorilla: when pinging iTsMaaT
         if (message.content.includes("<@411996978583699456>")) {
-            message.react('🦍')
+            message.react('🦍');
         }
 
         //reacts :chipmunk: when pinging phildiop
         if (message.content.includes("<@348281625173295114>")) {
-            message.react('🐿️')
+            message.react('🐿️');
         }
 
         //answers your mom when asking who's at break
         if (message.content.toLowerCase().includes("en pause")) {
-            message.channel.send("Ta mère")
+            message.channel.send("Ta mère");
         }
 
         //Ping fail if doesnt have @everyone perm
@@ -305,17 +301,20 @@ client.on("messageCreate", (message) => {
 
         //answers bruh to bruh
         if (message.content.toLowerCase() == "bruh") {
-            message.reply("bruh")
+            message.reply("bruh");
         }
 
+        //Reacts the stuff meme when a message includes "stuff"
         if (message.content.toLowerCase().includes("stuff")) {
-            message.reply("https://media.discordapp.net/attachments/774305852323790873/1040424470483046462/8fa.png?width=628&height=670")
+            message.react("<:stuff:1099738190966960179>");
         }
 
+        //Replies when someone does a mogus reference
         if (message.content.toLowerCase() == "sus" || message.content.toLowerCase() == "amogus" || message.content.toLowerCase() == "among us") {
             //message.reply("No.");
         }
 
+        //Votes for the memes
         if (message.attachments.size > 0 || message.content.startsWith("https://") || message.content.startsWith("http://")) {
             if (message.channel.name.includes('meme')) {
                 message.react('👍')
@@ -324,6 +323,7 @@ client.on("messageCreate", (message) => {
             }
         }
 
+        //Sends furry porn in DMs of anyone that says "sex"
         if (message.content.toLowerCase() == "sex") {
             fetchFurry().then(furryImage => {
                 const embed = new EmbedBuilder()
@@ -337,8 +337,10 @@ client.on("messageCreate", (message) => {
         }
     }
 })
+//Logins with the token
 client.login(process.env.TOKEN);
 
+//Function that fetches a random post from r/yiff
 const fetchFurry = async () => {
     let furryImage = "";
     while (!furryImage.startsWith("https://i.redd.it")) {
@@ -353,6 +355,7 @@ const fetchFurry = async () => {
     return furryImage;
 }
 
+//Music events
 const status = queue =>
     `Volume: \`${queue.volume}%\` | Filter: \`${queue.filters.names.join(', ') || 'Off'}\` | Loop: \`${queue.repeatMode ? (queue.repeatMode === 2 ? 'All Queue' : 'This Song') : 'Off'
     }\` | Autoplay: \`${queue.autoplay ? 'On' : 'Off'}\``
