@@ -4,12 +4,15 @@ module.exports = {
     description: "Reacts :snowflake: to every message of a user",
     category: "fun",
     async execute(logger, client, message, args) {
+        //Checks if the person executing the command is iTsMaaT or the server's owner
         if (message.member.permissions.has("Administrator") || message.author.id == USERID.itsmaat) {
             if (args.length == 1) {
+                //Transforms a ping into the ID
                 let rawid = args[0].replace("@", "");
                 rawdid = rawid.replace("<", "");
                 const strid = rawdid.replace(">", "");
                 rawid = parseInt(rawdid.replace(">", ""));
+                //Uses the database to add or remove the person from the list
                 let guildId = parseInt(message.guildId);
                 let enabled = (await prisma.snowflake.findFirst({where:{GuildID:guildId,UserID:rawid}})) != null;
                 if(!enabled){

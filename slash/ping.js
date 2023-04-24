@@ -11,6 +11,7 @@ module.exports = {
 		const target = await guild.members.fetch("1036485458827415633");
 		const sent = await interaction.editReply({ content: 'Pinging...', fetchReply: true });
     
+		//Gives the ping in ms, uptime in days, round trip latency in ms and the bots age in relative time
         interaction.editReply(`
 
 My ping is \`${client.ws.ping}ms\`

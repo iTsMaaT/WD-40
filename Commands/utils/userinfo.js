@@ -7,6 +7,7 @@ module.exports = {
     execute: async (logger, client, message, args) => {
         const guild = await client.guilds.fetch(message.guildId);
         if (!args[0]) {
+            //Info of the user executing the command
             try {
                 const id = message.author.id;
                 const target = await guild.members.fetch(id);
@@ -41,6 +42,7 @@ module.exports = {
                 message.reply(`Invalid user / id, User offline or an error occurred\n${err}`);
             }
         } else if (args.length == 1) {
+            //Info of a given user
             try {
                 const rawid1 = args[0].replace("@", "");
                 const rawdid2 = rawid1.replace("<", "");

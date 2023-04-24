@@ -9,6 +9,7 @@ module.exports = {
     category: "utils",
     private: true,
     execute(logger, client, message, args) {
+        //Finds all command files and separate them from categories, -all shows all and -admin shows the private ones (admin or iTsMaaT only)
         if (!args[0]) {
 
             let helpmessagebuilder = "";

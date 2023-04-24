@@ -20,6 +20,7 @@ __Users__
 
 ${ message.guild.members.cache.filter((m) => m.user).size == 42 ? "This is the answer to life!" : ""}    
 `, allowedMentions: { repliedUser: false }
+//Easter egg for 42 and 69 members
         })
     }
 }
