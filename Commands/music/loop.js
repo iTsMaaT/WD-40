@@ -3,7 +3,7 @@ module.exports={
     name:"loop",
     description:"Loop a desired song",
     category: "music",
-    execute(client, message, args){
+    execute(logger, client, message, args){
       if (!message.member.voice.channel) {
         const must_be_in_vc_embed = new EmbedBuilder()
       .setColor("#FF0000")
