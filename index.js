@@ -8,6 +8,7 @@ const got = require("got");
 const { DisTube } = require('distube');
 dotenv.config();
 const Discord = require('discord.js');
+const { Guild } = require("discord.js");
 const fs = require('fs');
 const path = require('node:path');
 const USERID = require("./UserIDs.js");
@@ -227,7 +228,8 @@ client.on("messageCreate", (message) => {
         }
 
         //Logging every executed commands
-        logger.info(`Executing [${message.content}] in [${message.channel.name} (${message.channel.id})] by [${message.member.user.tag} (${message.author.id})]`);
+
+        logger.info(`Executing [${message.content}]\nby\t[${message.member.user.tag} (${message.author.id})]\nin\t[${message.channel.name} (${message.channel.id})]\nfrom  [${message.guild.name} (${message.guild.id})]`);
         client.commands.get(command).execute(logger, client, message, args);
     }
 
