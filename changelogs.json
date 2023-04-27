@@ -19,7 +19,7 @@
       "date": "2023-05-27",
       "changes": [
         "Added ChatGPT-3.5 (>ask)",
-        "Made the rule34 command fetch from rule34.xx instead of Reddit",
+        "Made the rule34 command fetch from rule34.xxx instead of Reddit",
         "Reddit command now can fetch a user post (>help)",
         "Reddit and rule34 command now checks for NSFW channel",
         "Userinfo command also gives the highest level of the target user",
