@@ -99,6 +99,8 @@ module.exports = {
             };
             message.channel.send({ embeds: [embed] });
           
+        } else {
+            message.reply({ content: "You didn't specify the parameter correctly (-p for post, -u for user : >reddit <parameter> <subreddit or user>)", allowedMentions: { repliedUser: false } });
         }
     }
 }
