@@ -1,0 +1,33 @@
+[
+    {
+      "version": "2.0.0",
+      "date": "2023-02-13",
+      "changes": [
+        "Added feature X",
+        "Improved feature Y",
+        "Fixed bug Z"
+      ]
+    },
+    {
+      "version": "2.1.0",
+      "date": "2023-05-22",
+      "changes": [
+        "Added a database system",
+        "Event handler"
+    
+      ]
+    },
+    {
+      "version": "2.2.0",
+      "date": "2023-05-27",
+      "changes": [
+        "Added ChatGPT-3.5 (>ask)",
+        "Made the rule34 command fetch from rule34.xx instead of Reddit",
+        "Reddit command now can fetch a user post (>help)",
+        "Reddit and rule34 command now checks for NSFW channel",
+        "Userinfo command also gives the highest level of the target user",
+        "Added >changelog"
+      ]
+    }
+  ]
+  
