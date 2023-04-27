@@ -3,9 +3,7 @@
       "version": "2.0.0",
       "date": "2023-02-13",
       "changes": [
-        "Added feature X",
-        "Improved feature Y",
-        "Fixed bug Z"
+        "Added a dynamic help command"
       ]
     },
     {
@@ -14,7 +12,6 @@
       "changes": [
         "Added a database system",
         "Event handler"
-    
       ]
     },
     {
