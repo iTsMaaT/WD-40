@@ -10,7 +10,7 @@ module.exports = {
     `**Version: ${version}** (${date}):\n${changes.map(change => `- ${change}`).join('\n')}\n\n`)
     let cleanlog = log.join("").replace(",**Version:**","**Version:**")
     let prefix = prefixData.getValue(message.guildId) ?? global.prefix;
-    message.channel.send(
+    message.reply({content:
 `
 For help : ${prefix}help
 
@@ -18,6 +18,6 @@ For help : ${prefix}help
 ${cleanlog}
 `
 
-    );
+, allowedMentions: { repliedUser: false } });
   },
 };
