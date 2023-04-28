@@ -28,7 +28,7 @@ module.exports = {
                         if (RedditTries % 2 == 0 && RedditTries <= 10) {
                             sent.edit({ content: `Attempt ${RedditTries}/10`, fetchreply: true })
                         }
-                        if (RedditImage.startsWith("https://i.redd.it") || RedditImage.startsWith("https://im4.ezgif.com") || RedditImage.endsWith(".gif")) {
+                        if (RedditImage.endsWith(".jpg") || RedditImage.endsWith(".png") || RedditImage.endsWith(".gif")) {
                             if (!PostNsfw || (PostNsfw && message.channel.nsfw)) {
 
                                 const embed = {
