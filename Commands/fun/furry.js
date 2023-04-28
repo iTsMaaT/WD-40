@@ -22,7 +22,9 @@ module.exports = {
             PostImage = content[0].data.children[0].data.url;
             var PostAuthor = content[0].data.children[0].data.author;
             var PostRSlash = content[0].data.children[0].data.subreddit_name_prefixed;
+            var PostNsfw = content[0].data.children[0].data.over_18;
         }
+        if (!PostNsfw || (PostNsfw && message.channel.nsfw)) {
         const embed = {
             title: PostTitle,
             url: PostURL,
@@ -33,8 +35,11 @@ module.exports = {
               text: `Posted by ${PostAuthor} in ${PostRSlash}`,
             },
           };
-
-        message.channel.send({ embeds: [embed], allowedMentions: { repliedUser: false } });
+          message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+        } else {
+            message.reply({ content: `The post is NSFW but the channel isn't`, allowedMentions: { repliedUser: false } });
+        }
+        
       } catch (error) {
         logger.error(error);
         message.reply('There was an error fetching the random post.');
