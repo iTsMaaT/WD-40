@@ -25,6 +25,16 @@
         "Userinfo command also gives the highest level of the target user",
         "Added >changelog"
       ]
-    }
+    },
+    {
+        "version": "2.3.1",
+        "date": "2023-05-28",
+        "changes": [
+          "Added context and Jailbreak to ChatGPT",
+          "Added >roll, can roll dices",
+          "Added >furry, you know what this is",
+          "Multiple bug fixes and optimization"
+        ]
+      }
   ]
   
