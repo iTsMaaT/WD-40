@@ -2,8 +2,8 @@ const request = require('request');
 
 module.exports = {
     name: "rule34",
-    description: " [NSFW] Fetches a post using the rule34.xxx API, and can accept tags",
-    category: "fun",
+    description: "Fetches a post using the rule34.xxx API, and can accept tags",
+    category: "NSFW",
     execute: async (logger, client, message, args) => {
         if (message.channel.nsfw) {
             const url = 'http://rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=' + args.join('+');

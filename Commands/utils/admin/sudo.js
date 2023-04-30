@@ -1,5 +1,5 @@
 const { Guild } = require("discord.js");
-const USERID = require("../../UserIDs.js");
+const USERID = require("../../../UserIDs.js");
 module.exports = {
     name: "sudo",
     description: "Make the bot send a custom message / reply",

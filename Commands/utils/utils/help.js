@@ -2,7 +2,7 @@ const path = require('node:path');
 const fs = require('node:fs');
 const { readdirSync } = require('node:fs');
 const { EmbedBuilder } = require("discord.js")
-const USERID = require("../../UserIDs.js");
+const USERID = require("../../../UserIDs.js");
 module.exports = {
     name: "help",
     description: "Lists commands",
