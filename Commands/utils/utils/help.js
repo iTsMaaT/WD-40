@@ -2,7 +2,7 @@ const path = require('node:path');
 const fs = require('node:fs');
 const { readdirSync } = require('node:fs');
 const { EmbedBuilder } = require("discord.js")
-const USERID = require("../../UserIDs.js");
+const USERID = require("../../../UserIDs.js");
 module.exports = {
     name: "help",
     description: "Lists commands",
@@ -13,7 +13,7 @@ module.exports = {
         if (!args[0]) {
 
             let helpmessagebuilder = "";
-            let prefix = prefixData.getValue(message.guildId) ?? global.prefix;
+            let prefix = global.GuildManager.GetPrefix(message.guild);
             helpmessagebuilder += `**The prefix is:** \`${prefix}\`\n\n`
             let categorymapper = {};
             client.commands.each((val) => {

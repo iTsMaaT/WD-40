@@ -6,9 +6,9 @@ module.exports = {
     private: true,
     execute(logger, client, message, args) {
         if (message.author.id == 411996978583699456) {
-            logger.severe("Restart requested from discord...");
+            logger.severe(`Restart requested from discord for reason : ${args.join(" ")}`);
             message.reply("Restarting the bot.");
-            client.channels.cache.get("1037141235451842701").send("Restart requested from discord...");
+            client.channels.cache.get("1037141235451842701").send(`Restart requested from discord for reason : \`${args.join(" ")}\``);
             
             //After 3s, closes the database and then exits the process
             setTimeout(function () {

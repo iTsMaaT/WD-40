@@ -17,6 +17,7 @@ model GuildSettings {
   Prefix    String  @db.VarChar(3) @default(">")
   GuildName String  @db.VarChar(255)
   Active    Boolean @default(true)
+  Responses Boolean @default(false)
 }
 
 model Snowflake {
@@ -35,7 +36,8 @@ enum LogType {
   MUSIC
 }
 model Logs {
-  Date    DateTime  @id @default(now())
+  ID      BigInt    @id @default(autoincrement())
+  Date    DateTime  @default(now())
   Value   String    @db.Text
   Type    LogType   @default(INFO)
 }

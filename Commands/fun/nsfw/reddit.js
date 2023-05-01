@@ -3,8 +3,8 @@ const got = require("got");
 
 module.exports = {
     name: "reddit",
-    description: "[NSFW] Finds an image or post from *any* subreddit (-p for post, -u for user)",
-    category: "fun",
+    description: "Finds an image or post from *any* subreddit (-p for post, -u for user)",
+    category: "NSFW",
     execute: async (logger, client, message, args) => {
         var sent = "";
         if (args.length == 2 && args[0] == "-p") {

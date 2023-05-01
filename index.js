@@ -17,6 +17,7 @@ const client = new Client({
     partials: [Partials.Message, Partials.Channel, Partials.Reaction]
 });
 global.prisma = new PrismaClient();
+global.GuildManager = (require("./utils/GuildManager.js"))(prisma);
 global.prefix = '>';
 global.SnowflakeID = [];
 global.CmdEnabled = 1;
@@ -24,7 +25,7 @@ global.superuser = 0;
 global.BaseActivityStatus = ">help | Time to be annoying!"
 
 // Add array.equals()
-Array.prototype.equals = function(b) {
+Array.prototype.equals = function (b) {
     return this.length == b.length && this.every((v, i) => v === b[i]);
 }
 
@@ -32,6 +33,7 @@ const ffmpeg = require('ffmpeg');
 const { YtDlpPlugin } = require('@distube/yt-dlp');
 const { SpotifyPlugin } = require('@distube/spotify');
 const UserIDs = require("./UserIDs.js");
+const GuildManager = require("./utils/GuildManager.js");
 client.distube = new DisTube(client, {
     leaveOnStop: false,
     emitNewSongOnly: true,
@@ -41,18 +43,17 @@ client.distube = new DisTube(client, {
     youtubeCookie: process.env.YOUTUBECOOKIE,
     plugins: [
         new SpotifyPlugin({
-          emitEventsAfterFetching: true
+            emitEventsAfterFetching: true
         }),
         new YtDlpPlugin()
     ]
 })
 
 //Logger system and databases
-const logger = new Logger({ root: __dirname, client });
-global.prefixData = new SaveFile({root: __dirname, fileName: 'prefixes.json'});
+global.logger = new Logger({ root: __dirname, client });
 global.snowflakeData = [];
 prisma.snowflake.findMany().then(v => {
-    let result = v.map(v => [parseInt(v.GuildID),parseInt(v.UserID)]);
+    let result = v.map(v => [parseInt(v.GuildID), parseInt(v.UserID)]);
     global.snowflakeData = global.snowflakeData.concat(result);
 });
 
@@ -86,21 +87,24 @@ for (const file of slashcommandFiles) {
 
 //Text command handler
 const commandFiles = fs.readdirSync('./Commands/');
-while(commandFiles.length > 0) {
+while (commandFiles.length > 0) {
     let file = commandFiles.shift();
-    if(file.endsWith('.js')){
+    if (file.endsWith('.js')) {
         const command = require(`./Commands/${file}`);
         client.commands.set(command.name, command)
     } else {
-        let newFiles = fs.readdirSync('./Commands/'+file);
-        newFiles.forEach(f => commandFiles.push(file + '/' +f));
+        let newFiles = fs.readdirSync('./Commands/' + file);
+        newFiles.forEach(f => commandFiles.push(file + '/' + f));
     }
 }
 
 //Bot setup on startup
-client.on("ready", () => {
+client.on("ready", async () => {
 
     logger.info("Bot starting...");
+    
+    let guilds = await client.guilds.fetch();
+    await global.GuildManager.init(guilds);
 
     client.user.setActivity(`>help | Time to be annoying!`);
 
@@ -130,19 +134,24 @@ client.on('guildMemberRemove', member => {
 });
 
 //Bot join and leave logging
-client.on('guildCreate', guild => {
+client.on('guildCreate', async (guild) => {
+    await GuildManager.SetActiveOrCreate(guild);
     logger.info(`The bot has been added to \`${guild.name}\``)
     client.channels.cache.get("1048076076653486090").send(`The bot has been added to \`${guild.name}\``);
 });
-client.on('guildDelete', guild => {
+
+client.on('guildDelete', async (guild) => {
+    await GuildManager.SetActiveOrCreate(guild, false);
     logger.info(`The bot has been removed from \`${guild.name}\``)
     client.channels.cache.get("1048076076653486090").send(`The bot has been removed from \`${guild.name}\``);
 });
 
+/*
 //Debug event
 client.on('debug', debug => {
     console.log(debug);
 });
+*/
 
 //Guild unavailability (outage)
 client.on('guildUnavailable', (guild) => {
@@ -155,7 +164,7 @@ client.on('invalidated', () => {
     setTimeout(function () {
         global.prisma.$disconnect();
         process.exit(1);
-        }, 1000 * 3)
+    }, 1000 * 3)
 });
 
 //Warning if rate-limited
@@ -191,32 +200,10 @@ client.on(Events.InteractionCreate, async interaction => {
 client.on("messageCreate", (message) => {
     if (message.author.bot) return;
     if (superuser && message.author.id != USERID.itsmaat) return;
-    //if (message.webhookId) return;
-
-    //Enable/disable command (Disables auto-responses)
-    if (message.content.toLowerCase() == `>disable` && message.author.id == USERID.itsmaat) {
-        CmdEnabled = 0;
-        message.reply("Responses disabled.");
-    } else if (message.content.toLowerCase() == `>enable` && message.author.id == USERID.itsmaat) {
-        CmdEnabled = 1;
-        message.reply("Responses enabled.");
-    } else if (message.content.toLowerCase() == `>disable` || message.content.toLowerCase() == `>enable` && !message.author.id == USERID.itsmaat) {
-        message.reply(`You are not allowed to execute that command`);
-    }
-
-    //Superuser command (Only iTsMaaT can execute commands)
-    if (message.content.toLowerCase() == `>superuser` && message.author.id == USERID.itsmaat) {
-        if (superuser == 0) {
-            superuser = 1;
-            message.reply("Only you can execute commands now.");
-        } else {
-            superuser = 0;
-            message.reply("Everyone can execute commands");
-        }
-    }
+    if (!message.guild) return;
 
     //Text command executing
-    let prefix = prefixData.getValue(message.guildId) ?? global.prefix;
+    let prefix = global.GuildManager.GetPrefix(message.guild)
     if (message.content.startsWith(prefix)) {
 
         const args = message.content.slice(prefix.length).split(/ +/);
@@ -229,7 +216,7 @@ client.on("messageCreate", (message) => {
 
         //Logging every executed commands
 
-        logger.info(`Executing [${message.content}]\nby\t[${message.member.user.tag} (${message.author.id})]\nin\t[${message.channel.name} (${message.channel.id})]\nfrom  [${message.guild.name} (${message.guild.id})]`);
+        logger.info(`Executing [${message.content}]\nby    [${message.member.user.tag} (${message.author.id})]\nin    [${message.channel.name} (${message.channel.id})]\nfrom  [${message.guild.name} (${message.guild.id})]`);
         client.commands.get(command).execute(logger, client, message, args);
     }
 
@@ -239,7 +226,7 @@ client.on("messageCreate", (message) => {
     }
 
     //Auto-responses
-    if (CmdEnabled == 1) {
+    if (global.GuildManager.GetResponses(message.guild)) {
 
         //reacts S-T-F-U when gros gaming or smartass is said
         if (message.content.toLowerCase().includes("gros gaming") || message.content.toLowerCase().includes("smartass") || (message.content.toLowerCase().includes("edging") && !message.author.id == USERID.dada129)) {
@@ -272,11 +259,11 @@ client.on("messageCreate", (message) => {
 
         //Snowflake reaction
         if (snowflakeData != []) {
-            let expected = [parseInt(message.guildId),parseInt(message.author.id)];
+            let expected = [parseInt(message.guildId), parseInt(message.author.id)];
             let exists = snowflakeData.filter(v => {
                 return v.equals(expected);
             }).length >= 1;
-            if(exists) {
+            if (exists) {
                 message.react('❄️');
             }
         }
@@ -331,9 +318,9 @@ client.on("messageCreate", (message) => {
                 const embed = new EmbedBuilder()
                 embed.setImage(furryImage);
                 logger.info(`${message.author.tag} said sex, he therefore must receive \[${furryImage}\]`)
-                message.author.send({embeds: [embed]})
-                .catch(() => {
-                    logger.error(`Unable to send private message to ${message.member.user.tag}`);
+                message.author.send({ embeds: [embed] })
+                    .catch(() => {
+                        logger.error(`Unable to send private message to ${message.member.user.tag}`);
                     });
             });
         }
@@ -400,7 +387,7 @@ client.distube
             .setColor("#FF0000")
             .setDescription('Voice channel is empty! Leaving the channel...')
             .setTimestamp()
-            queue.textChannel.send({ embeds: [empty_embed] })
+        queue.textChannel.send({ embeds: [empty_embed] })
     })
     .on('searchNoResult', (message, query) => {
         const no_result_embed = new EmbedBuilder()

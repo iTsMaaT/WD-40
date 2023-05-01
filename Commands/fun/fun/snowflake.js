@@ -1,4 +1,4 @@
-const USERID = require("../../UserIDs.js");
+const USERID = require("../../../UserIDs.js");
 module.exports = {
     name: "snowflake",
     description: "Reacts :snowflake: to every message of a user",
