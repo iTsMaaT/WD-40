@@ -13,7 +13,7 @@ module.exports = {
         if (!args[0]) {
 
             let helpmessagebuilder = "";
-            let prefix = prefixData.getValue(message.guildId) ?? global.prefix;
+            let prefix = global.GuildManager.GetPrefix(message.guild);
             helpmessagebuilder += `**The prefix is:** \`${prefix}\`\n\n`
             let categorymapper = {};
             client.commands.each((val) => {

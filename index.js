@@ -17,6 +17,7 @@ const client = new Client({
     partials: [Partials.Message, Partials.Channel, Partials.Reaction]
 });
 global.prisma = new PrismaClient();
+global.GuildManager = (require("./utils/GuildManager.js"))(prisma);
 global.prefix = '>';
 global.SnowflakeID = [];
 global.CmdEnabled = 1;
@@ -32,6 +33,7 @@ const ffmpeg = require('ffmpeg');
 const { YtDlpPlugin } = require('@distube/yt-dlp');
 const { SpotifyPlugin } = require('@distube/spotify');
 const UserIDs = require("./UserIDs.js");
+const GuildManager = require("./utils/GuildManager.js");
 client.distube = new DisTube(client, {
     leaveOnStop: false,
     emitNewSongOnly: true,
@@ -49,7 +51,6 @@ client.distube = new DisTube(client, {
 
 //Logger system and databases
 global.logger = new Logger({ root: __dirname, client });
-global.prefixData = new SaveFile({ root: __dirname, fileName: 'prefixes.json' });
 global.snowflakeData = [];
 prisma.snowflake.findMany().then(v => {
     let result = v.map(v => [parseInt(v.GuildID), parseInt(v.UserID)]);
@@ -98,9 +99,12 @@ while (commandFiles.length > 0) {
 }
 
 //Bot setup on startup
-client.on("ready", () => {
+client.on("ready", async () => {
 
     logger.info("Bot starting...");
+    
+    let guilds = await client.guilds.fetch();
+    await global.GuildManager.init(guilds);
 
     client.user.setActivity(`>help | Time to be annoying!`);
 
@@ -130,11 +134,14 @@ client.on('guildMemberRemove', member => {
 });
 
 //Bot join and leave logging
-client.on('guildCreate', guild => {
+client.on('guildCreate', async (guild) => {
+    await GuildManager.SetActiveOrCreate(guild);
     logger.info(`The bot has been added to \`${guild.name}\``)
     client.channels.cache.get("1048076076653486090").send(`The bot has been added to \`${guild.name}\``);
 });
-client.on('guildDelete', guild => {
+
+client.on('guildDelete', async (guild) => {
+    await GuildManager.SetActiveOrCreate(guild, false);
     logger.info(`The bot has been removed from \`${guild.name}\``)
     client.channels.cache.get("1048076076653486090").send(`The bot has been removed from \`${guild.name}\``);
 });
@@ -193,10 +200,10 @@ client.on(Events.InteractionCreate, async interaction => {
 client.on("messageCreate", (message) => {
     if (message.author.bot) return;
     if (superuser && message.author.id != USERID.itsmaat) return;
-    //if (message.webhookId) return;
+    if (!message.guild) return;
 
     //Text command executing
-    let prefix = prefixData.getValue(message.guildId) ?? global.prefix;
+    let prefix = global.GuildManager.GetPrefix(message.guild)
     if (message.content.startsWith(prefix)) {
 
         const args = message.content.slice(prefix.length).split(/ +/);
@@ -209,7 +216,7 @@ client.on("messageCreate", (message) => {
 
         //Logging every executed commands
 
-        logger.info(`Executing [${message.content}]\nby\t[${message.member.user.tag} (${message.author.id})]\nin\t[${message.channel.name} (${message.channel.id})]\nfrom  [${message.guild.name} (${message.guild.id})]`);
+        logger.info(`Executing [${message.content}]\nby    [${message.member.user.tag} (${message.author.id})]\nin    [${message.channel.name} (${message.channel.id})]\nfrom  [${message.guild.name} (${message.guild.id})]`);
         client.commands.get(command).execute(logger, client, message, args);
     }
 
@@ -219,7 +226,7 @@ client.on("messageCreate", (message) => {
     }
 
     //Auto-responses
-    if (CmdEnabled == 1) {
+    if (global.GuildManager.GetResponses(message.guild)) {
 
         //reacts S-T-F-U when gros gaming or smartass is said
         if (message.content.toLowerCase().includes("gros gaming") || message.content.toLowerCase().includes("smartass") || (message.content.toLowerCase().includes("edging") && !message.author.id == USERID.dada129)) {

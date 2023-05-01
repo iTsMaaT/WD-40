@@ -1,40 +1,49 @@
 [
-    {
-      "version": "2.0.0",
-      "date": "2023-02-13",
-      "changes": [
-        "Added a dynamic help command"
-      ]
-    },
-    {
-      "version": "2.1.0",
-      "date": "2023-05-22",
-      "changes": [
-        "Added a database system",
-        "Event handler"
-      ]
-    },
-    {
-      "version": "2.2.0",
-      "date": "2023-05-27",
-      "changes": [
-        "Added ChatGPT-3.5 (>ask)",
-        "Made the rule34 command fetch from rule34.xxx instead of Reddit",
-        "Reddit command now can fetch a user post (>help)",
-        "Reddit and rule34 command now checks for NSFW channel",
-        "Userinfo command also gives the highest level of the target user",
-        "Added >changelog"
-      ]
-    },
-    {
-        "version": "2.3.1",
-        "date": "2023-05-28",
-        "changes": [
-          "Added context and Jailbreak to ChatGPT",
-          "Added >roll, can roll dices",
-          "Added >furry, you know what this is",
-          "Multiple bug fixes and optimization"
-        ]
-      }
-  ]
-  
+  {
+    "version": "2.0.0",
+    "date": "2023-02-13",
+    "changes": [
+      "Added a dynamic help command"
+    ]
+  },
+  {
+    "version": "2.1.0",
+    "date": "2023-05-22",
+    "changes": [
+      "Added a database system",
+      "Event handler"
+    ]
+  },
+  {
+    "version": "2.2.0",
+    "date": "2023-05-27",
+    "changes": [
+      "Added ChatGPT-3.5 (>ask)",
+      "Made the rule34 command fetch from rule34.xxx instead of Reddit",
+      "Reddit command now can fetch a user post (>help)",
+      "Reddit and rule34 command now checks for NSFW channel",
+      "Userinfo command also gives the highest level of the target user",
+      "Added >changelog"
+    ]
+  },
+  {
+    "version": "2.3.1",
+    "date": "2023-05-28",
+    "changes": [
+      "Added context and Jailbreak to ChatGPT",
+      "Added >roll, can roll dices",
+      "Added >furry, you know what this is",
+      "Multiple bug fixes and optimization"
+    ]
+  },
+  {
+    "version": "2.4.2",
+    "date": "2023-04-30",
+    "changes": [
+      "Refactoring",
+      "Multiple new commands (>car, >dog, >minecraft, >meme, >fact)",
+      "Completlely switched to a database system",
+      "Auto-responses are now per guilds and disabled by default"
+    ]
+  }
+]

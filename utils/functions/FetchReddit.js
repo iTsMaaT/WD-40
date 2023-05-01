@@ -4,6 +4,7 @@ const FetchReddit = async function (message, ...subreddits) {
     try {
         let array = [...subreddits]
         let subreddit = array[Math.floor(Math.random() * subreddits.length)];
+        console.log(subreddit)
         let PostImage = "";
         //var embed = new EmbedBuilder()
         while (!(PostImage.endsWith(".jpg") || PostImage.endsWith(".png") || PostImage.endsWith(".gif"))) {
