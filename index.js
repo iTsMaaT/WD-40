@@ -102,7 +102,7 @@ while (commandFiles.length > 0) {
 client.on("ready", async () => {
 
     logger.info("Bot starting...");
-    
+
     let guilds = await client.guilds.fetch();
     await global.GuildManager.init(guilds);
 
@@ -225,6 +225,16 @@ client.on("messageCreate", (message) => {
         message.reply(`**Prefix** : ${prefix}\n**Help command** : ${prefix}help`);
     }
 
+    //Votes for the memes
+    if (message.attachments.size > 0 || message.content.startsWith("https://") || message.content.startsWith("http://")) {
+        if (message.channel.name.includes('meme')) {
+            message.react('👍')
+                .then(() => message.react('👎'))
+                .then(() => message.react('♻️'))
+                .then(() => message.react('💀'));
+        }
+    }
+
     //Auto-responses
     if (global.GuildManager.GetResponses(message.guild)) {
 
@@ -303,15 +313,6 @@ client.on("messageCreate", (message) => {
             //message.reply("No.");
         }
 
-        //Votes for the memes
-        if (message.attachments.size > 0 || message.content.startsWith("https://") || message.content.startsWith("http://")) {
-            if (message.channel.name.includes('meme')) {
-                message.react('👍')
-                    .then(() => message.react('👎'))
-                    .then(() => message.react('♻️'));
-            }
-        }
-
         //Sends furry porn in DMs of anyone that says "sex"
         if (message.content.toLowerCase() == "sex") {
             fetchFurry().then(furryImage => {
@@ -344,66 +345,57 @@ const fetchFurry = async () => {
     return furryImage;
 }
 
-//Music events
-const status = queue =>
-    `Volume: \`${queue.volume}%\` | Filter: \`${queue.filters.names.join(', ') || 'Off'}\` | Loop: \`${queue.repeatMode ? (queue.repeatMode === 2 ? 'All Queue' : 'This Song') : 'Off'
-    }\` | Autoplay: \`${queue.autoplay ? 'On' : 'Off'}\``
+const status = queue => `Volume: \`${queue.volume}%\` | Filter: \`${queue.filters.names.join(', ') || 'Off'}\` | Loop: \`${queue.repeatMode ? (queue.repeatMode === 2 ? 'All Queue' : 'This Song') : 'Off'}\` | Autoplay: \`${queue.autoplay ? 'On' : 'Off'}\``
+
 client.distube
 
-    .on('playSong', (queue, song) => {
-        const playsong_embed = new EmbedBuilder()
-            .setColor("#FF0000")
-            .setDescription(`Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`)
-            .setTimestamp()
-        queue.textChannel.send({ embeds: [playsong_embed] })
-        logger.music(`Playing ${song.name} - ${song.formattedDuration}\nRequested by: ${song.user}\n${status(queue)}`);
-    })
-    .on('addSong', (queue, song) => {
-        const addsong_embed = new EmbedBuilder()
-            .setColor("#FF0000")
-            .setDescription(`Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}`)
-            .setTimestamp()
-        queue.textChannel.send({ embeds: [addsong_embed] })
-    }
-    )
-    .on('addList', (queue, playlist) => {
-        const addlist_embed = new EmbedBuilder()
-            .setColor("#FF0000")
-            .setDescription(`Added \`${playlist.name}\` playlist (${playlist.songs.length} songs) to queue\n${status(queue)}`)
-            .setTimestamp()
-        queue.textChannel.send({ embeds: [addlist_embed] })
-    }
-    )
-    .on('error', (channel, e) => {
-        const error_embed = new EmbedBuilder()
-            .setColor("#FF0000")
-            .setDescription(`An error encountered: ${e.toString().slice(0, 1974)}`)
-            .setTimestamp()
-        if (channel) channel.send({ embeds: [error_embed] })
-        else console.error(e)
-    })
-    .on('empty', queue => {
-        const empty_embed = new EmbedBuilder()
-            .setColor("#FF0000")
-            .setDescription('Voice channel is empty! Leaving the channel...')
-            .setTimestamp()
-        queue.textChannel.send({ embeds: [empty_embed] })
-    })
-    .on('searchNoResult', (message, query) => {
-        const no_result_embed = new EmbedBuilder()
-            .setColor("#FF0000")
-            .setDescription(`No result found for \`${query}\`!`)
-            .setTimestamp()
-        message.channel.send({ embeds: [no_result_embed] })
-    }
-    )
-    .on('finish', queue => {
-        const finished_embed = new EmbedBuilder()
-            .setColor("#FF0000")
-            .setDescription("Finished!")
-            .setTimestamp()
-        queue.textChannel.send({ embeds: [finished_embed] })
-    })
-client.distube.on('error', (channel, error) => {
-    logger.error(`An error encoutered: ${error}`)
-})
+  .on('playSong', (queue, song) =>{
+    const playsong_embed = new EmbedBuilder()
+      .setColor('#f5e942')
+      .setDescription(`Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`)
+      .setTimestamp()
+    queue.textChannel.send({embeds:[playsong_embed]})
+  })
+  .on('addSong', (queue, song) =>{
+    const addsong_embed = new EmbedBuilder()
+      .setColor('#f5e942')
+      .setDescription(`Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}`)
+      .setTimestamp()
+    queue.textChannel.send({embeds:[addsong_embed]})
+  })
+  .on('addList', (queue, playlist) =>{
+    const addlist_embed = new EmbedBuilder()
+      .setColor('#f5e942')
+      .setDescription(`Added \`${playlist.name}\` playlist (${playlist.songs.length} songs) to queue\n${status(queue)}`)
+      .setTimestamp()
+    queue.textChannel.send({embeds:[addlist_embed]})
+  })
+  .on('error', (channel, e) => {
+    const error_embed = new EmbedBuilder()
+      .setColor('#f5e942')
+      .setDescription(`An error encountered: ${e.toString().slice(0, 1974)}`)
+      .setTimestamp()
+    if (channel) channel.send({embeds:[error_embed]})
+    else console.error(e)
+  })
+  .on('empty', channel =>{
+    const empty_embed = new EmbedBuilder()
+      .setColor('#f5e942')
+      .setDescription('Voice channel is empty! Leaving the channel...')
+      .setTimestamp() 
+    channel.send({embeds:[empty_embed]})
+  })
+  .on('searchNoResult', (message, query) =>{
+    const no_result_embed = new EmbedBuilder()
+      .setColor('#f5e942')
+      .setDescription(`No result found for \`${query}\`!`)
+      .setTimestamp()
+    message.channel.send({embeds:[no_result_embed]})
+  })
+  .on('finish', queue => {
+    const finished_embed = new EmbedBuilder()
+      .setColor('#f5e942')
+      .setDescription("Finished!")
+      .setTimestamp()
+    queue.textChannel.send({embeds:[finished_embed]})
+  })

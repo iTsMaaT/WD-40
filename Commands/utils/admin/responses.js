@@ -1,7 +1,7 @@
 const USERID = require("../../../UserIDs.js");
 module.exports = {
     name: "responses",
-    description: "Placeholder to log the command",
+    description: "Enables/Disables auto-responses",
     category: "utils",
     private: true,
     async execute(logger, client, message, args) {
