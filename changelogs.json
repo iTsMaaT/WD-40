@@ -41,7 +41,7 @@
     "date": "2023-04-30",
     "changes": [
       "Refactoring",
-      "Multiple new commands (>car, >dog, >minecraft, >meme, >fact)",
+      "Multiple new commands (>cat, >dog, >minecraft, >meme, >fact)",
       "Completlely switched to a database system",
       "Auto-responses are now per guilds and disabled by default"
     ]

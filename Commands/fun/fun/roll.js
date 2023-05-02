@@ -1,6 +1,6 @@
 module.exports = {
     name: 'roll',
-    description: 'Roll between 1 and 250 dices of up to 350 sides. Defaults to rolling 1d6 when no arguments are given.',
+    description: 'Roll between 1 and 250 dices of up to 250 sides. Defaults to rolling 1d6 when no arguments are given.',
     category: "fun",
     execute(logger, client, message, args) {
         // Check if arguments are provided
