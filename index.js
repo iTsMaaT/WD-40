@@ -231,7 +231,8 @@ client.on("messageCreate", (message) => {
             message.react('👍')
                 .then(() => message.react('👎'))
                 .then(() => message.react('♻️'))
-                .then(() => message.react('💀'));
+                .then(() => message.react('💀'))
+                .then(() => message.react('🤨'));
         }
     }
 

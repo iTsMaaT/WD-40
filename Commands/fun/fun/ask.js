@@ -2,7 +2,7 @@ const { Configuration, OpenAIApi } = require('openai');
 const fs = require("fs/promises");
 module.exports = {
   name: "ask",
-  description: "Ask a question to ChatGPT-3.5-turbo (>ask -p <...> for changing the personality)",
+  description: "Ask a question to ChatGPT-3.5-turbo (>ask -p <...> for changing the personality prompt)",
   category: "fun",
   execute: async (logger, client, message, args) => {
 
@@ -10,8 +10,9 @@ module.exports = {
       if (args[0] == "-p" && message.member.permissions.has("Administrator") && message.author.id == 411996978583699456) {
         args.shift();
         await global.GuildManager.SetPersonality(message.guild, args.join(" "));
-      } else {
-        let conversationLog = [{ role: 'system', content: global.GuildManager.GetPersonality(message.guild) }];
+        message.reply({ content: 'Prompt successfully changed.', allowedMentions: { repliedUser: false } });
+      } else if (args[1]) {
+        let conversationLog = [{ role: 'system', content: global.GuildManager.GetPersonality(message.guild).toString() }];
         const configuration = new Configuration({
           apiKey: process.env.OPENAI_API_KEY,
         });
@@ -37,7 +38,7 @@ module.exports = {
             // max_tokens: 256, // limit token usage
           })
           .catch((error) => {
-            console.log(`OPENAI ERR: ${error}`);
+            logger.error(`OPENAI ERR: ${error}`);
           });
 
         if (result.data.choices[0].message.content.length < 2000) {
@@ -48,6 +49,8 @@ module.exports = {
           await message.reply({ files: [`./answer-${discriminator}.txt`] });
           await fs.unlink(`./answer-${discriminator}.txt`);
         }
+      } else {
+        message.reply("Invalid prompt.")
       }
     } catch (e) {
       logger.error(e);
