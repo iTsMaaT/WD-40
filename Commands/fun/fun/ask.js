@@ -36,7 +36,6 @@ module.exports = {
           console.log(`OPENAI ERR: ${error}`);
         });
 
-        console.log(result)
       if (result.data.choices[0].message.content.length < 2000) {
         await message.reply(result.data.choices[0].message.content);
       } else {
