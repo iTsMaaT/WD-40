@@ -10,6 +10,7 @@ module.exports = {
     private: true,
     execute(logger, client, message, args) {
         //Finds all command files and separate them from categories, -all shows all and -admin shows the private ones (admin or iTsMaaT only)
+        var i = 0;
         if (!args[0]) {
 
             let helpmessagebuilder = "";
@@ -27,10 +28,15 @@ module.exports = {
             })
 
             Object.keys(categorymapper).forEach(k => {
+                i += 1;
                 helpmessagebuilder += `__**${k.toUpperCase()}**__\r\n${categorymapper[k]}\r\n`;
+                if (i % 2 == 0) {
+                    message.channel.send(helpmessagebuilder + "_ _");
+                    helpmessagebuilder = "";
+                }
             });
 
-            return message.channel.send(helpmessagebuilder);
+            return;
         }
         else if (args[0] == "-admin" && message.author.id == USERID.itsmaat) {
             
@@ -47,10 +53,15 @@ module.exports = {
             })
 
             Object.keys(categorymapper).forEach(k => {
+                i += 1;
                 helpmessagebuilder += `__**${k.toUpperCase()}**__\r\n${categorymapper[k]}\r\n`;
+                if (i % 2 == 0) {
+                    message.channel.send(helpmessagebuilder + "_ _");
+                    helpmessagebuilder = "";
+                }
             });
 
-            return message.channel.send(helpmessagebuilder);
+            return;
         }
         else if (args[0] == "-all" && message.author.id == USERID.itsmaat) {
             let helpmessagebuilder = "";
@@ -64,10 +75,15 @@ module.exports = {
             })
 
             Object.keys(categorymapper).forEach(k => {
+                i += 1;
                 helpmessagebuilder += `__**${k.toUpperCase()}**__\r\n${categorymapper[k]}\r\n`;
+                if (i % 2 == 0) {
+                    message.channel.send(helpmessagebuilder + "_ _");
+                    helpmessagebuilder = "";
+                }
             });
 
-            return message.channel.send(helpmessagebuilder);
+            return;
         }
     }
 }
