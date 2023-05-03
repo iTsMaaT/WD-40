@@ -13,11 +13,12 @@ datasource db {
 }
 
 model GuildSettings {
-  GuildID   BigInt  @id
-  Prefix    String  @db.VarChar(3) @default(">")
-  GuildName String  @db.VarChar(255)
-  Active    Boolean @default(true)
-  Responses Boolean @default(false)
+  GuildID     BigInt  @id
+  Prefix      String  @db.VarChar(3) @default(">")
+  GuildName   String  @db.VarChar(255)
+  Active      Boolean @default(true)
+  Responses   Boolean @default(false)
+  Personality String  @db.VarChar(500) @default("Answer as if you are annoying.")
 }
 
 model Snowflake {

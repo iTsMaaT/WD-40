@@ -3,6 +3,7 @@ module.exports = (function(prisma) {
 
     let prefixes = {};
     let responses = {};
+    let personality = {};
 
     function init(guilds) {
         guilds.forEach(async (g) => {
@@ -11,6 +12,7 @@ module.exports = (function(prisma) {
             let settings = await GetGuildSettings(g);
             prefixes[g.id] = settings.Prefix;
             responses[g.id] = settings.Responses;
+            personality[g.id] = settings.Personality;
         });
     }
 
@@ -65,6 +67,11 @@ module.exports = (function(prisma) {
         prefixes[guild.id] = prefix;
     }
 
+    async function SetPersonality(guild, personality) {
+        await UpdateGuild(guild, {Personality: personality});
+        personality[guild.id] = personality;
+    }
+
     function GetPrefix(guild){
         return prefixes[guild.id];
     }
@@ -73,5 +80,9 @@ module.exports = (function(prisma) {
         return responses[guild.id];
     }
 
-    return {init, ToggleResponses, TogglePrefix, GetGuildSettings, AddGuildToDatabase, CheckIfGuildExists, SetActiveOrCreate, GetPrefix, GetResponses};
+    function GetPersonality(guild) {
+        return personality[guild.id];
+    }
+
+    return {init, ToggleResponses, TogglePrefix, GetGuildSettings, AddGuildToDatabase, CheckIfGuildExists, SetActiveOrCreate, GetPrefix, GetResponses, SetPersonality, GetPersonality};
 });
