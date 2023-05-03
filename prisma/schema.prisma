@@ -1,7 +1,12 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-//npx prisma db push
+//En prod
+// "npx prisma migrate dev" (review generated migration)
+// "npx prisma migrate deploy"
+
+//En dev
+// "npx prisma db push"
 
 generator client {
   provider = "prisma-client-js"
