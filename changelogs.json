@@ -45,5 +45,13 @@
       "Completlely switched to a database system",
       "Auto-responses are now per guilds and disabled by default"
     ]
+  },
+  {
+    "version": "2.5.3",
+    "date": "2023-05-03",
+    "changes": [
+      "Bug fixes and error handling in certain commands",
+      "Ability to change the personality prompt per guild for ChatGPT"
+    ]
   }
 ]
