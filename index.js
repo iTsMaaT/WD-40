@@ -120,7 +120,7 @@ client.on("ready", async () => {
     setTimeout(function () {
         client.channels.cache.get("1037141235451842701").send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
         logger.info("Bot started successfully.");
-    }, 1000 * 0.1);
+    }, 2000 * 0.1);
 });
 
 //Member join and leave logging
