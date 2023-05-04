@@ -3,7 +3,7 @@ const FetchReddit = require("../../../utils/functions/FetchReddit.js");
 module.exports = {
   name: 'cat',
   description: 'Cats!',
-  category: "fun",
+  category: "posts",
   async execute(logger, client, message, args) {
     message.reply({ embeds: [await FetchReddit(message, "cat", "cats", "catswithjobs", "tightpussy", "backpussy", "whitepussy")], allowedMentions: { repliedUser: false }})
   }
