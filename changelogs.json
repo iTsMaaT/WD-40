@@ -53,7 +53,8 @@
       "Bug fixes and error handling in certain commands",
       "Ability to change the personality prompt per guild for ChatGPT",
       "Changed colors for the music embeds",
-      "Fixed the music part of the bot"
+      "Fixed the music part of the bot",
+      ">help now has a page system"
     ]
   }
 ]
