@@ -37,9 +37,10 @@ const { YtDlpPlugin } = require('@distube/yt-dlp');
 const { SpotifyPlugin } = require('@distube/spotify');
 const UserIDs = require("./UserIDs.js");
 const GuildManager = require("./utils/GuildManager.js");
-const blacklist = require("./Commands/utils/admin/blacklist");
 client.distube = new DisTube(client, {
     leaveOnStop: false,
+    leaveOnFinish: true,
+    emptyCooldown: 30,
     emitNewSongOnly: true,
     emitAddSongWhenCreatingQueue: false,
     emitAddListWhenCreatingQueue: false,
