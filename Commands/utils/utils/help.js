@@ -31,7 +31,7 @@ module.exports = {
             return message.channel.send(CategoriesPage);
         } else if (args[0] > 0 && args[0] <= categories.length) {
             let page = args[0];
-            let HelpMessage = `__Commands for category : **${categories[page - 1]}**__\n`;
+            let HelpMessage = `__Commands for category : **${categories[page - 1].toUpperCase()}**__\n`;
             HelpMessage += categorymapper[categories[page - 1]];
             message.reply({ content: HelpMessage, allowedMentions: { repliedUser: false } });
         } else if (isNaN(args[0])) {

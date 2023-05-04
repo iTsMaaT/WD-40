@@ -23,6 +23,9 @@ global.SnowflakeID = [];
 global.CmdEnabled = 1;
 global.superuser = 0;
 global.BaseActivityStatus = ">help | Time to be annoying!"
+global.Blacklist = {};
+
+const FetchReddit = require("./utils/functions/FetchReddit.js");
 
 // Add array.equals()
 Array.prototype.equals = function (b) {
@@ -34,6 +37,7 @@ const { YtDlpPlugin } = require('@distube/yt-dlp');
 const { SpotifyPlugin } = require('@distube/spotify');
 const UserIDs = require("./UserIDs.js");
 const GuildManager = require("./utils/GuildManager.js");
+const blacklist = require("./Commands/utils/admin/blacklist");
 client.distube = new DisTube(client, {
     leaveOnStop: false,
     emitNewSongOnly: true,
@@ -197,10 +201,26 @@ client.on(Events.InteractionCreate, async interaction => {
     }
 });
 
+client.on("messageCreate", async (message) => {
+    if (message.author.bot) return;
+    if (superuser && message.author.id != USERID.itsmaat) return;
+    if (!message.guild) return;
+    if (Blacklist[message.author.id]) return;
+    if (global.GuildManager.GetResponses(message.guild)) {
+
+        //Sends furry porn in DMs of anyone that says "sex"
+        if (message.content.toLowerCase() == "sex") {
+            message.author.send({ embeds: [await FetchReddit(message, "furrypornsubreddit", "yiff", "furryonhuman")] })
+
+        }
+    }
+})
+
 client.on("messageCreate", (message) => {
     if (message.author.bot) return;
     if (superuser && message.author.id != USERID.itsmaat) return;
     if (!message.guild) return;
+    if (Blacklist[message.author.id]) return;
 
     //Text command executing
     let prefix = global.GuildManager.GetPrefix(message.guild)
@@ -232,7 +252,8 @@ client.on("messageCreate", (message) => {
                 .then(() => message.react('👎'))
                 .then(() => message.react('♻️'))
                 .then(() => message.react('💀'))
-                .then(() => message.react('🤨'));
+                .then(() => message.react('🤨'))
+                .then(() => message.react("😎"));
         }
     }
 
@@ -313,90 +334,63 @@ client.on("messageCreate", (message) => {
         if (message.content.toLowerCase() == "sus" || message.content.toLowerCase() == "amogus" || message.content.toLowerCase() == "among us") {
             //message.reply("No.");
         }
-
-        //Sends furry porn in DMs of anyone that says "sex"
-        if (message.content.toLowerCase() == "sex") {
-            fetchFurry().then(furryImage => {
-                const embed = new EmbedBuilder()
-                embed.setImage(furryImage);
-                logger.info(`${message.author.tag} said sex, he therefore must receive \[${furryImage}\]`)
-                message.author.send({ embeds: [embed] })
-                    .catch(() => {
-                        logger.error(`Unable to send private message to ${message.member.user.tag}`);
-                    });
-            });
-        }
     }
 })
 //Logins with the token
 client.login(process.env.TOKEN);
 
-//Function that fetches a random post from r/yiff
-const fetchFurry = async () => {
-    let furryImage = "";
-    while (!furryImage.startsWith("https://i.redd.it")) {
-        let response = await got('https://www.reddit.com/r/yiff/random/.json');
-        //FurryPornSubreddit
-        //rule34.xxx/index.php?page=post&s=random
-        let content = JSON.parse(response.body);
-        let permalink = content[0].data.children[0].data.permalink;
-        let furryUrl = `https://reddit.com${permalink}`;
-        furryImage = content[0].data.children[0].data.url;
-    }
-    return furryImage;
-}
 
 const status = queue => `Volume: \`${queue.volume}%\` | Filter: \`${queue.filters.names.join(', ') || 'Off'}\` | Loop: \`${queue.repeatMode ? (queue.repeatMode === 2 ? 'All Queue' : 'This Song') : 'Off'}\` | Autoplay: \`${queue.autoplay ? 'On' : 'Off'}\``
 
 client.distube
 
-  .on('playSong', (queue, song) =>{
-    const playsong_embed = new EmbedBuilder()
-      .setColor('#ffffff')
-      .setDescription(`Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`)
-      .setTimestamp()
-    queue.textChannel.send({embeds:[playsong_embed]})
-  })
-  .on('addSong', (queue, song) =>{
-    const addsong_embed = new EmbedBuilder()
-      .setColor('#ffffff')
-      .setDescription(`Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}`)
-      .setTimestamp()
-    queue.textChannel.send({embeds:[addsong_embed]})
-  })
-  .on('addList', (queue, playlist) =>{
-    const addlist_embed = new EmbedBuilder()
-      .setColor('#ffffff')
-      .setDescription(`Added \`${playlist.name}\` playlist (${playlist.songs.length} songs) to queue\n${status(queue)}`)
-      .setTimestamp()
-    queue.textChannel.send({embeds:[addlist_embed]})
-  })
-  .on('error', (channel, e) => {
-    const error_embed = new EmbedBuilder()
-      .setColor('#ffffff')
-      .setDescription(`An error encountered: ${e.toString().slice(0, 1974)}`)
-      .setTimestamp()
-    if (channel) channel.send({embeds:[error_embed]})
-    else console.error(e)
-  })
-  .on('empty', channel =>{
-    const empty_embed = new EmbedBuilder()
-      .setColor('#ffffff')
-      .setDescription('Voice channel is empty! Leaving the channel...')
-      .setTimestamp() 
-    channel.send({embeds:[empty_embed]})
-  })
-  .on('searchNoResult', (message, query) =>{
-    const no_result_embed = new EmbedBuilder()
-      .setColor('#ffffff')
-      .setDescription(`No result found for \`${query}\`!`)
-      .setTimestamp()
-    message.channel.send({embeds:[no_result_embed]})
-  })
-  .on('finish', queue => {
-    const finished_embed = new EmbedBuilder()
-      .setColor('#ffffff')
-      .setDescription("Finished!")
-      .setTimestamp()
-    queue.textChannel.send({embeds:[finished_embed]})
-  })
+    .on('playSong', (queue, song) => {
+        const playsong_embed = new EmbedBuilder()
+            .setColor('#ffffff')
+            .setDescription(`Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`)
+            .setTimestamp()
+        queue.textChannel.send({ embeds: [playsong_embed] })
+    })
+    .on('addSong', (queue, song) => {
+        const addsong_embed = new EmbedBuilder()
+            .setColor('#ffffff')
+            .setDescription(`Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}`)
+            .setTimestamp()
+        queue.textChannel.send({ embeds: [addsong_embed] })
+    })
+    .on('addList', (queue, playlist) => {
+        const addlist_embed = new EmbedBuilder()
+            .setColor('#ffffff')
+            .setDescription(`Added \`${playlist.name}\` playlist (${playlist.songs.length} songs) to queue\n${status(queue)}`)
+            .setTimestamp()
+        queue.textChannel.send({ embeds: [addlist_embed] })
+    })
+    .on('error', (channel, e) => {
+        const error_embed = new EmbedBuilder()
+            .setColor('#ffffff')
+            .setDescription(`An error encountered: ${e.toString().slice(0, 1974)}`)
+            .setTimestamp()
+        if (channel) channel.send({ embeds: [error_embed] })
+        else console.error(e)
+    })
+    .on('empty', channel => {
+        const empty_embed = new EmbedBuilder()
+            .setColor('#ffffff')
+            .setDescription('Voice channel is empty! Leaving the channel...')
+            .setTimestamp()
+        channel.send({ embeds: [empty_embed] })
+    })
+    .on('searchNoResult', (message, query) => {
+        const no_result_embed = new EmbedBuilder()
+            .setColor('#ffffff')
+            .setDescription(`No result found for \`${query}\`!`)
+            .setTimestamp()
+        message.channel.send({ embeds: [no_result_embed] })
+    })
+    .on('finish', queue => {
+        const finished_embed = new EmbedBuilder()
+            .setColor('#ffffff')
+            .setDescription("Finished!")
+            .setTimestamp()
+        queue.textChannel.send({ embeds: [finished_embed] })
+    })
