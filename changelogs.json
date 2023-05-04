@@ -51,7 +51,9 @@
     "date": "2023-05-03",
     "changes": [
       "Bug fixes and error handling in certain commands",
-      "Ability to change the personality prompt per guild for ChatGPT"
+      "Ability to change the personality prompt per guild for ChatGPT",
+      "Changed colors for the music embeds",
+      "Fixed the music part of the bot"
     ]
   }
 ]

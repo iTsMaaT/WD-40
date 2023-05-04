@@ -10,7 +10,7 @@ module.exports = {
     }*/
     if (!message.member.voice.channel) {
       const must_be_in_vc_embed = new EmbedBuilder()
-        .setColor("#FF0000")
+        .setColor("#ffffff")
         .setDescription(`You must be in a voice channel!`)
         .setTimestamp()
       return message.channel.send({ embeds: [must_be_in_vc_embed] })
@@ -18,13 +18,13 @@ module.exports = {
     const string = args.join(' ')
     if (!message.member.voice.channel) {
       const must_be_in_vc_embed = new EmbedBuilder()
-        .setColor("#FF0000")
+        .setColor("#ffffff")
         .setDescription(`You must be in a voice channel!`)
         .setTimestamp()
       return message.channel.send({ embeds: [must_be_in_vc_embed] })
     }
     const no_query_embed = new EmbedBuilder()
-      .setColor("#FF0000")
+      .setColor("#ffffff")
       .setDescription(`Please enter a song URL or query to search.`)
       .setTimestamp()
     if (!string) return message.channel.send({ embeds: [no_query_embed] })
