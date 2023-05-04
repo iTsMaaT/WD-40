@@ -23,7 +23,7 @@ module.exports = {
         let categories = Object.keys(categorymapper);
         if (!args[0]) {
 
-            var CategoriesPage = "__Command categories(`>help <page number>` to see the commands)__\n"
+            var CategoriesPage = "__Command categories__ (`>help <page number>` to see the commands)\n"
             for (let i = 0; i < categories.length; i++) {
                 CategoriesPage += `**Page ${i + 1}** : ${categories[i].toUpperCase()}\n`;
             }
@@ -31,7 +31,7 @@ module.exports = {
             return message.channel.send(CategoriesPage);
         } else if (args[0] > 0 && args[0] <= categories.length) {
             let page = args[0];
-            let HelpMessage = `__Commands for categorie : **${categories[page - 1]}**__\n`;
+            let HelpMessage = `__Commands for category : **${categories[page - 1]}**__\n`;
             HelpMessage += categorymapper[categories[page - 1]];
             message.reply({ content: HelpMessage, allowedMentions: { repliedUser: false } });
         } else if (isNaN(args[0])) {
