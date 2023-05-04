@@ -9,7 +9,7 @@ module.exports={
         const pause = "⏸️"
         const queue = client.distube.getQueue(message)
         const nothing_playing_embed = new EmbedBuilder()
-        .setColor('#f5e942')
+        .setColor('#ffffff')
         .setDescription(`There is nothing playing!`)
         .setTimestamp()
     if (!queue) return message.channel.send({embeds:[nothing_playing_embed]})
@@ -26,7 +26,7 @@ module.exports={
         .join("\n");
 
       const embed = new EmbedBuilder()
-        .setColor("#FF0000")
+        .setColor("#ffffff")
         .setDescription(
           `${(
             `${
@@ -56,7 +56,7 @@ module.exports={
         .join("\n");
 
       const embed = new EmbedBuilder()
-        .setColor("#FF0000")
+        .setColor("#ffffff")
         .setTitle(`**Page ${parseInt(args[0])}**`)
         .setDescription(
           `${(
@@ -87,7 +87,7 @@ module.exports={
         .join("\n");
 
       const embed = new EmbedBuilder()
-        .setColor("#FF0000")
+        .setColor("#ffffff")
         .setDescription(
           `${(
             `${
