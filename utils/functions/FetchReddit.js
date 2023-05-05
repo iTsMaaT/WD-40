@@ -21,6 +21,7 @@ const FetchReddit = async function (message, ...subreddits) {
 
         if (!PostNsfw || (PostNsfw && message.channel.nsfw)) {
             var embed = {
+                color: 0xffffff,
                 title: PostTitle,
                 url: PostURL,
                 image: {
