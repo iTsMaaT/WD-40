@@ -35,7 +35,6 @@ Array.prototype.equals = function (b) {
 const ffmpeg = require('ffmpeg');
 const { YtDlpPlugin } = require('@distube/yt-dlp');
 const { SpotifyPlugin } = require('@distube/spotify');
-const UserIDs = require("./UserIDs.js");
 const GuildManager = require("./utils/GuildManager.js");
 client.distube = new DisTube(client, {
     leaveOnStop: false,
@@ -106,7 +105,7 @@ while (commandFiles.length > 0) {
 //Bot setup on startup
 client.on("ready", async () => {
 
-    logger.info("Bot starting...");
+    logger.info(`Bot starting on [${process.env.SERVER}]...`);
 
     let guilds = await client.guilds.fetch();
     await global.GuildManager.init(guilds);
@@ -374,12 +373,12 @@ client.distube
         if (channel) channel.send({ embeds: [error_embed] })
         else console.error(e)
     })
-    .on('empty', channel => {
+    .on('empty', queue => {
         const empty_embed = new EmbedBuilder()
             .setColor('#ffffff')
             .setDescription('Voice channel is empty! Leaving the channel...')
             .setTimestamp()
-        channel.send({ embeds: [empty_embed] })
+            queue.textChannel.send({ embeds: [empty_embed] })
     })
     .on('searchNoResult', (message, query) => {
         const no_result_embed = new EmbedBuilder()

@@ -56,5 +56,12 @@
       "Fixed the music part of the bot",
       ">help now has a page system"
     ]
+  },
+  {
+    "version": "2.6.4",
+    "date": "2023-05-03",
+    "changes": [
+      "Updated >Help"
+    ]
   }
 ]
