@@ -24,7 +24,7 @@
     "@distube/ytdl-core": "^4.11.8",
     "@prisma/client": "^4.13.0",
     "cron": "^2.1.0",
-    "discord.js": "^14.6.0",
+    "discord.js": "^14.9.0",
     "distube": "^4.0.4",
     "dotenv": "^16.0.3",
     "ffmpeg": "^0.0.4",
