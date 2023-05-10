@@ -35,7 +35,5 @@ module.exports = {
             }, 1000 * 3)
             return;
         }
-
-        message.channel.send("Invalid server name / Not enough permissions.");
     }
 }
