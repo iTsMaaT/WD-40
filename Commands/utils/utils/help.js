@@ -69,48 +69,54 @@ module.exports = {
 
         collector.on("collect", async (interaction) => {
             if (counter < 0) counter = 0;
-            if (counter >= categories.length - 1) counter = categories.length - 1;
+            if (counter >= categories.length ) counter = categories.length ;
 
             if (interaction.customId === 'next') {
                 counter++;
             } else if (interaction.customId === 'previous') {
                 counter--;
             }
-            row.components[1].setLabel(`${counter} / ${categories.length}`)
-
+        
+            // Update the label to show the current page number
+            row.components[1].setLabel(`${counter} / ${categories.length}`);
+        
             if (counter == 0) {
-                HelpFull.edit({
+                // If we're on the first page, show the categories page
+                await HelpFull.edit({
                     content: CategoriesPage,
                     components: [row],
                     allowedMentions: { repliedUser: false }
                 });
             } else {
+                // Otherwise, show the commands for the current category
                 let HelpFullPage = `__Commands for category : **${categories[counter - 1].toUpperCase()}**__\n`;
                 HelpFullPage += categorymapper[categories[counter - 1]];
-                HelpFull.edit({
+                await HelpFull.edit({
                     content: HelpFullPage,
                     components: [row],
                     allowedMentions: { repliedUser: false }
                 })
             }
 
-            if (counter == 0) { await row.components[0].setDisabled(true) } else { await row.components[0].setDisabled(false) }
-            if (counter == categories.length) { await row.components[2].setDisabled(true) } else { await row.components[2].setDisabled(false) }
+            // Update the button states based on the current page number
+            await row.components[0].setDisabled(counter == 0);
+            await row.components[2].setDisabled(counter == categories.length);
+        
             await interaction.update({
                 components: [row],
-            })
-        })
-
+            });
+        });
+        
         collector.on("end", async (interaction) => {
             const messageContent = `${HelpFull.content}\n[\`Buttons expired.\`]`;
             row.components.forEach(component => {
                 component.setDisabled(true);
             })
-            HelpFull.edit({
+            await HelpFull.edit({
                 content: messageContent,
                 components: [row],
                 allowedMentions: { repliedUser: false }
-            })
-        })
+            });
+        });
     }
 }
