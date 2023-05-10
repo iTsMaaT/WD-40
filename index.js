@@ -1,28 +1,31 @@
 const { PrismaClient } = require("@prisma/client");
 const { Client, Intents, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events, WebhookClient, Partials } = require("discord.js");
+const { Guild } = require("discord.js");
+const { DisTube } = require('distube');
+
 const Logger = require("./utils/log");
 const SaveFile = require("./utils/save_file");
+const fs = require('fs');
+
 const cron = require("cron");
 const dotenv = require("dotenv");
 const got = require("got");
-const { DisTube } = require('distube');
-dotenv.config();
 const Discord = require('discord.js');
-const { Guild } = require("discord.js");
-const fs = require('fs');
 const path = require('node:path');
 const USERID = require("./UserIDs.js");
+
+dotenv.config();
+
 const client = new Client({
     intents: Object.keys(GatewayIntentBits), // all intents
     partials: [Partials.Message, Partials.Channel, Partials.Reaction]
 });
+
 global.prisma = new PrismaClient();
 global.GuildManager = (require("./utils/GuildManager.js"))(prisma);
 global.prefix = '>';
-global.SnowflakeID = [];
 global.CmdEnabled = 1;
 global.superuser = 0;
-global.BaseActivityStatus = ">help | Time to be annoying!"
 global.Blacklist = {};
 
 const FetchReddit = require("./utils/functions/FetchReddit.js");
@@ -32,6 +35,7 @@ Array.prototype.equals = function (b) {
     return this.length == b.length && this.every((v, i) => v === b[i]);
 }
 
+//Music 
 const ffmpeg = require('ffmpeg');
 const { YtDlpPlugin } = require('@distube/yt-dlp');
 const { SpotifyPlugin } = require('@distube/spotify');
@@ -47,7 +51,8 @@ client.distube = new DisTube(client, {
     youtubeCookie: process.env.YOUTUBECOOKIE,
     plugins: [
         new SpotifyPlugin({
-            emitEventsAfterFetching: true
+            emitEventsAfterFetching: true,
+            parallel: false
         }),
         new YtDlpPlugin()
     ]
@@ -67,40 +72,49 @@ process.on("uncaughtException", (err) => {
     client?.channels?.cache?.get("1037141235451842701")?.send(`Error caught <@411996978583699456>! <#1069811223950016572>`);
 });
 
-//create a collection for text commands
+
+//Collections creation
 client.commands = new Discord.Collection();
-//create a collection for slash commands
 client.slashcommands = new Discord.Collection();
+client.events = new Discord.Collection();
 
-//Slash command finder
-const slashcommandsPath = path.join(__dirname, 'slash');
-const slashcommandFiles = fs.readdirSync(slashcommandsPath).filter(file => file.endsWith('.js'));
-
+//File finder/loader
+function loadFiles(folder, callback) {
+    const commandFiles = fs.readdirSync(folder);
+    while (commandFiles.length > 0) {
+        let file = commandFiles.shift();
+        if (file.endsWith('.js')) {
+            const loaded = require(`${folder}${file}`);
+            callback(loaded, file);
+        } else {
+            let newFiles = fs.readdirSync(folder + file);
+            newFiles.forEach(f => commandFiles.push(file + '/' + f));
+        }
+    }
+}
 
 //Slash command handler
-for (const file of slashcommandFiles) {
-    const filePath = path.join(slashcommandsPath, file);
-    const slashcommand = require(filePath);
-    // Set a new item in the Collection with the key as the command name and the value as the exported module
+loadFiles('./slash/', function (slashcommand, fileName) {
     if ('data' in slashcommand && 'execute' in slashcommand) {
         client.slashcommands.set(slashcommand.data.name, slashcommand);
     } else {
-        logger.warning(`The command at ${filePath} is missing a required "data" or "execute" property.`);
+        logger.error(`[WARNING] The command ${fileName} is missing a required "data" or "execute" property.`);
     }
-}
+});
 
 //Text command handler
-const commandFiles = fs.readdirSync('./Commands/');
-while (commandFiles.length > 0) {
-    let file = commandFiles.shift();
-    if (file.endsWith('.js')) {
-        const command = require(`./Commands/${file}`);
-        client.commands.set(command.name, command)
+loadFiles('./Commands/', function (command) {
+    client.commands.set(command.name, command)
+});
+
+//Event handler
+loadFiles('./events/', function (event) {
+    if (event.once) {
+        client.once(event.name, (...args) => event.execute(client, logger, ...args));
     } else {
-        let newFiles = fs.readdirSync('./Commands/' + file);
-        newFiles.forEach(f => commandFiles.push(file + '/' + f));
+        client.on(event.name, (...args) => event.execute(client, logger, ...args));
     }
-}
+});
 
 //Bot setup on startup
 client.on("ready", async () => {
@@ -127,59 +141,12 @@ client.on("ready", async () => {
     }, 2000 * 0.1);
 });
 
-//Member join and leave logging
-client.on('guildMemberAdd', member => {
-    logger.info(`${member.user.tag} (${member.id}) joined \`${member.guild.name}\``)
-    client.channels.cache.get("1048076076653486090").send(`${member.user.tag} (<@${member.id}>) joined \`${member.guild.name}\``);
-});
-client.on('guildMemberRemove', member => {
-    logger.info(`${member.user.tag} (${member.id}) left \`${member.guild.name}\``)
-    client.channels.cache.get("1048076076653486090").send(`${member.user.tag} (<@${member.id}>) left \`${member.guild.name}\``);
-});
-
-//Bot join and leave logging
-client.on('guildCreate', async (guild) => {
-    await GuildManager.SetActiveOrCreate(guild);
-    logger.info(`The bot has been added to \`${guild.name}\``)
-    client.channels.cache.get("1048076076653486090").send(`The bot has been added to \`${guild.name}\``);
-});
-
-client.on('guildDelete', async (guild) => {
-    await GuildManager.SetActiveOrCreate(guild, false);
-    logger.info(`The bot has been removed from \`${guild.name}\``)
-    client.channels.cache.get("1048076076653486090").send(`The bot has been removed from \`${guild.name}\``);
-});
-
 /*
 //Debug event
 client.on('debug', debug => {
     console.log(debug);
 });
 */
-
-//Guild unavailability (outage)
-client.on('guildUnavailable', (guild) => {
-    logger.severe(`A guild is unavailable, likely because of a server outage: ${guild}`);
-});
-
-//Restarting the bot when it becomes invalidated
-client.on('invalidated', () => {
-    logger.severe("The client was invalidated, restarting the bot...");
-    setTimeout(function () {
-        global.prisma.$disconnect();
-        process.exit(1);
-    }, 1000 * 3)
-});
-
-//Warning if rate-limited
-client.on('rateLimit', (rateLimitData) => {
-    logger.warning(`The bot is rate-limited: ${rateLimitData}`);
-});
-
-//Warning info
-client.on('warn', (info) => {
-    logger.warning(`Warning: ${info}`);
-});
 
 //Slash command executing
 client.on(Events.InteractionCreate, async interaction => {
@@ -195,27 +162,15 @@ client.on(Events.InteractionCreate, async interaction => {
     try {
         //execute the slash command
         await slash.execute(logger, interaction, client);
+        //Logging the command
+        logger.info(`Executing [/${interaction.commandName}]\nby    [${interaction.user.tag} (${interaction.user.id})]\nin    [${interaction.channel.name} (${interaction.channel.id})]\nfrom  [${interaction.guild.name} (${interaction.guild.id})]`);
     } catch (error) {
         console.error(`Error executing ${interaction.commandName}`);
         console.error(error);
     }
 });
 
-client.on("messageCreate", async (message) => {
-    if (message.author.bot) return;
-    if (superuser && message.author.id != USERID.itsmaat) return;
-    if (!message.guild) return;
-    if (Blacklist[message.author.id]) return;
-    if (global.GuildManager.GetResponses(message.guild)) {
-
-        //Sends furry porn in DMs of anyone that says "sex"
-        if (message.content.toLowerCase() == "sex") {
-            message.author.send({ embeds: [await FetchReddit(message, "furrypornsubreddit", "yiff", "furryonhuman")] })
-
-        }
-    }
-})
-
+//Text command executing
 client.on("messageCreate", (message) => {
     if (message.author.bot) return;
     if (superuser && message.author.id != USERID.itsmaat) return;
@@ -240,105 +195,8 @@ client.on("messageCreate", (message) => {
         client.commands.get(command).execute(logger, client, message, args);
     }
 
-    //Gives the prefix if the bot is pinged
-    if (message.content == "<@1036485458827415633>") {
-        message.reply(`**Prefix** : ${prefix}\n**Help command** : ${prefix}help`);
-    }
 
-    //Votes for the memes
-    if (message.attachments.size > 0 || message.content.startsWith("https://") || message.content.startsWith("http://")) {
-        if (message.channel.name.includes('meme')) {
-            message.react('👍')
-                .then(() => message.react('👎'))
-                .then(() => message.react('♻️'))
-                .then(() => message.react('💀'))
-                .then(() => message.react('🤨'))
-                .then(() => message.react("😎"));
-        }
-    }
-
-    //Auto-responses
-    if (global.GuildManager.GetResponses(message.guild)) {
-
-        //reacts S-T-F-U when gros gaming or smartass is said
-        if (message.content.toLowerCase().includes("gros gaming") || message.content.toLowerCase().includes("smartass") || (message.content.toLowerCase().includes("edging") && !message.author.id == USERID.dada129)) {
-            message.react('🇸')
-                .then(() => message.react('🇹'))
-                .then(() => message.react('🇫'))
-                .then(() => message.react('🇺'));
-        }
-
-        //Deletes the message if it has edging and is said by dada
-        if (message.content.toLowerCase().includes("edging") && message.author.id == USERID.dada129) {
-            message.delete();
-        }
-
-        //what? eveeeer
-        if (message.content.toLowerCase() == `what` || message.content == `what?` || message.content == `What?` ||
-            message.content.toLowerCase() == `who` || message.content == `who?` || message.content == `Who?`) {
-            message.reply("ever!");
-        }
-
-        //ever what?
-        if (message.content.toLowerCase() == `ever`) {
-            message.reply("What?");
-        }
-
-        //skull reaction to skull emoji
-        if (message.content.toLowerCase() == `💀`) {
-            message.react('💀');
-        }
-
-        //Snowflake reaction
-        if (snowflakeData != []) {
-            let expected = [parseInt(message.guildId), parseInt(message.author.id)];
-            let exists = snowflakeData.filter(v => {
-                return v.equals(expected);
-            }).length >= 1;
-            if (exists) {
-                message.react('❄️');
-            }
-        }
-
-        //reacts :gorilla: when pinging iTsMaaT
-        if (message.content.includes("<@411996978583699456>")) {
-            message.react('🦍');
-        }
-
-        //reacts :chipmunk: when pinging phildiop
-        if (message.content.includes("<@348281625173295114>")) {
-            message.react('🐿️');
-        }
-
-        //answers your mom when asking who's at break
-        if (message.content.toLowerCase().includes("en pause")) {
-            message.channel.send("Ta mère");
-        }
-
-        //Ping fail if doesnt have @everyone perm
-        if (message.member && !message.member.permissions.has("MentionEveryone") && (message.content.includes("@everyone") || message.content.includes("@here"))) {
-            message.reply("Ping fail L");
-        }
-
-        //answers bruh to bruh
-        if (message.content.toLowerCase() == "bruh") {
-            message.reply("bruh");
-        }
-
-        //Reacts the stuff meme when a message includes "stuff"
-        if (message.content.toLowerCase().includes("stuff")) {
-            message.react("<:stuff:1099738190966960179>");
-        }
-
-        //Replies when someone does a mogus reference
-        if (message.content.toLowerCase() == "sus" || message.content.toLowerCase() == "amogus" || message.content.toLowerCase() == "among us") {
-            //message.reply("No.");
-        }
-    }
 })
-//Logins with the token
-client.login(process.env.TOKEN);
-
 
 const status = queue => `Volume: \`${queue.volume}%\` | Filter: \`${queue.filters.names.join(', ') || 'Off'}\` | Loop: \`${queue.repeatMode ? (queue.repeatMode === 2 ? 'All Queue' : 'This Song') : 'Off'}\` | Autoplay: \`${queue.autoplay ? 'On' : 'Off'}\``
 
@@ -378,7 +236,7 @@ client.distube
             .setColor('#ffffff')
             .setDescription('Voice channel is empty! Leaving the channel...')
             .setTimestamp()
-            queue.textChannel.send({ embeds: [empty_embed] })
+        queue.textChannel.send({ embeds: [empty_embed] })
     })
     .on('searchNoResult', (message, query) => {
         const no_result_embed = new EmbedBuilder()
@@ -394,3 +252,6 @@ client.distube
             .setTimestamp()
         queue.textChannel.send({ embeds: [finished_embed] })
     })
+
+//Logins with the token
+client.login(process.env.TOKEN);
