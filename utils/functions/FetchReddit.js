@@ -1,6 +1,6 @@
 const got = require("got");
 //const EmbedBuilder = require("discord.js")
-const FetchReddit = async function (message, ...subreddits) {
+const FetchReddit = async function (message, AllowNSFW, ...subreddits) {
     try {
         let array = [...subreddits]
         let subreddit = array[Math.floor(Math.random() * subreddits.length)];
@@ -19,7 +19,7 @@ const FetchReddit = async function (message, ...subreddits) {
             var PostNsfw = content[0].data.children[0].data.over_18;
         }
 
-        if (!PostNsfw || (PostNsfw && message.channel.nsfw)) {
+        if (!PostNsfw || (PostNsfw && message.channel.nsfw) || AllowNSFW) {
             var embed = {
                 color: 0xffffff,
                 title: PostTitle,
