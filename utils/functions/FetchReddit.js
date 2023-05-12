@@ -1,5 +1,12 @@
 const got = require("got");
 //const EmbedBuilder = require("discord.js")
+/**
+ * Fetches a post from Reddit's API from any subreddit mentionned.
+ * @param {*} message 
+ * @param {*} AllowNSFW 
+ * @param  {...any} subreddits 
+ * @returns 
+ */
 const FetchReddit = async function (message, AllowNSFW, ...subreddits) {
     try {
         let array = [...subreddits]

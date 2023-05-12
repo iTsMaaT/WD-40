@@ -45,14 +45,14 @@ client.distube = new DisTube(client, {
     leaveOnFinish: true,
     emptyCooldown: 30,
     emitNewSongOnly: true,
-    emitAddSongWhenCreatingQueue: false,
-    emitAddListWhenCreatingQueue: false,
+    emitAddSongWhenCreatingQueue: true,
+    emitAddListWhenCreatingQueue: true,
     nsfw: true,
     youtubeCookie: process.env.YOUTUBECOOKIE,
     plugins: [
         new SpotifyPlugin({
             emitEventsAfterFetching: true,
-            parallel: false
+            parallel: true
         }),
         new YtDlpPlugin()
     ]
@@ -94,9 +94,11 @@ function loadFiles(folder, callback) {
 }
 
 //Slash command handler
-loadFiles('./slash/', function (slashcommand, fileName) {
-    if ('data' in slashcommand && 'execute' in slashcommand) {
-        client.slashcommands.set(slashcommand.data.name, slashcommand);
+let discoveredCommands = [];
+loadFiles('./slash/', (slashcommand, fileName) => {
+    if ('name' in slashcommand && 'execute' in slashcommand && 'description' in slashcommand) {
+        client.slashcommands.set(slashcommand.name, slashcommand);
+        discoveredCommands.push(slashcommand);
     } else {
         logger.error(`[WARNING] The command ${fileName} is missing a required "data" or "execute" property.`);
     }
@@ -121,18 +123,30 @@ client.on("ready", async () => {
 
     logger.info(`Bot starting on [${process.env.SERVER}]...`);
 
+    console.log("Guild manager initiation...")
     let guilds = await client.guilds.fetch();
     await global.GuildManager.init(guilds);
+    console.log("Guild manager initiation done.")
 
+    console.log("Setting up slash commands...")
+    await client.application.commands.set(discoveredCommands);
+    console.log("Slash command setup done.")
+    
+    console.log("Setting up activity status...")
     client.user.setActivity(`>help | Time to be annoying!`);
+    console.log("Activity status setup done.")
 
+    console.log("Creating the daily - - - New Day - - -...")
     //- - - New Day - - -
     let scheduledMessage = new cron.CronJob('30 59 02 * * *', () => {
         // This runs every day at 02:59:30
         client.channels.cache.get("1069811223950016572").send("- - - - - New Day - - - - -");
     });
+
+    console.log("Starting the cron job...")
     //sarting the daily sending
     scheduledMessage.start();
+    console.log("Cron job setup done.")
 
     //start confirmation
     setTimeout(function () {

@@ -1,16 +1,14 @@
-const USERID = require("../../../UserIDs.js");
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, Component } = require("discord.js")
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, Component, ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js")
+
 module.exports = {
     name: "help",
     description: "Lists commands",
-    category: "utils",
-    private: true,
-    async execute(logger, client, message, args) {
+    async execute(logger, interaction, client) {
         //Finds all command files and separate them from categories, then use page to list the commands per category, -admin shows the private ones (admin or iTsMaaT only)
-
+        await interaction.deferReply();
         let counter = 0;
         //let helpmessagebuilder = "";
-        let prefix = global.GuildManager.GetPrefix(message.guild);
+        let prefix = global.GuildManager.GetPrefix(interaction.guild);
         //helpmessagebuilder += `**The prefix is:** \`${prefix}\`\n\n`
         let categorymapper = {};
         client.commands.each((val) => {
@@ -62,14 +60,14 @@ module.exports = {
 
         row.components[0].setDisabled(true);
         row.components[1].setDisabled(true);
-        var HelpFull = await message.reply({
+        var HelpFull = await interaction.editReply({
             content: CategoriesPage,
             components: [row],
             allowedMentions: { repliedUser: false }
         });
 
         const filter = (interaction) => {
-            if (interaction.user.id == message.author.id) return true;
+            if (interaction.user.id == interaction.user.id) return true;
         }
 
         const collector = HelpFull.createMessageComponentCollector({
