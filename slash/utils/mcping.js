@@ -24,7 +24,7 @@ module.exports = {
     ],
     execute(logger, interaction, client) {
         const server_ip = interaction.options.get("ip").value;
-        const server_port_string = interaction.options.get("port").value ?? "25565";
+        const server_port_string = interaction.options.get("port")?.value ?? "25565";
         const server_port = parseInt(server_port_string)
             util.status(server_ip, server_port, options)
                 .then((result) => {
@@ -32,7 +32,7 @@ module.exports = {
                     const string1 = JSON.stringify(result);// turn the object into a string
                     const string = JSON.parse(string1);// make the string parsable
 
-                    interaction.send(`
+                    interaction.reply(`
 __Server status for ${server_ip} (Port : ${server_port})__
 
 **Server version:** ${string.version.protocol}
