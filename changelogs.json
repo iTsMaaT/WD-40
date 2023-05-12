@@ -64,5 +64,13 @@
       "Updated >Help",
       "Fixes"
     ]
+  },
+  {
+    "version": "3.0.0",
+    "date": "2023-05-11",
+    "changes": [
+      "Added a LOT of slash commands",
+      "Fixes"
+    ]
   }
 ]
