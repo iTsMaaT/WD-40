@@ -26,6 +26,16 @@ module.exports = {
 
         //console.log(require('discord.js').version)
 
+        const FisrtPage = new ButtonBuilder()
+            .setCustomId('first')
+            .setLabel('◀◀')
+            .setStyle(ButtonStyle.Success)
+            
+        const LastPage = new ButtonBuilder()
+            .setCustomId('last')
+            .setLabel('▶▶')
+            .setStyle(ButtonStyle.Success)
+
         const NextPage = new ButtonBuilder()
             .setCustomId('next')
             .setLabel('▶')
@@ -43,7 +53,7 @@ module.exports = {
             .setDisabled(true);
 
         const row = new ActionRowBuilder()
-            .addComponents(PreviousPage, PageNumber, NextPage);
+            .addComponents(FisrtPage, PreviousPage, PageNumber, NextPage, LastPage);
 
         var CategoriesPage = `__Command categories__ (\`>help <page number>\` to see the commands)\n**The prefix is: **\`${prefix}\`\n`;
         for (let i = 0; i < categories.length; i++) {
@@ -51,6 +61,7 @@ module.exports = {
         }
 
         row.components[0].setDisabled(true);
+        row.components[1].setDisabled(true);
         var HelpFull = await message.reply({
             content: CategoriesPage,
             components: [row],
@@ -68,18 +79,23 @@ module.exports = {
         });
 
         collector.on("collect", async (interaction) => {
-            if (counter < 0) counter = 0;
-            if (counter >= categories.length ) counter = categories.length ;
+
 
             if (interaction.customId === 'next') {
                 counter++;
             } else if (interaction.customId === 'previous') {
                 counter--;
+            } else if (interaction.customId === 'first') {
+                counter = 0;
+            } else if (interaction.customId === 'last') {
+                counter = categories.length;
             }
-        
+            if (counter < 0) counter = 0;
+            if (counter >= categories.length) counter = categories.length;
+
             // Update the label to show the current page number
-            row.components[1].setLabel(`${counter} / ${categories.length}`);
-        
+            row.components[2].setLabel(`${counter} / ${categories.length}`);
+
             if (counter == 0) {
                 // If we're on the first page, show the categories page
                 await HelpFull.edit({
@@ -100,13 +116,15 @@ module.exports = {
 
             // Update the button states based on the current page number
             await row.components[0].setDisabled(counter == 0);
-            await row.components[2].setDisabled(counter == categories.length);
-        
+            await row.components[1].setDisabled(counter == 0);
+            await row.components[3].setDisabled(counter == categories.length);
+            await row.components[4].setDisabled(counter == categories.length);
+
             await interaction.update({
                 components: [row],
             });
         });
-        
+
         collector.on("end", async (interaction) => {
             const messageContent = `${HelpFull.content}\n[\`Buttons expired.\`]`;
             row.components.forEach(component => {
