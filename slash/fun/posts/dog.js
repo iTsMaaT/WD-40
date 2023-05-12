@@ -6,6 +6,7 @@ module.exports = {
   description: 'Not cats!',
   type :ApplicationCommandType.ChatInput,
   async execute(logger, interaction, client) {
-    interaction.reply({ embeds: [await FetchReddit(interaction, "dog", "dogs", "dogpictures")], allowedMentions: { repliedUser: false }})
+    await interaction.deferReply();
+    interaction.editReply({ embeds: [await FetchReddit(interaction, "dog", "dogs", "dogpictures")], allowedMentions: { repliedUser: false }})
   }
 }

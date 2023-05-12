@@ -14,7 +14,8 @@ module.exports = {
         },
     ],
     execute: async (logger, interaction, client) => {
-        const tags = interaction.options.get("tags").value.replace(" ","+")
+        interaction.deferReply();
+        const tags = interaction.options.get("tags")?.value.trim().replace(" ","+") ?? "";
         if (interaction.channel.nsfw) {
             try {
                 const url = 'http://rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=' + tags;
@@ -23,18 +24,18 @@ module.exports = {
                         if (!body) return message.reply("An error occured, probably a invalid tag.");
                         const data = JSON.parse(body);
                         const post = data[Math.floor(Math.random() * data.length)];
-                        interaction.reply({ content: post.file_url, allowedMentions: { repliedUser: false } });
+                        interaction.editReply({ content: post.file_url, allowedMentions: { repliedUser: false } });
                     } else {
                         logger.error(error);
                     }
 
                 });
             } catch (err) {
-                interaction.reply({content: "An error occured, probably a invalid tag.", ephemeral: true});
+                interaction.editReply({content: "An error occured, probably a invalid tag.", ephemeral: true});
                 logger.error(error);
             }
         } else {
-            interaction.reply({ content: "The channel you are in isn't NSFW", allowedMentions: { repliedUser: false } });
+            interaction.editReply({ content: "The channel you are in isn't NSFW", allowedMentions: { repliedUser: false } });
         }
     },
 };

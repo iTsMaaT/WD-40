@@ -13,7 +13,7 @@ module.exports = {
       required: true,
       choices: [
         { name: "Lookup a user's post", value: "user", },
-        { name: "Ftech a post from a subreddit", value: "sub", },
+        { name: "Fetch a post from a subreddit", value: "sub", },
       ],
     },
     {
@@ -25,19 +25,20 @@ module.exports = {
   ],
   execute: async (logger, interaction, client) => {
     const option = interaction.options.get("option").value
-    const data = interaction.options.get("data").value
+    const optiondata = interaction.options.get("data").value
+    await interaction.deferReply();
     switch (option) {
-      case "user":
+      case "sub":
         var sent = "";
         //Gore subreddits blacklist
-        if (data != "eyeblech" && data != "gore" && data != "guro") {
+        if (optiondata != "eyeblech" && optiondata != "gore" && optiondata != "guro") {
           let RedditImage = "";
           var RedditTries = 1;
-          sent = await interaction.send({ content: `Attempt ${RedditTries}/10`, fetchreply: true })
+          sent = await interaction.editReply({ content: `Attempt ${RedditTries}/10`, fetchreply: true })
           //Tries to fetch a post 10 times
           for (let i = 0; i <= 10; i++) {
             try {
-              let response = await got(`https://www.reddit.com/r/${data}/random/.json`);
+              let response = await got(`https://www.reddit.com/r/${optiondata}/random/.json`);
               let content = JSON.parse(response.body);
               let permalink = content[0].data.children[0].data.permalink;
               let RedditURL = `https://reddit.com${permalink}`;
@@ -83,8 +84,8 @@ module.exports = {
         }
           break;
       
-        case "sub":
-        const url = `https://www.reddit.com/user/${data}/submitted.json`;
+        case "user":
+        const url = `https://www.reddit.com/user/${optiondata}/submitted.json`;
         let response;
         try {
           response = await got(url);
@@ -118,7 +119,7 @@ module.exports = {
             text: `Posted by ${randomPost.data.author} in ${randomPost.data.subreddit_name_prefixed}`,
           },
         };
-        interaction.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+        interaction.editReply({ embeds: [embed], allowedMentions: { repliedUser: false } });
         break;
     } 
   }
