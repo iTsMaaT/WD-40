@@ -6,7 +6,7 @@ module.exports = {
     private: true,
     execute(logger, client, message, args) {
         const server = process.env.SERVER
-        if (message.author.id == 411996978583699456 && !args[0]) {
+        if (message.author.id == 411996978583699456) {
             logger.severe("Shutdown requested from discord...");
             client.channels.cache.get("1037141235451842701").send(`Bot shutdown requested, **Uptime**: \`${prettyMilliseconds(client.uptime)}\``);
             message.channel.send(`**Shutting down the bot...**\n**Uptime**: \`${prettyMilliseconds(client.uptime)}\``).then(() => {
