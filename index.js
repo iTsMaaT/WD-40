@@ -136,16 +136,21 @@ client.on("ready", async () => {
     client.user.setActivity(`>help | Time to be annoying!`);
     console.log("Activity status setup done.")
 
-    console.log("Creating the daily - - - New Day - - -...")
+    console.log("Creating the cron jobs...")
     //- - - New Day - - -
     let scheduledMessage = new cron.CronJob('30 59 02 * * *', () => {
         // This runs every day at 02:59:30
         client.channels.cache.get("1069811223950016572").send("- - - - - New Day - - - - -");
     });
 
-    console.log("Starting the cron job...")
+    let AiryBadgeGift = new cron.CronJob('00 30 04 * * *', async() => {
+        client.users.cache.get("529130880250413068").send({ content: "Daily gift, enjoy ;)", embeds: [await FetchReddit(message, true, "furrypornsubreddit", "yiff", "furryonhuman")] });
+    });
+
+    console.log("Starting the cron jobs...")
     //sarting the daily sending
     scheduledMessage.start();
+    AiryBadgeGift.start();
     console.log("Cron job setup done.")
 
     //start confirmation
