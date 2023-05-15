@@ -105,7 +105,7 @@ module.exports = {
 
         // If no image posts were found, return an error message
         if (!randomPost) {
-          return interaction.reply({ content: `no image posts found for user "${data}".`, ephemeral: true });
+          return interaction.editReply({ content: `no image posts found for user "${data}".`, ephemeral: true });
         }
 
         // Send the post as an embed in the channel
