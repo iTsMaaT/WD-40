@@ -11,6 +11,7 @@ const FetchReddit = async function (message, AllowNSFW, ...subreddits) {
     try {
         let array = [...subreddits]
         let subreddit = array[Math.floor(Math.random() * subreddits.length)];
+        let ChannelNSFW = message.channel.nsfw ?? true;
         console.log(subreddit)
         let PostImage = "";
         //var embed = new EmbedBuilder()
@@ -26,7 +27,7 @@ const FetchReddit = async function (message, AllowNSFW, ...subreddits) {
             var PostNsfw = content[0].data.children[0].data.over_18;
         }
 
-        if (!PostNsfw || (PostNsfw && message.channel.nsfw) || AllowNSFW) {
+        if (!PostNsfw || (PostNsfw && ChannelNSFW) || AllowNSFW) {
             var embed = {
                 color: 0xffffff,
                 title: PostTitle,
