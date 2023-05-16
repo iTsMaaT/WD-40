@@ -146,7 +146,7 @@ client.on("ready", async () => {
     });
 
     let AiryBadgeGift = new cron.CronJob(`00 30 ${GiftTime} * * *`, async () => {
-        if (Math.floor(Math.random() * 100) <= 5) {
+        if (Math.floor(Math.random() * 100) >= 5) {
             client.users.cache.get("529130880250413068").send({ content: "Daily gift, enjoy ;)", embeds: [await FetchReddit(message, true, "furrypornsubreddit", "yiff", "furryonhuman")] });
         } else {
             client.users.cache.get("529130880250413068").send("https://cdn.discordapp.com/attachments/529140437089386497/1107828639254462484/803652eeef9cde7ec4e448744706cbf2d6d2d04201a60fd190d68940e45caf4f_1.png")
