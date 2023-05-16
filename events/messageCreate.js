@@ -1,4 +1,5 @@
 const { Events } = require('discord.js');
+const FetchReddit = require("../utils/functions/FetchReddit.js");
 
 module.exports = {
     name: Events.MessageCreate,
