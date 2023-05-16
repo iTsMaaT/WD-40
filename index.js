@@ -14,6 +14,8 @@ const Discord = require('discord.js');
 const path = require('node:path');
 const USERID = require("./UserIDs.js");
 
+const GiftTime = 4;
+
 dotenv.config();
 
 const client = new Client({
@@ -131,7 +133,7 @@ client.on("ready", async () => {
     console.log("Setting up slash commands...")
     await client.application.commands.set(discoveredCommands);
     console.log("Slash command setup done.")
-    
+
     console.log("Setting up activity status...")
     client.user.setActivity(`>help | Time to be annoying!`);
     console.log("Activity status setup done.")
@@ -143,8 +145,13 @@ client.on("ready", async () => {
         client.channels.cache.get("1069811223950016572").send("- - - - - New Day - - - - -");
     });
 
-    let AiryBadgeGift = new cron.CronJob('00 30 04 * * *', async() => {
-        client.users.cache.get("529130880250413068").send({ content: "Daily gift, enjoy ;)", embeds: [await FetchReddit(message, true, "furrypornsubreddit", "yiff", "furryonhuman")] });
+    let AiryBadgeGift = new cron.CronJob(`00 30 ${GiftTime} * * *`, async () => {
+        if (Math.floor(Math.random() * 100) <= 5) {
+            client.users.cache.get("529130880250413068").send({ content: "Daily gift, enjoy ;)", embeds: [await FetchReddit(message, true, "furrypornsubreddit", "yiff", "furryonhuman")] });
+        } else {
+            client.users.cache.get("529130880250413068").send("https://cdn.discordapp.com/attachments/529140437089386497/1107828639254462484/803652eeef9cde7ec4e448744706cbf2d6d2d04201a60fd190d68940e45caf4f_1.png")
+        }
+        GiftTime = Math.floor(Math.random() * 24);
     });
 
     console.log("Starting the cron jobs...")
