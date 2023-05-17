@@ -1,4 +1,3 @@
-const USERID = require("../../../UserIDs.js");
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, Component } = require("discord.js")
 module.exports = {
     name: "help",

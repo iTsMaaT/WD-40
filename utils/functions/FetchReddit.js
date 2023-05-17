@@ -7,11 +7,10 @@ const got = require("got");
  * @param  {...any} subreddits 
  * @returns 
  */
-const FetchReddit = async function (message, AllowNSFW, ...subreddits) {
+const FetchReddit = async function (ChannelNSFW, AllowNSFW, ...subreddits) {
     try {
         let array = [...subreddits]
         let subreddit = array[Math.floor(Math.random() * subreddits.length)];
-        let ChannelNSFW = message.channel.nsfw ?? true;
         console.log(subreddit)
         let PostImage = "";
         //var embed = new EmbedBuilder()
@@ -39,6 +38,7 @@ const FetchReddit = async function (message, AllowNSFW, ...subreddits) {
                     text: `Posted by ${PostAuthor} in ${PostRSlash}`,
                 },
             };
+            console.log(PostImage)
         } else {
             embed = { title: "The post is NSFW but the channel isn't." }
         }

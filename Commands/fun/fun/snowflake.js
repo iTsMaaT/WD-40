@@ -1,11 +1,10 @@
-const USERID = require("../../../UserIDs.js");
 module.exports = {
     name: "snowflake",
     description: "Reacts :snowflake: to every message of a user",
     category: "fun",
     async execute(logger, client, message, args) {
         //Checks if the person executing the command is iTsMaaT or the server's owner
-        if (message.member.permissions.has("Administrator") || message.author.id == USERID.itsmaat) {
+        if (message.member.permissions.has("Administrator") || message.author.id == process.env.OWNER_ID) {
             if (args.length == 1) {
                 //Transforms a ping into the ID
                 let rawid = args[0].replace("@", "");
