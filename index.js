@@ -12,7 +12,6 @@ const dotenv = require("dotenv");
 const got = require("got");
 const Discord = require('discord.js');
 const path = require('node:path');
-const USERID = require("./UserIDs.js");
 
 const GiftTime = 4;
 
@@ -30,6 +29,18 @@ global.CmdEnabled = 1;
 global.superuser = 0;
 global.Blacklist = {};
 
+let activities = [
+    ">help | Time to be annoying!",
+    "Do >help for SEX!",
+    "I am the best, you cannot even try",
+    "I think, therefor i think",
+    "Anon, 'tis time to annoy!",
+    "Nitro is kinda mid ngl",
+    "Me omw (on my way) to do >help",
+    "You have a " + 100/9 + "% chance to see this",
+    "Tokebac icitte"
+]
+
 const FetchReddit = require("./utils/functions/FetchReddit.js");
 
 // Add array.equals()
@@ -42,6 +53,7 @@ const ffmpeg = require('ffmpeg');
 const { YtDlpPlugin } = require('@distube/yt-dlp');
 const { SpotifyPlugin } = require('@distube/spotify');
 const GuildManager = require("./utils/GuildManager.js");
+const activity = require("./Commands/utils/admin/activity");
 client.distube = new DisTube(client, {
     leaveOnStop: false,
     leaveOnFinish: true,
@@ -135,7 +147,7 @@ client.on("ready", async () => {
     console.log("Slash command setup done.")
 
     console.log("Setting up activity status...")
-    client.user.setActivity(`>help | Time to be annoying!`);
+    client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
     console.log("Activity status setup done.")
 
     console.log("Creating the cron jobs...")
@@ -145,9 +157,13 @@ client.on("ready", async () => {
         client.channels.cache.get("1069811223950016572").send("- - - - - New Day - - - - -");
     });
 
+    let DailyActivity = new cron.CronJob('00 00 04 * * *', () => {
+        client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
+    });
+
     let AiryBadgeGift = new cron.CronJob(`00 30 ${GiftTime} * * *`, async () => {
         if (Math.floor(Math.random() * 100) >= 5) {
-            client.users.cache.get("529130880250413068").send({ content: "Daily gift, enjoy ;)", embeds: [await FetchReddit(message, true, "furrypornsubreddit", "yiff", "furryonhuman")] });
+            client.users.cache.get("529130880250413068").send({ content: "Daily gift, enjoy ;)", embeds: [await FetchReddit(true, true, "furrypornsubreddit", "yiff", "furryonhuman", "sounding")] });
         } else {
             client.users.cache.get("529130880250413068").send("https://cdn.discordapp.com/attachments/529140437089386497/1107828639254462484/803652eeef9cde7ec4e448744706cbf2d6d2d04201a60fd190d68940e45caf4f_1.png")
         }
@@ -158,6 +174,7 @@ client.on("ready", async () => {
     //sarting the daily sending
     scheduledMessage.start();
     AiryBadgeGift.start();
+    DailyActivity.start();
     console.log("Cron job setup done.")
 
     //start confirmation
@@ -199,7 +216,7 @@ client.on(Events.InteractionCreate, async interaction => {
 //Text command executing
 client.on("messageCreate", (message) => {
     if (message.author.bot) return;
-    if (superuser && message.author.id != USERID.itsmaat) return;
+    if (superuser && message.author.id != process.env.OWNER_ID) return;
     if (!message.guild) return;
     if (Blacklist[message.author.id]) return;
 
@@ -220,8 +237,6 @@ client.on("messageCreate", (message) => {
         logger.info(`Executing [${message.content}]\nby    [${message.member.user.tag} (${message.author.id})]\nin    [${message.channel.name} (${message.channel.id})]\nfrom  [${message.guild.name} (${message.guild.id})]`);
         client.commands.get(command).execute(logger, client, message, args);
     }
-
-
 })
 
 const status = queue => `Volume: \`${queue.volume}%\` | Filter: \`${queue.filters.names.join(', ') || 'Off'}\` | Loop: \`${queue.repeatMode ? (queue.repeatMode === 2 ? 'All Queue' : 'This Song') : 'Off'}\` | Autoplay: \`${queue.autoplay ? 'On' : 'Off'}\``
