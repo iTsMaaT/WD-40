@@ -29,10 +29,10 @@ global.CmdEnabled = 1;
 global.superuser = 0;
 global.Blacklist = {};
 
-let activities = [
+const activities = [
     ">help | Time to be annoying!",
     "Do >help for SEX!",
-    "I am the best, you cannot even try",
+    "I am the best, you cannot even compare",
     "I think, therefor i think",
     "Anon, 'tis time to annoy!",
     "Nitro is kinda mid ngl",
