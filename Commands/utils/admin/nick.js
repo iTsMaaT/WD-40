@@ -4,7 +4,7 @@ module.exports = {
     category: 'utils',
     private: true,
     execute: async (logger, client, message, args) => {
-        if (message.author.id == process.env.OWNER_ID && args.length == 1) {
+        if (message.author.id == process.env.OWNER_ID && args.length >= 1) {
             const member = message.guild.members.cache.get(client.user.id);
 
             // Tries to set the server nickname
