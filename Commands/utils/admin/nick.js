@@ -1,26 +1,31 @@
-const USERID = require("../../../UserIDs.js");
 module.exports = {
-    name: "nick",
-    description: "Changes the bot's nickname",
-    category: "utils",
+    name: 'nick',
+    description: "Changes the server nickname",
+    category: 'utils',
     private: true,
     execute: async (logger, client, message, args) => {
-        if (message.author.id == USERID.itsmaat && args.length != 0) {
-            //Tries to set the username
+        if (message.author.id == process.env.OWNER_ID && args.length == 1) {
+            const member = message.guild.members.cache.get(client.user.id);
+
+            // Tries to set the server nickname
             try {
-            client.user.setUsername(args.join(' '));
-            message.reply('Nickname changed.');
+                await member.setNickname(args.join(' '));
+                message.reply('Server nickname changed.');
+            } catch (err) {
+                message.reply(`Nickname change failed.\n\`${err}\``);
             }
-            catch(err) {
-                message.reply(`Name change failed.\n\`${err}\``)
+        } else if (message.author.id == process.env.OWNER_ID && args.length === 0) {
+            const member = message.guild.members.cache.get(client.user.id);
+
+            // Resets the server nickname to default
+            try {
+                await member.setNickname(null);
+                message.reply({ content: 'Server nickname set to default', allowedMentions: { repliedUser: false } });
+            } catch (err) {
+                message.reply(`Nickname reset failed.\n\`${err}\``);
             }
-        }
-        //if no args, puts the name back to normal
-        else if (message.author.id == USERID.itsmaat && args.length == 0) {
-            client.user.setUsername(`WD-40`);
-            message.reply({ content: 'Nickname set to default', allowedMentions: { repliedUser: false } });
         } else {
-            message.reply(`You are not allowed to execute that command`);
+            message.reply('You are not allowed to execute that command.');
         }
-    }
-}
+    },
+};

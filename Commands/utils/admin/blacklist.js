@@ -6,7 +6,7 @@ module.exports = {
     private: true,
     execute(logger, client, message, args) {
         
-        if (message.author.id != 411996978583699456) return;
+        if (message.author.id != process.env.OWNER_ID) return;
 
         if (!args[0]) {
             if (Object.keys(global.Blacklist).length == 0) return message.reply("Empty.")

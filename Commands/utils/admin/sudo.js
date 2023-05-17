@@ -1,5 +1,4 @@
 const { Guild } = require("discord.js");
-const USERID = require("../../../UserIDs.js");
 module.exports = {
     name: "sudo",
     description: "Make the bot send a custom message / reply",
@@ -9,7 +8,7 @@ module.exports = {
         const owner = await message.guild.fetchOwner();
 
         //Only server owner and iTsMaaT are allowed to execute this command
-        if ((message.author.id == USERID.itsmaat || message.author.id == owner.id)) {
+        if ((message.author.id == process.env.OWNER_ID || message.author.id == owner.id)) {
             //Sends a message in a given channel
             let sudoprefix = args.shift();
             if (sudoprefix == "-s") {

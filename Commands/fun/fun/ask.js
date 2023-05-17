@@ -7,7 +7,7 @@ module.exports = {
   execute: async (logger, client, message, args) => {
 
     try {
-      if (args[0] == "-p" && message.member.permissions.has("Administrator") && message.author.id == 411996978583699456) {
+      if (args[0] == "-p" && message.member.permissions.has("Administrator") && message.author.id == process.env.OWNER_ID) {
         args.shift();
         await global.GuildManager.SetPersonality(message.guild, args.join(" "));
         message.reply({ content: 'Prompt successfully changed.', allowedMentions: { repliedUser: false } });
