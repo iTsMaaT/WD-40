@@ -5,13 +5,30 @@ module.exports = {
     private: true,
     execute(logger, client, message, args) {
         //Chances the activity status of the bot, uses the base one if no args is used
-        if (message.author.id == process.env.OWNER_ID && args.length != 0) {
-            client.user.setActivity(args.join(' '));
-            message.reply('Activity changed.');
+
+        if (message.author.id != process.env.OWNER_ID) return;
+        if (!args[0]) {
+            client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
+            message.reply({ content: `Activity randomised`, allowedMentions: { repliedUser: false } });
+            return;
         }
-        else {
-            client.user.setActivity(`Time to be annoying!`);
-            message.reply({ content: 'Activity set to default', allowedMentions: { repliedUser: false } });
+        switch (args[0]) {
+            case "-l":
+                let activityList = "";
+                let maxIndexWidth = (activities.length - 1).toString().length;
+                activities.forEach((activity, index) => {
+                    let formattedIndex = `[${index.toString().padStart(maxIndexWidth, " ")}]`;
+                    activityList += `${formattedIndex} : ${activity}\n`
+                });
+                message.reply({ content: `\`\`\`${activityList}\`\`\``, allowedMentions: { repliedUser: false } });
+                break;
+            case "-p":
+                client.user.setActivity(activities[args[1]]);
+                message.reply({ content: `Activity changed to : \`${activities[args[1]]}\``, allowedMentions: { repliedUser: false } });
+                break;
+            default:
+                client.user.setActivity(args.join(' '));
+                message.reply({ content: `Activity updated`, allowedMentions: { repliedUser: false } });
         }
     }
 }
