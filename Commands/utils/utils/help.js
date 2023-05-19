@@ -22,7 +22,6 @@ module.exports = {
             }
         })
         let categories = Object.keys(categorymapper);
-        console.log(categorymapper)
 
         //console.log(require('discord.js').version)
 
@@ -132,10 +131,6 @@ module.exports = {
                 components: [row],
                 allowedMentions: { repliedUser: false },
             });
-
-            // Update the button states based on the current page number
-            console.log(counter)
-
 
             await interaction.update({
                 embeds: [embed],
