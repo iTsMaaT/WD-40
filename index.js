@@ -29,7 +29,7 @@ global.CmdEnabled = 1;
 global.superuser = 0;
 global.Blacklist = {};
 
-let activities = [
+global.activities = [
     ">help | Time to be annoying!",
     "Do >help for SEX!",
     "I am the best, you cannot even compare",
@@ -37,10 +37,16 @@ let activities = [
     "Anon, 'tis time to annoy!",
     "Nitro is kinda mid ngl",
     "Me omw (on my way) to do >help",
-    "You have a " + 100/11 + "% chance to see this",
+    "You have a " + NaN + "% chance to see this",
     "Tokebac icitte",
     "Don't go on page 3 of >help!",
-    "*you're"
+    "*you're",
+    "The time has cum",
+    "bonjour",
+    "Use me pwease UwU",
+    "nuzzles *breaks your spine*",
+    "That's the gros sourire message",
+    "Barbeque bacon burger",
 ]
 
 const FetchReddit = require("./utils/functions/FetchReddit.js");
@@ -149,7 +155,9 @@ client.on("ready", async () => {
     console.log("Slash command setup done.")
 
     console.log("Setting up activity status...")
+    activities[7] = activities[7].replace("NaN", (100 / activities.length).toFixed(4));
     await client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
+    console.log(activities)
     console.log("Activity status setup done.")
 
     console.log("Creating the cron jobs...")
@@ -163,24 +171,12 @@ client.on("ready", async () => {
         client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
     });
 
-    /*let AiryBadgeGift = new cron.CronJob(`00 30 ${GiftTime} * * *`, async () => {
-        if (Math.floor(Math.random() * 100) >= 5) {
-            client.users.cache.get("529130880250413068").send({ content: "Daily gift, enjoy ;)", embeds: [await FetchReddit(true, "furrypornsubreddit", "yiff", "furryonhuman", "sounding")] });
-            logger.info("AiryBadge received some very explicit art ;)")
-        } else {
-            client.users.cache.get("529130880250413068").send("https://cdn.discordapp.com/attachments/529140437089386497/1107828639254462484/803652eeef9cde7ec4e448744706cbf2d6d2d04201a60fd190d68940e45caf4f_1.png")
-            logger.info("AiryBadge received breaking bald")
-        }
-        GiftTime = Math.floor(Math.random() * 23) + 1;
-    });*/
-
     console.log("Starting the cron jobs...")
     //sarting the daily sending
     scheduledMessage.start();
-    //AiryBadgeGift.start();
     DailyActivity.start();
     console.log("Cron job setup done.")
-    console.log(require('discord.js').version)
+    console.log("Discord.js version: " + require('discord.js').version)
 
     //start confirmation
     setTimeout(function () {
