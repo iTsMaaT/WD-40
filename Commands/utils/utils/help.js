@@ -5,7 +5,7 @@ module.exports = {
     category: "utils",
     private: true,
     async execute(logger, client, message, args) {
-        //Finds all command files and separate them from categories, then use page to list the commands per category, -admin shows the private ones (admin or iTsMaaT only)
+        //Finds all command files and separate them from categories, then use page to list the commands per category
 
         let counter = 0;
         //let helpmessagebuilder = "";
@@ -22,6 +22,7 @@ module.exports = {
             }
         })
         let categories = Object.keys(categorymapper);
+        console.log(categorymapper)
 
         //console.log(require('discord.js').version)
 
@@ -29,7 +30,7 @@ module.exports = {
             .setCustomId('first')
             .setLabel('◀◀')
             .setStyle(ButtonStyle.Success)
-            
+
         const LastPage = new ButtonBuilder()
             .setCustomId('last')
             .setLabel('▶▶')
@@ -54,31 +55,34 @@ module.exports = {
         const row = new ActionRowBuilder()
             .addComponents(FisrtPage, PreviousPage, PageNumber, NextPage, LastPage);
 
-        var CategoriesPage = `__Command categories__ (\`>help <page number>\` to see the commands)\n**The prefix is: **\`${prefix}\`\n`;
-        for (let i = 0; i < categories.length; i++) {
-            CategoriesPage += `**Page ${i + 1}** : ${categories[i].toUpperCase()}\n`;
-        }
+        var embed = {
+            title: "Command categories",
+            description: `**The prefix is:** \`${prefix}\`\n\n${categories
+                .map((category, index) => `**Page ${index + 1}:** ${category.toUpperCase()}`)
+                .join("\n")}`,
+            color: 0xffffff, // Embed color (you can change it to any color you like)
+        };
 
         row.components[0].setDisabled(true);
         row.components[1].setDisabled(true);
-        var HelpFull = await message.reply({
-            content: CategoriesPage,
+        const helpMessage = await message.reply({
+            embeds: [embed],
             components: [row],
-            allowedMentions: { repliedUser: false }
+            allowedMentions: { repliedUser: false },
         });
+
 
         const filter = (interaction) => {
             if (interaction.user.id == message.author.id) return true;
         }
 
-        const collector = HelpFull.createMessageComponentCollector({
+        const collector = helpMessage.createMessageComponentCollector({
             filter,
             time: 120000,
             dispose: true
         });
 
         collector.on("collect", async (interaction) => {
-
 
             if (interaction.customId === 'next') {
                 counter++;
@@ -96,41 +100,55 @@ module.exports = {
             row.components[2].setLabel(`${counter} / ${categories.length}`);
 
             if (counter == 0) {
-                // If we're on the first page, show the categories page
-                await HelpFull.edit({
-                    content: CategoriesPage,
-                    components: [row],
-                    allowedMentions: { repliedUser: false }
-                });
+                embed = {
+                    title: "Command categories",
+                    description: `**The prefix is:** \`${prefix}\`\n\n${categories
+                        .map((category, index) => `**Page ${index + 1}:** ${category.toUpperCase()}`)
+                        .join("\n")}`,
+                    color: 0xffffff, // Embed color (you can change it to any color you like)
+                };
+
+                await row.components[0].setDisabled(counter == 0);
+                await row.components[1].setDisabled(counter == 0);
+                await row.components[3].setDisabled(counter == categories.length);
+                await row.components[4].setDisabled(counter == categories.length);
+
             } else {
-                // Otherwise, show the commands for the current category
-                let HelpFullPage = `__Commands for category : **${categories[counter - 1].toUpperCase()}**__\n`;
-                HelpFullPage += categorymapper[categories[counter - 1]];
-                await HelpFull.edit({
-                    content: HelpFullPage,
-                    components: [row],
-                    allowedMentions: { repliedUser: false }
-                })
+                let currentCategory = categories[counter - 1];
+                embed = {
+                    title: `Commands for category: ${currentCategory.toUpperCase()}`,
+                    description: categorymapper[categories[counter - 1]],
+                    color: 0xffffff, // Embed color (you can change it to any color you like)
+                };
+
+                await row.components[0].setDisabled(counter == 0);
+                await row.components[1].setDisabled(counter == 0);
+                await row.components[3].setDisabled(counter == categories.length);
+                await row.components[4].setDisabled(counter == categories.length);
             }
 
+            helpMessage.edit({
+                embeds: [embed],
+                components: [row],
+                allowedMentions: { repliedUser: false },
+            });
+
             // Update the button states based on the current page number
-            await row.components[0].setDisabled(counter == 0);
-            await row.components[1].setDisabled(counter == 0);
-            await row.components[3].setDisabled(counter == categories.length);
-            await row.components[4].setDisabled(counter == categories.length);
+            console.log(counter)
+
 
             await interaction.update({
+                embeds: [embed],
                 components: [row],
             });
         });
 
         collector.on("end", async (interaction) => {
-            const messageContent = `${HelpFull.content}\n[\`Buttons expired.\`]`;
             row.components.forEach(component => {
                 component.setDisabled(true);
             })
-            await HelpFull.edit({
-                content: messageContent,
+            await helpMessage.edit({
+                embeds: [embed],
                 components: [row],
                 allowedMentions: { repliedUser: false }
             });

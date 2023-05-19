@@ -5,8 +5,21 @@ module.exports = {
   inVoiceChannel: true,
   execute: async (logger, client, message, args) => {
     const queue = client.distube.getQueue(message)
-    if (!queue) return message.channel.send(`There is nothing in the queue right now!`)
+    if (!queue) {
+      AutoEmbed = {
+        color: 0xffff00,
+        title: `There is nothing in the queue right now!`,
+        timestamp: new Date(),
+    }
+    return message.reply({ embeds: [AutoEmbed], allowedMentions: { repliedUser: false }} );
+    }
     const autoplay = queue.toggleAutoplay()
-    message.channel.send(`AutoPlay: \`${autoplay ? 'On' : 'Off'}\``)
+    AutoEmbed = {
+      color: 0xff0000,
+      title: `Autoplay`,
+      description: autoplay ? 'On' : 'Off',
+      timestamp: new Date(),
+  }
+  message.reply({ embeds: [AutoEmbed], allowedMentions: { repliedUser: false }} );
   }
 }

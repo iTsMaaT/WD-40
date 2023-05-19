@@ -6,7 +6,7 @@ module.exports={
     execute(logger, client, message, args){
         if (!message.member.voice.channel) {
             const must_be_in_vc_embed = new EmbedBuilder()
-          .setColor("#ffffff")
+          .setColor("#ffff00")
           .setDescription(`You must be in a voice channel!`)
           .setTimestamp()
             return message.channel.send({embeds:[must_be_in_vc_embed]})

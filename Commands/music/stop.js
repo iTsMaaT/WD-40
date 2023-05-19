@@ -6,7 +6,7 @@ module.exports={
     execute(logger, client, message){
         const queue = client.distube.getQueue(message)
         const no_music_embed = new EmbedBuilder()
-        .setColor("#ffffff")
+        .setColor("#ffff00")
         .setDescription(`There is nothing in the queue right now!`)
         .setTimestamp()
     if (!queue) return message.channel.send({embeds:[no_music_embed]})

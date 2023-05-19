@@ -1,6 +1,6 @@
 module.exports = {
     name: 'roll',
-    description: 'Roll between 1 and 250 dices of up to 250 sides. Defaults to rolling 1d6 when no arguments are given.',
+    description: 'Roll between 1 and 50 dices of up to 50 sides. Defaults to rolling 1d6 when no arguments are given.',
     category: "fun",
     execute(logger, client, message, args) {
         // Check if arguments are provided
@@ -14,22 +14,37 @@ module.exports = {
             }
 
             //Limits the input to 500d500
-            if (numDices > 250 || numSides > 250) {
-                return message.reply('Maximum of 500 dices with 500 sides');
+            if (numDices > 50 || numSides > 50) {
+                return message.reply('Maximum of 50 dices with 50 sides');
             }
 
             // Roll the dices
             const rolls = Array.from({ length: numDices }, () => Math.floor(Math.random() * numSides) + 1);
             const total = rolls.reduce((acc, cur) => acc + cur, 0);
 
-            message.channel.send(`
-Rolling **${numDices}d${numSides}**...
-**${rolls.join(', ')}**\nTotal: **${total}**
-            `);
+            RollEmbed = {
+                color: 0xffffff,
+                title: `Rolling **${numDices}d${numSides}**...`,
+                fields: [
+                    { name: "Rolls", value: rolls.join(", ")},
+                    { name: 'Total', value: total, inline: true }
+                ],
+                timestamp: new Date(),
+            }
+
+            message.reply({ embeds: [RollEmbed], allowedMentions: { repliedUser: false }} );
         } else {
             // Roll 1d6 by default
             const roll = Math.floor(Math.random() * 6) + 1;
-            message.reply(`You rolled a ${roll}!`);
+            RollEmbed = {
+                color: 0xffffff,
+                title: `Rolling **1d6**...`,
+                fields: [
+                    { name: "Roll", value: roll},
+                ],
+                timestamp: new Date(),
+            }
+            message.reply({ embeds: [RollEmbed], allowedMentions: { repliedUser: false }} );
         }
     },
 };

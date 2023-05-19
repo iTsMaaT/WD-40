@@ -1,52 +1,58 @@
-const { channelLink } = require("discord.js")
-
 module.exports = {
     name: "userinfo",
     description: "Gives info of a user",
     category: "utils",
     execute: async (logger, client, message, args) => {
         const guild = await client.guilds.fetch(message.guildId);
+        
+        let id;
         if (!args[0]) {
-            var id = message.author.id;
+            id = message.author.id;
         } else {
-            const rawid1 = args[0].replace("@", "");
-            const rawdid2 = rawid1.replace("<", "");
-            var id = rawdid2.replace(">", ""); 
-        }
-            //Info of the user executing the command
-            try {
-                
-                const target = await guild.members.fetch(id);
-                const status = await guild.presences.resolve(id);
-                try {
-                    var custom_status = status.activities[0]?.state ?? "`No status`";
-                    var activity_name = status.activities[1]?.name ?? "`No activity name`";
-                    var activity_details = status.activities[1]?.details ?? "`No activity details`";
-                } catch {
-                    var custom_status = "`No status`";
-                    var activity_name = "`No activity name`";
-                    var activity_details = "`No activity details`";
-                }
-                message.reply({
-                    content: `
-**User Informations For**: \`${message.member.user.tag}\`
-            
-**User ID**: ${target.user.id}
-**Account age**: <t:${parseInt(target.user.createdTimestamp / 1000)}:R>
-**Member of this server since**: <t:${parseInt(target.joinedTimestamp / 1000)}:R>
-**Status**: ${custom_status}
-**Activity Title**: ${activity_name}
-**Activity Details**: ${activity_details}
-**Highest Role**: ${target.roles.highest.name}
-
-
-
-            `, allowedMentions: { repliedUser: false }
-                });
-                /***Roles**:
-                ${target.roles.cache.map(r => r).join(" ")}*/
-            } catch (err) {
-                message.reply(`Invalid user / id, User offline or an error occurred\n\`${err}\``);
+            const rawId = args[0].replace(/[<!@>]/g, "");
+            if (!rawId.match(/^\d+$/)) {
+                return message.reply("Invalid user ID.");
             }
+            id = rawId;
         }
-}
+        
+        try {
+            const target = await guild.members.fetch(id);
+            const status = await guild.presences.resolve(id);
+            
+            try {
+                var custom_status = status.activities[0]?.state ?? "`No status`";
+                var activity_name = status.activities[1]?.name ?? "`No activity name`";
+                var activity_details = status.activities[1]?.details ?? "`No activity details`";
+            } catch {
+                var custom_status = "`No status`";
+                var activity_name = "`No activity name`";
+                var activity_details = "`No activity details`";
+            }
+            
+            userInfoEmbed = {
+                title: "User Information",
+                description: `User Informations For: **<@${id}>**`,
+                fields: [
+                    { name: "User ID", value: target.user.id },
+                    { name: "Account Age", value: `<t:${parseInt(target.user.createdTimestamp / 1000)}:R>` },
+                    { name: "Member Since", value: `<t:${parseInt(target.joinedTimestamp / 1000)}:R>` },
+                    { name: "Status", value: custom_status },
+                    { name: "Activity Title", value: activity_name },
+                    { name: "Activity Details", value: activity_details },
+                    { name: "Highest Role", value: target.roles.highest.name },
+                ],
+                timestamp: new Date(),
+            };
+            
+            message.reply({ embeds: [userInfoEmbed], allowedMentions: { repliedUser: false } });
+        } catch (err) {
+            userInfoEmbed = {
+                title: "Error",
+                description: err,
+                timestamp: new Date(),
+            };
+            message.reply({ embeds: [userInfoEmbed], allowedMentions: { repliedUser: false } });
+        }
+    }
+};

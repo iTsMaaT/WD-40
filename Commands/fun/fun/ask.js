@@ -5,13 +5,14 @@ module.exports = {
   description: "Ask a question to ChatGPT-3.5-turbo (>ask -p <...> for changing the personality prompt)",
   category: "fun",
   execute: async (logger, client, message, args) => {
+    message.channel.sendTyping();
 
     try {
       if (args[0] == "-p" && message.member.permissions.has("Administrator") && message.author.id == process.env.OWNER_ID) {
         args.shift();
         await global.GuildManager.SetPersonality(message.guild, args.join(" "));
         message.reply({ content: 'Prompt successfully changed.', allowedMentions: { repliedUser: false } });
-      } else if (args[1]) {
+      } else if (args[0]) {
         let conversationLog = [{ role: 'system', content: global.GuildManager.GetPersonality(message.guild).toString() }];
         const configuration = new Configuration({
           apiKey: process.env.OPENAI_API_KEY,

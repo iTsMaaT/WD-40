@@ -6,6 +6,7 @@ module.exports = {
     description: "Finds an image or post from *any* subreddit (-p for post, -u for user)",
     category: "NSFW",
     execute: async (logger, client, message, args) => {
+      message.channel.sendTyping();
         var sent = "";
         if (args.length == 2 && args[0] == "-p") {
             //Gore subreddits blacklist

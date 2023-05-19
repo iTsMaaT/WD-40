@@ -72,5 +72,21 @@
       "Added a LOT of slash commands",
       "Fixes"
     ]
+  },
+  {
+    "version": "3.0.2",
+    "date": "2023-05-17",
+    "changes": [
+      "Function updates",
+      "Fixes"
+    ]
+  },
+  {
+    "version": "3.1.0",
+    "date": "2023-05-18",
+    "changes": [
+      "Added lots of embeds",
+      "Fixes"
+    ]
   }
 ]
