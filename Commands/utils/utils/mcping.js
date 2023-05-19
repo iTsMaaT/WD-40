@@ -1,45 +1,55 @@
 const util = require('minecraft-server-util');
-const { EmbedBuilder } = require('discord.js');
-const options = {
-    timeout: 1000 * 5, // timeout in milliseconds
-    enableSRV: true // SRV record lookup
-};
+
 module.exports = {
-    name: 'mcping',
-    description: 'Ping a minecraft server',
-    category: "utils",
-    execute(logger, client, message, args) {
-        const server_ip = args[0]
-        const server_port_string = args[1] ?? "25565"
-        const server_port = parseInt(server_port_string)
-        if (!args[0]) {
-            message.channel.send("Please specify the server ip.")
-        } else {
-            util.status(server_ip, server_port, options)
-                .then((result) => {
+  name: 'mcping',
+  description: 'Ping a Minecraft server',
+  category: "utils",
+  async execute(logger, client, message, args) {
+    message.channel.sendTyping();
+    const options = {
+        enableSRV: true // SRV record lookup
+    };
+    const serverIP = args[0];
+    const serverPortString = args[1] ?? "25565";
+    const serverPort = parseInt(serverPortString);
 
-                    const string1 = JSON.stringify(result);// turn the object into a string
-                    const string = JSON.parse(string1);// make the string parsable
+    if (!args[0]) {
+      const errorEmbed = {
+        title: "Server IP Required",
+        color: 0xffff00, 
+        description: "Please specify the server IP.",
+      };
+      message.channel.send({ embeds: [errorEmbed] });
+    } else {
+      try {
+        const result = await util.status(serverIP, serverPort, options);
 
-                    message.channel.send(`
-__Server status for ${server_ip} (Port : ${server_port})__
+        const serverStatusEmbed = {
+          title: `Server Status for ${serverIP} (Port: ${serverPort})`,
+          color: 0xffffff, 
+          fields: [
+            { name: "Server Version", value: result.version.protocol },
+            { name: "Players Online", value: `${result.players.online}/${result.players.max}` },
+            { name: "MOTD (May Not Display Accurately)", value: result.motd.clean },
+            { name: "Latency", value: `${result.roundTripLatency}ms` },
+          ],
+          timestamp: new Date(),
+        };
 
-**Server version:** ${string.version.protocol}
-**Players Online:** ${string.players.online}
-**Max Players:** ${string.players.max}
-**MOTD (May Not Display Accurately):**\n${string.motd.clean}
-**Latency:** ${string.roundTripLatency}ms
-    `)
-        }).catch((error) => {
-            logger.error(error);// if the server was unable to be pinged or something else happened
-            message.channel.send(`
-__There was an error preforming your command__
-The server was unable to be pinged or you mis-typed the info
-
-The base port is 25565, if it didn't work without the port, it means the port isn't 25565
-    
-    `)
-            });
-        }
+        message.channel.send({ embeds: [serverStatusEmbed] });
+      } catch (error) {
+        logger.error(error);
+        const errorEmbed = {
+          title: "Error",
+          color: 0xff0000, // Embed color for error (you can change it to any color you like)
+          description: "There was an error performing your command.\nThe server was unable to be pinged or you entered incorrect information.",
+          footer: {
+            text: "The base port is 25565. If it didn't work without the port, it might mean the port isn't 25565.",
+          },
+          timestamp: new Date(),
+        };
+        message.channel.send({ embeds: [errorEmbed] });
+      }
     }
-}
+  },
+};

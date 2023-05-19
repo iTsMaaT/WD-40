@@ -3,7 +3,7 @@ const got = require("got");
 /**
  * Fetches a post from Reddit's API from @param subreddits
  */
-const FetchReddit = async function (ChannelNSFW, AllowNSFW, ...subreddits) {
+const FetchReddit = async function (ChannelNSFW, ...subreddits) {
     try {
         let array = [...subreddits]
         let subreddit = array[Math.floor(Math.random() * subreddits.length)];
@@ -22,7 +22,7 @@ const FetchReddit = async function (ChannelNSFW, AllowNSFW, ...subreddits) {
             var PostNsfw = content[0].data.children[0].data.over_18;
         }
 
-        if (!PostNsfw || (PostNsfw && ChannelNSFW) || AllowNSFW) {
+        if (!PostNsfw || (PostNsfw && ChannelNSFW)) {
             var embed = {
                 color: 0xffffff,
                 title: PostTitle,
@@ -36,11 +36,17 @@ const FetchReddit = async function (ChannelNSFW, AllowNSFW, ...subreddits) {
             };
             console.log(PostImage)
         } else {
-            embed = { title: "The post is NSFW but the channel isn't." }
+            embed = { 
+                color: 0xffff00,
+                title: "The post is NSFW but the channel isn't." 
+            }
         }
         return embed;
     } catch (err) {
-        embed = { title: "Error while fetching the post" }
+        embed = { 
+            color: 0xff0000,
+            title: "Error while fetching the post",
+        }
         logger.error("Error while fetching a post: " + err);
         return embed
     }

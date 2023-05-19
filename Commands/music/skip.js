@@ -6,14 +6,14 @@ module.exports={
     execute(logger, client, message, args){
       if (!message.member.voice.channel) {
         const must_be_in_vc_embed = new EmbedBuilder()
-      .setColor("#ffffff")
+      .setColor("#ffff00")
       .setDescription(`You must be in a voice channel!`)
       .setTimestamp()
         return message.channel.send({embeds:[must_be_in_vc_embed]})
       }
         const queue = client.distube.getQueue(message)
         const nothing_playing_embed =  new EmbedBuilder()
-        .setColor("#ffffff")
+        .setColor("#ffff00")
         .setDescription(`There is nothing in the queue right now!`)
         .setTimestamp()
     if (!queue) return message.channel.send({embeds:[nothing_playing_embed]})
@@ -26,7 +26,7 @@ module.exports={
       message.channel.send({embeds:[skipped_embed]})
     } catch (e) {
         const error_embed =  new EmbedBuilder()
-        .setColor("#ffffff")
+        .setColor("#ff0000")
         .setDescription(`an error occurred \n  ${e}`)
         .setTimestamp() 
       message.channel.send({embeds:[error_embed]})
