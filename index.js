@@ -13,7 +13,7 @@ const got = require("got");
 const Discord = require('discord.js');
 const path = require('node:path');
 
-let GiftTime = 4;
+//let GiftTime = 4;
 
 dotenv.config();
 
@@ -163,7 +163,7 @@ client.on("ready", async () => {
         client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
     });
 
-    let AiryBadgeGift = new cron.CronJob(`00 30 ${GiftTime} * * *`, async () => {
+    /*let AiryBadgeGift = new cron.CronJob(`00 30 ${GiftTime} * * *`, async () => {
         if (Math.floor(Math.random() * 100) >= 5) {
             client.users.cache.get("529130880250413068").send({ content: "Daily gift, enjoy ;)", embeds: [await FetchReddit(true, "furrypornsubreddit", "yiff", "furryonhuman", "sounding")] });
             logger.info("AiryBadge received some very explicit art ;)")
@@ -172,12 +172,12 @@ client.on("ready", async () => {
             logger.info("AiryBadge received breaking bald")
         }
         GiftTime = Math.floor(Math.random() * 23) + 1;
-    });
+    });*/
 
     console.log("Starting the cron jobs...")
     //sarting the daily sending
     scheduledMessage.start();
-    AiryBadgeGift.start();
+    //AiryBadgeGift.start();
     DailyActivity.start();
     console.log("Cron job setup done.")
     console.log(require('discord.js').version)
