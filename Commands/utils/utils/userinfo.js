@@ -43,6 +43,7 @@ module.exports = {
                     { name: "Highest Role", value: target.roles.highest.name },
                 ],
                 timestamp: new Date(),
+                color: 0xffffff,
             };
             
             message.reply({ embeds: [userInfoEmbed], allowedMentions: { repliedUser: false } });
@@ -51,6 +52,7 @@ module.exports = {
                 title: "Error",
                 description: err,
                 timestamp: new Date(),
+                color: 0xff0000,
             };
             message.reply({ embeds: [userInfoEmbed], allowedMentions: { repliedUser: false } });
         }
