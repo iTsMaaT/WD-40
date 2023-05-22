@@ -2,7 +2,7 @@ const got = require("got")
 module.exports = {
     name: "neko",
     description: "meow mrrrr~~ ฅ(＾・ω・＾ฅ)",
-    category: "fun",
+    category: "NSFW",
     async execute(logger, client, message, args) {
         message.channel.sendTyping();
 
