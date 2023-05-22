@@ -6,6 +6,7 @@ module.exports = {
     name: "test",
     description: "Test command",
     category: "fun",
+    private: true,
     async execute(logger, client, message, args) {
         message.channel.send(prettyString("shut the fuck up", "all", true) + "\n" + RandomMinMax(69, 420));
     }
