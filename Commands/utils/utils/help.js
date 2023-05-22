@@ -1,4 +1,5 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, Component } = require("discord.js")
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, Component } = require("discord.js");
+const prettyString = require("../../../utils/functions/prettyString.js");
 module.exports = {
     name: "help",
     description: "Lists commands",
@@ -15,9 +16,9 @@ module.exports = {
         client.commands.each((val) => {
             if (!val.private) {
                 if (categorymapper[val.category]) {
-                    categorymapper[val.category] += (`**${val.name}: **` + val.description.charAt(0).toUpperCase() + val.description.slice(1)) + "\r\n";
+                    categorymapper[val.category] += (`**${val.name}: **` + prettyString(val.description, "first", true)) + "\r\n";
                 } else {
-                    categorymapper[val.category] = (`**${val.name}: **` + val.description.charAt(0).toUpperCase() + val.description.slice(1)) + "\r\n";
+                    categorymapper[val.category] = (`**${val.name}: **` + prettyString(val.description, "first", true)) + "\r\n";
                 }
             }
         })
@@ -60,6 +61,7 @@ module.exports = {
                 .map((category, index) => `**Page ${index + 1}:** ${category.toUpperCase()}`)
                 .join("\n")}`,
             color: 0xffffff, // Embed color (you can change it to any color you like)
+            footer: { text: `Buttons expire after 2 minutes.` }
         };
 
         row.components[0].setDisabled(true);
@@ -105,6 +107,7 @@ module.exports = {
                         .map((category, index) => `**Page ${index + 1}:** ${category.toUpperCase()}`)
                         .join("\n")}`,
                     color: 0xffffff, // Embed color (you can change it to any color you like)
+                    footer: { text: `Buttons expire after 2 minutes.` }
                 };
 
                 await row.components[0].setDisabled(counter == 0);

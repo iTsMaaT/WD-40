@@ -1,10 +1,12 @@
 const FetchReddit = require("../../../utils/functions/FetchReddit.js");
+const RandomMinMax = require("../../../utils/functions/RandomMinMax.js");
+const prettyString = require("../../../utils/functions/prettyString.js");
 
 module.exports = {
     name: "test",
     description: "Test command",
     category: "fun",
     async execute(logger, client, message, args) {
-        message.channel.send("Shut the fuck up");
+        message.channel.send(prettyString("shut the fuck up", "all", true) + "\n" + RandomMinMax(69, 420));
     }
 }

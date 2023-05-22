@@ -88,5 +88,13 @@
       "Added lots of embeds",
       "Fixes"
     ]
+  },
+  {
+    "version": "3.2.0",
+    "date": "2023-05-22",
+    "changes": [
+      "New commands: Neko and Joke",
+      "Fixes"
+    ]
   }
 ]

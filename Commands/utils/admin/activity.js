@@ -1,10 +1,12 @@
+const { activities } = require("../../../utils/config.json")
+
 module.exports = {
     name: "activity",
     description: "Changes the bot's activity status",
     category: "utils",
     private: true,
     execute(logger, client, message, args) {
-        //Chances the activity status of the bot, uses the base one if no args is used
+        //Changes the activity or gives a list of all presets
 
         if (message.author.id != process.env.OWNER_ID) return;
         if (!args[0]) {
