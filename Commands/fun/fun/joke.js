@@ -1,0 +1,44 @@
+const got = require("got")
+module.exports = {
+    name: "joke",
+    description: "le funny",
+    category: "fun",
+    async execute(logger, client, message, args) {
+        message.channel.sendTyping();
+
+        await got("https://v2.jokeapi.dev/joke/Any")
+        .then(response => {
+            var joke = JSON.parse(response.body)
+
+            let trueFlags = [];
+
+            for (const flag in joke.flags) {
+                if (joke.flags.hasOwnProperty(flag) && joke.flags[flag] === true) {
+                  trueFlags.push(flag);
+                }
+            }
+
+            if (trueFlags.length === 0) trueFlags = ["None"]
+
+                FactEmbed = {
+                    color: 0xffffff,
+                    title: `The joke:`,
+                    description: `Catagory: ${joke.category}\nFlags: ${trueFlags.join(", ")}\n\n ${joke.setup ?? joke.joke} \n ${joke.delivery ?? ""}`,
+                    timestamp: new Date(),
+                    footer: { text: `ID : ${joke.id}` }
+                }
+
+                message.reply({ embeds: [FactEmbed], allowedMentions: { repliedUser: false }} );
+            })
+            .catch((err) => {
+                FactEmbed = {
+                    color: 0xff0000,
+                    title: `An error occured`,
+                    description: err,
+                    timestamp: new Date(),
+                }
+                message.reply({ embeds: [FactEmbed], allowedMentions: { repliedUser: false }} );
+                logger.error(err)
+            })
+    }
+}
