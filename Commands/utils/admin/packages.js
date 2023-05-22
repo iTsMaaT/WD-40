@@ -1,5 +1,6 @@
 const { version: discordjsVersion } = require('discord.js');
-const { dependencies, name, version } = require('../../../package.json');
+const { dependencies, name} = require('../../../package.json');
+const changelog = require('../../../changelogs.json');
 
 module.exports = {
     name: "packages",
@@ -7,12 +8,14 @@ module.exports = {
     category: "fun",
     private: true,
     async execute(logger, client, message, args) {
+        const WDVersion = changelog.slice(-1).map(({version}) => { return version }).join();
+    
         const embed = {
             title: 'Installed Packages',
             color: 0xffffff,
             description: 'The following packages are installed:',
             fields: [
-                { name, value: version, inline: false },
+                { name, value: WDVersion, inline: false },
                 { name: 'discord.js', value: discordjsVersion, inline: true },
             ]
         };

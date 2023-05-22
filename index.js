@@ -2,6 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const { Client, Intents, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events, WebhookClient, Partials } = require("discord.js");
 const { Guild } = require("discord.js");
 const { DisTube } = require('distube');
+const { activities } = require("./utils/config.json");
 
 const Logger = require("./utils/log");
 const SaveFile = require("./utils/save_file");
@@ -28,26 +29,6 @@ global.prefix = '>';
 global.CmdEnabled = 1;
 global.superuser = 0;
 global.Blacklist = {};
-
-global.activities = [
-    ">help | Time to be annoying!",
-    "Do >help for SEX!",
-    "I am the best, you cannot even compare",
-    "I think, therefor I think",
-    "Anon, 'tis time to annoy!",
-    "Nitro is kinda mid ngl",
-    "Me omw (on my way) to do >help",
-    "You have a " + NaN + "% chance to see this",
-    "Tokebac icitte",
-    "Don't go on page 3 of >help!",
-    "*you're",
-    "The time has cum",
-    "bonjour",
-    "Use me pwease UwU",
-    "nuzzles *breaks your spine*",
-    "That's the gros sourire message",
-    "Barbeque bacon burger",
-]
 
 const FetchReddit = require("./utils/functions/FetchReddit.js");
 
@@ -155,9 +136,8 @@ client.on("ready", async () => {
     console.log("Slash command setup done.")
 
     console.log("Setting up activity status...")
-    activities[7] = activities[7].replace("NaN", (100 / activities.length).toFixed(4));
+    activities[7] = activities[7].replace("Placeholder", (100 / activities.length).toFixed(4));
     await client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
-    console.log(activities)
     console.log("Activity status setup done.")
 
     console.log("Creating the cron jobs...")
