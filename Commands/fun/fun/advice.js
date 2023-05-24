@@ -12,7 +12,7 @@ module.exports = {
 
                 FactEmbed = {
                     color: 0xffffff,
-                    title: `Random fact`,
+                    title: `Random advice`,
                     description: advice.slip.advice,
                     timestamp: new Date(),
                     footer: { text: `ID : ${advice.slip.id}` }
