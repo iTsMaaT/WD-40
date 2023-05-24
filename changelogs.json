@@ -101,7 +101,7 @@
     "version": "3.3.0",
     "date": "2023-05-23",
     "changes": [
-      "New commands: Advice and urban",
+      "New commands: Advice, urban and guess (akinator)",
       "Fixes"
     ]
   }
