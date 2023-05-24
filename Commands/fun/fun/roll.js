@@ -13,7 +13,7 @@ module.exports = {
                 return message.reply('The amount of dices or sides per dices is invalid, please use at least a 1d2 (1 dice with 2 sides)');
             }
 
-            //Limits the input to 500d500
+            //Limits the input to 50d50
             if (numDices > 50 || numSides > 50) {
                 return message.reply('Maximum of 50 dices with 50 sides');
             }
@@ -27,7 +27,8 @@ module.exports = {
                 title: `Rolling **${numDices}d${numSides}**...`,
                 fields: [
                     { name: "Rolls", value: rolls.join(", ")},
-                    { name: 'Total', value: total, inline: true }
+                    { name: 'Total', value: total, inline: true },
+                    { name: 'Maximum possible', value: numDices * numSides, inline: true }
                 ],
                 timestamp: new Date(),
             }
