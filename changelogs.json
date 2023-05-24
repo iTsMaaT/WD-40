@@ -96,5 +96,13 @@
       "New commands: Neko and Joke",
       "Fixes"
     ]
+  },
+  {
+    "version": "3.3.0",
+    "date": "2023-05-23",
+    "changes": [
+      "New commands: Advice and urban",
+      "Fixes"
+    ]
   }
 ]
