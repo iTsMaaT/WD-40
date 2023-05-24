@@ -1,7 +1,7 @@
 const got = require("got")
 module.exports = {
     name: "advice",
-    description: "Get a random fact",
+    description: "Get a random advice",
     category: "fun",
     execute(logger, client, message, args) {
         message.channel.sendTyping();
