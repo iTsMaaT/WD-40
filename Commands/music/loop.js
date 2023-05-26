@@ -1,22 +1,14 @@
-const {EmbedBuilder} = require("discord.js")
-module.exports={
-    name:"loop",
-    description:"Loop a desired song or queue",
-    category: "music",
-    execute(logger, client, message, args){
-      if (!message.member.voice.channel) {
-        const must_be_in_vc_embed = new EmbedBuilder()
-      .setColor("#ffff00")
-      .setDescription(`You must be in a voice channel!`)
-      .setTimestamp()
-        return message.channel.send({embeds:[must_be_in_vc_embed]})
-      }
-        const queue = client.distube.getQueue(message)
-        const no_music_embed = new EmbedBuilder()
-        .setColor("#ffff00")
-        .setDescription(`There is nothing playing!`)
-        .setTimestamp()
-    if (!queue) return message.channel.send({embeds:[no_music_embed]})
+const { EmbedBuilder } = require("discord.js")
+const SendErrorEmbed = require("../../utils/functions/SendErrorEmbed")
+module.exports = {
+  name: "loop",
+  description: "Loop a desired song or queue",
+  category: "music",
+  execute(logger, client, message, args) {
+    if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow")
+
+    const queue = client.distube.getQueue(message)
+    if (!queue) return SendErrorEmbed(message, "There is nothing playing.", "yellow")
     let mode = 1
     switch (args[0]) {
       case 'off':
@@ -32,9 +24,9 @@ module.exports={
     mode = queue.setRepeatMode(mode)
     mode = mode ? (mode === 2 ? 'Repeat queue' : 'Repeat song') : 'Off'
     const repeat_mode_embed = new EmbedBuilder()
-        .setColor("#ffffff")
-        .setDescription(`Set repeat mode to \`${mode}\``)
-        .setTimestamp()
-    message.channel.send({embeds:[repeat_mode_embed]})
-    }
+      .setColor("#ffffff")
+      .setDescription(`Set repeat mode to \`${mode}\``)
+      .setTimestamp()
+    message.channel.send({ embeds: [repeat_mode_embed] })
+  }
 } 

@@ -1,3 +1,5 @@
+const SendErrorEmbed = require("../../utils/functions/SendErrorEmbed")
+
 module.exports = {
   name: 'autoplay',
   description: "Will find similar music to try and continue playing songs after the queue",
@@ -5,14 +7,8 @@ module.exports = {
   inVoiceChannel: true,
   execute: async (logger, client, message, args) => {
     const queue = client.distube.getQueue(message)
-    if (!queue) {
-      AutoEmbed = {
-        color: 0xffff00,
-        title: `There is nothing in the queue right now!`,
-        timestamp: new Date(),
-    }
-    return message.reply({ embeds: [AutoEmbed], allowedMentions: { repliedUser: false }} );
-    }
+    if (!queue) return SendErrorEmbed(message, "There is nothing in the queue right now.", "yellow")
+
     const autoplay = queue.toggleAutoplay()
     AutoEmbed = {
       color: 0xff0000,
