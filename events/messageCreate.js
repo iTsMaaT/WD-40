@@ -9,6 +9,17 @@ module.exports = {
         if (superuser && message.author.id != USERID.itsmaat) return;
         if (!message.guild) return;
         if (Blacklist[message.author.id]) return;
+        
+        await global.prisma.message.create({
+            data: {
+                MessageID: parseInt(message.id),
+                UserID: parseInt(message.author.id),
+                ChannelID: parseInt(message.channel.id),
+                GuildID: parseInt(message.guild.id),
+                //Timestamp: new Date(new Date(message.createdTimestamp).toLocaleString("en-US", {timeZone: "America/Toronto"})),
+                Content: message.content,
+            }
+        })
 
         //Gives the prefix if the bot is pinged
         if (message.content == "<@1036485458827415633>") {

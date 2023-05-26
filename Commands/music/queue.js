@@ -9,11 +9,8 @@ module.exports = {
     const play = "▶️"
     const pause = "⏸️"
     const queue = client.distube.getQueue(message)
-    const nothing_playing_embed = new EmbedBuilder()
-      .setColor('#ffffff')
-      .setDescription(`There is nothing playing!`)
-      .setTimestamp()
-    if (!queue) return message.channel.send({ embeds: [nothing_playing_embed] })
+    if (!queue) return SendErrorEmbed(message, "There is nothing in the queue.", "yellow")
+
     if (parseInt(args[0]) <= 1 || parseInt(args[0]) === NaN || !args[0]) {
       const songs = queue.songs
         .map((song, pos) => {
@@ -27,15 +24,7 @@ module.exports = {
       const embed = new EmbedBuilder()
         .setColor("#ffffff")
         .setDescription(
-          `${(
-            `${queue.songs.length > 20
-              ? `1-20/${queue.songs.length}`
-              : queue.songs.length
-            } songs):`,
-            queue.paused
-              ? pause
-              : play
-          )}\n${songs}`
+          `${(`${queue.songs.length > 20 ? `1-20/${queue.songs.length}` : queue.songs.length } songs):`, queue.paused ? pause : play )}\n${songs}`
         );
 
       message.channel.send({
@@ -84,19 +73,11 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setColor("#ffffff")
           .setDescription(
-            `${(
-              `${queue.songs.length > 20
-                ? `1-20/${queue.songs.length}`
-                : queue.songs.length
-              } songs):`,
-              queue.paused
-                ? pause
-                : play
-            )}\n${songs}`
+            `${(`${queue.songs.length > 20 ? `1-20/${queue.songs.length}` : queue.songs.length } songs):`, queue.paused ? pause : play )}\n${songs}`
           );
 
-        message.channel.send({
-          embeds: [embed],
+        message.reply({
+          embeds: [embed], allowedMentions: { repliedUser: false },
         });
       }
     }

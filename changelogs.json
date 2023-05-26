@@ -104,5 +104,13 @@
       "New commands: Advice, urban and guess (akinator)",
       "Fixes"
     ]
+  },
+  {
+    "version": "3.4.0",
+    "date": "2023-05-25",
+    "changes": [
+      "New command: country",
+      "Fixes"
+    ]
   }
 ]

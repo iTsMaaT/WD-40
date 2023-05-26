@@ -1,35 +1,24 @@
 const { EmbedBuilder } = require("discord.js")
-module.exports={
-    name:"skip",
-    description:"Skip a currently playing song",
-    category: "music",
-    execute(logger, client, message, args){
-      if (!message.member.voice.channel) {
-        const must_be_in_vc_embed = new EmbedBuilder()
-      .setColor("#ffff00")
-      .setDescription(`You must be in a voice channel!`)
-      .setTimestamp()
-        return message.channel.send({embeds:[must_be_in_vc_embed]})
-      }
-        const queue = client.distube.getQueue(message)
-        const nothing_playing_embed =  new EmbedBuilder()
-        .setColor("#ffff00")
-        .setDescription(`There is nothing in the queue right now!`)
-        .setTimestamp()
-    if (!queue) return message.channel.send({embeds:[nothing_playing_embed]})
+const SendErrorEmbed = require("../../utils/functions/SendErrorEmbed")
+module.exports = {
+  name: "skip",
+  description: "Skip a currently playing song",
+  category: "music",
+  execute(logger, client, message, args) {
+    if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow")
+
+    const queue = client.distube.getQueue(message)
+    if (!queue) SendErrorEmbed(message, "There is nothing in the queue.", "yellow")
+    
     try {
       const song = queue.skip()
-      const skipped_embed =  new EmbedBuilder()
-      .setColor("#ffffff")
-      .setDescription(`Skipped!`)
-      .setTimestamp()
-      message.channel.send({embeds:[skipped_embed]})
+      const skipped_embed = new EmbedBuilder()
+        .setColor("#ffffff")
+        .setDescription(`Skipped!`)
+        .setTimestamp()
+      message.channel.send({ embeds: [skipped_embed] })
     } catch (e) {
-        const error_embed =  new EmbedBuilder()
-        .setColor("#ff0000")
-        .setDescription(`an error occurred \n  ${e}`)
-        .setTimestamp() 
-      message.channel.send({embeds:[error_embed]})
+      SendErrorEmbed(message, "An error occurred.", "red", e)
     }
-    }
+  }
 } 

@@ -5,7 +5,7 @@ module.exports = {
   category: "music",
   execute: async (logger, client, message, args) => {
     const string = args.join(' ')
-    if (!string) return message.channel.send(`Please enter a song url or query to search.`)
+    if (!string) return SendErrorEmbed(message, "Please enter a song URL or query to search.", "yellow")
     client.distube.play(message.member.voice.channel, string, {
       member: message.member,
       textChannel: message.channel,
