@@ -1,5 +1,3 @@
-const SendErrorEmbed = require("../../utils/functions/SendErrorEmbed")
-
 module.exports = {
   name: 'skipto',
   description: "Skips to a precise song",
@@ -7,19 +5,14 @@ module.exports = {
   inVoiceChannel: true,
   execute: async (logger, client, message, args) => {
     const queue = client.distube.getQueue(message)
-    if (!queue) return SendErrorEmbed(message, "There is nothing in the queue.", "yellow")
-
-    if (!args[0]) return SendErrorEmbed(message, "Please enter a number to skip to.", "yellow")
-
+    if (!queue) return message.channel.send(`There is nothing in the queue right now!`)
+    if (!args[0]) {
+      return message.channel.send(`Please provide time (in seconds) to go rewind!`)
+    }
     const num = Number(args[0])
-    if (isNaN(num)) return SendErrorEmbed(message, "Invalid number.", "yellow")
-
+    if (isNaN(num)) return message.channel.send(`Please enter a valid number!`)
     await client.distube.jump(message, num).then(song => {
-      message.channel.send({ embeds: [{
-        color: 0xffffff,
-        title: `Skipped to: ${song.name}.`,
-        timestamp: new Date(),
-    }] })
+      message.channel.send({ content: `Skipped to: ${song.name}` })
     })
   }
 }

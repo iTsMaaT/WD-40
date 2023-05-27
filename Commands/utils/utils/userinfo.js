@@ -1,5 +1,3 @@
-const SendErrorEmbed = require("../../../utils/functions/SendErrorEmbed");
-
 module.exports = {
     name: "userinfo",
     description: "Gives info of a user",
@@ -8,13 +6,12 @@ module.exports = {
         const guild = await client.guilds.fetch(message.guildId);
         
         let id;
-        
         if (!args[0]) {
             id = message.author.id;
         } else {
             const rawId = args[0].replace(/[<!@>]/g, "");
             if (!rawId.match(/^\d+$/)) {
-                return SendErrorEmbed(message, "Invalid user ID.")
+                return message.reply("Invalid user ID.");
             }
             id = rawId;
         }
@@ -36,9 +33,6 @@ module.exports = {
             userInfoEmbed = {
                 title: "User Information",
                 description: `User Informations For: **<@${id}>**`,
-                thumbnail: {
-                    url: target.user.avatarURL({ dynamic: true }) || "",
-                  },
                 fields: [
                     { name: "User ID", value: target.user.id },
                     { name: "Account Age", value: `<t:${parseInt(target.user.createdTimestamp / 1000)}:R>` },
@@ -54,7 +48,13 @@ module.exports = {
             
             message.reply({ embeds: [userInfoEmbed], allowedMentions: { repliedUser: false } });
         } catch (err) {
-            SendErrorEmbed(message, "Error.", "red", err)
+            userInfoEmbed = {
+                title: "Error",
+                description: err,
+                timestamp: new Date(),
+                color: 0xff0000,
+            };
+            message.reply({ embeds: [userInfoEmbed], allowedMentions: { repliedUser: false } });
         }
     }
 };

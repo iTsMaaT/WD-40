@@ -1,3 +1,4 @@
+const { EmbedBuilder } = require("discord.js")
 module.exports = {
   name: "play",
   description: "Play a song",
@@ -7,18 +8,26 @@ module.exports = {
       message.reply("Spotify links are not supported.");
       return;
     }*/
-    const string = args.join(' ')
-
-    play_embed = {
-      color: 0xffffff,
-      description: `Request received!`,
-      timestamp: new Date(),
+    if (!message.member.voice.channel) {
+      const must_be_in_vc_embed = new EmbedBuilder()
+        .setColor("#ffff00")
+        .setDescription(`You must be in a voice channel!`)
+        .setTimestamp()
+      return message.channel.send({ embeds: [must_be_in_vc_embed] })
     }
-
-    if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow")
-    if (!string) return SendErrorEmbed(message, "Please enter a song URL or query to search.", "yellow")
-    message.reply({ embeds: [play_embed], allowedMentions: { repliedUser: false } });
-
+    const string = args.join(' ')
+    if (!message.member.voice.channel) {
+      const must_be_in_vc_embed = new EmbedBuilder()
+        .setColor("#ffff00")
+        .setDescription(`You must be in a voice channel!`)
+        .setTimestamp()
+      return message.channel.send({ embeds: [must_be_in_vc_embed] })
+    }
+    const no_query_embed = new EmbedBuilder()
+      .setColor("#ffff00")
+      .setDescription(`Please enter a song URL or query to search.`)
+      .setTimestamp()
+    if (!string) return message.channel.send({ embeds: [no_query_embed] })
     client.distube.play(message.member.voice.channel, string, {
       member: message.member,
       textChannel: message.channel,

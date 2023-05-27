@@ -2,10 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 //En prod
-//On localHost:
 // "npx prisma migrate dev" (review generated migration)
-// then
-//On Server (using FortiClient)
 // "npx prisma migrate deploy"
 
 //En dev
@@ -51,12 +48,3 @@ model Logs {
   Type    LogType   @default(INFO)
 }
 
-model Message {
-  ID        BigInt    @id @default(autoincrement())
-  MessageID BigInt  
-  UserID    BigInt    
-  ChannelID BigInt
-  GuildID   BigInt
-  Timestamp DateTime  @default(now())
-  Content   String    @db.Text
-}

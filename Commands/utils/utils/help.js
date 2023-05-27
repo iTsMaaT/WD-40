@@ -57,7 +57,7 @@ module.exports = {
 
         var embed = {
             title: "Command categories",
-            description: `**The prefix is:** \`${prefix}\`\n\nTotal commands: ${client.commands.size}\n${categories
+            description: `**The prefix is:** \`${prefix}\`\n\n${categories
                 .map((category, index) => `**Page ${index + 1}:** ${category.toUpperCase()}`)
                 .join("\n")}`,
             color: 0xffffff, // Embed color (you can change it to any color you like)
@@ -103,7 +103,7 @@ module.exports = {
             if (counter == 0) {
                 embed = {
                     title: "Command categories",
-                    description: `**The prefix is:** \`${prefix}\`\n\nTotal commands: ${client.commands.size}\n${categories
+                    description: `**The prefix is:** \`${prefix}\`\n\n${categories
                         .map((category, index) => `**Page ${index + 1}:** ${category.toUpperCase()}`)
                         .join("\n")}`,
                     color: 0xffffff, // Embed color (you can change it to any color you like)

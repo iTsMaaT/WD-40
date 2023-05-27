@@ -1,5 +1,4 @@
-const got = require("got");
-const getExactDate = require("../../../utils/functions/getExactDate");
+const got = require("got")
 module.exports = {
     name: "neko",
     description: "meow mrrrr~~ ฅ(＾・ω・＾ฅ)",

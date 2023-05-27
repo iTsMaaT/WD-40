@@ -1,5 +1,5 @@
 const prettyString = function (inputString, type, addDot) {
-    const punctuationMarks = ["!", "?", ".", ",", ";", ")", ":", "}", "]", ">"];
+    const punctuationMarks = ["!", "?", ".", ",", ";"];
     if (type === "all") {
         // Capitalize first letter of each word
         const words = inputString.toLowerCase().split(" ");

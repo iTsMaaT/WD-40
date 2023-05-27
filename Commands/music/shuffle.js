@@ -5,8 +5,7 @@ module.exports = {
     inVoiceChannel: true,
     execute: async (logger, client, message, args) => {
       const queue = client.distube.getQueue(message)
-      if (!queue) return SendErrorEmbed(message, "There is nothing in the queue.", "yellow")
-      
+      if (!queue) return message.channel.send(` There is nothing in the queue right now!`)
       queue.shuffle()
       message.channel.send('Shuffled songs in the queue')
     }
