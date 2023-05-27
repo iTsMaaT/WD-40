@@ -31,7 +31,6 @@
     "ffmpeg": "^0.0.4",
     "ffmpeg-static": "^4.4.1",
     "got": "^11.8.3",
-    "minecraft-server-util": "^5.3.1",
     "openai": "^3.2.1",
     "pretty-ms": "^7.0.1",
     "request": "^2.88.2",
