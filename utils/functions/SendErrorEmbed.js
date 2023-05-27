@@ -7,7 +7,7 @@ const SendErrorEmbed = function(message, string, color, err) {
         color: 0xffffff,
     };
     if (color = "red") embed.color = 0xff0000
-    if (color = "yellow") embed.color = 0xffff00
+    else if (color = "yellow") embed.color = 0xffff00
     if (err) embed.description = err
     return message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
 }

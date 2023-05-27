@@ -1,4 +1,6 @@
-const util = require('minecraft-server-util');
+const got = require("got");
+const SendErrorEmbed = require("../../../utils/functions/SendErrorEmbed");
+const { AttachmentBuilder } = require("discord.js");
 
 module.exports = {
   name: 'mcping',
@@ -6,50 +8,45 @@ module.exports = {
   category: "utils",
   async execute(logger, client, message, args) {
     message.channel.sendTyping();
-    const options = {
-        enableSRV: true // SRV record lookup
-    };
-    const serverIP = args[0];
-    const serverPortString = args[1] ?? "25565";
-    const serverPort = parseInt(serverPortString);
+    if (args[1]) { var port = ":" + parseInt(args[1]) }
+    got(`https://api.mcstatus.io/v2/status/java/${args[0]}${port ?? ""}`)
+      .then(async response => {
+        const server = JSON.parse(response.body);
 
-    if (!args[0]) {
-      const errorEmbed = {
-        title: "Server IP Required",
-        color: 0xffff00, 
-        description: "Please specify the server IP.",
-      };
-      message.channel.send({ embeds: [errorEmbed] });
-    } else {
-      try {
-        const result = await util.status(serverIP, serverPort, options);
+        if (!server.online) return SendErrorEmbed(message, `${server.eula_blocked ? "The server is banned by Mojang." : "Server offline or nonexistent."}`, "red");
+
+        
+        if (server.icon) {
+          let data = server.icon.split(',')[1];
+          let buf = Buffer.from(data, 'base64');
+          var imgfile = new AttachmentBuilder(buf, 'img.png');
+        }
 
         const serverStatusEmbed = {
-          title: `Server Status for ${serverIP} (Port: ${serverPort})`,
-          color: 0xffffff, 
+          title: `Server Status for ${server.host} (Port: ${server.port})`,
+          color: 0xffffff,
+          thumbnail: {
+            url: 'attachment://file.jpg' || "",
+          },
           fields: [
-            { name: "Server Version", value: result.version.protocol },
-            { name: "Players Online", value: `${result.players.online}/${result.players.max}` },
-            { name: "MOTD (May Not Display Accurately)", value: result.motd.clean },
-            { name: "Latency", value: `${result.roundTripLatency}ms` },
+            { name: "Server Version", value: server.version.name_clean },
+            { name: "Players Online", value: `${server.players.online}/${server.players.max}` },
+            { name: "MOTD (May Not Display Accurately)", value: server.motd.clean ?? "`N/A`" },
           ],
           timestamp: new Date(),
         };
 
-        message.channel.send({ embeds: [serverStatusEmbed] });
-      } catch (error) {
-        logger.error(error);
-        const errorEmbed = {
-          title: "Error",
-          color: 0xff0000, // Embed color for error (you can change it to any color you like)
-          description: "There was an error performing your command.\nThe server was unable to be pinged or you entered incorrect information.",
-          footer: {
-            text: "The base port is 25565. If it didn't work without the port, it might mean the port isn't 25565.",
-          },
-          timestamp: new Date(),
-        };
-        message.channel.send({ embeds: [errorEmbed] });
-      }
-    }
+        if (server.players.list[0] && server.players.list.length < 10) {
+          const playerNames = [];
+
+          for (const player of server.players.list) {
+            playerNames.push(player.name_clean);
+          }
+          serverStatusEmbed.fields.push({ name: "Player list", value: playerNames.join(", ") });
+        }
+
+        if (server.icon) return message.reply({ embeds: [serverStatusEmbed], files: [imgfile], allowedMentions: { repliedUser: false } });
+        message.reply({ embeds: [serverStatusEmbed], allowedMentions: { repliedUser: false } });
+      })
   },
 };
