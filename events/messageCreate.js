@@ -14,10 +14,10 @@ module.exports = {
         try {
             await global.prisma.message.create({
                 data: {
-                    MessageID: parseInt(message.id),
-                    UserID: parseInt(message.author.id),
-                    ChannelID: parseInt(message.channel.id),
-                    GuildID: parseInt(message.guild.id),
+                    MessageID: BigInt(parseInt(message.id)),
+                    UserID: BigInt(parseInt(message.author.id)),
+                    ChannelID: BigInt(parseInt(message.channel.id)),
+                    GuildID: BigInt(parseInt(message.guild.id)),
                     //Timestamp: new Date(new Date(message.createdTimestamp).toLocaleString("en-US", {timeZone: "America/Toronto"})),
                     Content: message.content,
                 }
