@@ -1,6 +1,5 @@
 const path = require('node:path');
 const fs = require('node:fs');
-const { Prisma } = require('@prisma/client');
 
 function checkIfFolderExists(path) {
     try{
