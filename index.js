@@ -30,19 +30,14 @@ global.CmdEnabled = 1;
 global.superuser = 0;
 global.Blacklist = {};
 
-const FetchReddit = require("./utils/functions/FetchReddit.js");
-
 // Add array.equals()
 Array.prototype.equals = function (b) {
     return this.length == b.length && this.every((v, i) => v === b[i]);
 }
 
 //Music 
-const ffmpeg = require('ffmpeg');
 const { YtDlpPlugin } = require('@distube/yt-dlp');
 const { SpotifyPlugin } = require('@distube/spotify');
-const GuildManager = require("./utils/GuildManager.js");
-const activity = require("./Commands/utils/admin/activity");
 client.distube = new DisTube(client, {
     leaveOnStop: false,
     leaveOnFinish: true,
@@ -57,7 +52,7 @@ client.distube = new DisTube(client, {
             emitEventsAfterFetching: true,
             parallel: true
         }),
-        new YtDlpPlugin()
+        new YtDlpPlugin({ update: true })
     ]
 })
 

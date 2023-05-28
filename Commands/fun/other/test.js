@@ -11,15 +11,15 @@ module.exports = {
     private: true,
     async execute(logger, client, message, args) {
         message.channel.send(
-prettyString("shut the fuck up", "all", true) 
-+ "\n" + 
-RandomMinMax(69, 420) 
-+ "\n" + 
-getExactDate() 
-+ "\n" + 
-CreateUniqueSeed(message)
-+ "\n" + 
-CreateUniqueSeed()
-);
+            prettyString("shut the fuck up", "all", true)
+            + "\n" +
+            RandomMinMax(69, 420)
+            + "\n" +
+            getExactDate()
+            + "\n" +
+            CreateUniqueSeed(message)
+            + "\n" +
+            CreateUniqueSeed()
+        );
     }
 }

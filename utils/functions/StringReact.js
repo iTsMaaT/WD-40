@@ -1,5 +1,5 @@
 /**
- * Reacts the provide string to a message
+ * Reacts the provided string to a message
  */
 const StringReact = function (ChannelID, MessageID, String) {
     let letters = String.toUpperCase().toString();
