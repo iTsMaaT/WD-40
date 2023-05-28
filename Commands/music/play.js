@@ -11,7 +11,7 @@ module.exports = {
 
     play_embed = {
       color: 0xffffff,
-      description: `Request received!`,
+      description: `Request received, fetching...`,
       timestamp: new Date(),
     }
 
