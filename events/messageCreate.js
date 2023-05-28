@@ -11,22 +11,6 @@ module.exports = {
         if (!message.guild) return;
         if (Blacklist[message.author.id]) return;
 
-        try {
-            await global.prisma.message.create({
-                data: {
-                    MessageID: BigInt(parseInt(message.id)),
-                    UserID: BigInt(parseInt(message.author.id)),
-                    ChannelID: BigInt(parseInt(message.channel.id)),
-                    GuildID: BigInt(parseInt(message.guild.id)),
-                    //Timestamp: new Date(new Date(message.createdTimestamp).toLocaleString("en-US", {timeZone: "America/Toronto"})),
-                    Content: message.content,
-                }
-            })
-        } catch (ex) {
-            console.log(`[${getExactDate()} - SEVERE] Unable to write to database`)
-            console.log(ex)
-        }
-
         //Gives the prefix if the bot is pinged
         if (message.content == "<@1036485458827415633>") {
             message.reply(`**Prefix** : ${prefix}\n**Help command** : ${prefix}help`);

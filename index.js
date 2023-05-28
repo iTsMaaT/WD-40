@@ -191,11 +191,27 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 
 //Text command executing
-client.on("messageCreate", (message) => {
+client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
     if (superuser && message.author.id != process.env.OWNER_ID) return;
     if (!message.guild) return;
     if (Blacklist[message.author.id]) return;
+
+    try {
+        await global.prisma.message.create({
+            data: {
+                MessageID: message.id,
+                UserID: message.author.id,
+                ChannelID: message.channel.id,
+                GuildID: message.guild.id,
+                //Timestamp: new Date(new Date(message.createdTimestamp).toLocaleString("en-US", {timeZone: "America/Toronto"})),
+                Content: message.content,
+            }
+        })
+    } catch (ex) {
+        console.log(`[${getExactDate()} - SEVERE] Unable to write to database`)
+        console.log(ex)
+    }
 
     //Text command executing
     let prefix = global.GuildManager.GetPrefix(message.guild)

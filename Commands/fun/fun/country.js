@@ -3,6 +3,7 @@ const got = require("got");
 module.exports = {
     name: "country",
     description: "See information about a country",
+    category: "fun",
     execute(logger, client, message, args) {
         if (!args[0]) return message.channel.send("No country provided");
 

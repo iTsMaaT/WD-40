@@ -11,7 +11,7 @@ module.exports = {
 
     const autoplay = queue.toggleAutoplay()
     AutoEmbed = {
-      color: 0xff0000,
+      color: 0xffffff,
       title: `Autoplay`,
       description: autoplay ? 'On' : 'Off',
       timestamp: new Date(),

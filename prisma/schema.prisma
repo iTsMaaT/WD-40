@@ -53,10 +53,10 @@ model Logs {
 
 model Message {
   ID        BigInt    @id @default(autoincrement())
-  MessageID BigInt  
-  UserID    BigInt    
-  ChannelID BigInt
-  GuildID   BigInt
+  MessageID String  
+  UserID    String    
+  ChannelID String
+  GuildID   String
   Timestamp DateTime  @default(now())
   Content   String    @db.Text
 }
