@@ -32,7 +32,7 @@ module.exports = (function(prisma) {
     async function AddGuildToDatabase(guild) {
         await prisma.GuildSettings.create({
             data: {
-                GuildID: parseInt(guild.id),
+                GuildID: BigInt(parseInt(guild.id)),
                 GuildName:  guild.name
             }
         });
@@ -43,7 +43,7 @@ module.exports = (function(prisma) {
     async function GetGuildSettings(guild) {
         return await prisma.GuildSettings.findUnique({
             where: {
-                GuildID: parseInt(guild.id)
+                GuildID: BigInt(parseInt(guild.id))
             }
         });
     }
@@ -51,7 +51,7 @@ module.exports = (function(prisma) {
     async function UpdateGuild(guild, data) {
         await prisma.GuildSettings.update({
             where: {
-                GuildID: parseInt(guild.id)
+                GuildID: BigInt(parseInt(guild.id))
             },
             data
         });
