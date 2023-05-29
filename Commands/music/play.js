@@ -1,3 +1,5 @@
+const SendErrorEmbed = require("../../utils/functions/SendErrorEmbed")
+
 module.exports = {
   name: "play",
   description: "Play a song",
