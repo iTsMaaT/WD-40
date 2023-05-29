@@ -112,5 +112,13 @@
       "New command: country",
       "Fixes"
     ]
+  },
+  {
+    "version": "3.5.0",
+    "date": "2023-05-29",
+    "changes": [
+      "New command: botinfo",
+      "Fixes"
+    ]
   }
 ]
