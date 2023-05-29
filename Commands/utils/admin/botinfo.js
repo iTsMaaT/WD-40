@@ -7,7 +7,6 @@ module.exports = {
     name: 'botinfo',
     description: 'Gives info about the Pterodactyl server',
     category: "utils",
-    private: true,
     async execute(logger, client, message, args) {
         message.channel.sendTyping();
 
