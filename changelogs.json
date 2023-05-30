@@ -117,7 +117,7 @@
     "version": "3.5.0",
     "date": "2023-05-29",
     "changes": [
-      "New command: botinfo",
+      "New commands: botinfo and quote",
       "Fixes"
     ]
   }
