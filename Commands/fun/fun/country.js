@@ -6,6 +6,7 @@ module.exports = {
     category: "fun",
     execute(logger, client, message, args) {
         if (!args[0]) return message.channel.send("No country provided");
+        message.channel.sendTyping();
 
         got(`https://restcountries.com/v3.1/name/${encodeURIComponent(args.slice(0).join(" "))}?fullText=true`)
             .then(response => {
