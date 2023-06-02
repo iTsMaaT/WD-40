@@ -1,8 +1,8 @@
 /**
  * Reacts the provided string to a message
  */
-const StringReact = function (ChannelID, MessageID, String) {
-    let letters = String.toUpperCase().toString();
+const StringReact = function (client, ChannelID, MessageID, string) {
+    let letters = string.toUpperCase().toString();
 
     for (i = 0; i < letters.length; i++) {
         if (letters[i] === " ") continue;
@@ -10,7 +10,7 @@ const StringReact = function (ChannelID, MessageID, String) {
         client.channels.cache.get(ChannelID).messages.fetch({ cache: false, message: MessageID })
             .then(m => {
                 m.react(String.fromCodePoint(letter.codePointAt(0) - 65 + 0x1f1e6));
-            }).catch((err) => Logger.error("Error while reacting: " + err));
+            }).catch((err) => console.log("Error while reacting: " + err));
     }
 }
 module.exports = StringReact;

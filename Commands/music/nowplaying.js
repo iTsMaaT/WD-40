@@ -5,13 +5,17 @@ module.exports={
     description:"See what song is currently playing",
     category: "music",
     execute(logger, client, message, args){
-        const queue = client.distube.getQueue(message)
+        const queue = player.getQueue(message.guild.id)
         if (!queue) return SendErrorEmbed(message, "There is nothing in the queue right now.", "yellow")
 
-        const song = queue.songs[0]
+        const track = queue.current;
+        const trackDuration = timestamp.progress == 'Infinity' ? 'infinity (live)' : track.duration;
+        const timestamp = queue.getPlayerTimestamp();
+
+
         const song_playing_embed = new EmbedBuilder()
         .setColor("#ffffff")
-        .setDescription(`I'm playing **\`${song.name}\`**, by ${song.user}`)
+        .setDescription(`I'm playing **\`${track}\`**, Duration: ${timestamp} / ${trackDuration}`)
         .setTimestamp()
         message.channel.send({embeds:[song_playing_embed]})
     }

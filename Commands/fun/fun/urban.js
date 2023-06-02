@@ -2,6 +2,7 @@ const got = require("got")
 module.exports = {
     name: "urban",
     description: "search something on the urban dictionary",
+    usage: "< [Prompt] >",
     category: "fun",
     async execute(logger, client, message, args) {
         message.channel.sendTyping();

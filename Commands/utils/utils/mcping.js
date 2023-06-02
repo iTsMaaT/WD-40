@@ -5,6 +5,7 @@ const { AttachmentBuilder } = require("discord.js");
 module.exports = {
   name: 'mcping',
   description: 'Ping a Minecraft server',
+  usage: "< [IP]: mc server ip, [Port]: the port of the server (optional) >",
   category: "utils",
   async execute(logger, client, message, args) {
     message.channel.sendTyping();

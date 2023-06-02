@@ -1,6 +1,7 @@
 module.exports = {
     name: "snowflake",
     description: "Reacts :snowflake: to every message of a user",
+    usage: "< [UserID / Mention] >",
     category: "fun",
     async execute(logger, client, message, args) {
         //Checks if the person executing the command is iTsMaaT or the server's owner

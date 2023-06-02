@@ -2,7 +2,8 @@ const { Configuration, OpenAIApi } = require('openai');
 const fs = require("fs/promises");
 module.exports = {
   name: "ask",
-  description: "Ask a question to ChatGPT-3.5-turbo (>ask -p <...> for changing the personality prompt)",
+  description: "Ask a question to ChatGPT-3.5-turbo",
+  usage: "< -p: Personality, [ANY]: The prompt>",
   category: "fun",
   execute: async (logger, client, message, args) => {
     message.channel.sendTyping();

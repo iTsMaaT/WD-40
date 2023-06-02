@@ -7,11 +7,11 @@ module.exports = {
   execute(logger, client, message, args) {
     if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow")
 
-    const queue = client.distube.getQueue(message)
+    const queue = player.getQueue(message.guild.id)
     if (!queue) SendErrorEmbed(message, "There is nothing in the queue.", "yellow")
     
     try {
-      const song = queue.skip()
+      queue.skip()
       const skipped_embed = new EmbedBuilder()
         .setColor("#ffffff")
         .setDescription(`Skipped!`)

@@ -1,6 +1,7 @@
 module.exports = {
     name: "suggestion",
     description: "Suggest ideas for the bot",
+    usage: "< [Suggestion] >",
     category: "utils",
     execute(logger, client, message, args) {
         

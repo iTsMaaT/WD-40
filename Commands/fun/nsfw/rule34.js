@@ -3,6 +3,7 @@ const request = require('request');
 module.exports = {
     name: "rule34",
     description: "Fetches a post using the rule34.xxx API, and can accept tags",
+    usage: "< [Any]: tags...>",
     category: "NSFW",
     execute: async (logger, client, message, args) => {
         message.channel.sendTyping();

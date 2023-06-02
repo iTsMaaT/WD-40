@@ -2,7 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const { Client, Intents, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events, WebhookClient, Partials } = require("discord.js");
 const { Guild } = require("discord.js");
 const { DisTube } = require('distube');
-const { activities } = require("./utils/config.json");
+const { activities, blacklist, whitelist } = require("./utils/config.json");
 
 const Logger = require("./utils/log");
 const SaveFile = require("./utils/save_file");
@@ -13,6 +13,10 @@ const dotenv = require("dotenv");
 const got = require("got");
 const Discord = require('discord.js');
 const path = require('node:path');
+
+var HourlyRam = [0, 0, 0];
+let RAMusage = 0;
+let RAMlimit = 0;
 
 //let GiftTime = 4;
 
@@ -28,33 +32,15 @@ global.GuildManager = (require("./utils/GuildManager.js"))(prisma);
 global.prefix = '>';
 global.CmdEnabled = 1;
 global.superuser = 0;
-global.Blacklist = {};
+global.tempBlacklist = {};
 
 // Add array.equals()
 Array.prototype.equals = function (b) {
     return this.length == b.length && this.every((v, i) => v === b[i]);
 }
 
-//Music 
-const { YtDlpPlugin } = require('@distube/yt-dlp');
-const { SpotifyPlugin } = require('@distube/spotify');
-client.distube = new DisTube(client, {
-    leaveOnStop: false,
-    leaveOnFinish: true,
-    emptyCooldown: 30,
-    emitNewSongOnly: true,
-    emitAddSongWhenCreatingQueue: true,
-    emitAddListWhenCreatingQueue: true,
-    nsfw: true,
-    youtubeCookie: process.env.YOUTUBECOOKIE,
-    plugins: [
-        new SpotifyPlugin({
-            emitEventsAfterFetching: true,
-            parallel: true
-        }),
-        new YtDlpPlugin({ update: true })
-    ]
-})
+//music
+const { Player } = require('discord-player');
 
 //Logger system and databases
 global.logger = new Logger({ root: __dirname, client });
@@ -146,10 +132,55 @@ client.on("ready", async () => {
         client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
     });
 
+    let RamLeakDetector = new cron.CronJob('0 * * * * *', async () => {
+        try {
+        await got("https://dash.kpotatto.net/api/client/servers/adc0f433/resources", {
+            "method": "GET",
+            "headers": {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.PTERODACTYL_API_KEY}`,
+            }
+        }).then(response => {
+            try {
+                let json = JSON.parse(response.body);
+                RAMusage = json.attributes.resources.memory_bytes;
+            } catch (err) {
+                RAMusage = 0
+            }
+        })
+        await got("https://dash.kpotatto.net/api/client/servers/adc0f433", {
+            "method": "GET",
+            "headers": {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.PTERODACTYL_API_KEY}`,
+            }
+        }).then(response => {
+            try {
+                let json = JSON.parse(response.body);
+
+                RAMlimit = json.attributes.limits.memory;
+            } catch (err) {
+                RAMlimit = 0
+            }
+        })
+        let RamLeakPourcentage = RAMusage / (RAMlimit * 1000) * 100
+        console.log(`Current RAM usage: ${RamLeakPourcentage}%`)
+        HourlyRam.push(RamLeakPourcentage);
+        HourlyRam.shift();
+        if (RamLeakPourcentage > 100) RamLeakPourcentage = 100;
+        if (HourlyRam[0] == HourlyRam[1] == HourlyRam [2] == 100) client.users.cache.get("529130880250413068").send("Memory leak detected.")
+    } catch(err) {
+        logger.error("Couldn't get the RAM % for MemoryLeakDetector")
+    }
+    });
+
     console.log("Starting the cron jobs...")
     //sarting the daily sending
     scheduledMessage.start();
     DailyActivity.start();
+    RamLeakDetector.start();
     console.log("Cron job setup done.")
     console.log("Discord.js version: " + require('discord.js').version)
 
@@ -193,17 +224,20 @@ client.on(Events.InteractionCreate, async interaction => {
 //Text command executing
 client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
-    if (superuser && message.author.id != process.env.OWNER_ID) return;
+    if (superuser && (message.author.id != process.env.OWNER_ID || !whitelist.includes(message.author.id))) return;
     if (!message.guild) return;
-    if (Blacklist[message.author.id]) return;
+    if (tempBlacklist[message.author.id] || blacklist.includes(message.author.id)) return;
 
     try {
         await global.prisma.message.create({
             data: {
                 MessageID: message.id,
                 UserID: message.author.id,
+                UserName: message.member.user.tag,
                 ChannelID: message.channel.id,
+                ChannelName: message.channel.name,
                 GuildID: message.guild.id,
+                GuildName: message.guild.name,
                 //Timestamp: new Date(new Date(message.createdTimestamp).toLocaleString("en-US", {timeZone: "America/Toronto"})),
                 Content: message.content,
             }
@@ -231,61 +265,5 @@ client.on("messageCreate", async (message) => {
         client.commands.get(command).execute(logger, client, message, args);
     }
 })
-
-const status = queue => `Volume: \`${queue.volume}%\` | Filter: \`${queue.filters.names.join(', ') || 'Off'}\` | Loop: \`${queue.repeatMode ? (queue.repeatMode === 2 ? 'All Queue' : 'This Song') : 'Off'}\` | Autoplay: \`${queue.autoplay ? 'On' : 'Off'}\``
-
-client.distube
-
-    .on('playSong', (queue, song) => {
-        const playsong_embed = new EmbedBuilder()
-            .setColor('#ffffff')
-            .setDescription(`Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`)
-            .setTimestamp()
-        queue.textChannel.send({ embeds: [playsong_embed] })
-    })
-    .on('addSong', (queue, song) => {
-        const addsong_embed = new EmbedBuilder()
-            .setColor('#ffffff')
-            .setDescription(`Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}`)
-            .setTimestamp()
-        queue.textChannel.send({ embeds: [addsong_embed] })
-    })
-    .on('addList', (queue, playlist) => {
-        const addlist_embed = new EmbedBuilder()
-            .setColor('#ffffff')
-            .setDescription(`Added \`${playlist.name}\` playlist (${playlist.songs.length} songs) to queue\n${status(queue)}`)
-            .setTimestamp()
-        queue.textChannel.send({ embeds: [addlist_embed] })
-    })
-    .on('error', (channel, e) => {
-        const error_embed = new EmbedBuilder()
-            .setColor('#ffffff')
-            .setDescription(`An error encountered: ${e.toString().slice(0, 1974)}`)
-            .setTimestamp()
-        if (channel) channel.send({ embeds: [error_embed] })
-        else console.error(e)
-    })
-    .on('empty', queue => {
-        const empty_embed = new EmbedBuilder()
-            .setColor('#ffffff')
-            .setDescription('Voice channel is empty! Leaving the channel...')
-            .setTimestamp()
-        queue.textChannel.send({ embeds: [empty_embed] })
-    })
-    .on('searchNoResult', (message, query) => {
-        const no_result_embed = new EmbedBuilder()
-            .setColor('#ffffff')
-            .setDescription(`No result found for \`${query}\`!`)
-            .setTimestamp()
-        message.channel.send({ embeds: [no_result_embed] })
-    })
-    .on('finish', queue => {
-        const finished_embed = new EmbedBuilder()
-            .setColor('#ffffff')
-            .setDescription("Finished!")
-            .setTimestamp()
-        queue.textChannel.send({ embeds: [finished_embed] })
-    })
-
 //Logins with the token
 client.login(process.env.TOKEN);
