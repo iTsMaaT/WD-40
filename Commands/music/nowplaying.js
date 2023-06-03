@@ -24,8 +24,9 @@ module.exports = {
                 { name: 'Extractor', value: `\`${track.extractor?.identifier || 'N/A'}\`` }
             ])
             .setFooter({
-                text: `Ping: ${queue.ping}ms | Event Loop Lag: ${queue.player.eventLoopLag.toFixed(0)}ms`
-            });
+                text: `Event Loop Lag: ${queue.player.eventLoopLag.toFixed(0)}ms`
+            })
+            .setTimestamp();
         message.reply({ embeds: [song_playing_embed], allowedMentions: { repliedUser: false }})
     }
 }
