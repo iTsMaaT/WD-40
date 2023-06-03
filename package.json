@@ -20,9 +20,6 @@
     "@discord-player/extractor": "^4.2.2",
     "@discordjs/opus": "^0.9.0",
     "@discordjs/voice": "^0.16.0",
-    "@distube/spotify": "^1.5.1",
-    "@distube/yt-dlp": "^1.1.3",
-    "@distube/ytdl-core": "^4.11.10",
     "@prisma/client": "^4.13.0",
     "cron": "^2.1.0",
     "discord-player": "^6.3.0",
@@ -36,7 +33,8 @@
     "openai": "^3.2.1",
     "opusscript": "^0.0.8",
     "pretty-ms": "^7.0.1",
-    "sodium": "^3.0.2"
+    "sodium": "^3.0.2",
+    "ytdl-core": "^4.11.4"
   },
   "devDependencies": {
     "prisma": "^4.13.0"
