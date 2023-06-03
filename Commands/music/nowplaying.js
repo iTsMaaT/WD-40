@@ -1,22 +1,31 @@
-const {EmbedBuilder} = require("discord.js")
+const { EmbedBuilder } = require("discord.js")
 const SendErrorEmbed = require("../../utils/functions/SendErrorEmbed")
-module.exports={
-    name:"nowplaying",
-    description:"See what song is currently playing",
+const { useQueue, useTimeline } = require('discord-player');
+
+module.exports = {
+    name: "nowplaying",
+    description: "See what song is currently playing",
     category: "music",
-    execute(logger, client, message, args){
-        const queue = player.getQueue(message.guild.id)
-        if (!queue) return SendErrorEmbed(message, "There is nothing in the queue right now.", "yellow")
+    execute(logger, client, message, args) {
+        const queue = useQueue(message.guild.id)
+        const timeline = useTimeline(message.guild.id);
 
-        const track = queue.current;
-        const trackDuration = timestamp.progress == 'Infinity' ? 'infinity (live)' : track.duration;
-        const timestamp = queue.getPlayerTimestamp();
+        if (!queue || !queue.currentTrack) return SendErrorEmbed(message, "There is nothing in the queue right now.", "yellow")
 
+        const track = queue.currentTrack;
 
         const song_playing_embed = new EmbedBuilder()
-        .setColor("#ffffff")
-        .setDescription(`I'm playing **\`${track}\`**, Duration: ${timestamp} / ${trackDuration}`)
-        .setTimestamp()
-        message.channel.send({embeds:[song_playing_embed]})
+            .setColor(0xffffff)
+            .setTitle('Now Playing')
+            .setDescription(`[${track.title}](${track.url})`)
+            .addFields([
+                { name: 'Author', value: track.author },
+                { name: 'Progress', value: `${queue.node.createProgressBar()} (${timeline.timestamp?.progress}%)` },
+                { name: 'Extractor', value: `\`${track.extractor?.identifier || 'N/A'}\`` }
+            ])
+            .setFooter({
+                text: `Ping: ${queue.ping}ms | Event Loop Lag: ${queue.player.eventLoopLag.toFixed(0)}ms`
+            });
+        message.reply({ embeds: [song_playing_embed], allowedMentions: { repliedUser: false }})
     }
 }

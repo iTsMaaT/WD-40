@@ -1,18 +1,20 @@
 const { EmbedBuilder } = require("discord.js")
 const SendErrorEmbed = require("../../utils/functions/SendErrorEmbed")
+const { useQueue } = require('discord-player');
+
 module.exports = {
     name: "clear",
     description: "Clear currently playing queue",
     category: "music",
     execute(logger, client, message, args) {
-        const queue = player.getQueue(message.guild.id)
-        if (!queue || !queue.playing) return SendErrorEmbed(message, "There is nothing in the queue.", "yellow")
+        const queue = useQueue(message.guild.id)
+        if (!queue) return SendErrorEmbed(message, "There is nothing in the queue.", "yellow")
 
-        queue.clear()
+        queue.tracks.clear()
         const stoppped_music_embed = new EmbedBuilder()
             .setColor("#ffffff")
             .setDescription("Cleared!")
             .setTimestamp()
-        message.channel.send({ embeds: [stoppped_music_embed] })
+        message.reply({ embeds: [stoppped_music_embed], allowedMentions: { repliedUser: false }})
     }
 }

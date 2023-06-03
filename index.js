@@ -41,6 +41,9 @@ Array.prototype.equals = function (b) {
 
 //music
 const { Player } = require('discord-player');
+const GetPterodactylInfo = require("./utils/functions/GetPterodactylInfo");
+global.player = new Player(client);
+player.extractors.loadDefault();
 
 //Logger system and databases
 global.logger = new Logger({ root: __dirname, client });
@@ -132,47 +135,19 @@ client.on("ready", async () => {
         client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
     });
 
-    let RamLeakDetector = new cron.CronJob('0 * * * * *', async () => {
+    let RamLeakDetector = new cron.CronJob('0 * * * *', async () => {
         try {
-        await got("https://dash.kpotatto.net/api/client/servers/adc0f433/resources", {
-            "method": "GET",
-            "headers": {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.PTERODACTYL_API_KEY}`,
-            }
-        }).then(response => {
-            try {
-                let json = JSON.parse(response.body);
-                RAMusage = json.attributes.resources.memory_bytes;
-            } catch (err) {
-                RAMusage = 0
-            }
-        })
-        await got("https://dash.kpotatto.net/api/client/servers/adc0f433", {
-            "method": "GET",
-            "headers": {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.PTERODACTYL_API_KEY}`,
-            }
-        }).then(response => {
-            try {
-                let json = JSON.parse(response.body);
-
-                RAMlimit = json.attributes.limits.memory;
-            } catch (err) {
-                RAMlimit = 0
-            }
-        })
-        let RamLeakPourcentage = RAMusage / (RAMlimit * 1000) * 100
+        let PterodactylInfo = await GetPterodactylInfo();
+        let RamLeakPourcentage = parseInt(PterodactylInfo.ram.pourcentage);
+        if (RamLeakPourcentage > 100) RamLeakPourcentage = 100;
         console.log(`Current RAM usage: ${RamLeakPourcentage}%`)
         HourlyRam.push(RamLeakPourcentage);
         HourlyRam.shift();
-        if (RamLeakPourcentage > 100) RamLeakPourcentage = 100;
-        if (HourlyRam[0] == HourlyRam[1] == HourlyRam [2] == 100) client.users.cache.get("529130880250413068").send("Memory leak detected.")
+        console.log(HourlyRam)
+        if (HourlyRam[0] == HourlyRam[1] == HourlyRam [2] == 100) client.users.cache.get(process.env.OWNER_ID).send("Memory leak detected.")
     } catch(err) {
         logger.error("Couldn't get the RAM % for MemoryLeakDetector")
+        logger.error(err)
     }
     });
 

@@ -1,4 +1,5 @@
-const SendErrorEmbed = require("../../utils/functions/SendErrorEmbed")
+const SendErrorEmbed = require("../../utils/functions/SendErrorEmbed");
+const { useQueue } = require('discord-player');
 
 module.exports = {
   name: 'jump',
@@ -7,29 +8,33 @@ module.exports = {
   category: "music",
   inVoiceChannel: true,
   execute: async (logger, client, message, args) => {
-    const queue = player.getQueue(message.guild.id)
-    const track = args.join(' ')
-    if (!queue) return SendErrorEmbed(message, "There is nothing in the queue.", "yellow")
+    const queue = useQueue(message.guild.id)
+    const track = parseInt(args[0])
+    const jump = queue?.tracks.at(track);
+    const position = queue?.node.getTrackPosition(jump);
+    const tracks = queue?.tracks.map((track, id) => ({
+      name: track.title,
+      value: ++id
+    }));
+
+    if (jump?.title && !tracks.some((t) => t.name === jump.title)) {
+      tracks.unshift({
+        name: jump.title,
+        value: position
+      });
+    }
+
+    if (!queue || !queue.tracks) return SendErrorEmbed(message, "There is nothing in the queue.", "yellow")
 
     if (!args[0]) return SendErrorEmbed(message, "Please enter a number to skip to.", "yellow")
 
-    const num = Number(args[0])
-    if (isNaN(track)) {
-      for (let song of queue.tracks) {
-        if (song.title === track || song.url === track) {
-          queue.skipTo(song);
-          return SendErrorEmbed(message, `Skiped to ${track}`)
-        }
-      }
-    return SendErrorEmbed(message, `Couldn't find song to skip to.`, "red")
-    } else {
-      const index = track - 1;
-      const trackname = queue.tracks[index].title;
-      if (!trackname) return SendErrorEmbed(message, `Couldn't find song to skip to.`, "red")
-        
-      queue.skipTo(index);
-      return SendErrorEmbed(message, `Skiped to ${trackname}`)
-    }
+    const trackResolvable = queue.tracks.at(jump);
+    console.log(trackResolvable)
+
+    if (isNaN(track) || !trackResolvable) return SendErrorEmbed(message, `Couldn't find song to skip to.`, "red")
+
+    queue.node.jump(trackResolvable);
+    return SendErrorEmbed(message, `Skiped to ${trackResolvable.title}`)
 
   }
 }

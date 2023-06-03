@@ -42,7 +42,7 @@ module.exports = {
             if (!CommandName) SendErrorEmbed(message, "This command doesn't exist.", "red")
             if (!CommandName.private) {
                 CommandEmbed = {
-                    title: `**${CommandName.name}** (${CommandName.usage ?? "No args"})`,
+                    title: `**${CommandName.name}** ${CommandName.usage ?? "(No args)"}`,
                     color: 0xffffff,
                     description: CommandName.description,
                     timestamp: new Date(),

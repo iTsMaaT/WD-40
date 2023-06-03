@@ -1,4 +1,5 @@
 const SendErrorEmbed = require("../../utils/functions/SendErrorEmbed")
+const { QueryType } = require('discord-player');
 
 module.exports = {
   name: "play",
@@ -16,14 +17,7 @@ module.exports = {
       searchEngine: QueryType.AUTO
     });
 
-    const queue = await player.createQueue(message.guild, {
-      metadata: message.channel,
-      spotifyBridge: true,
-      initialVolume: 75,
-      leaveOnEnd: true
-    });
-
-    if (!research || !research.tracks.length) return SendErrorEmbed(message, "No results found", "red")
+    if (!research.hasTracks()) return SendErrorEmbed(message, "No results found", "red")
 
     play_embed = {
       color: 0xffffff,
@@ -34,18 +28,22 @@ module.exports = {
     if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow")
     if (!string) return SendErrorEmbed(message, "Please enter a song URL or query to search.", "yellow")
 
-    try {
-      if (!queue.connection) await queue.connect(message.member.voice.channel);
-    } catch {
-      await player.deleteQueue(message.guild.id);
-      return SendErrorEmbed(message, "Unable to join voice channel.", "red")
-    }
-
     message.reply({ embeds: [play_embed], allowedMentions: { repliedUser: false } });
 
-    research.playlist ? queue.addTracks(research.tracks) : queue.addTrack(research.tracks[0]);
+    const res = await player.play(message.member.voice.channel.id, research, {
+      nodeOptions: {
+        metadata: {
+          channel: message.channel,
+          requestedBy: message.author
+        },
+        leaveOnEmptyCooldown: 300000,
+        leaveOnEmpty: true,
+        leaveOnEnd: false,
+        bufferingTimeout: 0,
+        volume: 75,
 
-    if (!queue.playing) await queue.play();
+      }
+    });
 
   }
 }

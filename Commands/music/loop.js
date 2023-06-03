@@ -1,5 +1,7 @@
 const { EmbedBuilder } = require("discord.js")
 const SendErrorEmbed = require("../../utils/functions/SendErrorEmbed")
+const {  QueueRepeatMode, useQueue } = require('discord-player');
+
 module.exports = {
   name: "loop",
   description: "Loop a desired song or queue",
@@ -8,17 +10,18 @@ module.exports = {
   execute(logger, client, message, args) {
     if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow")
 
-    const queue = client.distube.getQueue(message)
-    if (!queue || !queue.playing) return SendErrorEmbed(message, "There is nothing playing.", "yellow")
+    const queue = useQueue(message.guild.id)
+
+    if (!queue || !queue.tracks) return SendErrorEmbed(message, "There is nothing playing.", "yellow")
     switch (args[0]) {
       case 'off':
-        queue.setRepeatMode( QueueRepeatMode.TRACK)
+        queue.setRepeatMode(QueueRepeatMode.TRACK)
         break
       case 'song':
         queue.setRepeatMode(QueueRepeatMode.OFF)
         break
       case 'queue':
-        queue.setRepeatMode( QueueRepeatMode.QUEUE);
+        queue.setRepeatMode(QueueRepeatMode.QUEUE);
         break
       default:
         SendErrorEmbed(message, "Invalid loop type.", "yellow")
@@ -28,6 +31,6 @@ module.exports = {
       .setColor("#ffffff")
       .setDescription(`Set repeat mode to \`${args[0]}\``)
       .setTimestamp()
-    message.channel.send({ embeds: [repeat_mode_embed] })
+      message.reply({ embeds: [repeat_mode_embed], allowedMentions: { repliedUser: false }})
   }
 } 
