@@ -41,9 +41,15 @@ module.exports = {
         leaveOnEnd: false,
         bufferingTimeout: 0,
         volume: 75,
-
       }
     });
 
+    embed = {
+      color: 0xffffff,
+      description: `Successfully enqueued${res.track.playlist ? ` **track(s)** from: **${res.track.playlist.title}**` : `: **${res.track.title}**`}`,
+      timestamp: new Date(),
+    }
+
+    message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
   }
 }
