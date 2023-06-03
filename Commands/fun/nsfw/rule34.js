@@ -1,4 +1,4 @@
-const request = require('request');
+const got = require('got');
 
 module.exports = {
     name: "rule34",
@@ -10,33 +10,27 @@ module.exports = {
         if (message.channel.nsfw) {
             try {
                 const url = 'http://rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=' + args.join('+');
-                request(url, (error, response, body) => {
-                    if (!error && response.statusCode == 200) {
-                        if (!body) return message.reply("An error occured, probably a invalid tag.");
-                        const data = JSON.parse(body);
-                        const post = data[Math.floor(Math.random() * data.length)];
+                const response = await got(url);
 
-                        RuleEmbed = {
-                            color: 0xffffff,
-                            title: `Posted by: ${post.owner}`,
-                            image: {
-                                url: post.file_url,
-                            },
-                            timestamp: new Date(),
-                        }
-                        message.reply({ embeds: [RuleEmbed], allowedMentions: { repliedUser: false }} );
-                    } else {
-                        logger.error(error);
+                    const data = JSON.parse(response.body);
+                    const post = data[Math.floor(Math.random() * data.length)];
+
+                    RuleEmbed = {
+                        color: 0xffffff,
+                        title: `Posted by: ${post.owner}`,
+                        image: {
+                            url: post.file_url,
+                        },
+                        timestamp: new Date(),
                     }
-
-                });
+                    message.reply({ embeds: [RuleEmbed], allowedMentions: { repliedUser: false } });
             } catch (err) {
                 RuleEmbed = {
                     color: 0xff0000,
                     title: `An error occured, probably a invalid tag`,
                     timestamp: new Date(),
                 }
-                message.reply({ embeds: [RuleEmbed], allowedMentions: { repliedUser: false }} );
+                message.reply({ embeds: [RuleEmbed], allowedMentions: { repliedUser: false } });
                 logger.error(err);
             }
         } else {
@@ -45,7 +39,7 @@ module.exports = {
                 title: `The channel you are in isn't NSFW`,
                 timestamp: new Date(),
             }
-            message.reply({ embeds: [RuleEmbed], allowedMentions: { repliedUser: false }} );
+            message.reply({ embeds: [RuleEmbed], allowedMentions: { repliedUser: false } });
         }
     },
 };

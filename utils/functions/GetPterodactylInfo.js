@@ -75,7 +75,10 @@ const GetPterodactylInfo = async function () {
                 raw: parseInt(RAMusage),
                 clean: `${ToEngineerNotation(parseInt(RAMusage))}b`
             },
-            pourcentage: parseInt(RAMusage) / (parseInt(RAMlimit) * 1024 * 1024) * 100
+            pourcentage: {
+                raw: parseInt(RAMusage) / (parseInt(RAMlimit) * 1024 * 1024) * 100,
+                clean: (parseInt(RAMusage) / (parseInt(RAMlimit) * 1024 * 1024) * 100).toFixed(2) + "%"
+            }
         },
         disk: {
             limit: {
@@ -86,15 +89,24 @@ const GetPterodactylInfo = async function () {
                 raw: parseInt(DISKusage),
                 clean: `${ToEngineerNotation(parseInt(DISKusage))}b`
             },
-            pourcentage: parseInt(DISKusage) / (parseInt(DISKlimit) * 1024 * 1024) * 100
+            pourcentage: {
+                raw: parseInt(DISKusage) / (parseInt(DISKlimit) * 1024 * 1024) * 100,
+                clean: (parseInt(DISKusage) / (parseInt(DISKlimit) * 1024 * 1024) * 100).toFixed(2) + "%"
+            }
         },
-        download: {
-            raw: NETWORKin,
-            clean: `${ToEngineerNotation(parseInt(NETWORKin))}b`
+        cpu: {
+            limit: CPUlimit,
+            usage: CPUusage
         },
-        upload: {
-            raw: NETWORKout,
-            clean: `${ToEngineerNotation(parseInt(NETWORKout))}b`
+        network: {
+            download: {
+                raw: NETWORKin,
+                clean: `${ToEngineerNotation(parseInt(NETWORKin))}b`
+            },
+            upload: {
+                raw: NETWORKout,
+                clean: `${ToEngineerNotation(parseInt(NETWORKout))}b`
+            },
         },
         uptime: {
             raw: parseInt(BOTuptime),
