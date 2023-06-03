@@ -1,7 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const { Client, Intents, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events, WebhookClient, Partials } = require("discord.js");
 const { Guild } = require("discord.js");
-const { DisTube } = require('distube');
 const { activities, blacklist, whitelist } = require("./utils/config.json");
 
 const Logger = require("./utils/log");
@@ -15,8 +14,6 @@ const Discord = require('discord.js');
 const path = require('node:path');
 
 var HourlyRam = [0, 0, 0];
-let RAMusage = 0;
-let RAMlimit = 0;
 
 //let GiftTime = 4;
 
