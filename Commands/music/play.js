@@ -11,13 +11,10 @@ module.exports = {
       message.reply("Spotify links are not supported.");
       return;
     }*/
-    const string = args.join(' ')
-    const research = await player.search(string, {
-      requestedBy: message.member,
-      searchEngine: QueryType.AUTO
-    });
+    if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow")
 
-    if (!research.hasTracks()) return SendErrorEmbed(message, "No results found", "red")
+    const string = args.join(' ')
+    if (!string) return SendErrorEmbed(message, "Please enter a song URL or query to search.", "yellow")
 
     play_embed = {
       color: 0xffffff,
@@ -25,10 +22,14 @@ module.exports = {
       timestamp: new Date(),
     }
 
-    if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow")
-    if (!string) return SendErrorEmbed(message, "Please enter a song URL or query to search.", "yellow")
-
     message.reply({ embeds: [play_embed], allowedMentions: { repliedUser: false } });
+
+    const research = await player.search(string, {
+      requestedBy: message.member,
+      searchEngine: QueryType.AUTO
+    });
+
+    if (!research.hasTracks()) return SendErrorEmbed(message, "No results found", "red")
 
     const res = await player.play(message.member.voice.channel.id, research, {
       nodeOptions: {
