@@ -36,7 +36,6 @@ const GetPterodactylInfo = async function () {
                 IPport = json.attributes.relationships.allocations.data[0].attributes.port;
             } catch (err) {
                 logger.error(err.stack)
-                SendErrorEmbed(message, "Failed to fetch from the API", "red", err)
             }
         })
 
