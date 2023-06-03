@@ -13,7 +13,7 @@ module.exports = {
 
             const PteroInfo = await GetPterodactylInfo()
             const embed = {
-                title: `Pterodactyl info for ${PteroInfo.main.name} (${PteroInfo.main.ip}:${PteroInfo.main.IPport})`,
+                title: `Pterodactyl info for ${PteroInfo.main.name} (${PteroInfo.main.ip}:${PteroInfo.main.port})`,
                 color: 0xffffff,
                 description: `Uptime: ${PteroInfo.uptime.clean}`,
                 fields: [
@@ -22,13 +22,13 @@ module.exports = {
                         value: `${PteroInfo.ram.usage.clean} / ${PteroInfo.ram.limit.clean} (${PteroInfo.ram.pourcentage.clean})`
                     }, {
                         name: "CPU usage",
-                        value: `${PteroInfo.cpu.usage}% / ${PteroInfo.cpu.limit}%`
+                        value: `${PteroInfo.cpu.usage}% / ${PteroInfo.cpu.limit}% (${PteroInfo.cpu.pourcentage.clean})`
                     }, {
                         name: "Disk usage",
-                        value: `${PteroInfo.disk.usage.clean} / ${PteroInfo.disk.limit.clean}B (${PteroInfo.disk.pourcentage.clean})`
+                        value: `${PteroInfo.disk.usage.clean} / ${PteroInfo.disk.limit.clean} (${PteroInfo.disk.pourcentage.clean})`
                     }, {
                         name: "Network",
-                        value: `IN: ${PteroInfo.network.download.clean}\nOUT: ${PteroInfo.network.upload.clean}}`
+                        value: `IN: ${PteroInfo.network.download.clean}\nOUT: ${PteroInfo.network.upload.clean}`
                     }
                 ],
                 footer: {
