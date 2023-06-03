@@ -2,6 +2,7 @@ const got = require("got");
 const ToEngineerNotation = require("../../../utils/functions/ToEngineerNotation");
 const prettyMilliseconds = require('pretty-ms');
 const SendErrorEmbed = require("../../../utils/functions/SendErrorEmbed");
+const GetPterodactylInfo = require("../../../utils/functions/GetPterodactylInfo");
 
 module.exports = {
     name: 'botinfo',
@@ -10,83 +11,24 @@ module.exports = {
     async execute(logger, client, message, args) {
         message.channel.sendTyping();
 
-        var serverName = "";
-        var RAMlimit = "";
-        var CPUlimit = "";
-        var DISKlimit = "";
-        var IPalias = "";
-        var IPport = "";
-        var RAMusage = "";
-        var CPUusage = "";
-        var DISKusage = "";
-        var NETWORKin = "";
-        var NETWORKout = "";
-        var uptime = "";
-
-        try {
-            await got("https://dash.kpotatto.net/api/client/servers/adc0f433", {
-                "method": "GET",
-                "headers": {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${process.env.PTERODACTYL_API_KEY}`,
-                }
-            }).then(response => {
-                try {
-                    let json = JSON.parse(response.body);
-
-                    serverName = json.attributes.name;
-                    RAMlimit = json.attributes.limits.memory;
-                    CPUlimit = json.attributes.limits.cpu;
-                    DISKlimit = json.attributes.limits.disk
-                    IPalias = json.attributes.relationships.allocations.data[0].attributes.ip_alias;
-                    IPport = json.attributes.relationships.allocations.data[0].attributes.port;
-                } catch (err) {
-                    logger.error(err.stack)
-                    SendErrorEmbed(message, "Failed to fetch from the API", "red", err)
-                }
-            })
-
-            await got("https://dash.kpotatto.net/api/client/servers/adc0f433/resources", {
-                "method": "GET",
-                "headers": {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${process.env.PTERODACTYL_API_KEY}`,
-                }
-            }).then(response => {
-                try {
-                    let json = JSON.parse(response.body);
-
-                    RAMusage = json.attributes.resources.memory_bytes;
-                    CPUusage = json.attributes.resources.cpu_absolute;
-                    DISKusage = json.attributes.resources.disk_bytes;
-                    NETWORKin = json.attributes.resources.network_rx_bytes;
-                    NETWORKout = json.attributes.resources.network_tx_bytes;
-                    uptime = json.attributes.resources.uptime;
-                } catch (err) {
-                    logger.error(err.stack)
-                    SendErrorEmbed(message, "Failed to fetch from the API", "red", err)
-                }
-            })
-
+            const PteroInfo = await GetPterodactylInfo()
             const embed = {
-                title: `Pterodactyl info for ${serverName} (${IPalias}:${IPport})`,
+                title: `Pterodactyl info for ${PteroInfo.main.name} (${PteroInfo.main.ip}:${PteroInfo.main.IPport})`,
                 color: 0xffffff,
-                description: `Uptime: ${prettyMilliseconds(parseInt(uptime))}`,
+                description: `Uptime: ${PteroInfo.uptime.clean}`,
                 fields: [
                     {
                         name: "RAM usage",
-                        value: `${ToEngineerNotation(parseInt(RAMusage))}B / ${ToEngineerNotation(parseInt(RAMlimit) * 1024 * 1024)}B`
+                        value: `${PteroInfo.ram.usage.clean} / ${PteroInfo.ram.limit.clean} (${PteroInfo.ram.pourcentage.clean})`
                     }, {
                         name: "CPU usage",
-                        value: `${CPUusage}% / ${CPUlimit}%`
+                        value: `${PteroInfo.cpu.usage}% / ${PteroInfo.cpu.limit}%`
                     }, {
                         name: "Disk usage",
-                        value: `${ToEngineerNotation(parseInt(DISKusage))}B / ${ToEngineerNotation(parseInt(DISKlimit) * 1024 * 1024)}B`
+                        value: `${PteroInfo.disk.usage.clean} / ${PteroInfo.disk.limit.clean}B (${PteroInfo.disk.pourcentage.clean})`
                     }, {
                         name: "Network",
-                        value: `IN: ${ToEngineerNotation(parseInt(NETWORKin))}B\nOUT: ${ToEngineerNotation(parseInt(NETWORKout))}B`
+                        value: `IN: ${PteroInfo.network.download.clean}\nOUT: ${PteroInfo.network.upload.clean}}`
                     }
                 ],
                 footer: {
@@ -95,10 +37,6 @@ module.exports = {
                 timestamp: new Date(),
             };
             message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
-        } catch (err) {
-            logger.error(err.stack)
-            SendErrorEmbed(message, "Error encountered.", "red", err)
-        }
 
     }
 }
