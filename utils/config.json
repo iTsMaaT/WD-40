@@ -20,5 +20,11 @@
         "Suggest new statuses | >suggestion",
         "Do you know who else suffers from dimentia?",
         "Fuck Mee6"
+    ],
+
+    "blacklist": [],
+
+    "whitelist": [
+        273587964334964737
     ]
 }

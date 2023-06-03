@@ -120,5 +120,16 @@
       "New commands: botinfo and quote",
       "Fixes"
     ]
+  },
+  {
+    "version": "4.0.0",
+    "date": "2023-05-30",
+    "changes": [
+      "Added command usage: >help -u",
+      "Individual command help: >help <command name>",
+      "Updates to database",
+      "New music plugin and commands",
+      "Fixes"
+    ]
   }
 ]

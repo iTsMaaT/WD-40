@@ -3,6 +3,7 @@ const SendErrorEmbed = require("../../../utils/functions/SendErrorEmbed");
 module.exports = {
     name: "prefix",
     description: "Changes the prefix to do commands",
+    usage: "< [Prefix]: new prefix for the guild >",
     category: "utils",
     async execute(logger, client, message, args) {
       if (args.length === 1) {

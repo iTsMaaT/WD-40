@@ -3,6 +3,7 @@ const SendErrorEmbed = require("../../../utils/functions/SendErrorEmbed");
 module.exports = {
     name: "userinfo",
     description: "Gives info of a user",
+    usage: "< [User]: the user to get info from (optional) >",
     category: "utils",
     execute: async (logger, client, message, args) => {
         const guild = await client.guilds.fetch(message.guildId);

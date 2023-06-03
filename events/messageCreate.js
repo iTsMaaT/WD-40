@@ -1,15 +1,16 @@
 const { Events } = require('discord.js');
 const FetchReddit = require("../utils/functions/FetchReddit.js");
 const getExactDate = require('../utils/functions/getExactDate.js');
+const { blacklist } = require("../utils/config.json")
 
 module.exports = {
     name: Events.MessageCreate,
     once: false,
     async execute(client, logger, message) {
         if (message.author.bot) return;
-        if (superuser && message.author.id != USERID.itsmaat) return;
+        if (superuser && (message.author.id != process.env.OWNER_ID || !whitelist.includes(message.author.id))) return;
         if (!message.guild) return;
-        if (Blacklist[message.author.id]) return;
+        if (tempBlacklist[message.author.id] || blacklist.includes(message.author.id)) return;
 
         //Gives the prefix if the bot is pinged
         if (message.content == "<@1036485458827415633>") {

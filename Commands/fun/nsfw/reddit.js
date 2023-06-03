@@ -3,7 +3,8 @@ const got = require("got");
 
 module.exports = {
     name: "reddit",
-    description: "Finds an image or post from *any* subreddit (-p for post, -u for user)",
+    description: "Finds an image or post from *any* subreddit",
+    usage: "< -p [...]: post, -u [...]: user>",
     category: "NSFW",
     execute: async (logger, client, message, args) => {
       message.channel.sendTyping();

@@ -1,5 +1,5 @@
 const { version: discordjsVersion } = require('discord.js');
-const { dependencies, name} = require('../../../package.json');
+const { dependencies, name } = require('../../../package.json');
 const changelog = require('../../../changelogs.json');
 
 module.exports = {
