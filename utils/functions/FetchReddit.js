@@ -5,14 +5,14 @@ const got = require("got");
  */
 const FetchReddit = async function (ChannelNSFW, ...subreddits) {
     try {
-        let array = [...subreddits]
-        let subreddit = array[Math.floor(Math.random() * subreddits.length)];
-        console.log(subreddit)
+        const array = [...subreddits];
+        const subreddit = array[Math.floor(Math.random() * subreddits.length)];
+        console.log(subreddit);
         let PostImage = "";
         //var embed = new EmbedBuilder()
         while (!(PostImage.endsWith(".jpg") || PostImage.endsWith(".png") || PostImage.endsWith(".gif"))) {
-            let response = await got(`https://www.reddit.com/r/${subreddit}/random/.json`);
-            let content = JSON.parse(response.body);
+            var response = await got(`https://www.reddit.com/r/${subreddit}/random/.json`);
+            var content = JSON.parse(response.body);
             var permalink = content[0].data.children[0].data.permalink;
             var PostURL = `https://reddit.com${permalink}`;
             var PostTitle = content[0].data.children[0].data.title;
@@ -34,21 +34,21 @@ const FetchReddit = async function (ChannelNSFW, ...subreddits) {
                     text: `Posted by ${PostAuthor} in ${PostRSlash}`,
                 },
             };
-            console.log(PostImage)
+            console.log(PostImage);
         } else {
             embed = { 
                 color: 0xffff00,
                 title: "The post is NSFW but the channel isn't." 
-            }
+            };
         }
         return embed;
     } catch (err) {
         embed = { 
             color: 0xff0000,
             title: "Error while fetching the post",
-        }
+        };
         logger.error("Error while fetching a post: " + err);
-        return embed
+        return embed;
     }
 };
 module.exports = FetchReddit;

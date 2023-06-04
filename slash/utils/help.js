@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, Component, ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js")
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, Component, ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
 
 module.exports = {
     name: "help",
@@ -8,9 +8,9 @@ module.exports = {
         await interaction.deferReply();
         let counter = 0;
         //let helpmessagebuilder = "";
-        let prefix = global.GuildManager.GetPrefix(interaction.guild);
+        const prefix = global.GuildManager.GetPrefix(interaction.guild);
         //helpmessagebuilder += `**The prefix is:** \`${prefix}\`\n\n`
-        let categorymapper = {};
+        const categorymapper = {};
         client.commands.each((val) => {
             if (!val.private) {
                 if (categorymapper[val.category]) {
@@ -19,20 +19,20 @@ module.exports = {
                     categorymapper[val.category] = (`**${val.name}: **` + val.description.charAt(0).toUpperCase() + val.description.slice(1)) + "\r\n";
                 }
             }
-        })
-        let categories = Object.keys(categorymapper);
+        });
+        const categories = Object.keys(categorymapper);
 
         //console.log(require('discord.js').version)
 
         const FisrtPage = new ButtonBuilder()
             .setCustomId('first')
             .setLabel('◀◀')
-            .setStyle(ButtonStyle.Success)
+            .setStyle(ButtonStyle.Success);
             
         const LastPage = new ButtonBuilder()
             .setCustomId('last')
             .setLabel('▶▶')
-            .setStyle(ButtonStyle.Success)
+            .setStyle(ButtonStyle.Success);
 
         const NextPage = new ButtonBuilder()
             .setCustomId('next')
@@ -68,7 +68,7 @@ module.exports = {
 
         const filter = (interaction) => {
             if (interaction.user.id == interaction.user.id) return true;
-        }
+        };
 
         const collector = HelpFull.createMessageComponentCollector({
             filter,
@@ -109,7 +109,7 @@ module.exports = {
                     content: HelpFullPage,
                     components: [row],
                     allowedMentions: { repliedUser: false }
-                })
+                });
             }
 
             // Update the button states based on the current page number
@@ -127,7 +127,7 @@ module.exports = {
             const messageContent = `${HelpFull.content}\n[\`Buttons expired.\`]`;
             row.components.forEach(component => {
                 component.setDisabled(true);
-            })
+            });
             await HelpFull.edit({
                 content: messageContent,
                 components: [row],
@@ -135,4 +135,4 @@ module.exports = {
             });
         });
     }
-}
+};

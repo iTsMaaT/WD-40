@@ -12,4 +12,4 @@ module.exports = {
             embedColor: '#ffffff' // Defaults to "Random"
         });
     }
-}
+};

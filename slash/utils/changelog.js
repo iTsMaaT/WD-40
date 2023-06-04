@@ -2,16 +2,16 @@ const { ApplicationCommandType, ApplicationCommandOptionType } = require("discor
 const changelog = require('../../changelogs.json');
 
 module.exports = {
-  name: 'changelog',
-  description: 'Displays the latest changes to the bot',
-  type :ApplicationCommandType.ChatInput,
-  execute(logger, interaction, client) {
-    const latestChanges = changelog.slice(-5);
-    let log = latestChanges.map(({ version, date, changes }) =>
-    `**Version: ${version}** (${date}):\n${changes.map(change => `- ${change}`).join('\n')}\n\n`)
-    let cleanlog = log.join("").replace(",**Version:**","**Version:**")
-    let prefix = global.GuildManager.GetPrefix(interaction.guild);
-    interaction.reply({content:
+    name: 'changelog',
+    description: 'Displays the latest changes to the bot',
+    type :ApplicationCommandType.ChatInput,
+    execute(logger, interaction, client) {
+        const latestChanges = changelog.slice(-5);
+        const log = latestChanges.map(({ version, date, changes }) =>
+            `**Version: ${version}** (${date}):\n${changes.map(change => `- ${change}`).join('\n')}\n\n`);
+        const cleanlog = log.join("").replace(",**Version:**","**Version:**");
+        const prefix = global.GuildManager.GetPrefix(interaction.guild);
+        interaction.reply({content:
 `
 For help : ${prefix}help
 
@@ -19,6 +19,6 @@ For help : ${prefix}help
 ${cleanlog}
 `
 
-, allowedMentions: { repliedUser: false } });
-  },
+        , allowedMentions: { repliedUser: false } });
+    },
 };

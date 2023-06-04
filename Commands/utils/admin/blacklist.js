@@ -9,8 +9,8 @@ module.exports = {
         if (message.author.id != process.env.OWNER_ID) return;
 
         if (!args[0]) {
-            if (Object.keys(global.tempBlacklist).length == 0) return message.reply("Empty.")
-            const blacklist = Object.keys(global.tempBlacklist).map(id => `<@${id}>`)
+            if (Object.keys(global.tempBlacklist).length == 0) return message.reply("Empty.");
+            const blacklist = Object.keys(global.tempBlacklist).map(id => `<@${id}>`);
             message.reply({ content: `Blacklisted members:\n${blacklist.join('\n')}`, allowedMentions: { repliedUser: false } });
             return;
         }
@@ -25,4 +25,4 @@ module.exports = {
         tempBlacklist[id] = true;
         message.reply(`Successfully blacklisted <@${id}>.`);
     }
-}
+};

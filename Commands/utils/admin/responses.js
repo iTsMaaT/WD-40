@@ -15,4 +15,4 @@ module.exports = {
             message.reply("Responses enabled.");
         }
     }
-}
+};

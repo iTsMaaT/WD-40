@@ -1,15 +1,15 @@
 
 module.exports = (function(prisma) {
 
-    let prefixes = {};
-    let responses = {};
-    let personality = {};
+    const prefixes = {};
+    const responses = {};
+    const personality = {};
 
     function init(guilds) {
         guilds.forEach(async (g) => {
-            let exists = await CheckIfGuildExists(g);
+            const exists = await CheckIfGuildExists(g);
             if(!exists) await AddGuildToDatabase(g);
-            let settings = await GetGuildSettings(g);
+            const settings = await GetGuildSettings(g);
             prefixes[g.id] = settings.Prefix;
             responses[g.id] = settings.Responses;
             personality[g.id] = settings.Personality;
@@ -25,7 +25,7 @@ module.exports = (function(prisma) {
     } 
 
     async function CheckIfGuildExists(guild) {
-        let result = await GetGuildSettings(guild);
+        const result = await GetGuildSettings(guild);
         return result != undefined && result != null;
     }
 

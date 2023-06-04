@@ -1,4 +1,4 @@
-const got = require("got")
+const got = require("got");
 module.exports = {
     name: "advice",
     description: "Get a random advice",
@@ -8,7 +8,7 @@ module.exports = {
 
         got("https://api.adviceslip.com/advice")
             .then(response => {
-                const advice = JSON.parse(response.body)
+                const advice = JSON.parse(response.body);
 
                 FactEmbed = {
                     color: 0xffffff,
@@ -16,7 +16,7 @@ module.exports = {
                     description: advice.slip.advice,
                     timestamp: new Date(),
                     footer: { text: `ID : ${advice.slip.id}` }
-                }
+                };
 
                 message.reply({ embeds: [FactEmbed], allowedMentions: { repliedUser: false }} );
             })
@@ -26,9 +26,9 @@ module.exports = {
                     title: `An error occured`,
                     description: err,
                     timestamp: new Date(),
-                }
+                };
                 message.reply({ embeds: [ErrEmbed], allowedMentions: { repliedUser: false }} );
-                logger.error(err)
-            })
+                logger.error(err);
+            });
     }
-}
+};

@@ -12,9 +12,9 @@ module.exports = {
         let counter = 0;
         let CommandSize = 0;
         //let helpmessagebuilder = "";
-        let prefix = global.GuildManager.GetPrefix(message.guild);
+        const prefix = global.GuildManager.GetPrefix(message.guild);
         //helpmessagebuilder += `**The prefix is:** \`${prefix}\`\n\n`
-        let categorymapper = {};
+        const categorymapper = {};
         if (args[0] == "-u") {
             client.commands.each((val) => {
                 if (!val.private) {
@@ -25,7 +25,7 @@ module.exports = {
                     }
                     CommandSize += 1;
                 }
-            })
+            });
         } else if (!args[0]) {
             client.commands.each((val) => {
                 if (!val.private) {
@@ -36,33 +36,33 @@ module.exports = {
                     }
                     CommandSize += 1;
                 }
-            })
+            });
         } else if(args[0]) {
-            let CommandName = client.commands.get(args[0])
-            if (!CommandName) SendErrorEmbed(message, "This command doesn't exist.", "red")
+            const CommandName = client.commands.get(args[0]);
+            if (!CommandName) SendErrorEmbed(message, "This command doesn't exist.", "red");
             if (!CommandName.private) {
-                CommandEmbed = {
+                var CommandEmbed = {
                     title: `**${CommandName.name}** ${CommandName.usage ?? "(No args)"}`,
                     color: 0xffffff,
                     description: CommandName.description,
                     timestamp: new Date(),
-                  }
+                };
             }
             return message.reply({ embeds: [CommandEmbed], allowedMentions: { repliedUser: false } });
         }
-        let categories = Object.keys(categorymapper);
+        const categories = Object.keys(categorymapper);
 
         //console.log(require('discord.js').version)
 
         const FisrtPage = new ButtonBuilder()
             .setCustomId('first')
             .setLabel('◀◀')
-            .setStyle(ButtonStyle.Success)
+            .setStyle(ButtonStyle.Success);
 
         const LastPage = new ButtonBuilder()
             .setCustomId('last')
             .setLabel('▶▶')
-            .setStyle(ButtonStyle.Success)
+            .setStyle(ButtonStyle.Success);
 
         const NextPage = new ButtonBuilder()
             .setCustomId('next')
@@ -103,7 +103,7 @@ module.exports = {
 
         const filter = (interaction) => {
             if (interaction.user.id == message.author.id) return true;
-        }
+        };
 
         const collector = helpMessage.createMessageComponentCollector({
             filter,
@@ -144,7 +144,7 @@ module.exports = {
                 await row.components[4].setDisabled(counter == categories.length);
 
             } else {
-                let currentCategory = categories[counter - 1];
+                const currentCategory = categories[counter - 1];
                 embed = {
                     title: `Commands for category: ${currentCategory.toUpperCase()}`,
                     description: categorymapper[categories[counter - 1]],
@@ -172,7 +172,7 @@ module.exports = {
         collector.on("end", async (interaction) => {
             row.components.forEach(component => {
                 component.setDisabled(true);
-            })
+            });
             await helpMessage.edit({
                 embeds: [embed],
                 components: [row],
@@ -180,4 +180,4 @@ module.exports = {
             });
         });
     }
-}
+};

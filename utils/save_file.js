@@ -3,7 +3,7 @@ const fs = require('node:fs');
 
 function checkIfFolderExists(path) {
     try{
-        fs.readdirSync(path)
+        fs.readdirSync(path);
     } catch(e ){
         fs.mkdirSync(path);
     }
@@ -31,7 +31,7 @@ class SaveFile {
     fileName = "";
 
     constructor(options) {
-        let p = path.join(options.root, 'saves');
+        const p = path.join(options.root, 'saves');
         this.fileName = path.join(p, options.fileName);
         checkIfFolderExists(p);
         this.data = readData(this.fileName);

@@ -15,7 +15,7 @@ module.exports = {
         } else {
             const rawId = args[0].replace(/[<!@>]/g, "");
             if (!rawId.match(/^\d+$/)) {
-                return SendErrorEmbed(message, "Invalid user ID.")
+                return SendErrorEmbed(message, "Invalid user ID.");
             }
             id = rawId;
         }
@@ -29,17 +29,17 @@ module.exports = {
                 var activity_name = status.activities[1]?.name ?? "`No activity name`";
                 var activity_details = status.activities[1]?.details ?? "`No activity details`";
             } catch {
-                var custom_status = "`No status`";
-                var activity_name = "`No activity name`";
-                var activity_details = "`No activity details`";
+                custom_status = "`No status`";
+                activity_name = "`No activity name`";
+                activity_details = "`No activity details`";
             }
             
-            userInfoEmbed = {
+            const userInfoEmbed = {
                 title: "User Information",
                 description: `User Informations For: **<@${id}>**`,
                 thumbnail: {
                     url: target.user.avatarURL({ dynamic: true }) || "",
-                  },
+                },
                 fields: [
                     { name: "User ID", value: target.user.id },
                     { name: "Account Age", value: `<t:${parseInt(target.user.createdTimestamp / 1000)}:R>` },
@@ -55,7 +55,7 @@ module.exports = {
             
             message.reply({ embeds: [userInfoEmbed], allowedMentions: { repliedUser: false } });
         } catch (err) {
-            SendErrorEmbed(message, "Error.", "red", err)
+            SendErrorEmbed(message, "Error.", "red", err);
         }
     }
 };

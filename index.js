@@ -1,17 +1,15 @@
 const { PrismaClient } = require("@prisma/client");
-const { Client, Intents, GatewayIntentBits, EmbedBuilder, PermissionsBitField, SelectMenuOptionBuilder, Events, WebhookClient, Partials } = require("discord.js");
-const { Guild } = require("discord.js");
+const { Client, GatewayIntentBits, Events, Partials } = require("discord.js");
 const { activities, blacklist, whitelist } = require("./utils/config.json");
 
 const Logger = require("./utils/log");
-const SaveFile = require("./utils/save_file");
 const fs = require('fs');
 
 const cron = require("cron");
 const dotenv = require("dotenv");
-const got = require("got");
 const Discord = require('discord.js');
-const path = require('node:path');
+
+const getExactDate = require("./utils/functions/getExactDate");
 
 var HourlyRam = [0, 0, 0];
 
@@ -34,7 +32,7 @@ global.tempBlacklist = {};
 // Add array.equals()
 Array.prototype.equals = function (b) {
     return this.length == b.length && this.every((v, i) => v === b[i]);
-}
+};
 
 //music
 const { Player } = require('discord-player');
@@ -46,7 +44,7 @@ player.extractors.loadDefault();
 global.logger = new Logger({ root: __dirname, client });
 global.snowflakeData = [];
 prisma.snowflake.findMany().then(v => {
-    let result = v.map(v => [parseInt(v.GuildID), parseInt(v.UserID)]);
+    const result = v.map(v => [parseInt(v.GuildID), parseInt(v.UserID)]);
     global.snowflakeData = global.snowflakeData.concat(result);
 });
 
@@ -66,19 +64,19 @@ client.events = new Discord.Collection();
 function loadFiles(folder, callback) {
     const commandFiles = fs.readdirSync(folder);
     while (commandFiles.length > 0) {
-        let file = commandFiles.shift();
+        const file = commandFiles.shift();
         if (file.endsWith('.js')) {
             const loaded = require(`${folder}${file}`);
             callback(loaded, file);
         } else {
-            let newFiles = fs.readdirSync(folder + file);
+            const newFiles = fs.readdirSync(folder + file);
             newFiles.forEach(f => commandFiles.push(file + '/' + f));
         }
     }
 }
 
 //Slash command handler
-let discoveredCommands = [];
+const discoveredCommands = [];
 loadFiles('./slash/', (slashcommand, fileName) => {
     if ('name' in slashcommand && 'execute' in slashcommand && 'description' in slashcommand) {
         client.slashcommands.set(slashcommand.name, slashcommand);
@@ -90,7 +88,7 @@ loadFiles('./slash/', (slashcommand, fileName) => {
 
 //Text command handler
 loadFiles('./Commands/', function (command) {
-    client.commands.set(command.name, command)
+    client.commands.set(command.name, command);
 });
 
 //Event handler
@@ -107,54 +105,54 @@ client.on("ready", async () => {
 
     logger.info(`Bot starting on [${process.env.SERVER}]...`);
 
-    console.log("Guild manager initiation...")
-    let guilds = await client.guilds.fetch();
+    console.log("Guild manager initiation...");
+    const guilds = await client.guilds.fetch();
     await global.GuildManager.init(guilds);
-    console.log("Guild manager initiation done.")
+    console.log("Guild manager initiation done.");
 
-    console.log("Setting up slash commands...")
+    console.log("Setting up slash commands...");
     await client.application.commands.set(discoveredCommands);
-    console.log("Slash command setup done.")
+    console.log("Slash command setup done.");
 
-    console.log("Setting up activity status...")
+    console.log("Setting up activity status...");
     activities[7] = activities[7].replace("Placeholder", (100 / activities.length).toFixed(4));
     await client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
-    console.log("Activity status setup done.")
+    console.log("Activity status setup done.");
 
-    console.log("Creating the cron jobs...")
+    console.log("Creating the cron jobs...");
     //- - - New Day - - -
-    let scheduledMessage = new cron.CronJob('30 59 02 * * *', () => {
+    const scheduledMessage = new cron.CronJob('30 59 02 * * *', () => {
         // This runs every day at 02:59:30
         client.channels.cache.get("1069811223950016572").send("- - - - - New Day - - - - -");
     });
 
-    let DailyActivity = new cron.CronJob('00 00 04 * * *', () => {
+    const DailyActivity = new cron.CronJob('00 00 04 * * *', () => {
         client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
     });
 
-    let RamLeakDetector = new cron.CronJob('0 * * * *', async () => {
+    const RamLeakDetector = new cron.CronJob('0 * * * *', async () => {
         try {
-        let PterodactylInfo = await GetPterodactylInfo();
-        let RamLeakPourcentage = parseInt(PterodactylInfo.ram.pourcentage);
-        if (RamLeakPourcentage > 100) RamLeakPourcentage = 100;
-        console.log(`Current RAM usage: ${RamLeakPourcentage}%`)
-        HourlyRam.push(RamLeakPourcentage);
-        HourlyRam.shift();
-        console.log(HourlyRam)
-        if (HourlyRam[0] == HourlyRam[1] == HourlyRam [2] == 100) client.users.cache.get(process.env.OWNER_ID).send("Memory leak detected.")
-    } catch(err) {
-        logger.error("Couldn't get the RAM % for MemoryLeakDetector")
-        logger.error(err)
-    }
+            const PterodactylInfo = await GetPterodactylInfo();
+            let RamLeakPourcentage = parseInt(PterodactylInfo.ram.pourcentage.raw).toFixed(0);
+            if (RamLeakPourcentage > 100) RamLeakPourcentage = 100;
+            console.log(`Current RAM usage: ${RamLeakPourcentage}%`);
+            HourlyRam.push(RamLeakPourcentage);
+            HourlyRam.shift();
+            console.log(HourlyRam);
+            if (HourlyRam[0] == HourlyRam[1] == HourlyRam [2] == 100) client.users.cache.get(process.env.OWNER_ID).send("Memory leak detected.");
+        } catch(err) {
+            logger.error("Couldn't get the RAM % for MemoryLeakDetector");
+            logger.error(err);
+        }
     });
 
-    console.log("Starting the cron jobs...")
+    console.log("Starting the cron jobs...");
     //sarting the daily sending
     scheduledMessage.start();
     DailyActivity.start();
     RamLeakDetector.start();
-    console.log("Cron job setup done.")
-    console.log("Discord.js version: " + require('discord.js').version)
+    console.log("Cron job setup done.");
+    console.log("Discord.js version: " + require('discord.js').version);
 
     //start confirmation
     setTimeout(function () {
@@ -213,14 +211,14 @@ client.on("messageCreate", async (message) => {
                 //Timestamp: new Date(new Date(message.createdTimestamp).toLocaleString("en-US", {timeZone: "America/Toronto"})),
                 Content: message.content,
             }
-        })
+        });
     } catch (ex) {
-        console.log(`[${getExactDate()} - SEVERE] Unable to write to database`)
-        console.log(ex)
+        console.log(`[${getExactDate()} - SEVERE] Unable to write to database`);
+        console.log(ex);
     }
 
     //Text command executing
-    let prefix = global.GuildManager.GetPrefix(message.guild)
+    const prefix = global.GuildManager.GetPrefix(message.guild);
     if (message.content.startsWith(prefix)) {
 
         const args = message.content.slice(prefix.length).split(/ +/);
@@ -236,6 +234,6 @@ client.on("messageCreate", async (message) => {
         logger.info(`Executing [${message.content}]\nby    [${message.member.user.tag} (${message.author.id})]\nin    [${message.channel.name} (${message.channel.id})]\nfrom  [${message.guild.name} (${message.guild.id})]`);
         client.commands.get(command).execute(logger, client, message, args);
     }
-})
+});
 //Logins with the token
 client.login(process.env.TOKEN);

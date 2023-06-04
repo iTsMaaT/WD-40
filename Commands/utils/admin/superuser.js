@@ -5,7 +5,7 @@ module.exports = {
     private: true,
     execute(logger, client, message, args) {
         //Superuser command (Only iTsMaaT can execute commands)
-        const server = process.env.SERVER
+        const server = process.env.SERVER;
         if (args[0] == server) {
             if (message.author.id == process.env.OWNER_ID && !superuser) {
                 superuser = 1;
@@ -28,4 +28,4 @@ module.exports = {
             }
         }
     }
-}
+};

@@ -17,7 +17,7 @@ module.exports = {
                 global.prisma.$disconnect();
                 process.exit(1);
                 /****************/
-            }, 1000 * 3)
+            }, 1000 * 3);
             return;
         }
 
@@ -32,8 +32,8 @@ module.exports = {
                 global.prisma.$disconnect();
                 process.exit(1);
                 /****************/
-            }, 1000 * 3)
+            }, 1000 * 3);
             return;
         }
     }
-}
+};

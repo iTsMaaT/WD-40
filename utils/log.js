@@ -1,13 +1,10 @@
-const path = require('node:path');
-const fs = require('node:fs');
-
-function checkIfFolderExists(path) {
+/*function checkIfFolderExists(path) {
     try{
-        fs.readdirSync(path)
+        fs.readdirSync(path);
     } catch(e ){
         fs.mkdirSync(path);
     }
-}
+}*/
 
 function getDate() {
     // Récupère la date
@@ -36,10 +33,10 @@ async function writeLogToFile(log, client, type) {
                 Value: log,
                 Type: type
             }
-        })
+        });
     } catch(ex) {
-        console.log(`[${getDateTime()} - SEVERE] Unable to write to database`)
-        console.log(ex)
+        console.log(`[${getDateTime()} - SEVERE] Unable to write to database`);
+        console.log(ex);
     }
     console.log(`${log}`);
     client?.channels?.cache?.get("1069811223950016572")?.send(`\`\`\`${log}\`\`\``);

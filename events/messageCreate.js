@@ -1,7 +1,7 @@
 const { Events } = require('discord.js');
 const FetchReddit = require("../utils/functions/FetchReddit.js");
 const getExactDate = require('../utils/functions/getExactDate.js');
-const { blacklist } = require("../utils/config.json")
+const { blacklist } = require("../utils/config.json");
 
 module.exports = {
     name: Events.MessageCreate,
@@ -34,7 +34,7 @@ module.exports = {
 
             //Sends furry porn in DMs of anyone that says "sex"
             if (message.content.toLowerCase() == "sex") {
-                message.author.send({ embeds: [await FetchReddit(message, true, "furrypornsubreddit", "yiff", "furryonhuman")] })
+                message.author.send({ embeds: [await FetchReddit(message, true, "furrypornsubreddit", "yiff", "furryonhuman")] });
 
             }
 
@@ -69,8 +69,8 @@ module.exports = {
 
             //Snowflake reaction
             if (snowflakeData != []) {
-                let expected = [parseInt(message.guildId), parseInt(message.author.id)];
-                let exists = snowflakeData.filter(v => {
+                const expected = [parseInt(message.guildId), parseInt(message.author.id)];
+                const exists = snowflakeData.filter(v => {
                     return v.equals(expected);
                 }).length >= 1;
                 if (exists) {
