@@ -1,135 +1,143 @@
 [
-  {
-    "version": "2.0.0",
-    "date": "2023-02-13",
-    "changes": [
-      "Added a dynamic help command"
-    ]
-  },
-  {
-    "version": "2.1.0",
-    "date": "2023-05-22",
-    "changes": [
-      "Added a database system",
-      "Event handler"
-    ]
-  },
-  {
-    "version": "2.2.0",
-    "date": "2023-05-27",
-    "changes": [
-      "Added ChatGPT-3.5 (>ask)",
-      "Made the rule34 command fetch from rule34.xxx instead of Reddit",
-      "Reddit command now can fetch a user post (>help)",
-      "Reddit and rule34 command now checks for NSFW channel",
-      "Userinfo command also gives the highest level of the target user",
-      "Added >changelog"
-    ]
-  },
-  {
-    "version": "2.3.1",
-    "date": "2023-05-28",
-    "changes": [
-      "Added context and Jailbreak to ChatGPT",
-      "Added >roll, can roll dices",
-      "Added >furry, you know what this is",
-      "Multiple bug fixes and optimization"
-    ]
-  },
-  {
-    "version": "2.4.2",
-    "date": "2023-04-30",
-    "changes": [
-      "Refactoring",
-      "Multiple new commands (>cat, >dog, >minecraft, >meme, >fact)",
-      "Completlely switched to a database system",
-      "Auto-responses are now per guilds and disabled by default"
-    ]
-  },
-  {
-    "version": "2.5.3",
-    "date": "2023-05-03",
-    "changes": [
-      "Bug fixes and error handling in certain commands",
-      "Ability to change the personality prompt per guild for ChatGPT",
-      "Changed colors for the music embeds",
-      "Fixed the music part of the bot",
-      ">help now has a page system"
-    ]
-  },
-  {
-    "version": "2.6.4",
-    "date": "2023-05-03",
-    "changes": [
-      "Updated >Help",
-      "Fixes"
-    ]
-  },
-  {
-    "version": "3.0.0",
-    "date": "2023-05-11",
-    "changes": [
-      "Added a LOT of slash commands",
-      "Fixes"
-    ]
-  },
-  {
-    "version": "3.0.2",
-    "date": "2023-05-17",
-    "changes": [
-      "Function updates",
-      "Fixes"
-    ]
-  },
-  {
-    "version": "3.1.0",
-    "date": "2023-05-18",
-    "changes": [
-      "Added lots of embeds",
-      "Fixes"
-    ]
-  },
-  {
-    "version": "3.2.0",
-    "date": "2023-05-22",
-    "changes": [
-      "New commands: Neko and Joke",
-      "Fixes"
-    ]
-  },
-  {
-    "version": "3.3.0",
-    "date": "2023-05-23",
-    "changes": [
-      "New commands: Advice, urban and guess (akinator)",
-      "Fixes"
-    ]
-  },
-  {
-    "version": "3.4.0",
-    "date": "2023-05-25",
-    "changes": [
-      "New command: country",
-      "Fixes"
-    ]
-  },
-  {
-    "version": "3.5.0",
-    "date": "2023-05-29",
-    "changes": [
-      "New commands: botinfo and quote",
-      "Fixes"
-    ]
-  },
-  {
-    "version": "4.0.0",
-    "date": "2023-05-30",
-    "changes": [
-      "Added command usage: >help -u",
-      "Individual command help: >help <command name>",
-      "Updates to database",
-      "New music plugin and commands",
-      "Fixes"
-    ]
-  }
+    {
+        "version": "2.0.0",
+        "date": "2023-02-13",
+        "changes": [
+            "Added a dynamic help command"
+        ]
+    },
+    {
+        "version": "2.1.0",
+        "date": "2023-05-22",
+        "changes": [
+            "Added a database system",
+            "Event handler"
+        ]
+    },
+    {
+        "version": "2.2.0",
+        "date": "2023-05-27",
+        "changes": [
+            "Added ChatGPT-3.5 (>ask)",
+            "Made the rule34 command fetch from rule34.xxx instead of Reddit",
+            "Reddit command now can fetch a user post (>help)",
+            "Reddit and rule34 command now checks for NSFW channel",
+            "Userinfo command also gives the highest level of the target user",
+            "Added >changelog"
+        ]
+    },
+    {
+        "version": "2.3.1",
+        "date": "2023-05-28",
+        "changes": [
+            "Added context and Jailbreak to ChatGPT",
+            "Added >roll, can roll dices",
+            "Added >furry, you know what this is",
+            "Multiple bug fixes and optimization"
+        ]
+    },
+    {
+        "version": "2.4.2",
+        "date": "2023-04-30",
+        "changes": [
+            "Refactoring",
+            "Multiple new commands (>cat, >dog, >minecraft, >meme, >fact)",
+            "Completlely switched to a database system",
+            "Auto-responses are now per guilds and disabled by default"
+        ]
+    },
+    {
+        "version": "2.5.3",
+        "date": "2023-05-03",
+        "changes": [
+            "Bug fixes and error handling in certain commands",
+            "Ability to change the personality prompt per guild for ChatGPT",
+            "Changed colors for the music embeds",
+            "Fixed the music part of the bot",
+            ">help now has a page system"
+        ]
+    },
+    {
+        "version": "2.6.4",
+        "date": "2023-05-03",
+        "changes": [
+            "Updated >Help",
+            "Fixes"
+        ]
+    },
+    {
+        "version": "3.0.0",
+        "date": "2023-05-11",
+        "changes": [
+            "Added a LOT of slash commands",
+            "Fixes"
+        ]
+    },
+    {
+        "version": "3.0.2",
+        "date": "2023-05-17",
+        "changes": [
+            "Function updates",
+            "Fixes"
+        ]
+    },
+    {
+        "version": "3.1.0",
+        "date": "2023-05-18",
+        "changes": [
+            "Added lots of embeds",
+            "Fixes"
+        ]
+    },
+    {
+        "version": "3.2.0",
+        "date": "2023-05-22",
+        "changes": [
+            "New commands: Neko and Joke",
+            "Fixes"
+        ]
+    },
+    {
+        "version": "3.3.0",
+        "date": "2023-05-23",
+        "changes": [
+            "New commands: Advice, urban and guess (akinator)",
+            "Fixes"
+        ]
+    },
+    {
+        "version": "3.4.0",
+        "date": "2023-05-25",
+        "changes": [
+            "New command: country",
+            "Fixes"
+        ]
+    },
+    {
+        "version": "3.5.0",
+        "date": "2023-05-29",
+        "changes": [
+            "New commands: botinfo and quote",
+            "Fixes"
+        ]
+    },
+    {
+        "version": "4.0.0",
+        "date": "2023-05-30",
+        "changes": [
+            "Added command usage: >help -u",
+            "Individual command help: >help <command name>",
+            "Updates to database",
+            "New music plugin and commands",
+            "Fixes"
+        ]
+    },
+    {
+        "version": "4.1.0",
+        "date": "2023-05-30",
+        "changes": [
+            "Added new slash command: /count",
+            "Fixes"
+        ]
+    }
 ]
