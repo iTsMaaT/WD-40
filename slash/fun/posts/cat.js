@@ -1,4 +1,4 @@
-const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
+const { ApplicationCommandType } = require("discord.js");
 const FetchReddit = require("../../../utils/functions/FetchReddit.js");
 
 module.exports = {

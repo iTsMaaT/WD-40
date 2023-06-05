@@ -15,7 +15,7 @@ function readData(fileName){
         const fd = fs.readFileSync(fileName, {encoding: 'utf8'});
         data = JSON.parse(fd);
     } catch (e){
-        fs.writeFileSync(fileName, "{}", (err) => {});
+        fs.writeFileSync(fileName, "{}", (err) => {console.log(err);});
     }
     
     return data;
