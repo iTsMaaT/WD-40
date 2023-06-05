@@ -35,7 +35,7 @@ module.exports = {
         const String = interaction.options.get("string");
         const GuildID = interaction.options.get("guild");
         const Channel = interaction.options.get("channel");
-        const User = interaction.options.get("user");
+        const User = interaction.options.getUser("user")?.id;
         var filter = {}; 
         var link = "";
 
