@@ -76,7 +76,7 @@ module.exports = {
                 description: `
 Guild ID: ${GuildID?.value ? await client.guilds.fetch(GuildID).name : "None"}
 Channel ID: ${Channel?.value ? await client.channels.fetch(Channel).name : "None"}
-User ID: ${User?.value ? await client.users.fetch(User).tag : "None"}
+User ID: ${User ? await client.users.fetch(User).tag : "None"}
 Prompt: ${String?.value ?? "None"}
                 `,
                 fields: [
