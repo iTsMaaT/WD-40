@@ -1,4 +1,5 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
+const SendErrorEmbed = require("../../../utils/functions/SendErrorEmbed");
 module.exports = {
     name: "count",
     description: "Counts the number of time a prompt as been said",
@@ -64,7 +65,7 @@ module.exports = {
                 ID: 'desc'
             }
         }))[0];
-        console.log(last);
+        if (!last || !count) return SendErrorEmbed(interaction, "None found.")
 
         if (last) link = `https://discord.com/channels/${last.GuildID}/${last.ChannelID}/${last.MessageID}`;
 
