@@ -1,4 +1,4 @@
-const { activities } = require("../../../utils/config.json")
+const { activities } = require("../../../utils/config.json");
 
 module.exports = {
     name: "activity",
@@ -15,22 +15,23 @@ module.exports = {
             return;
         }
         switch (args[0]) {
-            case "-l":
-                let activityList = "";
-                let maxIndexWidth = (activities.length - 1).toString().length;
-                activities.forEach((activity, index) => {
-                    let formattedIndex = `[${index.toString().padStart(maxIndexWidth, " ")}]`;
-                    activityList += `${formattedIndex} : ${activity}\n`
-                });
-                message.reply({ content: `\`\`\`${activityList}\`\`\``, allowedMentions: { repliedUser: false } });
-                break;
-            case "-p":
-                client.user.setActivity(activities[args[1]]);
-                message.reply({ content: `Activity changed to : \`${activities[args[1]]}\``, allowedMentions: { repliedUser: false } });
-                break;
-            default:
-                client.user.setActivity(args.join(' '));
-                message.reply({ content: `Activity updated`, allowedMentions: { repliedUser: false } });
+        case "-l": {
+            let activityList = "";
+            const maxIndexWidth = (activities.length - 1).toString().length;
+            activities.forEach((activity, index) => {
+                const formattedIndex = `[${index.toString().padStart(maxIndexWidth, " ")}]`;
+                activityList += `${formattedIndex} : ${activity}\n`;
+            });
+            message.reply({ content: `\`\`\`${activityList}\`\`\``, allowedMentions: { repliedUser: false } });
+            break;
+        }
+        case "-p":
+            client.user.setActivity(activities[args[1]]);
+            message.reply({ content: `Activity changed to : \`${activities[args[1]]}\``, allowedMentions: { repliedUser: false } });
+            break;
+        default:
+            client.user.setActivity(args.join(' '));
+            message.reply({ content: `Activity updated`, allowedMentions: { repliedUser: false } });
         }
     }
-}
+};

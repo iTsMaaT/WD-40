@@ -1,5 +1,5 @@
-const { EmbedBuilder } = require("discord.js")
-const SendErrorEmbed = require("../../utils/functions/SendErrorEmbed")
+const { EmbedBuilder } = require("discord.js");
+const SendErrorEmbed = require("../../utils/functions/SendErrorEmbed");
 const { useQueue, useTimeline } = require('discord-player');
 
 module.exports = {
@@ -7,10 +7,10 @@ module.exports = {
     description: "See what song is currently playing",
     category: "music",
     execute(logger, client, message, args) {
-        const queue = useQueue(message.guild.id)
+        const queue = useQueue(message.guild.id);
         const timeline = useTimeline(message.guild.id);
 
-        if (!queue || !queue.currentTrack) return SendErrorEmbed(message, "There is nothing in the queue right now.", "yellow")
+        if (!queue || !queue.currentTrack) return SendErrorEmbed(message, "There is nothing in the queue right now.", "yellow");
 
         const track = queue.currentTrack;
 
@@ -27,6 +27,6 @@ module.exports = {
                 text: `Event Loop Lag: ${queue.player.eventLoopLag.toFixed(0)}ms`
             })
             .setTimestamp();
-        message.reply({ embeds: [song_playing_embed], allowedMentions: { repliedUser: false }})
+        message.reply({ embeds: [song_playing_embed], allowedMentions: { repliedUser: false }});
     }
-}
+};

@@ -7,28 +7,28 @@ module.exports = {
     usage: "< -p [...]: post, -u [...]: user>",
     category: "NSFW",
     execute: async (logger, client, message, args) => {
-      message.channel.sendTyping();
+        message.channel.sendTyping();
         var sent = "";
         if (args.length == 2 && args[0] == "-p") {
             //Gore subreddits blacklist
             if (args[1] != "eyeblech" && args[1] != "gore" && args[1] != "guro") {
                 let RedditImage = "";
                 var RedditTries = 1;
-                sent = await message.channel.send({ content: `Attempt ${RedditTries}/10`, fetchreply: true })
+                sent = await message.channel.send({ content: `Attempt ${RedditTries}/10`, fetchreply: true });
                 //Tries to fetch a post 10 times
                 for (let i = 0; i <= 10; i++) {
                     try {
-                        let response = await got(`https://www.reddit.com/r/${args[1]}/random/.json`);
-                        let content = JSON.parse(response.body);
-                        let permalink = content[0].data.children[0].data.permalink;
-                        let RedditURL = `https://reddit.com${permalink}`;
-                        let RedditTitle = content[0].data.children[0].data.title;
-                        let PostNsfw = content[0].data.children[0].data.over_18;
+                        const response = await got(`https://www.reddit.com/r/${args[1]}/random/.json`);
+                        const content = JSON.parse(response.body);
+                        const permalink = content[0].data.children[0].data.permalink;
+                        const RedditURL = `https://reddit.com${permalink}`;
+                        const RedditTitle = content[0].data.children[0].data.title;
+                        const PostNsfw = content[0].data.children[0].data.over_18;
                         RedditImage = content[0].data.children[0].data.url;
                         RedditTries += 1;
                         //Updates the counter
                         if (RedditTries % 2 == 0 && RedditTries <= 10) {
-                            sent.edit({ content: `Attempt ${RedditTries}/10`, fetchreply: true })
+                            sent.edit({ content: `Attempt ${RedditTries}/10`, fetchreply: true });
                         }
                         if (RedditImage.endsWith(".jpg") || RedditImage.endsWith(".png") || RedditImage.endsWith(".gif")) {
                             if (!PostNsfw || (PostNsfw && message.channel.nsfw)) {
@@ -37,15 +37,15 @@ module.exports = {
                                     title: RedditTitle,
                                     url: RedditURL,
                                     image: {
-                                      url: RedditImage,
+                                        url: RedditImage,
                                     },
                                     footer: {
-                                      text: `Posted by ${content[0].data.children[0].data.author} in ${content[0].data.children[0].data.subreddit_name_prefixed}`,
+                                        text: `Posted by ${content[0].data.children[0].data.author} in ${content[0].data.children[0].data.subreddit_name_prefixed}`,
                                     },
-                                  };
+                                };
 
 
-                                sent.edit({ content: `Attempt ${RedditTries}/10`, fetchreply: true })
+                                sent.edit({ content: `Attempt ${RedditTries}/10`, fetchreply: true });
                                 sent.edit({ embeds: [embed], allowedMentions: { repliedUser: false } });
                                 logger.info(RedditImage);
                                 return;
@@ -68,10 +68,10 @@ module.exports = {
             const url = `https://www.reddit.com/user/${args[1]}/submitted.json`;
             let response;
             try {
-              response = await got(url);
+                response = await got(url);
             } catch (error) {
-              console.error(error);
-              return message.reply('an error occurred while fetching posts from the Reddit API.');
+                console.error(error);
+                return message.reply('an error occurred while fetching posts from the Reddit API.');
             }
         
             // Parse the JSON response
@@ -85,19 +85,19 @@ module.exports = {
         
             // If no image posts were found, return an error message
             if (!randomPost) {
-              return message.reply(`no image posts found for user "${args[0]}".`);
+                return message.reply(`no image posts found for user "${args[0]}".`);
             }
         
             // Send the post as an embed in the channel
             const embed = {
-              title: randomPost.data.title,
-              url: `https://www.reddit.com${randomPost.data.permalink}`,
-              image: {
-                url: randomPost.data.url,
-              },
-              footer: {
-                text: `Posted by ${randomPost.data.author} in ${randomPost.data.subreddit_name_prefixed}`,
-              },
+                title: randomPost.data.title,
+                url: `https://www.reddit.com${randomPost.data.permalink}`,
+                image: {
+                    url: randomPost.data.url,
+                },
+                footer: {
+                    text: `Posted by ${randomPost.data.author} in ${randomPost.data.subreddit_name_prefixed}`,
+                },
             };
             message.channel.send({ embeds: [embed] });
           
@@ -105,4 +105,4 @@ module.exports = {
             message.reply({ content: "You didn't specify the parameter correctly (-p for post, -u for user : >reddit <parameter> <subreddit or user>)", allowedMentions: { repliedUser: false } });
         }
     }
-}
+};

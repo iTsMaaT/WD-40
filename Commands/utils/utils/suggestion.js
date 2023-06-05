@@ -11,4 +11,4 @@ module.exports = {
         message.reply(`Suggestion received.`);
         logger.info(`Suggestion received`);
     }
-}
+};

@@ -1,0 +1,29 @@
+{
+    "env": {
+        "browser": false,
+        "es6": true,
+        "node": true
+    },
+    "extends": "eslint:recommended",
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly",
+        "logger": "off"
+    },
+    "parserOptions": {
+        "ecmaVersion": 2023,
+        "sourceType": "module"
+    },
+    "rules": {
+        "indent": ["error", 4],
+        "semi": "error",
+        "prefer-const": "error",
+        "no-undef": "off",
+        "no-unused-vars": ["warn", {
+            "vars": "local",
+            "args": "after-used",
+            "ignoreRestSiblings": false,
+            "varsIgnorePattern": ["client", "args", "logger"]
+        }]
+    }
+}

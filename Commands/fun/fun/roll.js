@@ -32,7 +32,7 @@ module.exports = {
                     { name: 'Maximum possible', value: numDices * numSides, inline: true }
                 ],
                 timestamp: new Date(),
-            }
+            };
 
             message.reply({ embeds: [RollEmbed], allowedMentions: { repliedUser: false }} );
         } else {
@@ -45,7 +45,7 @@ module.exports = {
                     { name: "Roll", value: roll},
                 ],
                 timestamp: new Date(),
-            }
+            };
             message.reply({ embeds: [RollEmbed], allowedMentions: { repliedUser: false }} );
         }
     },

@@ -2,15 +2,15 @@
  * Reacts the provided string to a message
  */
 const StringReact = function (client, ChannelID, MessageID, string) {
-    let letters = string.toUpperCase().toString();
+    const letters = string.toUpperCase().toString();
 
     for (i = 0; i < letters.length; i++) {
         if (letters[i] === " ") continue;
-        let letter = letters[i];
+        const letter = letters[i];
         client.channels.cache.get(ChannelID).messages.fetch({ cache: false, message: MessageID })
             .then(m => {
                 m.react(String.fromCodePoint(letter.codePointAt(0) - 65 + 0x1f1e6));
             }).catch((err) => console.log("Error while reacting: " + err));
     }
-}
+};
 module.exports = StringReact;

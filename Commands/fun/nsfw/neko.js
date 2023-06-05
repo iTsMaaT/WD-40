@@ -10,7 +10,7 @@ module.exports = {
         if (message.channel.nsfw) {
             await got("https://nekos.life/api/neko")
                 .then(response => {
-                    var url = JSON.parse(response.body)
+                    var url = JSON.parse(response.body);
 
                     NekoEmbed = {
                         color: 0xffffff,
@@ -19,17 +19,17 @@ module.exports = {
                             url: url.neko,
                         },
                         timestamp: new Date(),
-                    }
+                    };
 
                     message.reply({ embeds: [NekoEmbed], allowedMentions: { repliedUser: false } });
-                })
+                });
         } else {
             ErrorEmbed = {
                 color: 0xffff00,
                 title: `The channel you are in isn't NSFW`,
                 timestamp: new Date(),
-            }
+            };
             message.reply({ embeds: [ErrorEmbed], allowedMentions: { repliedUser: false } });
         }
     }
-}
+};

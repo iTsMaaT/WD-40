@@ -19,7 +19,7 @@ module.exports = {
         if (interaction.channel.nsfw) {
             try {
                 const url = 'http://rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=' + tags;
-                const response = await got(url)
+                const response = await got(url);
 
                 const data = JSON.parse(response.body);
                 const post = data[Math.floor(Math.random() * data.length)];

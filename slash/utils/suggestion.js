@@ -10,7 +10,7 @@ module.exports = {
             type: ApplicationCommandOptionType.String,
             required: true,
         },
-      ],
+    ],
     execute(logger, interaction, client) {
         //Sends the suggestion and other info in a channel
         const suggestion = interaction.options.get("suggestion").value;
@@ -19,4 +19,4 @@ module.exports = {
         interaction.reply({content : `Suggestion received.`, ephemeral: true, allowedMentions: { repliedUser: false }});
         logger.info(`Suggestion received`);
     }
-}
+};

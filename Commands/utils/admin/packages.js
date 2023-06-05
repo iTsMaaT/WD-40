@@ -8,7 +8,7 @@ module.exports = {
     category: "fun",
     private: true,
     async execute(logger, client, message, args) {
-        const WDVersion = changelog.slice(-1).map(({version}) => { return version }).join();
+        const WDVersion = changelog.slice(-1).map(({version}) => { return version; }).join();
     
         const embed = {
             title: 'Installed Packages',

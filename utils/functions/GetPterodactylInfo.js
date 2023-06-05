@@ -26,18 +26,18 @@ const GetPterodactylInfo = async function () {
             }
         }).then(response => {
             try {
-                let json = JSON.parse(response.body);
+                const json = JSON.parse(response.body);
 
                 serverName = json.attributes.name;
                 RAMlimit = json.attributes.limits.memory;
                 CPUlimit = json.attributes.limits.cpu;
-                DISKlimit = json.attributes.limits.disk
+                DISKlimit = json.attributes.limits.disk;
                 IPalias = json.attributes.relationships.allocations.data[0].attributes.ip_alias;
                 IPport = json.attributes.relationships.allocations.data[0].attributes.port;
             } catch (err) {
-                logger.error(err.stack)
+                logger.error(err.stack);
             }
-        })
+        });
 
         await got("https://dash.kpotatto.net/api/client/servers/adc0f433/resources", {
             "method": "GET",
@@ -48,7 +48,7 @@ const GetPterodactylInfo = async function () {
             }
         }).then(response => {
             try {
-                let json = JSON.parse(response.body);
+                var json = JSON.parse(response.body);
 
                 RAMusage = json.attributes.resources.memory_bytes;
                 CPUusage = json.attributes.resources.cpu_absolute;
@@ -57,14 +57,14 @@ const GetPterodactylInfo = async function () {
                 NETWORKout = json.attributes.resources.network_tx_bytes;
                 BOTuptime = json.attributes.resources.uptime;
             } catch (err) {
-                logger.error(err.stack)
+                logger.error(err.stack);
             }
-        })
+        });
     } catch (err) {
-        logger.error(err.stack)
+        logger.error(err.stack);
     }
 
-    info = {
+    const info = {
         ram: {
             limit: {
                 raw: parseInt(RAMlimit) * 1024 * 1024,
@@ -120,8 +120,8 @@ const GetPterodactylInfo = async function () {
             ip: IPalias,
             port: IPport
         }
-    }
+    };
     //console.log(info)
-    return info
-}
+    return info;
+};
 module.exports = GetPterodactylInfo;

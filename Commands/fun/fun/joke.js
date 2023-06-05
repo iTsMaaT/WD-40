@@ -1,4 +1,4 @@
-const got = require("got")
+const got = require("got");
 module.exports = {
     name: "joke",
     description: "le funny",
@@ -7,18 +7,18 @@ module.exports = {
         message.channel.sendTyping();
 
         await got("https://v2.jokeapi.dev/joke/Any")
-        .then(response => {
-            var joke = JSON.parse(response.body)
+            .then(response => {
+                var joke = JSON.parse(response.body);
 
-            let trueFlags = [];
+                let trueFlags = [];
 
-            for (const flag in joke.flags) {
-                if (joke.flags.hasOwnProperty(flag) && joke.flags[flag] === true) {
-                  trueFlags.push(flag);
+                for (const flag in joke.flags) {
+                    if (Object.prototype.hasOwnProperty.call(joke.flags, flag) && joke.flags[flag] === true) {
+                        trueFlags.push(flag);
+                    }
                 }
-            }
 
-            if (trueFlags.length === 0) trueFlags = ["None"]
+                if (trueFlags.length === 0) trueFlags = ["None"];
 
                 FactEmbed = {
                     color: 0xffffff,
@@ -26,7 +26,7 @@ module.exports = {
                     description: `Catagory: ${joke.category}\nFlags: ${trueFlags.join(", ")}\n\n ${joke.setup ?? joke.joke} \n ${joke.delivery ?? ""}`,
                     timestamp: new Date(),
                     footer: { text: `ID : ${joke.id}` }
-                }
+                };
 
                 message.reply({ embeds: [FactEmbed], allowedMentions: { repliedUser: false }} );
             })
@@ -36,9 +36,9 @@ module.exports = {
                     title: `An error occured`,
                     description: err,
                     timestamp: new Date(),
-                }
+                };
                 message.reply({ embeds: [FactEmbed], allowedMentions: { repliedUser: false }} );
-                logger.error(err)
-            })
+                logger.error(err);
+            });
     }
-}
+};
