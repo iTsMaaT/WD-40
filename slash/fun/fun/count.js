@@ -32,6 +32,7 @@ module.exports = {
     ],
     execute: async (logger, interaction, client) => {
         //interaction.deferReply();
+        await interaction.deferReply({ ephemeral: true });
         const String = interaction.options.get("string");
         const GuildID = interaction.options.get("guild");
         const Channel = interaction.options.get("channel");
