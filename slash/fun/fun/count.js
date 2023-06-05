@@ -32,7 +32,7 @@ module.exports = {
     ],
     execute: async (logger, interaction, client) => {
         //interaction.deferReply();
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply();
         const String = interaction.options.get("string");
         const GuildID = interaction.options.get("guild");
         const Channel = interaction.options.get("channel");
@@ -66,7 +66,7 @@ module.exports = {
                 ID: 'desc'
             }
         }))[0];
-        if (!last || !count) return SendErrorEmbed(interaction, "None found.")
+        if (!last || !count) return await SendErrorEmbed(interaction, "None found.")
 
         if (last) link = `https://discord.com/channels/${last.GuildID}/${last.ChannelID}/${last.MessageID}`;
 
@@ -86,7 +86,7 @@ Prompt: ${String?.value ?? "None"}
                 ],
                 timestamp: new Date(),
             };
-            interaction.reply({ embeds: [embed], allowedMentions: {RepliedUser: false} });
+            await interaction.editReply({ embeds: [embed], allowedMentions: {RepliedUser: false} });
         }
     }
 };
