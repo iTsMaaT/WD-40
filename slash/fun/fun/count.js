@@ -35,7 +35,7 @@ module.exports = {
         const String = interaction.options.get("string");
         const GuildID = interaction.options.get("guild");
         const Channel = interaction.options.get("channel");
-        const User = interaction.options.getUser("user")?.id;
+        const User = interaction.options.getUser("user");
         var filter = {}; 
         var link = "";
 
@@ -76,7 +76,7 @@ module.exports = {
                 description: `
 Guild ID: ${GuildID?.value ? await client.guilds.fetch(GuildID).name : "None"}
 Channel ID: ${Channel?.value ? await client.channels.fetch(Channel).name : "None"}
-User ID: ${User ? await client.users.fetch(User).tag : "None"}
+User ID: ${User ? await User.tag : "None"}
 Prompt: ${String?.value ?? "None"}
                 `,
                 fields: [
