@@ -34,7 +34,7 @@ module.exports = {
 
             //Sends furry porn in DMs of anyone that says "sex"
             if (message.content.toLowerCase() == "sex") {
-                message.author.send({ embeds: [await FetchReddit(message, true, "furrypornsubreddit", "yiff", "furryonhuman")] });
+                message.author.send({ embeds: [await FetchReddit(true, "furrypornsubreddit", "yiff", "furryonhuman")] });
 
             }
 
