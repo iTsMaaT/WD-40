@@ -52,7 +52,7 @@ module.exports = {
         }
 
         if(User) {
-            filter.UserID = User.value;
+            filter.UserID = User.id;
         }
 
         const count = await global.prisma.message.count({
