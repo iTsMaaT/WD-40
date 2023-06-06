@@ -14,7 +14,7 @@ module.exports = {
                 await global.GuildManager.SetPersonality(message.guild, args.join(" "));
                 message.reply({ content: 'Prompt successfully changed.', allowedMentions: { repliedUser: false } });
             } else if (args[0]) {
-                const conversationLog = [{ role: 'system', content: global.GuildManager.GetPersonality(message.guild).toString() }];
+                const conversationLog = [{ role: 'system', content: global.GuildManager.GetPersonality(message.guild)?.toString() }];
                 const configuration = new Configuration({
                     apiKey: process.env.OPENAI_API_KEY,
                 });
@@ -55,7 +55,7 @@ module.exports = {
                 message.reply("Invalid prompt.");
             }
         } catch (e) {
-            logger.error(e);
+            logger.error(e.stack);
         }
     }
 };

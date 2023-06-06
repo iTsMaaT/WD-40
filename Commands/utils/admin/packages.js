@@ -15,14 +15,14 @@ module.exports = {
             color: 0xffffff,
             description: 'The following packages are installed:',
             fields: [
-                { name, value: WDVersion, inline: false },
-                { name: 'discord.js', value: discordjsVersion, inline: true },
+                { name: name.toUpperCase(), value: WDVersion, inline: false },
+                { name: 'discord.js', value: "^" + discordjsVersion, inline: true },
             ]
         };
 
         const fields = [];
         for (const [packageName, packageVersion] of Object.entries(dependencies)) {
-            fields.push({ name: packageName, value: packageVersion, inline: true });
+            if (packageName != "discord.js") fields.push({ name: packageName, value: packageVersion, inline: true });
         }
         
         embed.fields.push(...fields);

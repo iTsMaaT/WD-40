@@ -75,10 +75,10 @@ module.exports = {
                 color: 0xffffff,
                 title: `Counting for:`,
                 description: `
-Guild ID: ${GuildID?.value ? await client.guilds.cache.get(GuildID.value).name : "None"}
-Channel: ${Channel?.value ? await client.channels.fetch(Channel).name : "None"}
-User: ${User ? await User.tag : "None"}
-Prompt: ${String?.value ?? "None"}
+Guild ID: ${GuildID?.value ? await client.guilds.cache.get(GuildID.value).name : "**-**"}
+Channel: ${Channel?.value ? await client.channels.fetch(Channel).name : "**-**"}
+User: ${User ? await User.tag : "**-**"}
+Prompt: ${String?.value ?? "**-**"}
                 `,
                 fields: [
                     { name: "Count", value: count, inline: false },

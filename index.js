@@ -139,7 +139,7 @@ client.on("ready", async () => {
             HourlyRam.push(RamLeakPourcentage);
             HourlyRam.shift();
             console.log(HourlyRam);
-            if (HourlyRam[0] == HourlyRam[1] == HourlyRam [2] == 100) client.users.cache.get(process.env.OWNER_ID).send("Memory leak detected.");
+            if (HourlyRam[0] > 90 && HourlyRam[1] > 90 && HourlyRam [2] > 90) client.users.cache.get(process.env.OWNER_ID).send("Memory leak detected.");
         } catch(err) {
             logger.error("Couldn't get the RAM % for MemoryLeakDetector");
             logger.error(err);
