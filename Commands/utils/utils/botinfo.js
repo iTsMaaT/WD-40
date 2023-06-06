@@ -21,7 +21,7 @@ module.exports = {
                     name: "RAM usage",
                     value: `${PteroInfo.ram.usage.clean} / ${PteroInfo.ram.limit.clean} (${PteroInfo.ram.pourcentage.clean})`
                 }, {
-                    name: "CPU usage",
+                    name: "CPU usage (100% = 1 core)",
                     value: `${PteroInfo.cpu.usage}% / ${PteroInfo.cpu.limit}% (${PteroInfo.cpu.pourcentage.clean})`
                 }, {
                     name: "Disk usage",
