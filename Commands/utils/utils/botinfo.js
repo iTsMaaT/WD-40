@@ -13,7 +13,7 @@ module.exports = {
 
         const PteroInfo = await GetPterodactylInfo();
         const embed = {
-            title: `Pterodactyl info for ${PteroInfo.main.name} (${PteroInfo.main.ip}:${PteroInfo.main.port})`,
+            title: `Pterodactyl info for ${PteroInfo.main.name}`,
             color: 0xffffff,
             description: `Uptime: ${PteroInfo.uptime.clean}`,
             fields: [
