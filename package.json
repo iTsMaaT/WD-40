@@ -32,6 +32,7 @@
     "node-opus": "^0.3.3",
     "openai": "^3.2.1",
     "opusscript": "^0.0.8",
+    "os": "^0.1.2",
     "pretty-ms": "^7.0.1",
     "sodium": "^3.0.2",
     "ytdl-core": "^4.9.1"
