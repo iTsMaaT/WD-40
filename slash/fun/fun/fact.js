@@ -1,5 +1,5 @@
 const got = require("got");
-const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
+const { ApplicationCommandType } = require("discord.js");
 module.exports = {
     name: "fact",
     description: "Get a random fact",
@@ -17,7 +17,7 @@ ${fact.text}
                 });
             })
             .catch((err) => {
-                interaction.reply({ content: `An error occorred: ${err}`, ephemeral: true});
+                interaction.reply({ content: `An error occorred: ${err}`, ephemeral: true });
                 logger.error(err);
             });
     }

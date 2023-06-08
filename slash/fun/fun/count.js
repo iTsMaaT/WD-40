@@ -37,22 +37,22 @@ module.exports = {
         const GuildID = interaction.options.get("guild");
         const Channel = interaction.options.get("channel");
         const User = interaction.options.getUser("user");
-        var filter = {}; 
+        var filter = {};
         var link = "";
 
-        if(String) {
+        if (String) {
             filter.Content = { contains: String.value };
         }
 
-        if(GuildID) {
+        if (GuildID) {
             filter.GuildID = GuildID.value;
         }
 
-        if(Channel) {
+        if (Channel) {
             filter.ChannelID = Channel.value;
         }
 
-        if(User) {
+        if (User) {
             filter.UserID = User.id;
         }
 
@@ -66,7 +66,7 @@ module.exports = {
                 ID: 'desc'
             }
         }))[0];
-        if (!last || !count) return await SendErrorEmbed(interaction, "None found.")
+        if (!last || !count) return await SendErrorEmbed(interaction, "None found.");
 
         if (last) link = `https://discord.com/channels/${last.GuildID}/${last.ChannelID}/${last.MessageID}`;
 
@@ -86,7 +86,7 @@ Prompt: ${String?.value ?? "**-**"}
                 ],
                 timestamp: new Date(),
             };
-            await interaction.editReply({ embeds: [embed], allowedMentions: {RepliedUser: false} });
+            await interaction.editReply({ embeds: [embed], allowedMentions: { RepliedUser: false } });
         }
     }
 };
