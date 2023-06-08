@@ -175,10 +175,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
     const slash = interaction.client.slashcommands.get(interaction.commandName);
 
-    if (!slash) {
-        console.error(`No command matching ${interaction.commandName} was found.`);
-        return;
-    }
+    if (!slash) return console.error(`No command matching ${interaction.commandName} was found.`);
 
     try {
         //execute the slash command
@@ -225,10 +222,8 @@ client.on("messageCreate", async (message) => {
         const command = args.shift().toLowerCase();
 
         // If command does not exist, return
-        if (!client.commands.get(command)) {
-            return;
-        }
-
+        if (!client.commands.get(command)) return;
+            
         //Logging every executed commands
 
         logger.info(`Executing [${message.content}]\nby    [${message.member.user.tag} (${message.author.id})]\nin    [${message.channel.name} (${message.channel.id})]\nfrom  [${message.guild.name} (${message.guild.id})]`);
