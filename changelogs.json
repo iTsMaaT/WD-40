@@ -139,5 +139,13 @@
             "Added new slash command: /count",
             "Fixes"
         ]
+    },
+    {
+        "version": "4.2.0",
+        "date": "2023-06-07",
+        "changes": [
+            "Added new slash command: >stats",
+            "Fixes"
+        ]
     }
 ]
