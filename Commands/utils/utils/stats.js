@@ -57,7 +57,7 @@ module.exports = {
         if (lastExecutedCommand) lastCommandTimeSinceNow = prettyMilliseconds(Date.now() - (await client.channels.cache.get(lastExecutedCommand.ChannelID).messages.fetch(lastExecutedCommand.MessageID).then(message => message.createdTimestamp)));
 
         const embed = {
-            title: `Stats for ${client.user.name}`,
+            title: `Stats for ${client.user.username}`,
             color: 0xffffff,
             description: ``,
             fields: [
@@ -75,7 +75,7 @@ module.exports = {
                     value: `Total executed command (since 08-05-23): **${totalExecutedCommands}**\nLast executed command (in ${message.guild.name}):\n\`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow + " ago" ?? "N/A"})`
                 }, {
                     name: "Hosting",
-                    value: `Host: **${os.hostname()}**\nRunning on: **${os.platform()} ${os.release()}**`
+                    value: `Host: **${os.platform()} ${os.release()}**`
                 }
             ],
             footer: {
