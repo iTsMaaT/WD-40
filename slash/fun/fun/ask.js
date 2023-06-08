@@ -1,6 +1,8 @@
 const { Configuration, OpenAIApi } = require('openai');
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
 const fs = require("fs/promises");
+const CreateUniqueSeed = require("../../../utils/functions/CreateUniqueSeed.js");
+
 module.exports = {
     name: "ask",
     description: "Ask a question to ChatGPT-3.5-turbo",
@@ -64,7 +66,7 @@ module.exports = {
             if (result.data.choices[0].message.content.length < 2000) {
                 await interaction.editReply({ content: result.data.choices[0].message.content, allowedMentions: { repliedUser: false } });
             } else {
-                const discriminator = Math.floor(Math.random() * 99999) + 1;
+                const discriminator = CreateUniqueSeed(message);
                 await fs.writeFile(`./answer-${discriminator}.txt`, result.data.choices[0].message.content, { encoding: "utf8" });
                 await interaction.editReply({ files: [`./answer-${discriminator}.txt`] });
                 await fs.unlink(`./answer-${discriminator}.txt`);

@@ -13,7 +13,7 @@ module.exports = {
         const queue = useQueue(message.guild.id);
 
         if (!queue || !queue.tracks) return SendErrorEmbed(message, "There is nothing playing.", "yellow");
-        switch (args[0].toLowerCase()) {
+        switch (args[0]?.toLowerCase() ?? "queue") {
         case 'off':
             queue.setRepeatMode(QueueRepeatMode.TRACK);
             break;
