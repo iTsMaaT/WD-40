@@ -1,10 +1,23 @@
 const prettyMilliseconds = require('pretty-ms');
+const os = require('os');
 
 module.exports = {
     name: "stats",
-    description: "Gives info of a server",
+    description: "Gives statistics about the bot",
     category: "utils",
     execute: async (logger, client, message, args) => {
+        message.channel.sendTyping();
+        /*
+		TODO
+		amount users in present guild
+		amount bots (?)
+		amount shards
+		version
+		nodejs version
+		host (os npm package?)
+		
+		*/
+        console.log(`Bot is hosted on ${os.hostname()} running on ${os.platform()} ${os.release()}`);
         const prefix = global.GuildManager.GetPrefix(message.guild);
         let lastCommandTimeSinceNow = "";
         let lastExecutedCommand = "";
@@ -59,7 +72,10 @@ module.exports = {
                     value: `Ping: **${ping}**\nUptime: **${uptime}**`
                 }, {
                     name: "Commands stats",
-                    value: `Total executed command (since 08-05-23): **${totalExecutedCommands}**\nLast executed command: \`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow + " ago" ?? "N/A"})`
+                    value: `Total executed command (since 08-05-23): **${totalExecutedCommands}**\nLast executed command (in ${message.guild.name}):\n\`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow + " ago" ?? "N/A"})`
+                }, {
+                    name: "Hosting",
+                    value: `Host: **${os.hostname()}**\nRunning on: **${os.platform()} ${os.release()}**`
                 }
             ],
             footer: {
