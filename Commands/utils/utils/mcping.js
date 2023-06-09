@@ -9,17 +9,17 @@ module.exports = {
     category: "utils",
     async execute(logger, client, message, args) {
         message.channel.sendTyping();
-        if (args[1]) { var port = ":" + parseInt(args[1]) }
+        if (args[1]) { var port = ":" + parseInt(args[1]); }
         got(`https://api.mcstatus.io/v2/status/java/${args[0]}${port ?? ""}`)
             .then(async response => {
                 const server = JSON.parse(response.body);
 
-                if (!server.online) return SendErrorEmbed(message, `${server.eula_blocked ? "The server is banned by Mojang." : "Server offline or nonexistent."}`, "red");
+                if (!server.online) return SendErrorEmbed(message, `${server.eula_blocked ? "The server is banned by Mojang." : "Server offline or nonexistant."}`, "red");
 
 
                 if (server.icon) {
-                    let data = server.icon.split(',')[1];
-                    let buf = Buffer.from(data, 'base64');
+                    const data = server.icon.split(',')[1];
+                    const buf = Buffer.from(data, 'base64');
                     var imgfile = new AttachmentBuilder(buf, 'img.png');
                 }
 
@@ -48,6 +48,6 @@ module.exports = {
 
                 if (server.icon) return message.reply({ embeds: [serverStatusEmbed], files: [imgfile], allowedMentions: { repliedUser: false } });
                 message.reply({ embeds: [serverStatusEmbed], allowedMentions: { repliedUser: false } });
-            })
+            });
     },
 };
