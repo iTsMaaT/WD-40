@@ -6,7 +6,7 @@ module.exports = {
     private: true,
     execute(logger, client, message, args) {
         const server = process.env.SERVER;
-        if (message.author.id == process.env.OWNER_ID) {
+        if (message.author.id == process.env.OWNER_ID && !args[0]) {
             logger.severe(`Restart requested from discord`);
             message.reply("Restarting the bot.");
             client.channels.cache.get("1037141235451842701").send(`Restart requested from discord for reason : \`${args.join(" ")}\``);
@@ -19,6 +19,11 @@ module.exports = {
                 /****************/
             }, 1000 * 3);
             return;
+        }
+
+        if (message.author.id == process.env.OWNER_ID && (args[0] == "-smart")) {
+            SmartRestartEnabled ? SmartRestartEnabled = 0 : SmartRestartEnabled = 1;
+            message.reply(`Smart restart ${SmartRestartEnabled ? "enabled" : "disabled"}.`);
         }
 
         if (message.author.id == process.env.OWNER_ID && (args[0] == server)) {
