@@ -1,6 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const { Client, GatewayIntentBits, Events, Partials } = require("discord.js");
-const { activities, blacklist, whitelist } = require("./utils/config.json");
+const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState } = require("./utils/config.json");
 
 const Logger = require("./utils/log");
 const fs = require('fs');
@@ -29,6 +29,7 @@ global.CmdEnabled = 1;
 global.superuser = 0;
 global.debug = 1;
 global.tempBlacklist = {};
+global.SmartRestartEnabled = 0;
 
 // Add array.equals()
 Array.prototype.equals = function (b) {
@@ -115,7 +116,8 @@ client.on("ready", async () => {
     console.log("Slash command setup done.");
 
     console.log("Setting up activity status...");
-    activities[7] = activities[7].replace("Placeholder", (100 / activities.length).toFixed(2));
+    activities[7] = activities[7].replace("Placeholder01", (100 / activities.length).toFixed(2));
+    activities[8] = activities[8].replace("Placeholder02", activities.length - 1);
     await client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
     console.log("Activity status setup done.");
 
@@ -146,21 +148,40 @@ client.on("ready", async () => {
         }
     });
 
+    const SmartRestart = new cron.CronJob('* * * * *', async () => {
+        if (SmartRestartEnabled) {
+            if (Array.from(client.voice.adapters.keys()).length == 0) {
+                logger.severe(`Restart requested from discord`);
+                client.channels.cache.get("1037141235451842701").send(`Restart requested from discord for reason : \`Smart restart\``);
+
+                //After 3s, closes the database and then exits the process
+                setTimeout(function () {
+                /****************/
+                    global.prisma.$disconnect();
+                    process.exit(1);
+                /****************/
+                }, 1000 * 3);
+            }
+        }
+    });
+
     console.log("Starting the cron jobs...");
     //sarting the daily sending
     scheduledMessage.start();
     DailyActivity.start();
     RamLeakDetector.start();
+    SmartRestart.start();
     console.log("Cron job setup done.");
     console.log("Discord.js version: " + require('discord.js').version);
     console.log(`There is ${client.options.shardCount} shard${client.options.shardCount > 1 ? "s" : ""} spawned`);
+    global.debug = DefaultDebugState;
+    global.superuser = DefaultSuperuserState;
 
     //start confirmation
     setTimeout(function () {
         client.channels.cache.get("1037141235451842701").send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
         logger.info("Bot started successfully.");
     }, 2000 * 0.1);
-    global.debug = 0;
     client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
 });
 
