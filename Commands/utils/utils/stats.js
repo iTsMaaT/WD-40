@@ -23,6 +23,7 @@ module.exports = {
         const prefix = global.GuildManager.GetPrefix(message.guild);
         let lastCommandTimeSinceNow = "";
         let lastExecutedCommand = "";
+        let lastCommandLink = "";
         const WDVersion = changelog.slice(-1).map(({version}) => { return version; }).join();
         const Shards = client.options.shardCount ?? 1;
         const nodeVersion = process.version;
@@ -51,16 +52,21 @@ module.exports = {
             }
         }));
         const TextCommands = client.commands.map(command => command.name);
-        for (let command in lastExecutedCommands) {
-            command = lastExecutedCommands[command];
-            if (TextCommands.includes(command.Content.split(" ")[0].replace(prefix, ""))) {
-                lastExecutedCommand = command;
-                break;
+        if (lastExecutedCommands) {
+            for (let command in lastExecutedCommands) {
+                command = lastExecutedCommands[command];
+                if (TextCommands.includes(command.Content?.split(" ")[0]?.replace(prefix, ""))) {
+                    lastExecutedCommand = command;
+                    break;
+                }
             }
         }
 
         const lastCommandContent = lastExecutedCommand?.Content;
-        if (lastExecutedCommand) lastCommandTimeSinceNow = prettyMilliseconds(Date.now() - (await client.channels.cache.get(lastExecutedCommand.ChannelID).messages.fetch(lastExecutedCommand.MessageID).then(message => message.createdTimestamp)));
+        if (lastExecutedCommand) {
+            lastCommandLink = `https://discord.com/channels/${lastExecutedCommand.GuildID}/${lastExecutedCommand.ChannelID}/${lastExecutedCommand.MessageID}`;
+            lastCommandTimeSinceNow = prettyMilliseconds(Date.now() - (await client.channels.cache.get(lastExecutedCommand.ChannelID).messages.fetch(lastExecutedCommand.MessageID).then(message => message.createdTimestamp)));
+        }
 
         const embed = {
             title: `Stats for ${client.user.username} (v${WDVersion})`,
@@ -78,7 +84,7 @@ module.exports = {
                     value: `Ping: **${ping}**\nUptime: **${uptime}**`
                 }, {
                     name: "Commands stats",
-                    value: `Total executed commands (since 08-05-23): **${totalExecutedCommands}**\nLast executed command (in \`${message.guild.name}\`):\n\`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow + " ago" ?? "N/A"})`
+                    value: `Total executed commands (since 08-05-23): **${totalExecutedCommands}**\nLast executed command (in \`${message.guild.name}\`):\n\`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow ?? "Never"} ago) ${lastCommandLink ? `\nLink: ${lastCommandLink}` : ""}`
                 }, {
                     name: "Hosting",
                     value: `Host: **${os.platform()} ${os.release()}**\nShard count: **${Shards}**\nNodeJS version: **${nodeVersion}**\nRam usage: **${RamUsageFormatted}**`
