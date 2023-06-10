@@ -1,4 +1,5 @@
 const got = require("got");
+const SendErrorEmbed = require("../../../utils/functions/SendErrorEmbed");
 module.exports = {
     name: "quote",
     description: "Create a quote using the InspiroBot AI",
@@ -26,6 +27,8 @@ module.exports = {
                 },
                 timestamp: new Date(),
             };
+        } else {
+            return SendErrorEmbed(message, "Invalid argument (Do >help quote for more info)", "yellow");
         }
         message.reply({ embeds: [QuoteEmbed], allowedMentions: { repliedUser: false } });
     }
