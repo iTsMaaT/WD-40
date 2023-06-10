@@ -7,7 +7,8 @@
         "Anon, 'tis time to annoy!",
         "Nitro is kinda mid ngl",
         "Me omw (on my way) to do >help",
-        "You have a Placeholder% chance to see this",
+        "You have a Placeholder01% chance to see this",
+        "There is Placeholder02 other satuses",
         "Tokebac icitte",
         "Don't go on page 3 of >help!",
         "*you're",
@@ -17,7 +18,7 @@
         "nuzzles *breaks your spine*",
         "That's the gros sourire message",
         "Barbeque bacon burger",
-        "Suggest new statuses | >suggestion",
+        "Give suggestions! (I'm desperate) | >suggestion",
         "Do you know who else suffers from dimentia?",
         "Fuck Mee6"
     ],
@@ -26,5 +27,8 @@
 
     "whitelist": [
         273587964334964737
-    ]
+    ],
+
+    "DefaultSuperuserState": 0,
+    "DefaultDebugState": 0
 }
