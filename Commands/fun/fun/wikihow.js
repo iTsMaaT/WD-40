@@ -6,7 +6,7 @@ module.exports = {
     async execute(logger, client, message, args) {
         message.channel.sendTyping();
 
-        const req = await got("https://www.wikihow.com/api.php?action=query&generator=random&prop=imageinfo&format=json&iiprop=url&grnnamespace=6");
+        const req = await got("https://www.wikihow.com/api.php?action=query&generator=random&prop=imageinfo&format=json&iiprop=url&grnnamespace=6", { https: { rejectUnauthorized: false } });
         const json = await JSON.parse(req.body);
         const id = Object.keys(json.query.pages)[0];
         const image = json.query.pages[id].imageinfo[0].url;
