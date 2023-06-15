@@ -144,7 +144,15 @@
         "version": "4.2.0",
         "date": "2023-06-07",
         "changes": [
-            "Added new slash command: >stats",
+            "Added new command: >stats",
+            "Fixes"
+        ]
+    },
+    {
+        "version": "4.3.0",
+        "date": "2023-06-14",
+        "changes": [
+            "Added new commands:\n>mcskin: get the skin of a minecraft user\n>wikihow: get a random image from Wikihow\n>emote: easely add a emote/sticker to a server\n>linkinfo: analize a link",
             "Fixes"
         ]
     }

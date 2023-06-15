@@ -6,10 +6,10 @@ module.exports = {
     usage: "< [User]: the user to get info from (optional) >",
     category: "utils",
     execute: async (logger, client, message, args) => {
-        const guild = await client.guilds.fetch(message.guildId);
-        
         let id;
-        
+        let target;
+        let status;
+
         if (!args[0]) {
             id = message.author.id;
         } else {
@@ -19,43 +19,60 @@ module.exports = {
             }
             id = rawId;
         }
-        
+
         try {
-            const target = await guild.members.fetch(id);
-            const status = await guild.presences.resolve(id);
-            
-            try {
-                var custom_status = status.activities[0]?.state ?? "`No status`";
-                var activity_name = status.activities[1]?.name ?? "`No activity name`";
-                var activity_details = status.activities[1]?.details ?? "`No activity details`";
-            } catch {
-                custom_status = "`No status`";
-                activity_name = "`No activity name`";
-                activity_details = "`No activity details`";
+            target = await message.guild.members.fetch(id);
+            status = await message.guild.presences.resolve(id);
+        } catch (e) {
+            if (e.code === 10007) {
+                try {
+                    target = await client.users.fetch(id);
+                    status = null; // No presence information available
+                } catch (err) {
+                    console.log(err);
+                    return SendErrorEmbed(message, "User not found.", "red");
+                }
+            } else {
+                console.log(e);
+                return SendErrorEmbed(message, "An error occurred while fetching the user.", "red");
             }
-            
+        }
+
+        try {
+            var custom_status = status?.activities[0]?.state ?? "`No status`";
+            var activity_name = status?.activities[1]?.name ?? "`No activity name`";
+            var activity_details = status?.activities[1]?.details ?? "`No activity details`";
+        } catch {
+            custom_status = "-";
+            activity_name = "-";
+            activity_details = "-";
+        }
+
+        try {
+            const presenceStatus = target?.presence?.status || "Offline";
             const userInfoEmbed = {
                 title: "User Information",
-                description: `User Informations For: **<@${id}>**`,
+                description: `User Information For: <@${target.id}>`,
                 thumbnail: {
-                    url: target.user.avatarURL({ dynamic: true }) || "",
+                    url: target.avatarURL({ dynamic: true }) || "",
                 },
                 fields: [
-                    { name: "User ID", value: target.user.id },
-                    { name: "Account Age", value: `<t:${parseInt(target.user.createdTimestamp / 1000)}:R>` },
-                    { name: "Member Since", value: `<t:${parseInt(target.joinedTimestamp / 1000)}:R>` },
-                    { name: "Status", value: custom_status },
+                    { name: "User ID", value: target.id },
+                    { name: "Status", value: presenceStatus},
+                    { name: "Account Age", value: `<t:${parseInt(target.createdTimestamp / 1000)}:R>` },
+                    { name: "Member Since", value: `${target.joinedTimestamp ? `<t:${parseInt(target.joinedTimestamp / 1000)}:R>` : `-`}` },
+                    { name: "Custom Status", value: custom_status },
                     { name: "Activity Title", value: activity_name },
                     { name: "Activity Details", value: activity_details },
-                    { name: "Highest Role", value: target.roles.highest.name },
+                    { name: "Highest Role", value: target.roles?.highest?.name || "-" },
                 ],
                 timestamp: new Date(),
                 color: 0xffffff,
             };
-            
+
             message.reply({ embeds: [userInfoEmbed], allowedMentions: { repliedUser: false } });
         } catch (err) {
             SendErrorEmbed(message, "Error.", "red", err);
         }
-    }
+    },
 };

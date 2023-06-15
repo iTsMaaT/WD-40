@@ -38,6 +38,8 @@ Array.prototype.equals = function (b) {
 
 //music
 const { Player } = require('discord-player');
+const GetUniqueValues = require("./utils/functions/GetUniqueValues");
+const CombineCollections = require("./utils/functions/CombineCollections");
 global.player = new Player(client);
 player.extractors.loadDefault();
 
@@ -50,7 +52,8 @@ prisma.snowflake.findMany().then(v => {
 });
 
 //Error handler
-process.on("uncaughtException", (err) => {
+//Gotta Catch ’Em All!
+process.on("unhandledRejection", (err) => {
     logger.error(err.stack);
     client?.channels?.cache?.get("1037141235451842701")?.send(`Error caught <@411996978583699456>! <#1069811223950016572>`);
 });
@@ -176,12 +179,18 @@ client.on("ready", async () => {
     console.log(`There is ${client.options.shardCount} shard${client.options.shardCount > 1 ? "s" : ""} spawned`);
     global.debug = DefaultDebugState;
     global.superuser = DefaultSuperuserState;
+    if (process.env.SERVER == "dev") global.superuser = 1;
+    console.log(`Debug is ${debug ? "en" : "dis"}abled\nSuperuser is ${superuser ? "en" : "dis"}abled`);
+    console.log("The missing commands to translate to the other types are: " + GetUniqueValues(CombineCollections(client.commands.filter(val => !val.private).map((command) => command.name), client.slashcommands.map((command) => command.name))).join(", "));
 
     //start confirmation
-    setTimeout(function () {
-        client.channels.cache.get("1037141235451842701").send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
-        logger.info("Bot started successfully.");
-    }, 2000 * 0.1);
+    logger.info("Bot started successfully.");
+    const interval = setInterval(() => {
+        if (client.ws.ping !== -1) {
+            client.channels.cache.get("1037141235451842701").send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
+            clearInterval(interval);
+        }
+    }, 500);
     client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
 });
 
@@ -212,7 +221,7 @@ client.on(Events.InteractionCreate, async interaction => {
 //Text command executing
 client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
-    if (superuser && (message.author.id != process.env.OWNER_ID || !whitelist.includes(message.author.id))) return;
+    if (superuser && (message.author.id != process.env.OWNER_ID && !whitelist.includes(message.author.id))) return;
     if (!message.guild) return;
     if (tempBlacklist[message.author.id] || blacklist.includes(message.author.id)) return;
 

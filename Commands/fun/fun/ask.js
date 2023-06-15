@@ -14,10 +14,10 @@ module.exports = {
                 await global.GuildManager.SetPersonality(message.guild, args.join(" "));
                 message.reply({ content: 'Prompt successfully changed.', allowedMentions: { repliedUser: false } });
             } else if (args[0]) {
-                let perso = global.GuildManager.GetPersonality(message.guild)?.toString()
+                const perso = global.GuildManager.GetPersonality(message.guild)?.toString();
                 if (!perso) { 
-                    global.GuildManager.init(message.guild)
-                    global.GuildManager.GetPersonality(message.guild).toString()
+                    global.GuildManager.init(message.guild);
+                    global.GuildManager.GetPersonality(message.guild).toString();
                 }
                 const conversationLog = [{ role: 'system', content: perso}];
                 const configuration = new Configuration({

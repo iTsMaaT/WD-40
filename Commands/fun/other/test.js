@@ -5,6 +5,7 @@ const prettyString = require("../../../utils/functions/prettyString.js");
 const StringReact = require("../../../utils/functions/StringReact.js");
 const ShuffleArray = require("../../../utils/functions/ShuffleArray.js");
 const GetPterodactylInfo = require("../../../utils/functions/GetPterodactylInfo.js");
+const GetUniqueValues = require("../../../utils/functions/GetUniqueValues.js");
 
 module.exports = {
     name: "test",
@@ -29,7 +30,9 @@ module.exports = {
             ShuffleArray(array).join(", ")
             + "\n" +
             ptero.main.name
+            + "\n" +
+            GetUniqueValues(["a", "a", "s", "r", "r", "e", "x", "v", "v"])
             
-        );   
+        );  
     }
 };
