@@ -9,9 +9,7 @@ module.exports = {
             message.reply("Debug enabled, check console.");
         } else if (message.author.id == process.env.OWNER_ID && debug) {
             debug = 0;
-            message.reply("Debuf disabled.");
-        } else if (!message.author.id == process.env.OWNER_ID) {
-            message.reply(`You are not allowed to execute that command`);
+            message.reply("Debug disabled.");
         }
     }
 };
