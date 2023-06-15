@@ -9,7 +9,7 @@ module.exports = {
     category: "utils",
     async execute(logger, client, message, args) {
         message.channel.sendTyping();
-        const link = args[0];
+        const link = args[0] ?? "https://discord.gg";
 
         analyzeLink(link)
             .then((result) => {
