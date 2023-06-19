@@ -42,13 +42,13 @@ module.exports = {
             if (!CommandName) SendErrorEmbed(message, "This command doesn't exist.", "red");
             if (!CommandName.private) {
                 var CommandEmbed = {
-                    title: `**${CommandName.name}** ${CommandName.usage ?? "(No args)"}`,
+                    title: `**${CommandName.name}** ${CommandName.usage ?? ""}`,
                     color: 0xffffff,
                     description: CommandName.description,
                     timestamp: new Date(),
                 };
+                return message.reply({ embeds: [CommandEmbed], allowedMentions: { repliedUser: false } });
             }
-            return message.reply({ embeds: [CommandEmbed], allowedMentions: { repliedUser: false } });
         }
         const categories = Object.keys(categorymapper);
 
@@ -169,7 +169,7 @@ module.exports = {
             });
         });
 
-        collector.on("end", async (interaction) => {
+        collector.on("end", async () => {
             row.components.forEach(component => {
                 component.setDisabled(true);
             });

@@ -54,6 +54,7 @@ prisma.snowflake.findMany().then(v => {
 //Error handler
 //Gotta Catch ’Em All!
 process.on("unhandledRejection", (err) => {
+    if (err.code === 10008) return logger.error(err.stack);
     logger.error(err.stack);
     client?.channels?.cache?.get("1037141235451842701")?.send(`Error caught <@411996978583699456>! <#1069811223950016572>`);
 });
