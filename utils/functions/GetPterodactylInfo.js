@@ -99,7 +99,8 @@ const GetPterodactylInfo = async function () {
             pourcentage: {
                 raw: parseInt(CPUusage) / (parseInt(CPUlimit)) * 100,
                 clean: (parseInt(CPUusage) / (parseInt(CPUlimit)) * 100).toFixed(2) + "%"
-            }
+            },
+            cores: (CPUusage / 100).toFixed(2)
         },
         network: {
             download: {
