@@ -40,6 +40,7 @@ Array.prototype.equals = function (b) {
 const { Player } = require('discord-player');
 const GetUniqueValues = require("./utils/functions/GetUniqueValues");
 const CombineCollections = require("./utils/functions/CombineCollections");
+const SendErrorEmbed = require("./utils/functions/SendErrorEmbed");
 global.player = new Player(client);
 player.extractors.loadDefault();
 
@@ -64,6 +65,7 @@ process.on("unhandledRejection", (err) => {
 client.commands = new Discord.Collection();
 client.slashcommands = new Discord.Collection();
 client.events = new Discord.Collection();
+const cooldowns = new Map();
 
 //File finder/loader
 function loadFiles(folder, callback) {
@@ -82,7 +84,7 @@ function loadFiles(folder, callback) {
 
 //Slash command handler
 const discoveredCommands = [];
-loadFiles('./slash/', (slashcommand, fileName) => {
+loadFiles('./Commands/slash/', (slashcommand, fileName) => {
     if ('name' in slashcommand && 'execute' in slashcommand && 'description' in slashcommand) {
         client.slashcommands.set(slashcommand.name, slashcommand);
         discoveredCommands.push(slashcommand);
@@ -92,8 +94,14 @@ loadFiles('./slash/', (slashcommand, fileName) => {
 });
 
 //Text command handler
-loadFiles('./Commands/', function (command) {
+loadFiles('./Commands/text/', function (command) {
     client.commands.set(command.name, command);
+    
+    if (command.aliases && Array.isArray(command.aliases)) {
+        command.aliases.forEach(alias => {
+            client.commands.set(alias, command);
+        });
+    }
 });
 
 //Event handler
@@ -248,17 +256,37 @@ client.on("messageCreate", async (message) => {
     //Text command executing
     const prefix = global.GuildManager.GetPrefix(message.guild);
     if (message.content.startsWith(prefix)) {
-
         const args = message.content.slice(prefix.length).split(/ +/);
-        const command = args.shift().toLowerCase();
+        const commandName = args.shift().toLowerCase();
 
-        // If command does not exist, return
-        if (!client.commands.get(command)) return;
-            
-        //Logging every executed commands
+        // Check if the command or alias exists
+        const command = client.commands.get(commandName);
+        if (!command) return;
 
+        // Check command cooldown
+        if (cooldowns.has(message.author.id)) {
+            const cooldown = cooldowns.get(message.author.id);
+            const timeLeft = cooldown - Date.now();
+            if (timeLeft > 0) {
+                message.reply(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before using that command again.`);
+                return;
+            }
+        }
+
+        // Set command cooldown
+        const cooldownTime = command.cooldown || 0;
+        cooldowns.set(message.author.id, Date.now() + cooldownTime);
+
+        // Logging every executed commands
         logger.info(`Executing [${message.content}]\nby    [${message.member.user.tag} (${message.author.id})]\nin    [${message.channel.name} (${message.channel.id})]\nfrom  [${message.guild.name} (${message.guild.id})]`);
-        client.commands.get(command).execute(logger, client, message, args);
+
+        // Execute the command
+        try {
+            await command.execute(logger, client, message, args);
+        } catch (error) {
+            logger.error(error.stack);
+            return SendErrorEmbed(message, "An error occured while executing the command");
+        }
     }
 });
 //Logins with the token

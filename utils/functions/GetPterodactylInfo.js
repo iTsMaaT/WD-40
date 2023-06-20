@@ -17,51 +17,43 @@ const GetPterodactylInfo = async function () {
     var BOTuptime = "";
 
     try {
-        await got("https://dash.kpotatto.net/api/client/servers/adc0f433", {
-            "method": "GET",
-            "headers": {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.PTERODACTYL_API_KEY}`,
-            }
-        }).then(response => {
-            try {
-                const json = JSON.parse(response.body);
+        const [serverResponse, resourcesResponse] = await Promise.all([
+            got("https://dash.kpotatto.net/api/client/servers/adc0f433", {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${process.env.PTERODACTYL_API_KEY}`,
+                },
+            }),
+            got("https://dash.kpotatto.net/api/client/servers/adc0f433/resources", {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${process.env.PTERODACTYL_API_KEY}`,
+                },
+            }),
+        ]);
 
-                serverName = json.attributes.name;
-                RAMlimit = json.attributes.limits.memory;
-                CPUlimit = json.attributes.limits.cpu;
-                DISKlimit = json.attributes.limits.disk;
-                IPalias = json.attributes.relationships.allocations.data[0].attributes.ip_alias;
-                IPport = json.attributes.relationships.allocations.data[0].attributes.port;
-            } catch (err) {
-                logger.error(err.stack);
-            }
-        });
+        const serverJson = JSON.parse(serverResponse.body);
+        serverName = serverJson.attributes.name;
+        RAMlimit = serverJson.attributes.limits.memory;
+        CPUlimit = serverJson.attributes.limits.cpu;
+        DISKlimit = serverJson.attributes.limits.disk;
+        IPalias = serverJson.attributes.relationships.allocations.data[0].attributes.ip_alias;
+        IPport = serverJson.attributes.relationships.allocations.data[0].attributes.port;
 
-        await got("https://dash.kpotatto.net/api/client/servers/adc0f433/resources", {
-            "method": "GET",
-            "headers": {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.PTERODACTYL_API_KEY}`,
-            }
-        }).then(response => {
-            try {
-                var json = JSON.parse(response.body);
-
-                RAMusage = json.attributes.resources.memory_bytes;
-                CPUusage = json.attributes.resources.cpu_absolute;
-                DISKusage = json.attributes.resources.disk_bytes;
-                NETWORKin = json.attributes.resources.network_rx_bytes;
-                NETWORKout = json.attributes.resources.network_tx_bytes;
-                BOTuptime = json.attributes.resources.uptime;
-            } catch (err) {
-                logger.error(err.stack);
-            }
-        });
+        const resourcesJson = JSON.parse(resourcesResponse.body);
+        RAMusage = resourcesJson.attributes.resources.memory_bytes;
+        CPUusage = resourcesJson.attributes.resources.cpu_absolute;
+        DISKusage = resourcesJson.attributes.resources.disk_bytes;
+        NETWORKin = resourcesJson.attributes.resources.network_rx_bytes;
+        NETWORKout = resourcesJson.attributes.resources.network_tx_bytes;
+        BOTuptime = resourcesJson.attributes.resources.uptime;
     } catch (err) {
         logger.error(err.stack);
+        return undefined;
     }
 
     const info = {
