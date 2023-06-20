@@ -155,5 +155,15 @@
             "Added new commands:\n>mcskin: get the skin of a minecraft user\n>wikihow: get a random image from Wikihow\n>emote: easely add a emote/sticker to a server\n>linkinfo: analize a link",
             "Fixes"
         ]
+    },
+    {
+        "version": "4.4.0",
+        "date": "2023-06-19",
+        "changes": [
+            "Added new commands in the NSFW category",
+            "Updated >linkinfo",
+            "Faster API requests for certain commands",
+            "Fixes"
+        ]
     }
 ]
