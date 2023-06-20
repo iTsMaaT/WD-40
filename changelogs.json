@@ -163,6 +163,7 @@
             "Added new commands in the NSFW category",
             "Updated >linkinfo",
             "Faster API requests for certain commands",
+            "added aliases & cooldowns to certain commands",
             "Fixes"
         ]
     }

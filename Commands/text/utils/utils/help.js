@@ -10,34 +10,33 @@ module.exports = {
         //Finds all command files and separate them from categories, then use page to list the commands per category
 
         let counter = 0;
-        let CommandSize = 0;
-        //let helpmessagebuilder = "";
         const prefix = global.GuildManager.GetPrefix(message.guild);
-        //helpmessagebuilder += `**The prefix is:** \`${prefix}\`\n\n`
         const categorymapper = {};
+        const addedCommands = new Set(); // Keep track of added commands
+
         if (args[0] == "-u") {
             client.commands.each((val) => {
-                if (!val.private) {
+                if (!val.private && !addedCommands.has(val.name)) {
                     if (categorymapper[val.category]) {
                         categorymapper[val.category] += (`**${val.name}: **` + prettyString(val.usage ?? "-", "first")) + "\r\n";
                     } else {
                         categorymapper[val.category] = (`**${val.name}: **` + prettyString(val.usage ?? "-", "first")) + "\r\n";
                     }
-                    CommandSize += 1;
+                    addedCommands.add(val.name);
                 }
             });
         } else if (!args[0]) {
             client.commands.each((val) => {
-                if (!val.private) {
+                if (!val.private && !addedCommands.has(val.name)) {
                     if (categorymapper[val.category]) {
-                        categorymapper[val.category] += (`**${val.name}: **` + prettyString(val.description, "first", true)) + "\r\n";
+                        categorymapper[val.category] += (`**${val.name}${val.aliases ? ` [${(val.aliases).join("")}]` : ""}: **` + prettyString(val.description, "first", true)) + "\r\n";
                     } else {
                         categorymapper[val.category] = (`**${val.name}: **` + prettyString(val.description, "first", true)) + "\r\n";
                     }
-                    CommandSize += 1;
+                    addedCommands.add(val.name);
                 }
             });
-        } else if(args[0]) {
+        } else if (args[0]) {
             const CommandName = client.commands.get(args[0]);
             if (!CommandName) SendErrorEmbed(message, "This command doesn't exist.", "red");
             if (!CommandName.private) {
@@ -50,6 +49,7 @@ module.exports = {
                 return message.reply({ embeds: [CommandEmbed], allowedMentions: { repliedUser: false } });
             }
         }
+
         const categories = Object.keys(categorymapper);
 
         //console.log(require('discord.js').version)
@@ -85,7 +85,7 @@ module.exports = {
 
         var embed = {
             title: "Command categories",
-            description: `**The prefix is:** \`${prefix}\`\n\nTotal commands: ${CommandSize}\n${categories
+            description: `**The prefix is:** \`${prefix}\`\n\nTotal commands: ${addedCommands.size}\n${categories
                 .map((category, index) => `**Page ${index + 1}:** ${category.toUpperCase()}`)
                 .join("\n")}`,
             color: 0xffffff, // Embed color (you can change it to any color you like)
@@ -131,7 +131,7 @@ module.exports = {
             if (counter == 0) {
                 embed = {
                     title: "Command categories",
-                    description: `**The prefix is:** \`${prefix}\`\n\nTotal commands: ${client.commands.size}\n${categories
+                    description: `**The prefix is:** \`${prefix}\`\n\nTotal commands: ${addedCommands.size}\n${categories
                         .map((category, index) => `**Page ${index + 1}:** ${category.toUpperCase()}`)
                         .join("\n")}`,
                     color: 0xffffff, // Embed color (you can change it to any color you like)
