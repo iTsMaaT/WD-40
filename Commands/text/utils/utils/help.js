@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, Component } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const prettyString = require("../../../../utils/functions/prettyString.js");
 const SendErrorEmbed = require("../../../../utils/functions/SendErrorEmbed.js");
 module.exports = {
