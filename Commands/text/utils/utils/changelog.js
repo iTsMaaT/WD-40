@@ -4,6 +4,7 @@ module.exports = {
     name: 'changelog',
     description: 'Displays the latest changes to the bot',
     category: 'utils',
+    aliases: ["cl"],
     execute(logger, client, message, args) {
         const latestChanges = changelog.slice(-5);
 
