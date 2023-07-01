@@ -166,5 +166,13 @@
             "added aliases & cooldowns to certain commands",
             "Fixes"
         ]
+    },
+    {
+        "version": "4.5.0",
+        "date": "2023-06-30",
+        "changes": [
+            "Added new commands:\n>moveall, >deafenall, >moveall\n>inviteinfo",
+            "FIxes"
+        ]
     }
 ]
