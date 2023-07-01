@@ -1,7 +1,7 @@
 module.exports = {
     name: "serverinfo",
     description: "Gives info of a server",
-    category: "utils",
+    category: "info",
     execute: async (logger, client, message, args) => {
         const owner = await message.guild.fetchOwner();
   
@@ -14,18 +14,19 @@ module.exports = {
             fields: [
                 {
                     name: "General",
-                    value: `**Server name**: \`${message.guild.name}\`
-                  **Created at**: <t:${Math.floor(message.guild.createdTimestamp / 1000)}:D> (<t:${Math.floor(message.guild.createdTimestamp / 1000)}:R>)
-                  **Owner**: ${owner}
-                  **Server description**: ${message.guild.description || "None"}`,
+                    value: 
+`**Server name**: \`${message.guild.name}\` 
+**Regiob**: ${message.guild.preferredLocale}
+**Created at**: <t:${Math.floor(message.guild.createdTimestamp / 1000)}:D> (<t:${Math.floor(message.guild.createdTimestamp / 1000)}:R>)
+**Owner**: ${owner}
+**Server description**: ${message.guild.description || "-"}`,
                 },
                 {
                     name: "Users",
-                    value: `**User count**: ${message.guild.members.cache.filter((m) => !m.user.bot).size}
-                  **Bot count**: ${message.guild.members.cache.filter((m) => m.user.bot).size}
-                  **Total**: ${message.guild.memberCount} ${
-    message.guild.memberCount === 69 ? "(Nice)" : ""
-}${message.guild.memberCount === 42 ? " This is the answer to life!" : ""}`,
+                    value: 
+`**User count**: ${message.guild.members.cache.filter((m) => !m.user.bot).size}
+**Bot count**: ${message.guild.members.cache.filter((m) => m.user.bot).size}
+**Total**: ${message.guild.memberCount} ${message.guild.memberCount === 69 ? "(Nice)" : ""}${message.guild.memberCount === 42 ? " This is the answer to life!" : ""}`,
                 },
             ],
             timestamp: new Date(),

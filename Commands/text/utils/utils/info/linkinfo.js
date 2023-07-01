@@ -1,13 +1,13 @@
 const got = require('got');
 const cheerio = require('cheerio');
 const https = require('https');
-const SendErrorEmbed = require('../../../../utils/functions/SendErrorEmbed');
+const SendErrorEmbed = require('../../../../../utils/functions/SendErrorEmbed');
 
 module.exports = {
     name: 'linkinfo',
     description: 'Gives info about a link',
     usage: '< [URL] >',
-    category: 'utils',
+    category: 'info',
     cooldown: 10000,
     async execute(logger, client, message, args) {
         message.channel.sendTyping();
@@ -38,19 +38,7 @@ module.exports = {
                 `🟡  Suspicious: ${result.scanResults.suspicious ?? "-"}\n` +
                 `🔴  Malicious: ${result.scanResults.malicious ?? "-"}`,
                     },
-                    {
-                        name: 'Metadata',
-                        value:
-              'Description: ' +
-              result.metadata.description +
-              '\nKeywords: ' +
-              result.metadata.keywords +
-              '\nog:title: ' +
-              result.metadata.ogTitle +
-              '\nog:description: ' +
-              result.metadata.ogDescription ||
-              '-',
-                    },
+                    { name: 'Metadata', value: `Description: ${result.metadata.description}\nKeywords: ${result.metadata.keywords}\nog:title: ${result.metadata.ogTitle}\nog:description: ${result.metadata.ogDescription}\nAuthor: ${result.metadata.author}\nPublisher: ${result.metadata.publisher}\nCreator: ${result.metadata.creator}` },
                 ],
             };
 
@@ -222,12 +210,18 @@ module.exports = {
                 const keywords = $('meta[name="keywords"]').attr('content');
                 const ogTitle = $('meta[property="og:title"]').attr('content');
                 const ogDescription = $('meta[property="og:description"]').attr('content');
+                const author = $('meta[name="author"]').attr('content');
+                const publisher = $('meta[property="article:publisher"]').attr('content');
+                const creator = $('meta[name="creator"]').attr('content');
           
                 const metadata = {
                     description: description || '-',
                     keywords: keywords || '-',
                     ogTitle: ogTitle || '-',
                     ogDescription: ogDescription || '-',
+                    author: author || '-',
+                    publisher: publisher || '-',
+                    creator: creator || '-',
                 };
           
                 metadataCache[url] = metadata;
@@ -239,9 +233,13 @@ module.exports = {
                     keywords: '-',
                     ogTitle: '-',
                     ogDescription: '-',
+                    author: '-',
+                    publisher: '-',
+                    creator: '-',
                 };
             }
         }
+          
           
         async function getVirusTotalAnalysis(url) {
             try {

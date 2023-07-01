@@ -37,6 +37,7 @@ module.exports = {
         const ping = client.ws.ping + "ms";
         const botAge = prettyMilliseconds(Date.now() - client.user.createdAt);
         const totalExecutedCommands = await global.prisma.logs.count({ where: { Value: { contains: "Executing [", } } });
+        const VoicesPlaying = Array.from(client.voice.adapters.keys()).length;
       
         const lastExecutedCommands = (await global.prisma.message.findMany({
             where: {
@@ -88,6 +89,9 @@ module.exports = {
                 }, {
                     name: "Hosting",
                     value: `Host: **${os.platform()} ${os.release()}**\nShard count: **${Shards}**\nNodeJS version: **${nodeVersion}**\nRam usage: **${RamUsageFormatted}**`
+                }, {
+                    name: "Voice",
+                    value: `Playing in **${VoicesPlaying} / ${totalGuilds}** VCs`
                 }
             ],
             footer: {

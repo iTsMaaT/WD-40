@@ -84,5 +84,41 @@ module.exports = (function(prisma) {
         return personality[guild.id];
     }
 
+
+
+    /*
+        function blacklist(prisma, guildId) {
+
+            let blacklist = {
+                user_id: ["admin", "music_player"]
+            }
+            function init()
+
+            function addPermission(userId, permission)
+            function removerPermission(userId, permission)
+            function checkPermission(userId, permission)
+            return {addPermission, removePermission, checkPermission}
+        }
+
+        let blacklists = {
+            guild_id: (blacklist())
+        }
+
+        function getBlacklist(guildId) {
+            CHECK IN blacklists array
+            IF NOT CREATE AND ADD
+            RETURN FUNCTION
+        }
+
+
+        model blacklist {
+            ID          BigInt    @id @default(autoincrement())
+            GuildID     string
+            UserID      string
+            Permission  string
+        }
+
+    */
+
     return {init, ToggleResponses, TogglePrefix, GetGuildSettings, AddGuildToDatabase, CheckIfGuildExists, SetActiveOrCreate, GetPrefix, GetResponses, SetPersonality, GetPersonality};
 });

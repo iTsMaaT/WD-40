@@ -1,10 +1,14 @@
 {
   "name": "wd40",
-  "version": "3.0.0",
+  "version": "4.4.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --no-fix .",
+    "prisma:migrate": "npx prisma migrate dev",
+    "prisma:deploy": "npx prisma migrate deploy",
+    "prisma:push": "npx prisma db push"
   },
   "repository": {
     "type": "git",

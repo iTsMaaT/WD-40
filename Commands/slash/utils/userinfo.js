@@ -3,7 +3,7 @@ const { ApplicationCommandType, ApplicationCommandOptionType } = require("discor
 module.exports = {
     name: 'userinfo',
     description: 'Gives info of a user',
-    type :ApplicationCommandType.ChatInput,
+    type: ApplicationCommandType.ChatInput,
     options: [
         {
             name: "user",
