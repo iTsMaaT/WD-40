@@ -20,7 +20,7 @@ module.exports = {
                 orderBy: {
                     ID: 'desc',
                 },
-                //take: 20,
+                take: 2500,
             });
 
             // Calculate the maximum length for each column
