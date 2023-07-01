@@ -1,10 +1,10 @@
-const SendErrorEmbed = require("../../../../utils/functions/SendErrorEmbed");
+const SendErrorEmbed = require("../../../../../utils/functions/SendErrorEmbed");
 
 module.exports = {
     name: "userinfo",
     description: "Gives info of a user",
     usage: "< [User]: the user to get info from (optional) >",
-    category: "utils",
+    category: "info",
     execute: async (logger, client, message, args) => {
         let id;
         let target;

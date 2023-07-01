@@ -1,6 +1,6 @@
 const { Events } = require('discord.js');
 const FetchReddit = require("../utils/functions/FetchReddit.js");
-const getExactDate = require('../utils/functions/getExactDate.js');
+const StringReact = require('../utils/functions/StringReact.js');
 const { blacklist, whitelist } = require("../utils/config.json");
 
 module.exports = {
@@ -31,6 +31,8 @@ module.exports = {
 
         //Auto-responses
         if (global.GuildManager.GetResponses(message.guild)) {
+
+            if (message.type == "GUILD_MEMBER_JOIN") StringReact(client, message.channel.id, message.id, "hi");
 
             //Sends furry porn in DMs of anyone that says "sex"
             if (message.content.toLowerCase() == "sex") {

@@ -29,7 +29,7 @@ module.exports = {
             client.commands.each((val) => {
                 if (!val.private && !addedCommands.has(val.name)) {
                     if (categorymapper[val.category]) {
-                        categorymapper[val.category] += (`**${val.name}${val.aliases ? ` [${(val.aliases).join("")}]` : ""}: **` + prettyString(val.description, "first", true)) + "\r\n";
+                        categorymapper[val.category] += (`**${val.name}${val.aliases ? ` [${(val.aliases).join(", ")}]` : ""}: **` + prettyString(val.description, "first", true)) + "\r\n";
                     } else {
                         categorymapper[val.category] = (`**${val.name}: **` + prettyString(val.description, "first", true)) + "\r\n";
                     }

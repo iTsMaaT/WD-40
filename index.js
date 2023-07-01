@@ -11,6 +11,9 @@ const Discord = require('discord.js');
 
 const getExactDate = require("./utils/functions/getExactDate");
 const GetPterodactylInfo = require("./utils/functions/GetPterodactylInfo");
+const GetUniqueValues = require("./utils/functions/GetUniqueValues");
+const CombineCollections = require("./utils/functions/CombineCollections");
+const SendErrorEmbed = require("./utils/functions/SendErrorEmbed");
 
 var HourlyRam = [0, 0, 0];
 
@@ -19,7 +22,8 @@ dotenv.config();
 const client = new Client({
     intents: Object.keys(GatewayIntentBits), // all intents
     partials: [Partials.Message, Partials.Channel, Partials.Reaction],
-    shards: "auto"
+    shards: "auto",
+    allowedMentions: { repliedUser: false }
 });
 
 global.prisma = new PrismaClient();
@@ -38,9 +42,6 @@ Array.prototype.equals = function (b) {
 
 //music
 const { Player } = require('discord-player');
-const GetUniqueValues = require("./utils/functions/GetUniqueValues");
-const CombineCollections = require("./utils/functions/CombineCollections");
-const SendErrorEmbed = require("./utils/functions/SendErrorEmbed");
 global.player = new Player(client);
 player.extractors.loadDefault();
 
@@ -262,6 +263,7 @@ client.on("messageCreate", async (message) => {
         // Check if the command or alias exists
         const command = client.commands.get(commandName);
         if (!command) return;
+        if (command.admin && !message.member.permissions.has("Administrator") || !message.author.id == process.env.OWNER_ID) return SendErrorEmbed(message, "You are not administrator", "red");
 
         // Check command cooldown
         if (cooldowns.has(message.author.id)) {
@@ -285,7 +287,7 @@ client.on("messageCreate", async (message) => {
             await command.execute(logger, client, message, args);
         } catch (error) {
             logger.error(error.stack);
-            return SendErrorEmbed(message, "An error occured while executing the command");
+            return SendErrorEmbed(message, "An error occured while executing the command", "red");
         }
     }
 });
