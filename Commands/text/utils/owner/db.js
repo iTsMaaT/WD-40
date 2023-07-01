@@ -1,4 +1,5 @@
 const fs = require('fs/promises');
+const prettyMilliseconds = require('pretty-ms');
 
 module.exports = {
     name: 'db',
@@ -12,6 +13,7 @@ module.exports = {
             return message.reply('Please provide a table name!');
         }
         const tableName = args[0];
+        const sent = await message.reply({content: `Fetching the DB...`, fetchReply: true });
 
         try {
             const data = await global.prisma[tableName].findMany({
@@ -49,11 +51,12 @@ module.exports = {
             // Create a text file
             const fileName = `./${tableName}_data.txt`;
             await fs.writeFile(fileName, table, { encoding: 'utf8' });
+            await sent.edit(`Operation took ${prettyMilliseconds(Date.now() - sent.createdTimestamp)}`);
             await message.reply({ files: [fileName] });
             await fs.unlink(fileName);
         } catch (error) {
             console.error(error.stack);
-            message.reply('An error occurred while fetching data.');
+            sent.edit('An error occurred while fetching data.');
         }
     },
 };
