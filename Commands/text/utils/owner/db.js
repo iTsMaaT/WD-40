@@ -16,12 +16,19 @@ module.exports = {
         const sent = await message.reply({content: `Fetching the DB...`, fetchReply: true });
 
         try {
+            const columnFinder = await global.prisma[tableName].findMany({
+                take: 1,
+            });
+            if (!columnFinder[0]) return sent.edit(`This table is empty.`);
+            const firstColumn = Object.keys(columnFinder[0])[0];
+
             const data = await global.prisma[tableName].findMany({
                 orderBy: {
-                    ID: 'desc',
+                    [firstColumn]: 'desc',
                 },
                 take: 2500,
             });
+
 
             // Calculate the maximum length for each column
             const columnLengths = {};
