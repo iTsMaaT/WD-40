@@ -33,9 +33,12 @@ module.exports = {
             // Calculate the maximum length for each column
             const columnLengths = {};
             Object.keys(data[0]).forEach(column => {
-                const maxLength = Math.max(...data.map(row => String(row[column]).length));
+                const columnData = data.map(row => String(row[column]));
+                columnData.push(column); // Include the column name in the data array
+                const maxLength = Math.max(...columnData.map(value => value.length));
                 columnLengths[column] = maxLength;
             });
+
 
             // Create the table header
             const tableHeader = Object.keys(data[0])
