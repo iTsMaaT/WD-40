@@ -22,8 +22,8 @@ module.exports = {
         };
   
         // Check the argument to determine if muting or unmuting
-        const action = args[0]?.toLowerCase() ?? 'mute';
-        if (action === 'mute') {
+        const action = args[0]?.toLowerCase() ?? '-mute';
+        if (action === '-mute') {
         // Mute all members except the executor
             voiceChannel.members.forEach(async (member) => {
                 if (member.id !== message.author.id) {
@@ -36,7 +36,7 @@ module.exports = {
             });
   
             embed.title = 'Successfully muted all members except yourself.';
-        } else if (action === 'unmute') {
+        } else if (action === '-unmute') {
         // Unmute all members
             voiceChannel.members.forEach(async (member) => {
                 try {
