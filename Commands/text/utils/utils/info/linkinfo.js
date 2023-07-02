@@ -15,6 +15,7 @@ module.exports = {
         if (!args[0]) return SendErrorEmbed(message, "Please provide a URL", "yellow");
         const link = args[0];
         const metadataCache = {};
+        const MAX_FIELD_LENGTH = 1000;
 
         try {
             const result = await analyzeLink(link);
@@ -23,22 +24,18 @@ module.exports = {
                 color: 0xffffff,
                 title: 'Link Analysis',
                 fields: [
-                    { name: 'Unshortened URL', value: result.unshortenedURL ?? '-' },
-                    { name: 'Response Status', value: result.responseStatus},
-                    { name: 'IP Address', value: result.ip ?? '-' },
-                    { name: 'Type', value: result.type },
-                    { name: 'SSL Certificate', value: result.sslCertificate ?? '-' },
-                    { name: 'Redirect Chain', value: result.redirectChain?.join(' -> ') || '-' },
-                    { name: 'Page Title', value: result.pageTitle || '-' },
+                    { name: 'Unshortened URL', value: truncateText(result.unshortenedURL, MAX_FIELD_LENGTH) ?? '-' },
+                    { name: 'Response Status', value: truncateText(result.responseStatus, MAX_FIELD_LENGTH) },
+                    { name: 'IP Address', value: truncateText(result.ip, MAX_FIELD_LENGTH) ?? '-' },
+                    { name: 'Type', value: truncateText(result.type, MAX_FIELD_LENGTH) },
+                    { name: 'SSL Certificate', value: truncateText(result.sslCertificate, MAX_FIELD_LENGTH) ?? '-' },
+                    { name: 'Redirect Chain', value: truncateText(result.redirectChain?.join(' -> '), MAX_FIELD_LENGTH) || '-' },
+                    { name: 'Page Title', value: truncateText(result.pageTitle, MAX_FIELD_LENGTH) || '-' },
                     {
                         name: 'VirusTotal Analysis (Note that this only works on known links by VirusTotal)',
-                        value: result.scanResults.isRateLimited
-                            ? 'VirusTotal API rate limit exceeded. Please try again later.'
-                            : `🟢  Safe: ${result.scanResults.harmless ?? "-"}\n` +
-                `🟡  Suspicious: ${result.scanResults.suspicious ?? "-"}\n` +
-                `🔴  Malicious: ${result.scanResults.malicious ?? "-"}`,
+                        value: truncateText(getVirusTotalAnalysisText(result.scanResults), MAX_FIELD_LENGTH),
                     },
-                    { name: 'Metadata', value: `Description: ${result.metadata.description}\nKeywords: ${result.metadata.keywords}\nog:title: ${result.metadata.ogTitle}\nog:description: ${result.metadata.ogDescription}\nAuthor: ${result.metadata.author}\nPublisher: ${result.metadata.publisher}\nCreator: ${result.metadata.creator}` },
+                    { name: 'Metadata', value: truncateText(getMetadataText(result.metadata), MAX_FIELD_LENGTH) },
                 ],
             };
 
@@ -258,6 +255,34 @@ module.exports = {
                 logger.error(error);
                 return { isRateLimited: false, harmless: '-', suspicious: '-', malicious: '-' };
             }
+        }
+
+        function truncateText(text, maxLength) {
+            if (text && text.length > maxLength) {
+                return text.substring(0, maxLength - 3) + '...';
+            }
+            return text;
+        }
+        
+        function getVirusTotalAnalysisText(scanResults) {
+            if (scanResults.isRateLimited) {
+                return 'VirusTotal API rate limit exceeded. Please try again later.';
+            }
+            const harmless = truncateText(scanResults.harmless, MAX_FIELD_LENGTH);
+            const suspicious = truncateText(scanResults.suspicious, MAX_FIELD_LENGTH);
+            const malicious = truncateText(scanResults.malicious, MAX_FIELD_LENGTH);
+            return `🟢  Safe: ${harmless ?? "-"}\n🟡  Suspicious: ${suspicious ?? "-"}\n🔴  Malicious: ${malicious ?? "-"}`;
+        }
+        
+        function getMetadataText(metadata) {
+            const description = truncateText(metadata.description, MAX_FIELD_LENGTH);
+            const keywords = truncateText(metadata.keywords, MAX_FIELD_LENGTH);
+            const ogTitle = truncateText(metadata.ogTitle, MAX_FIELD_LENGTH);
+            const ogDescription = truncateText(metadata.ogDescription, MAX_FIELD_LENGTH);
+            const author = truncateText(metadata.author, MAX_FIELD_LENGTH);
+            const publisher = truncateText(metadata.publisher, MAX_FIELD_LENGTH);
+            const creator = truncateText(metadata.creator, MAX_FIELD_LENGTH);
+            return `Description: ${description}\nKeywords: ${keywords}\nog:title: ${ogTitle}\nog:description: ${ogDescription}\nAuthor: ${author}\nPublisher: ${publisher}\nCreator: ${creator}`;
         }
           
     },
