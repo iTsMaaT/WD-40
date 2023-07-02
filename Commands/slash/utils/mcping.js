@@ -66,8 +66,8 @@ module.exports = {
                     serverStatusEmbed.fields.push({ name: "Player list", value: playerNames.join(", ") });
                 }
     
-                if (server.icon) return interaction.editReply({ embeds: [serverStatusEmbed], files: [imgfile], allowedMentions: { repliedUser: false } });
-                interaction.editReply({ embeds: [serverStatusEmbed], allowedMentions: { repliedUser: false } });
+                if (server.icon) return interaction.editReply({ embeds: [serverStatusEmbed], files: [imgfile]  });
+                interaction.editReply({ embeds: [serverStatusEmbed]  });
             });
     }
 };

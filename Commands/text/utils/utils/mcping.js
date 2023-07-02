@@ -46,8 +46,8 @@ module.exports = {
                     serverStatusEmbed.fields.push({ name: "Player list", value: playerNames.join(", ") });
                 }
 
-                if (server.icon) return message.reply({ embeds: [serverStatusEmbed], files: [imgfile], allowedMentions: { repliedUser: false } });
-                message.reply({ embeds: [serverStatusEmbed], allowedMentions: { repliedUser: false } });
+                if (server.icon) return message.reply({ embeds: [serverStatusEmbed], files: [imgfile] });
+                message.reply({ embeds: [serverStatusEmbed] });
             });
     },
 };

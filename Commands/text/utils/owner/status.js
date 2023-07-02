@@ -29,5 +29,6 @@ module.exports = {
             client.user.setPresence({ status: 'dnd' });
         }
         }
+        message.reply("Status changed to: " + args[0] ?? "dnd");
     }
 };

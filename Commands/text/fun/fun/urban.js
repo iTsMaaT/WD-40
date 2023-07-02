@@ -17,7 +17,7 @@ module.exports = {
                             title: `Invalid argument.`,
                             timestamp: new Date(),
                         };
-                        message.reply({ embeds: [ErrEmbed], allowedMentions: { repliedUser: false }});
+                        message.reply({ embeds: [ErrEmbed] });
                         return;
                     }
                     var definition = urban.list[0].definition.replace(/[[\]]/g, "");
@@ -33,7 +33,7 @@ module.exports = {
                         footer: { text: `ID : By: ${author}` }
                     };
     
-                    message.reply({ embeds: [UrbanEmbed], allowedMentions: { repliedUser: false }});
+                    message.reply({ embeds: [UrbanEmbed] });
                 } catch (err) {
                     const ErrEmbed = {
                         color: 0xff0000,
@@ -41,7 +41,7 @@ module.exports = {
                         description: err,
                         timestamp: new Date(),
                     };
-                    message.reply({ embeds: [ErrEmbed], allowedMentions: { repliedUser: false }});
+                    message.reply({ embeds: [ErrEmbed] });
                     logger.error(err);
                 }
             });

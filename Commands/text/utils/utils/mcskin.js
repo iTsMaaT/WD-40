@@ -21,7 +21,7 @@ module.exports = {
                 timestamp: new Date(),
                 footer: { text: `Defaults to Steve if no arguments are provided` }
             };
-            message.reply({ embeds: [MCSkinEmbed, {image: { url: `https://mc-heads.net/body/${name}` }, url: `https://mc-heads.net/user/${name}`}], allowedMentions: { repliedUser: false } });
+            message.reply({ embeds: [MCSkinEmbed, {image: { url: `https://mc-heads.net/body/${name}` }, url: `https://mc-heads.net/user/${name}`}] });
         } catch(err) {
             SendErrorEmbed(message, "An unknown error occured", "red");
             logger.error(err);

@@ -18,6 +18,6 @@ Uptime : \`${prettyMilliseconds(client.uptime)}\`
 Round trip latency : \`${sent.createdTimestamp - interaction.createdTimestamp}ms\`
 Bot's age : <t:${parseInt(target.user.createdTimestamp / 1000)}:R>
 
-            `, ephemeral: true, allowedMentions: { repliedUser: false }});
+            `, ephemeral: true });
     },
 };

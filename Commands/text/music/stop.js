@@ -15,6 +15,6 @@ module.exports = {
             .setColor("#ffffff")
             .setDescription("Stopped!")
             .setTimestamp();
-        message.reply({ embeds: [stoppped_music_embed], allowedMentions: { repliedUser: false } });
+        message.reply({ embeds: [stoppped_music_embed] });
     }
 };

@@ -2,13 +2,13 @@ const prettyString = require("./prettyString");
 
 const SendErrorEmbed = function(message, string, color, err) {
     var embed = {
-        title: prettyString(string.toString()),
+        title: prettyString(string.toString(), false, true),
         timestamp: new Date(),
         color: 0xffffff,
     };
     if (color == "red") embed.color = 0xff0000;
     else if (color == "yellow") embed.color = 0xffff00;
     if (err) embed.description = err;
-    return message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+    return message.reply({ embeds: [embed] });
 };
 module.exports = SendErrorEmbed;

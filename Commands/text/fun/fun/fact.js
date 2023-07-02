@@ -17,7 +17,7 @@ module.exports = {
                     timestamp: new Date(),
                 };
 
-                message.reply({ embeds: [FactEmbed], allowedMentions: { repliedUser: false }} );
+                message.reply({ embeds: [FactEmbed] });
             })
             .catch((err) => {
                 FactEmbed = {
@@ -26,7 +26,7 @@ module.exports = {
                     description: err,
                     timestamp: new Date(),
                 };
-                message.reply({ embeds: [FactEmbed], allowedMentions: { repliedUser: false }} );
+                message.reply({ embeds: [FactEmbed] });
                 logger.error(err);
             });
     }

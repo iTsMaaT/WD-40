@@ -30,6 +30,6 @@ module.exports = {
         } else {
             return SendErrorEmbed(message, "Invalid argument (Do >help quote for more info)", "yellow");
         }
-        message.reply({ embeds: [QuoteEmbed], allowedMentions: { repliedUser: false } });
+        message.reply({ embeds: [QuoteEmbed] });
     }
 };

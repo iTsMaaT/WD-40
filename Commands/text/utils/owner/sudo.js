@@ -1,4 +1,3 @@
-const { Guild } = require("discord.js");
 module.exports = {
     name: "sudo",
     description: "Make the bot send a custom message / reply",

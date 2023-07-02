@@ -27,6 +27,6 @@ module.exports = {
             .setDescription('Music paused.')
             .setTimestamp();
 
-        message.reply({ embeds: [state ? music_paused_embed : music_resumed_embed], allowedMentions: { repliedUser: false } });
+        message.reply({ embeds: [state ? music_paused_embed : music_resumed_embed] });
     }
 }; 

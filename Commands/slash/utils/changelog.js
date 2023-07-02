@@ -18,7 +18,6 @@ For help : ${prefix}help
 **Changelogs**
 ${cleanlog}
 `
-
-        , allowedMentions: { repliedUser: false } });
+        });
     },
 };

@@ -23,13 +23,13 @@ module.exports = {
 
                 const data = JSON.parse(response.body);
                 const post = data[Math.floor(Math.random() * data.length)];
-                interaction.editReply({ content: post.file_url, allowedMentions: { repliedUser: false } });
+                interaction.editReply({ content: post.file_url  });
             } catch (err) {
                 interaction.editReply({ content: "An error occured, probably a invalid tag.", ephemeral: true });
                 logger.error(error);
             }
         } else {
-            interaction.editRyply({ content: "The channel you are in isn't NSFW", allowedMentions: { repliedUser: false } });
+            interaction.editRyply({ content: "The channel you are in isn't NSFW"  });
         }
     },
 };

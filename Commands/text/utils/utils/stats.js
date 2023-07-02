@@ -99,6 +99,6 @@ module.exports = {
             },
             timestamp: new Date(),
         };
-        message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+        message.reply({ embeds: [embed] });
     }
 };

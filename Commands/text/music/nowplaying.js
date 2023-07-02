@@ -28,6 +28,6 @@ module.exports = {
                 text: `Event Loop Lag: ${queue.player.eventLoopLag.toFixed(0)}ms`
             })
             .setTimestamp();
-        message.reply({ embeds: [song_playing_embed], allowedMentions: { repliedUser: false }});
+        message.reply({ embeds: [song_playing_embed] });
     }
 };

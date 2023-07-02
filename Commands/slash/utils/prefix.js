@@ -15,7 +15,7 @@ module.exports = {
         //set or deletes the prefix, if a custom one was already applied
         const prefix = interaction.options.get("prefix").value;
         await global.GuildManager.TogglePrefix(interaction.guild, prefix);
-        interaction.reply({ content: `The new prefix is \`${prefix}\` in \`${interaction.member.guild.name}\``, allowedMentions: { repliedUser: false } });
+        interaction.reply({ content: `The new prefix is \`${prefix}\` in \`${interaction.member.guild.name}\``  });
         logger.info(`Prefix changed to ${prefix} in \`${interaction.member.guild.name}\``);
     }
 };

@@ -18,7 +18,7 @@ module.exports = {
                 .setColor("#ffffff")
                 .setDescription(`Skipped!`)
                 .setTimestamp();
-            message.reply({ embeds: [skipped_embed], allowedMentions: { repliedUser: false } });
+            message.reply({ embeds: [skipped_embed] });
         } catch (e) {
             SendErrorEmbed(message, "An error occurred.", "red", e);
         }

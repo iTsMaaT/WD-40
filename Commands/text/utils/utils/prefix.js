@@ -16,7 +16,7 @@ module.exports = {
                 description: `The new prefix is \`${args[0].charAt(0)}\` in \`${message.member.guild.name}\``,
                 timestamp: new Date(),
             };
-            message.reply({ embeds: [responseEmbed], allowedMentions: { repliedUser: false } });
+            message.reply({ embeds: [responseEmbed]  });
             logger.info(`Prefix changed to ${args[0].charAt(0)} in \`${message.member.guild.name}\``);
         } else if (args.length === 0) {
         // No prefix error message

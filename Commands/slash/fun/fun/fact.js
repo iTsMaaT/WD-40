@@ -13,7 +13,7 @@ module.exports = {
                     content: `
 **Random fact**:
 ${fact.text}
-            `, allowedMentions: { repliedUser: false }
+            ` 
                 });
             })
             .catch((err) => {

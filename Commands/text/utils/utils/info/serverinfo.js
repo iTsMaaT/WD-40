@@ -32,6 +32,6 @@ module.exports = {
             timestamp: new Date(),
         };
   
-        message.reply({ embeds: [serverInfoEmbed], allowedMentions: { repliedUser: false } });
+        message.reply({ embeds: [serverInfoEmbed] });
     },
 };

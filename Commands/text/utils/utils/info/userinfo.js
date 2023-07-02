@@ -70,7 +70,7 @@ module.exports = {
                 color: 0xffffff,
             };
 
-            message.reply({ embeds: [userInfoEmbed], allowedMentions: { repliedUser: false } });
+            message.reply({ embeds: [userInfoEmbed]  });
         } catch (err) {
             SendErrorEmbed(message, "Error.", "red", err);
         }

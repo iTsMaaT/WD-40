@@ -18,7 +18,7 @@ module.exports = {
                     footer: { text: `ID : ${advice.slip.id}` }
                 };
 
-                message.reply({ embeds: [FactEmbed], allowedMentions: { repliedUser: false }} );
+                message.reply({ embeds: [FactEmbed] });
             })
             .catch((err) => {
                 ErrEmbed = {
@@ -27,7 +27,7 @@ module.exports = {
                     description: err,
                     timestamp: new Date(),
                 };
-                message.reply({ embeds: [ErrEmbed], allowedMentions: { repliedUser: false }} );
+                message.reply({ embeds: [ErrEmbed] });
                 logger.error(err);
             });
     }

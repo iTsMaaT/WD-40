@@ -21,7 +21,7 @@ datasource db {
 }
 
 model GuildSettings {
-  GuildID     BigInt  @id
+  GuildID     String  @id
   Prefix      String  @db.VarChar(3) @default(">")
   GuildName   String  @db.VarChar(255)
   Active      Boolean @default(true)
@@ -30,8 +30,8 @@ model GuildSettings {
 }
 
 model Snowflake {
-  GuildID   BigInt
-  UserID    BigInt
+  GuildID   String
+  UserID    String
   @@id([GuildID,UserID])
   @@unique([GuildID,UserID])
 }
@@ -62,4 +62,12 @@ model Message {
   GuildName   String
   Timestamp   DateTime  @default(now())
   Content     String    @db.Text
+}
+
+model Blacklist {
+  ID          BigInt  @id @default(autoincrement())
+  GuildID     String
+  UserID      String
+  Permission  String  @db.Text
+  @@unique([GuildID, UserID])
 }

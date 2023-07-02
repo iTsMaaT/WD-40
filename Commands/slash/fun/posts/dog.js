@@ -7,6 +7,6 @@ module.exports = {
     type :ApplicationCommandType.ChatInput,
     async execute(logger, interaction, client) {
         await interaction.deferReply();
-        interaction.editReply({ embeds: [await FetchReddit(interaction.channel.nsfw, "dog", "dogs", "dogpictures")], allowedMentions: { repliedUser: false }});
+        interaction.editReply({ embeds: [await FetchReddit(interaction.channel.nsfw, "dog", "dogs", "dogpictures")] });
     }
 };

@@ -46,7 +46,7 @@ module.exports = {
 
 
                                 sent.edit({ content: `Attempt ${RedditTries}/10`, fetchreply: true });
-                                sent.edit({ embeds: [embed], allowedMentions: { repliedUser: false } });
+                                sent.edit({ embeds: [embed]  });
                                 logger.info(RedditImage);
                                 return;
                             } else {

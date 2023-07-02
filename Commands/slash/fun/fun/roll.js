@@ -35,7 +35,7 @@ module.exports = {
             content: `
 Rolling **${numDices}d${numSides}**...
 **${rolls.join(', ')}**\nTotal: **${total}**
-            `, allowedMentions: { repliedUser: false }
+            ` 
         });
     },
 };

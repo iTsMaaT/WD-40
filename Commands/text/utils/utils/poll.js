@@ -4,6 +4,7 @@ module.exports = {
     name: "poll",
     description: "Create a poll",
     category: "utils",
+    private: true,
     async execute(logger, client, message, args) {
         if (!args[0] || !args[1]) return SendErrorEmbed(message, "Invalid arguments, please refer to >help poll", "yellow");
 

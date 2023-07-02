@@ -13,7 +13,7 @@ module.exports = {
             .then(response => {
                 const json = JSON.parse(response.body);
 
-                if (json.status === "404") return message.channel.reply({ content: "Couldn't find the specified country.", allowedMentions: { repliedUser: false } });
+                if (json.status === "404") return message.channel.reply({ content: "Couldn't find the specified country."  });
 
                 const country = json[0];
                 const currencies = Object.values(country.currencies).map(currency => `${currency.name} (${currency.symbol})`);
@@ -45,7 +45,7 @@ module.exports = {
                     };
                 }
 
-                message.channel.send({ embeds: [countryEmbed], allowedMentions: { repliedUser: false } });
+                message.channel.send({ embeds: [countryEmbed] });
             })
             .catch(error => {
                 console.error("Error retrieving country information:", error);

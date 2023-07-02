@@ -1,6 +1,8 @@
+const SendErrorEmbed = require("../../../../utils/functions/SendErrorEmbed");
+
 module.exports = {
     name: "muteall",
-    description: "Deafens all user in a channel except self",
+    description: "Mutes all user in a channel except self",
     category: "admin",
     usage: "< -mute / -unmute >",
     admin: true,
@@ -9,10 +11,16 @@ module.exports = {
   
         // Check if the user is in a voice channel
         if (!message.member.voice.channel) {
-            return message.reply('You need to be in a voice channel to use this command.');
+            return SendErrorEmbed(message, 'You need to be in a voice channel to use this command.', "yellow");
         }
   
         const voiceChannel = message.member.voice.channel;
+
+        const embed = {
+            color: 0xffffff,
+            title: '',
+            timestamp: new Date(),
+        };
   
         // Check the argument to determine if muting or unmuting
         const action = args[0]?.toLowerCase() ?? 'mute';
@@ -28,7 +36,7 @@ module.exports = {
                 }
             });
   
-            message.reply('Successfully muted all members except yourself.');
+            embed.title = 'Successfully muted all members except yourself.';
         } else if (action === 'unmute') {
         // Unmute all members
             voiceChannel.members.forEach(async (member) => {
@@ -39,9 +47,10 @@ module.exports = {
                 }
             });
   
-            message.reply('Successfully unmuted all members.');
+            embed.title = 'Successfully unmuted all members.';
+            message.reply({ embeds: [embed] });
         } else {
-            message.reply('Invalid argument. Please specify either "mute" or "unmute".');
+            SendErrorEmbed(message, 'Invalid argument. Please specify either "mute" or "unmute".', "yellow");
         }
     }
 };

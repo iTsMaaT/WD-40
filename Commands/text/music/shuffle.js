@@ -19,6 +19,6 @@ module.exports = {
             timestamp: new Date(),
         };
 
-        message.reply({ embeds: [shuffle_embed], allowedMentions: { repliedUser: false } });
+        message.reply({ embeds: [shuffle_embed] });
     }
 };

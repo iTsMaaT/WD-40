@@ -21,6 +21,6 @@ module.exports = {
         };
 
         const prefix = global.GuildManager.GetPrefix(message.guild);
-        message.reply({ embeds: [changelogEmbed], content: `For help: ${prefix}help`, allowedMentions: { repliedUser: false } });
+        message.reply({ embeds: [changelogEmbed], content: `For help: ${prefix}help` });
     },
 };

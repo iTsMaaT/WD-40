@@ -35,9 +35,9 @@ module.exports = {
             if (message.member.permissions.has("Administrator")) {
                 try {
                     await global.GuildManager.SetPersonality(message.guild, prompt);
-                    interaction.editReply({ content: 'Prompt successfully changed.', allowedMentions: { repliedUser: false } });
+                    interaction.editReply({ content: 'Prompt successfully changed.'  });
                 } catch (err) {
-                    interaction.editReply({ content: `Error while changing the personality:\n${err}`, allowedMentions: { repliedUser: false }, ephemeral: true });
+                    interaction.editReply({ content: `Error while changing the personality:\n${err}` , ephemeral: true });
                 }
             }
             break;
@@ -64,7 +64,7 @@ module.exports = {
                 });
 
             if (result.data.choices[0].message.content.length < 2000) {
-                await interaction.editReply({ content: result.data.choices[0].message.content, allowedMentions: { repliedUser: false } });
+                await interaction.editReply({ content: result.data.choices[0].message.content, allowedMentions: { repliedUser: true } });
             } else {
                 const discriminator = CreateUniqueSeed(message);
                 await fs.writeFile(`./answer-${discriminator}.txt`, result.data.choices[0].message.content, { encoding: "utf8" });

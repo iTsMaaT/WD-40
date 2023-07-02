@@ -32,7 +32,6 @@ global.prefix = '>';
 global.CmdEnabled = 1;
 global.superuser = 0;
 global.debug = 1;
-global.tempBlacklist = {};
 global.SmartRestartEnabled = 0;
 
 // Add array.equals()
@@ -75,6 +74,7 @@ function loadFiles(folder, callback) {
         const file = commandFiles.shift();
         if (file.endsWith('.js')) {
             const loaded = require(`${folder}${file}`);
+            loaded.filePath = folder + file;
             callback(loaded, file);
         } else {
             const newFiles = fs.readdirSync(folder + file);
@@ -231,9 +231,9 @@ client.on(Events.InteractionCreate, async interaction => {
 //Text command executing
 client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
-    if (superuser && (message.author.id != process.env.OWNER_ID && !whitelist.includes(message.author.id))) return;
+    if (superuser && (message.author.id != process.env.OWNER_ID && whitelist.includes(message.author.id))) return;
     if (!message.guild) return;
-    if (tempBlacklist[message.author.id] || blacklist.includes(message.author.id)) return;
+    if (blacklist.includes(message.author.id)) return;
 
     try {
         await global.prisma.message.create({
@@ -264,6 +264,13 @@ client.on("messageCreate", async (message) => {
         const command = client.commands.get(commandName);
         if (!command) return;
         if (command.admin && !message.member.permissions.has("Administrator") || !message.author.id == process.env.OWNER_ID) return SendErrorEmbed(message, "You are not administrator", "red");
+
+        const blacklist = await GuildManager.GetBlacklist(message.guild.id);
+        const blCategory = !blacklist.CheckPermission(message.author.id, command.category);
+        const blCommand = !blacklist.CheckPermission(message.author.id, command.name);
+        if(blCategory || blCommand){
+            return SendErrorEmbed(message, `You are blacklisted from executing ${!blCategory ? `commands in the **${command.category}** category` : `the **${command.name}** command`}.`, "red");
+        }
 
         // Check command cooldown
         if (cooldowns.has(message.author.id)) {
