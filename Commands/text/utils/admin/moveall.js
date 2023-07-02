@@ -7,7 +7,6 @@ module.exports = {
     category: "admin",
     usage: "< channelID >",
     admin: true,
-    private: true,
     execute(logger, client, message, args) {
   
         // Check if the user is in a voice channel
