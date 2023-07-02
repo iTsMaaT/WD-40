@@ -6,7 +6,6 @@ module.exports = {
     category: "admin",
     usage: "< -deafen / -undeafen >",
     admin: true,
-    private: true,
     execute(logger, client, message, args) {
       
         // Check if the user is in a voice channel
