@@ -22,8 +22,8 @@ module.exports = {
         };
       
         // Check the argument to determine if deafening or undeafening
-        const action = args[0]?.toLowerCase() ?? 'deafen';
-        if (action === 'deafen') {
+        const action = args[0]?.toLowerCase() ?? '-deafen';
+        if (action === '-deafen') {
             // Deafen all members except the executor
             voiceChannel.members.forEach(async (member) => {
                 if (member.id !== message.author.id) {
@@ -36,7 +36,7 @@ module.exports = {
             });
       
             embed.title = 'Successfully deafened all members except yourself.';
-        } else if (action === 'undeafen') {
+        } else if (action === '-undeafen') {
             // Undeafen all members
             voiceChannel.members.forEach(async (member) => {
                 try {
