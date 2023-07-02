@@ -25,6 +25,6 @@ module.exports = {
             .setURL(lyrics.url)
             .setDescription(trimmedLyrics.length === 1997 ? `${trimmedLyrics}...` : trimmedLyrics)
             .setColor(0xffffff);
-        message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+        message.reply({ embeds: [embed] });
     }
 };

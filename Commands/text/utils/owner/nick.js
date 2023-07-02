@@ -20,7 +20,7 @@ module.exports = {
             // Resets the server nickname to default
             try {
                 await member.setNickname(null);
-                message.reply({ content: 'Server nickname set to default', allowedMentions: { repliedUser: false } });
+                message.reply({ content: 'Server nickname set to default' });
             } catch (err) {
                 message.reply(`Nickname reset failed.\n\`${err}\``);
             }

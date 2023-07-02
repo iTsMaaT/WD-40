@@ -10,7 +10,7 @@ module.exports = {
         if (message.author.bot) return;
         if (superuser && (message.author.id != process.env.OWNER_ID || !whitelist.includes(message.author.id))) return;
         if (!message.guild) return;
-        if (tempBlacklist[message.author.id] || blacklist.includes(message.author.id)) return;
+        if (blacklist.includes(message.author.id)) return;
 
         //Gives the prefix if the bot is pinged
         if (message.content == "<@1036485458827415633>") {

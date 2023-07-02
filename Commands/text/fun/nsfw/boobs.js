@@ -21,7 +21,7 @@ module.exports = {
                         timestamp: new Date(),
                     };
 
-                    message.reply({ embeds: [Embed], allowedMentions: { repliedUser: false } });
+                    message.reply({ embeds: [Embed] });
                 });
         } else {
             return SendErrorEmbed(message, "The channel you are in isn't NSFW", "yellow");

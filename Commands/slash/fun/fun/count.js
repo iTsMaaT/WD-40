@@ -12,12 +12,6 @@ module.exports = {
             required: false,
         },
         {
-            name: "guild",
-            description: "The guild to search from",
-            type: ApplicationCommandOptionType.String,
-            required: false,
-        },
-        {
             name: "channel",
             description: "The channel to search from",
             type: ApplicationCommandOptionType.Channel,
@@ -34,7 +28,6 @@ module.exports = {
         //interaction.deferReply();
         await interaction.deferReply();
         const String = interaction.options.get("string");
-        const GuildID = interaction.options.get("guild");
         const Channel = interaction.options.get("channel");
         const User = interaction.options.getUser("user");
         var filter = {};
@@ -45,7 +38,7 @@ module.exports = {
         }
 
         if (GuildID) {
-            filter.GuildID = GuildID.value;
+            filter.GuildID = interaction.guild.id;
         }
 
         if (Channel) {
@@ -86,7 +79,7 @@ Prompt: ${String?.value ?? "**-**"}
                 ],
                 timestamp: new Date(),
             };
-            await interaction.editReply({ embeds: [embed], allowedMentions: { RepliedUser: false } });
+            await interaction.editReply({ embeds: [embed]  });
         }
     }
 };

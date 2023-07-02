@@ -33,7 +33,7 @@ module.exports = {
                 unique: true
             });
 
-            message.reply({ content: `Here's the invite to the server: ${invite.url}`, allowedMentions: { repliedUser: false } });
+            message.reply({ content: `Here's the invite to the server: ${invite.url}` });
         } catch (error) {
             console.error('Error creating invite:', error);
             message.reply('An error occurred while creating the invite.');

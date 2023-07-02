@@ -8,12 +8,24 @@ module.exports = {
     private: true,
     async execute(logger, client, message, args) {
         if (message.author.id != process.env.OWNER_ID) return;
+        let data;
 
         if (!args) {
             return message.reply('Please provide a table name!');
         }
+
+        const option = args[0];
+
+        if (option === '-t') {
+            // List all tables
+            const tables = Object.keys(global.prisma);
+            const tableList = tables.filter(name => !name.startsWith("_") && !name.startsWith("$")).join(', ');
+
+            return message.reply(`Tables: ${tableList}`);
+        }
+
         const tableName = args[0];
-        const sent = await message.reply({content: `Fetching the DB...`, fetchReply: true });
+        const sent = await message.reply({ content: `Fetching the DB...`, fetchReply: true });
 
         try {
             const columnFinder = await global.prisma[tableName].findMany({
@@ -22,34 +34,32 @@ module.exports = {
             if (!columnFinder[0]) return sent.edit(`This table is empty.`);
             const firstColumn = Object.keys(columnFinder[0])[0];
 
-            const data = await global.prisma[tableName].findMany({
+            data = await global.prisma[tableName].findMany({
                 orderBy: {
                     [firstColumn]: 'desc',
                 },
                 take: 2500,
             });
 
-
             // Calculate the maximum length for each column
             const columnLengths = {};
-            Object.keys(data[0]).forEach(column => {
-                const columnData = data.map(row => String(row[column]));
+            Object.keys(data[0]).forEach((column) => {
+                const columnData = data.map((row) => String(row[column]));
                 columnData.push(column); // Include the column name in the data array
-                const maxLength = Math.max(...columnData.map(value => value.length));
+                const maxLength = Math.max(...columnData.map((value) => value.length));
                 columnLengths[column] = maxLength;
             });
 
-
             // Create the table header
             const tableHeader = Object.keys(data[0])
-                .map(header => header.padEnd(columnLengths[header]))
+                .map((header) => header.padEnd(columnLengths[header]))
                 .join(' | ');
 
             // Create the separator line
             const separatorLine = '-'.repeat(tableHeader.length);
 
             // Create the table rows
-            const tableRows = data.map(row =>
+            const tableRows = data.map((row) =>
                 Object.entries(row)
                     .map(([key, value]) => String(value).padEnd(columnLengths[key]))
                     .join(' | ')

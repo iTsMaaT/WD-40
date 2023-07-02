@@ -17,9 +17,7 @@ __Users__
 **Bot count**: ${interaction.guild.members.cache.filter((m) => m.user.bot).size}
 **Total**: ${interaction.guild.members.cache.filter((m) => m.user).size} ${ interaction.guild.members.cache.filter((m) => m.user).size == 69 ? "(Nice)" : ""}  
 
-${ interaction.guild.members.cache.filter((m) => m.user).size == 42 ? "This is the answer to life!" : ""}    
-`, allowedMentions: { repliedUser: false }
-            //Easter egg for 42 and 69 members
+${ interaction.guild.members.cache.filter((m) => m.user).size == 42 ? "This is the answer to life!" : ""}`//Easter egg for 42 and 69 members
         });
     }
 };

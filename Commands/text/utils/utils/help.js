@@ -46,7 +46,7 @@ module.exports = {
                     description: CommandName.description,
                     timestamp: new Date(),
                 };
-                return message.reply({ embeds: [CommandEmbed], allowedMentions: { repliedUser: false } });
+                return message.reply({ embeds: [CommandEmbed]  });
             }
         }
 

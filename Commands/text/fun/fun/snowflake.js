@@ -19,11 +19,11 @@ module.exports = {
                 if(!enabled){
                     global.snowflakeData.push([guildId,rawid]);
                     await prisma.snowflake.create({data:{GuildID:guildId,UserID:rawid}});
-                    message.reply({ content: `<@${strid}> is a snowflake`, allowedMentions: { repliedUser: false } });
+                    message.reply({ content: `<@${strid}> is a snowflake` });
                 } else {
                     global.snowflakeData = snowflakeData.filter(v => !v.equals([guildId, rawid]));
                     await prisma.snowflake.delete({where:{GuildID_UserID: {GuildID:guildId,UserID:rawid}}});
-                    message.reply({ content: `<@${strid}> is no longer a snowflake (good for him)`, allowedMentions: { repliedUser: false } });
+                    message.reply({ content: `<@${strid}> is no longer a snowflake (good for him)` });
                 }
             }
         }

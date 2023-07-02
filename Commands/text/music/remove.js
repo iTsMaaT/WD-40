@@ -23,6 +23,6 @@ module.exports = {
             .setColor('#ffffff')
             .setDescription(`Removed: ${trackResolvable.title}`)
             .setTimestamp();
-        message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+        message.reply({ embeds: [embed] });
     }
 };

@@ -34,7 +34,7 @@ module.exports = {
                 timestamp: new Date(),
             };
 
-            message.reply({ embeds: [RollEmbed], allowedMentions: { repliedUser: false }} );
+            message.reply({ embeds: [RollEmbed] } );
         } else {
             // Roll 1d6 by default
             const roll = Math.floor(Math.random() * 6) + 1;
@@ -46,7 +46,7 @@ module.exports = {
                 ],
                 timestamp: new Date(),
             };
-            message.reply({ embeds: [RollEmbed], allowedMentions: { repliedUser: false }} );
+            message.reply({ embeds: [RollEmbed] });
         }
     },
 };

@@ -21,6 +21,6 @@ module.exports = {
             .setAuthor({name: `Server queue - ${message.guild.name}`})
             .setDescription(`**Current:** ${queue.currentTrack.title}\n\n${tracks.slice(0, 10).join('\n')}\n\n${nextSongs}`)
             .setTimestamp();
-        message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+        message.reply({ embeds: [embed] });
     }
 };

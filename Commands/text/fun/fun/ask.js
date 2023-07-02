@@ -49,7 +49,7 @@ module.exports = {
                     });
 
                 if (result.data.choices[0].message.content.length < 2000) {
-                    await message.reply(result.data.choices[0].message.content);
+                    await message.reply({ content: result.data.choices[0].message.content, allowedMentions: { repliedUser: true }});
                 } else {
                     const discriminator = Math.floor(Math.random() * 99999) + 1;
                     await fs.writeFile(`./answer-${discriminator}.txt`, result.data.choices[0].message.content, { encoding: "utf8" });

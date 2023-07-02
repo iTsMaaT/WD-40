@@ -19,7 +19,7 @@ module.exports = {
             timestamp: new Date(),
         };
 
-        const msg = await message.reply({ embeds: [play_embed], allowedMentions: { repliedUser: false } });
+        const msg = await message.reply({ embeds: [play_embed] });
 
         const research = await player.search(string, {
             requestedBy: message.member,
@@ -48,6 +48,6 @@ module.exports = {
             timestamp: new Date(),
         };
 
-        await msg.edit({ embeds: [embed], allowedMentions: { repliedUser: false } });
+        await msg.edit({ embeds: [embed] });
     }
 };

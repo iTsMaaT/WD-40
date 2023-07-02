@@ -20,6 +20,6 @@ module.exports = {
             timestamp: new Date(),
         };
 
-        message.reply({ embeds: [Embed], allowedMentions: { repliedUser: false } });
+        message.reply({ embeds: [Embed] });
     }
 };

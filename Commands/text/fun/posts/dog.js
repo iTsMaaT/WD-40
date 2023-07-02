@@ -22,7 +22,7 @@ module.exports = {
                         timestamp: new Date(),
                     };
 
-                    message.reply({ embeds: [NekoEmbed], allowedMentions: { repliedUser: false } });
+                    message.reply({ embeds: [NekoEmbed] });
                 });
         } else {
             return SendErrorEmbed(message, "The channel you are in isn't NSFW", "yellow");

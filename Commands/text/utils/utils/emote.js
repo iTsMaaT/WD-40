@@ -28,14 +28,14 @@ module.exports = {
         
         if (type === "-e") {
             message.guild.emojis.create({attachment: buffer, name: name})
-                .then(emoji => message.reply({ content: `Emote added: **${emoji.name}**`, allowedMentions: { repliedUser: false } }))
+                .then(emoji => message.reply({ content: `Emote added: **${emoji.name}**` }))
                 .catch((err) => {
                     SendErrorEmbed(message, "An error occured", "red");
                     logger.error(err.stack);
                 });
         } else {
             message.guild.stickers.create({ file: buffer, name: name, tags: tag })
-                .then(sticker => message.reply({ content: `Sticker added: **${sticker.name}**`, allowedMentions: { repliedUser: false } }))
+                .then(sticker => message.reply({ content: `Sticker added: **${sticker.name}**` }))
                 .catch((err) => {
                     SendErrorEmbed(message, "An error occured", "red");
                     logger.error(err);

@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, Component, ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 
 module.exports = {
     name: "help",
@@ -63,7 +63,6 @@ module.exports = {
         var HelpFull = await interaction.editReply({
             content: CategoriesPage,
             components: [row],
-            allowedMentions: { repliedUser: false }
         });
 
         const filter = (interaction) => {
@@ -99,7 +98,6 @@ module.exports = {
                 await HelpFull.edit({
                     content: CategoriesPage,
                     components: [row],
-                    allowedMentions: { repliedUser: false }
                 });
             } else {
                 // Otherwise, show the commands for the current category
@@ -108,7 +106,6 @@ module.exports = {
                 await HelpFull.edit({
                     content: HelpFullPage,
                     components: [row],
-                    allowedMentions: { repliedUser: false }
                 });
             }
 
@@ -131,7 +128,6 @@ module.exports = {
             await HelpFull.edit({
                 content: messageContent,
                 components: [row],
-                allowedMentions: { repliedUser: false }
             });
         });
     }

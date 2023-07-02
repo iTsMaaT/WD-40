@@ -34,6 +34,6 @@ module.exports = {
             .setColor("#ffffff")
             .setDescription(`Set repeat mode to \`${args[0]}\``)
             .setTimestamp();
-        message.reply({ embeds: [repeat_mode_embed], allowedMentions: { repliedUser: false } });
+        message.reply({ embeds: [repeat_mode_embed]  });
     }
 }; 

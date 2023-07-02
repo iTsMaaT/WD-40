@@ -20,19 +20,29 @@ module.exports = {
                     text: ''
                 }
             };
-  
+            const userCountArray = [];
+            const botCountArray = [];
+            guilds.forEach(guild => {
+                userCountArray.push(guild.memberCount);
+                botCountArray.push(guild.members.cache.filter(member => member.user.bot).size);
+            });
+            
+
             // Add fields for each guild
             guilds.forEach(guild => {
                 const userCount = guild.memberCount;
                 const botCount = guild.members.cache.filter(member => member.user.bot).size;
                 const totalCount = userCount + botCount;
+
+                const userPadding = ' '.repeat(Math.max(userCountArray).toString().length - userCount.toString().length);
+                const botPadding = ' '.repeat(Math.max(botCountArray).toString().length - botCount.toString().length);
   
                 totalUsers += userCount;
                 totalBots += botCount;
   
                 const field = {
                     name: `${guild.name} (${guild.id})`,
-                    value: `Users: ${userCount} | Bots: ${botCount} | Total: ${totalCount}`
+                    value: `\`Users: ${userCount}${userPadding} | Bots: ${botCount}${botPadding} | Total: ${totalCount}\``
                 };
   
                 embed.fields.push(field);

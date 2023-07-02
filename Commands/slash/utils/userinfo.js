@@ -45,7 +45,7 @@ module.exports = {
 
 
 
-        `, allowedMentions: { repliedUser: false }
+        ` 
             });
             /***Roles**:
             ${target.roles.cache.map(r => r).join(" ")}*/

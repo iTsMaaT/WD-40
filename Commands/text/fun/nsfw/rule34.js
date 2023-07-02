@@ -23,14 +23,14 @@ module.exports = {
                     },
                     timestamp: new Date(),
                 };
-                message.reply({ embeds: [RuleEmbed], allowedMentions: { repliedUser: false } });
+                message.reply({ embeds: [RuleEmbed] });
             } catch (err) {
                 const RuleEmbed = {
                     color: 0xff0000,
                     title: `An error occured, probably a invalid tag`,
                     timestamp: new Date(),
                 };
-                message.reply({ embeds: [RuleEmbed], allowedMentions: { repliedUser: false } });
+                message.reply({ embeds: [RuleEmbed] });
                 logger.error(err);
             }
         } else {
