@@ -32,7 +32,7 @@ module.exports = (function(prisma) {
     async function AddGuildToDatabase(guild) {
         await prisma.GuildSettings.create({
             data: {
-                GuildID: BigInt(parseInt(guild.id)),
+                GuildID: guild.id,
                 GuildName:  guild.name
             }
         });
@@ -43,7 +43,7 @@ module.exports = (function(prisma) {
     async function GetGuildSettings(guild) {
         return await prisma.GuildSettings.findUnique({
             where: {
-                GuildID: BigInt(parseInt(guild.id))
+                GuildID: guild.id
             }
         });
     }
@@ -51,7 +51,7 @@ module.exports = (function(prisma) {
     async function UpdateGuild(guild, data) {
         await prisma.GuildSettings.update({
             where: {
-                GuildID: BigInt(parseInt(guild.id))
+                GuildID: guild.id
             },
             data
         });
@@ -84,41 +84,78 @@ module.exports = (function(prisma) {
         return personality[guild.id];
     }
 
+    async function blacklistFn(prisma, guildId) {
+        const bl = {};
 
-
-    /*
-        function blacklist(prisma, guildId) {
-
-            let blacklist = {
-                user_id: ["admin", "music_player"]
+        try{
+            const data = await prisma.Blacklist.findMany({
+                where: {
+                    GuildID: guildId
+                }
+            });
+            if(data.length > 0) {
+                for(const i in data){
+                    const value = data[i];
+                    if(value.UserID === undefined) continue;
+                    bl[value.UserID] = new String(value.Permission).toLowerCase().split(";");
+                }
             }
-            function init()
-
-            function addPermission(userId, permission)
-            function removerPermission(userId, permission)
-            function checkPermission(userId, permission)
-            return {addPermission, removePermission, checkPermission}
+        }catch(e) {
+            global.logger.error("Silently failing blacklist init for guild " + guildId + ", " + e.stack);
         }
 
-        let blacklists = {
-            guild_id: (blacklist())
+        function GrantPermission(userId, permission) {
+            if(!CheckPermission(userId, permission)) {
+                bl[userId] = bl[userId].filter(p => p != permission?.toLowerCase());
+                UpdateUserInDB(userId);
+            }
         }
 
-        function getBlacklist(guildId) {
-            CHECK IN blacklists array
-            IF NOT CREATE AND ADD
-            RETURN FUNCTION
+        function DenyPermission(userId, permission) {
+            if(CheckPermission(userId, permission)) {
+                if(bl[userId] === null || bl[userId] === undefined) {
+                    bl[userId] = [permission?.toLowerCase()];
+                } else {
+                    bl[userId].push(permission?.toLowerCase());
+                }
+                UpdateUserInDB(userId);
+            }
         }
 
-
-        model blacklist {
-            ID          BigInt    @id @default(autoincrement())
-            GuildID     string
-            UserID      string
-            Permission  string
+        function UpdateUserInDB(userId) {
+            prisma.Blacklist.upsert({
+                where: {
+                    GuildID_UserID: {
+                        GuildID: guildId,
+                        UserID: userId
+                    } 
+                },
+                update: {
+                    Permission: bl[userId].join(";").toLowerCase()
+                },
+                create: {
+                    GuildID: guildId,
+                    UserID: userId,
+                    Permission: bl[userId].join(";").toLowerCase()
+                }
+            }).catch(e => global.logger.error(`Unable to update Blacklist table (U: ${userId} | G: ${guildId} | P: '${bl[userId].join(";")}')\r\n${e.stack}`));
         }
 
-    */
+        function CheckPermission(userId, permission) {
+            return bl[userId] === null || bl[userId] === undefined || !bl[userId].includes(permission?.toLowerCase());
+        }
 
-    return {init, ToggleResponses, TogglePrefix, GetGuildSettings, AddGuildToDatabase, CheckIfGuildExists, SetActiveOrCreate, GetPrefix, GetResponses, SetPersonality, GetPersonality};
+        return { GrantPermission, DenyPermission, CheckPermission };
+    }
+
+    const blacklist = {};
+
+    async function GetBlacklist(guildId) {
+        if(!blacklist[guildId]) {
+            blacklist[guildId] = await blacklistFn(prisma, guildId);
+        }
+        return blacklist[guildId];
+    }
+
+    return {init, ToggleResponses, TogglePrefix, GetGuildSettings, AddGuildToDatabase, CheckIfGuildExists, SetActiveOrCreate, GetPrefix, GetResponses, SetPersonality, GetPersonality, GetBlacklist};
 });
