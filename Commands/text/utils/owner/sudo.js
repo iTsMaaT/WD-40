@@ -1,3 +1,5 @@
+const infoFromMessageLink = require("../../../../utils/functions/InfoFromMessageLink");
+
 module.exports = {
     name: "sudo",
     description: "Make the bot send a custom message / reply",
@@ -18,8 +20,9 @@ module.exports = {
             }
             //Replies to a given message in a given channel
             else if (sudoprefix == "-r") {
-                const ChannelID = args.shift();
-                const MsgID = args.shift();
+                const LinkArray = infoFromMessageLink(args.shift());
+                const ChannelID = LinkArray[1];
+                const MsgID = LinkArray[2];
                 client.channels.cache.get(ChannelID).messages.fetch({ cache: false, message: MsgID })
                     .then(m => {
                         m.reply(args.join(' '));

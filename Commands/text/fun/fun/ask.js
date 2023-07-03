@@ -1,5 +1,6 @@
 const { Configuration, OpenAIApi } = require('openai');
 const fs = require("fs/promises");
+const SendErrorEmbed = require('../../../../utils/functions/SendErrorEmbed');
 module.exports = {
     name: "ask",
     description: "Ask a question to ChatGPT-3.5-turbo",
@@ -46,6 +47,7 @@ module.exports = {
                     })
                     .catch((error) => {
                         logger.error(`OPENAI ERR: ${error}`);
+                        if (error.response.status === 429) return SendErrorEmbed(message, "Funds needed to keep running", "yellow");
                     });
 
                 if (result.data.choices[0].message.content.length < 2000) {
@@ -61,6 +63,7 @@ module.exports = {
             }
         } catch (e) {
             logger.error(e.stack);
+            SendErrorEmbed(message, "An error occured", "red");
         }
     }
 };
