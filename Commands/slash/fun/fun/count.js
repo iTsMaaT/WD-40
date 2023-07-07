@@ -32,13 +32,10 @@ module.exports = {
         const User = interaction.options.getUser("user");
         var filter = {};
         var link = "";
+        filter.GuildID = interaction.guild.id;
 
         if (String) {
             filter.Content = { contains: String.value };
-        }
-
-        if (GuildID) {
-            filter.GuildID = interaction.guild.id;
         }
 
         if (Channel) {
@@ -59,7 +56,7 @@ module.exports = {
                 ID: 'desc'
             }
         }))[0];
-        if (!last || !count) return await SendErrorEmbed(interaction, "None found.");
+        if (!last || !count) return await SendErrorEmbed(interaction, "None found.", "red");
 
         if (last) link = `https://discord.com/channels/${last.GuildID}/${last.ChannelID}/${last.MessageID}`;
 
@@ -68,7 +65,7 @@ module.exports = {
                 color: 0xffffff,
                 title: `Counting for:`,
                 description: `
-Guild ID: ${GuildID?.value ? await client.guilds.cache.get(GuildID.value).name : "**-**"}
+Guild ID: ${await interaction.guild.name (interaction.guild.id)}
 Channel: ${Channel?.value ? await client.channels.fetch(Channel).name : "**-**"}
 User: ${User ? await User.tag : "**-**"}
 Prompt: ${String?.value ?? "**-**"}
