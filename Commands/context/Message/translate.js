@@ -15,10 +15,12 @@ module.exports = {
                 translate(text, { to: LanguageCode }),
             ]);
 
+            if (enTr.text == "" || !enTr.text) throw new Error("Invalid text to translate");
+
             const embed = {
                 color: 0xffffff,
                 title: "Translation",
-                description: "**English:** " + limitString(enTr.text, 500),
+                description: "**original: **" + text + "\n**English:** " + limitString(enTr.text, 500),
                 footer: { text: ""},
                 timestamp: new Date(),        
             };

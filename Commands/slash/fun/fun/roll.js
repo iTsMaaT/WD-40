@@ -19,8 +19,8 @@ module.exports = {
     ],
     execute(logger, interaction, client) {
         // Parse the number of dices and the number of sides per dice
-        const numDices = interaction.options.get("amount").value ?? 1;
-        const numSides = interaction.options.get("sides").value ?? 6;
+        const numDices = interaction.options.get("amount")?.value ?? 1;
+        const numSides = interaction.options.get("sides")?.value ?? 6;
 
         //Limits the input to 500d500
         if (numDices > 250 || numSides > 250) {

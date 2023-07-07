@@ -95,7 +95,7 @@ module.exports = {
                 }
             ],
             footer: {
-                text: `The bot is ${botAge} old | Created by iTsMaaT#4020`
+                text: `The bot is ${botAge} old | Created by @itsmaat`
             },
             timestamp: new Date(),
         };
