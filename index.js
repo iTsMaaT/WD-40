@@ -64,6 +64,7 @@ process.on("unhandledRejection", (err) => {
 //Collections creation
 client.commands = new Discord.Collection();
 client.slashcommands = new Discord.Collection();
+client.contextCommands = new Discord.Collection();
 client.events = new Discord.Collection();
 const cooldowns = new Map();
 
@@ -97,11 +98,21 @@ loadFiles('./Commands/slash/', (slashcommand, fileName) => {
 //Text command handler
 loadFiles('./Commands/text/', function (command) {
     client.commands.set(command.name, command);
-    
+
     if (command.aliases && Array.isArray(command.aliases)) {
         command.aliases.forEach(alias => {
             client.commands.set(alias, command);
         });
+    }
+});
+
+// Context menu command handler
+loadFiles('./Commands/context/', (contextcommand, fileName) => {
+    if ('name' in contextcommand && 'execute' in contextcommand && 'type' in contextcommand) {
+        client.contextCommands.set(contextcommand.name, contextcommand);
+        discoveredCommands.push(contextcommand);
+    } else {
+        logger.error(`[WARNING] The command ${fileName} is missing a required "name", "execute", or "description" property.`);
     }
 });
 
@@ -211,20 +222,34 @@ client.on('debug', debug => {
 
 //Slash command executing
 client.on(Events.InteractionCreate, async interaction => {
-    if (!interaction.isChatInputCommand()) return;
+    if (interaction.isChatInputCommand()) {
 
-    const slash = interaction.client.slashcommands.get(interaction.commandName);
+        const slash = interaction.client.slashcommands.get(interaction.commandName);
 
-    if (!slash) return console.error(`No command matching ${interaction.commandName} was found.`);
+        if (!slash) return console.error(`No command matching ${interaction.commandName} was found.`);
 
-    try {
+        try {
         //execute the slash command
-        await slash.execute(logger, interaction, client);
-        //Logging the command
-        logger.info(`Executing [/${interaction.commandName}]\nby    [${interaction.user.tag} (${interaction.user.id})]\nin    [${interaction.channel.name} (${interaction.channel.id})]\nfrom  [${interaction.guild.name} (${interaction.guild.id})]`);
-    } catch (error) {
-        console.error(`Error executing ${interaction.commandName}`);
-        console.error(error);
+            await slash.execute(logger, interaction, client);
+            //Logging the command
+            logger.info(`Executing [/${interaction.commandName}]\nby    [${interaction.user.tag} (${interaction.user.id})]\nin    [${interaction.channel.name} (${interaction.channel.id})]\nfrom  [${interaction.guild.name} (${interaction.guild.id})]`);
+        } catch (error) {
+            logger.error(`Error executing slash command [${interaction.commandName}]`);
+            logger.error(error);
+        }
+    } else if (interaction.isContextMenuCommand()) {
+        
+        const context = client.contextCommands.get(interaction.commandName);
+
+        if (!context) return console.error(`No command matching ${interaction.commandName} was found.`);
+
+        try {
+            await context.execute(logger, interaction, client);
+            logger.info(`Executing [${interaction.commandName} (${context.type === 2 ? "User" : "Message"})]\nby    [${interaction.user.tag} (${interaction.user.id})]\nin    [${interaction.channel.name} (${interaction.channel.id})]\nfrom  [${interaction.guild.name} (${interaction.guild.id})]`);
+        } catch (error) {
+            logger.error(`Error executing context menu command [${interaction.commandName}]`);
+            logger.error(error);
+        }
     }
 });
 
