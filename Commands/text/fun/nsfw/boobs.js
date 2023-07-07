@@ -1,4 +1,5 @@
 const got = require("got");
+const SendErrorEmbed = require("../../../../utils/functions/SendErrorEmbed");
 
 module.exports = {
     name: 'boobs',
