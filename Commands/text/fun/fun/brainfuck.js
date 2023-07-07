@@ -6,6 +6,7 @@ module.exports = {
     description: "Translates a string to brainfuck",
     category: "fun",
     usage: "< String >",
+    aliases: ['bf'],
     async execute(logger, client, message, args) {
         message.channel.sendTyping();
         if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");

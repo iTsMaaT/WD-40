@@ -12,7 +12,7 @@ module.exports = {
         const bf = brainfuckToAlphuck(stringToBF(args.join(" ")));
         try {
             if (bf.length < 2000) {
-                await message.reply(`\`\`\`alphfuck\n${bf}\`\`\``);
+                await message.reply(`\`\`\`alphuck\n${bf}\`\`\``);
             } else {
                 const discriminator = Math.floor(Math.random() * 99999) + 1;
                 fs.writeFile(`./bf-${discriminator}.txt`, bf.toString(), { encoding: "utf8" });
