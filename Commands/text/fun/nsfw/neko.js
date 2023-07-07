@@ -1,5 +1,6 @@
 const got = require("got");
-const getExactDate = require("../../../../utils/functions/getExactDate");
+const SendErrorEmbed = require("../../../../utils/functions/SendErrorEmbed");
+
 module.exports = {
     name: "neko",
     description: "meow mrrrr~~ ฅ(＾・ω・＾ฅ)",
