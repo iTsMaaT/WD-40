@@ -1,4 +1,4 @@
-const SendErrorEmbed = require("../../../../utils/functions/SendErrorEmbed");
+const SendErrorEmbed = require("@functions/SendErrorEmbed");
 const { ChannelType } = require("discord.js");
 
 module.exports = {

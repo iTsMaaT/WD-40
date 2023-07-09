@@ -1,14 +1,18 @@
-const { ApplicationCommandType } = require("discord.js");
 const translate = require("@iamtraction/google-translate");
+const SendErrorEmbed = require("@functions/SendErrorEmbed");
 
 module.exports = {
-    name: 'Translate',
-    type: ApplicationCommandType.Message,
-    execute: async(logger, interaction, client) => {
-        await interaction.deferReply();
-        const LanguageCode = interaction.guild.preferredLocale.split("-")[0].toString().toLowerCase();
-        const text = interaction.targetMessage.content;
-        console.log(text);
+    name: "translate",
+    description: "Translate the replied to message",
+    usage: "Will translate the message the user replied to",
+    category: "utils",
+    async execute(logger, client, message, args) {
+        const LanguageCode = message.guild.preferredLocale.split("-")[0].toString().toLowerCase();
+
+        if (!message.reference) SendErrorEmbed(message, "You need to reply to a message", "yellow");
+
+        const reference = await message.channel.messages.fetch(message.reference.messageId);
+        const text = reference.content;
 
         try{
             const [enTr, localeTr] = await Promise.all([
@@ -35,11 +39,11 @@ module.exports = {
                 logger.error(err);
             }
         
-            await interaction.editReply({ embeds: [embed] });
+            message.reply({ embeds: [embed] });
                 
         } catch(err) {
             logger.error(err.stack);
-            await interaction.editReply({ embeds: [{title: "An error occured.", color: 0xff0000, timestamp: new Date()}] });
+            message.reply({ embeds: [{title: "An error occured.", color: 0xff0000, timestamp: new Date()}] });
         } 
 
         function limitString(string, limit) {

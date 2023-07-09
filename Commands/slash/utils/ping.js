@@ -1,4 +1,4 @@
-const { ApplicationCommandType, ApplicationCommandOptionType} = require("discord.js");
+const { ApplicationCommandType } = require("discord.js");
 const prettyMilliseconds = require("pretty-ms");
 module.exports = {
     name: 'ping',

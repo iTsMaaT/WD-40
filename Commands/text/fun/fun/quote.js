@@ -1,5 +1,5 @@
 const got = require("got");
-const SendErrorEmbed = require("../../../../utils/functions/SendErrorEmbed");
+const SendErrorEmbed = require("@functions/SendErrorEmbed");
 module.exports = {
     name: "quote",
     description: "Create a quote using the InspiroBot AI",

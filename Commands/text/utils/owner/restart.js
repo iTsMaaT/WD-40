@@ -1,4 +1,3 @@
-const prettyMilliseconds = require('pretty-ms');
 module.exports = {
     name: "restart",
     description: "Restart the bot from discord",

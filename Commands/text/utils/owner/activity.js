@@ -1,4 +1,4 @@
-const { activities } = require("../../../../utils/config.json");
+const { activities } = require("@root/utils/config.json");
 
 module.exports = {
     name: "activity",

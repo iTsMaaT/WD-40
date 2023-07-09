@@ -1,11 +1,12 @@
 const { EmbedBuilder } = require("discord.js");
-const SendErrorEmbed = require("../../../utils/functions/SendErrorEmbed");
+const SendErrorEmbed = require("@functions/SendErrorEmbed");
 const { useQueue } = require('discord-player');
 
 module.exports = {
     name: "skip",
     description: "Skip a currently playing song",
     category: "music",
+    aliases: ['next'],
     execute(logger, client, message, args) {
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
 

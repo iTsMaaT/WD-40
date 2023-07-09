@@ -1,6 +1,6 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
 const got = require("got");
-const SendErrorEmbed = require("../../../utils/functions/SendErrorEmbed");
+const SendErrorEmbed = require("@functions/SendErrorEmbed");
 const { AttachmentBuilder } = require("discord.js");
 
 const options = {

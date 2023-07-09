@@ -2,6 +2,7 @@ module.exports = {
     name: "serverinfo",
     description: "Gives info of a server",
     category: "info",
+    aliases: ['sinfo'],
     execute: async (logger, client, message, args) => {
         const owner = await message.guild.fetchOwner();
   
@@ -16,7 +17,7 @@ module.exports = {
                     name: "General",
                     value: 
 `**Server name**: \`${message.guild.name}\` 
-**Regiob**: ${message.guild.preferredLocale}
+**Region**: ${message.guild.preferredLocale}
 **Created at**: <t:${Math.floor(message.guild.createdTimestamp / 1000)}:D> (<t:${Math.floor(message.guild.createdTimestamp / 1000)}:R>)
 **Owner**: ${owner}
 **Server description**: ${message.guild.description || "-"}`,

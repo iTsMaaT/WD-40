@@ -2,6 +2,8 @@ const { PrismaClient } = require("@prisma/client");
 const { Client, GatewayIntentBits, Events, Partials } = require("discord.js");
 const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState } = require("./utils/config.json");
 
+require('module-alias/register');
+
 const Logger = require("./utils/log");
 const fs = require('fs');
 
@@ -9,11 +11,11 @@ const cron = require("cron");
 const dotenv = require("dotenv");
 const Discord = require('discord.js');
 
-const getExactDate = require("./utils/functions/getExactDate");
-const GetPterodactylInfo = require("./utils/functions/GetPterodactylInfo");
-const GetUniqueValues = require("./utils/functions/GetUniqueValues");
-const CombineCollections = require("./utils/functions/CombineCollections");
-const SendErrorEmbed = require("./utils/functions/SendErrorEmbed");
+const getExactDate = require("@functions/getExactDate");
+const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
+const GetUniqueValues = require("@functions/GetUniqueValues");
+const CombineCollections = require("@functions/CombineCollections");
+const SendErrorEmbed = require("@functions/SendErrorEmbed");
 
 var HourlyRam = [0, 0, 0];
 
@@ -21,7 +23,7 @@ dotenv.config();
 
 const client = new Client({
     intents: Object.keys(GatewayIntentBits), // all intents
-    partials: [Partials.Message, Partials.Channel, Partials.Reaction],
+    partials: Object.keys(Partials),
     shards: "auto",
     allowedMentions: { repliedUser: false }
 });

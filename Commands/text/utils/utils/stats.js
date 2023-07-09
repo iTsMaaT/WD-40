@@ -1,7 +1,7 @@
 const prettyMilliseconds = require('pretty-ms');
 const os = require('os');
-const changelog = require('../../../../changelogs.json');
-const GetPterodactylInfo = require("../../../../utils/functions/GetPterodactylInfo");
+const changelog = require('@root/changelogs.json');
+const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
 
 module.exports = {
     name: "stats",

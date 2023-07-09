@@ -1,5 +1,5 @@
 const got = require('got');
-const SendErrorEmbed = require("../../../../utils/functions/SendErrorEmbed.js");
+const SendErrorEmbed = require("@functions/SendErrorEmbed.js");
 
 module.exports = {
     name: 'dog',

@@ -1,7 +1,7 @@
 const { Events } = require('discord.js');
-const FetchReddit = require("../utils/functions/FetchReddit.js");
-const StringReact = require('../utils/functions/StringReact.js');
-const { blacklist, whitelist } = require("../utils/config.json");
+const FetchReddit = require("@functions/FetchReddit.js");
+const StringReact = require('@functions/StringReact.js');
+const { blacklist, whitelist } = require("@config.json");
 
 module.exports = {
     name: Events.MessageCreate,

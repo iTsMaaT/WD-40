@@ -1,5 +1,5 @@
 const { useQueue } = require('discord-player');
-const SendErrorEmbed = require('../../../utils/functions/SendErrorEmbed');
+const SendErrorEmbed = require('@functions/SendErrorEmbed');
 
 module.exports = {
     name: 'shuffle',

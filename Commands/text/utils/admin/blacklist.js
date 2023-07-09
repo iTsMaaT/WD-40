@@ -1,5 +1,5 @@
-const SendErrorEmbed = require("../../../../utils/functions/SendErrorEmbed");
-const id = require("../../../../utils/functions/id");
+const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const id = require("@functions/id");
 
 module.exports = {
     name: 'blacklist',

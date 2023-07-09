@@ -1,4 +1,4 @@
-const changelog = require('../../../../changelogs.json');
+const changelog = require('@root/changelogs.json');
 
 module.exports = {
     name: 'changelog',

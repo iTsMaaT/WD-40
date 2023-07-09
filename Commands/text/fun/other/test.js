@@ -1,11 +1,11 @@
-const CreateUniqueSeed = require("../../../../utils/functions/CreateUniqueSeed.js");
-const RandomMinMax = require("../../../../utils/functions/RandomMinMax.js");
-const getExactDate = require("../../../../utils/functions/getExactDate.js");
-const prettyString = require("../../../../utils/functions/prettyString.js");
-const StringReact = require("../../../../utils/functions/StringReact.js");
-const ShuffleArray = require("../../../../utils/functions/ShuffleArray.js");
-const GetPterodactylInfo = require("../../../../utils/functions/GetPterodactylInfo.js");
-const GetUniqueValues = require("../../../../utils/functions/GetUniqueValues.js");
+const CreateUniqueSeed = require("@functions/CreateUniqueSeed.js");
+const RandomMinMax = require("@functions/RandomMinMax.js");
+const getExactDate = require("@functions/getExactDate.js");
+const prettyString = require("@functions/prettyString.js");
+const StringReact = require("@functions/StringReact.js");
+const ShuffleArray = require("@functions/ShuffleArray.js");
+const GetPterodactylInfo = require("@functions/GetPterodactylInfo.js");
+const GetUniqueValues = require("@functions/GetUniqueValues.js");
 
 module.exports = {
     name: "test",

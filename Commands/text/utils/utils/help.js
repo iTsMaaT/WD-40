@@ -1,6 +1,6 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const prettyString = require("../../../../utils/functions/prettyString.js");
-const SendErrorEmbed = require("../../../../utils/functions/SendErrorEmbed.js");
+const prettyString = require("@functions/prettyString.js");
+const SendErrorEmbed = require("@functions/SendErrorEmbed.js");
 module.exports = {
     name: "help",
     description: "Lists commands",
