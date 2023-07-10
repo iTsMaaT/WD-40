@@ -1,4 +1,4 @@
-const FetchReddit = require("../../../../utils/functions/FetchReddit.js");
+const FetchReddit = require("@functions/FetchReddit.js");
 
 module.exports = {
     name: 'quebec',

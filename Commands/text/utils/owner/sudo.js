@@ -1,4 +1,4 @@
-const infoFromMessageLink = require("../../../../utils/functions/InfoFromMessageLink");
+const infoFromMessageLink = require("@functions/InfoFromMessageLink");
 
 module.exports = {
     name: "sudo",

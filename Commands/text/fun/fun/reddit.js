@@ -1,11 +1,11 @@
 const got = require("got");
-const SendErrorEmbed = require("../../../../utils/functions/SendErrorEmbed");
+const SendErrorEmbed = require("@functions/SendErrorEmbed");
 
 module.exports = {
     name: "reddit",
     description: "Finds an image or post from *any* subreddit",
     usage: "< -p [...]: post, -u [...]: user>",
-    category: "NSFW",
+    category: "fun",
     execute: async (logger, client, message, args) => {
         message.channel.sendTyping();
         var sent = "";

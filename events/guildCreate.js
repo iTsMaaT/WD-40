@@ -1,5 +1,5 @@
 const { Events } = require('discord.js');
-const { guildblacklist } = require('../utils/config.json');
+const { guildblacklist } = require('@root/utils/config.json');
 
 module.exports = {
     name: Events.GuildCreate,

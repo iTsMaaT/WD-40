@@ -1,4 +1,4 @@
-const SendErrorEmbed = require("../../../utils/functions/SendErrorEmbed");
+const SendErrorEmbed = require("@functions/SendErrorEmbed");
 const { useQueue } = require('discord-player');
 
 module.exports = {

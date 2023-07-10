@@ -1,6 +1,6 @@
 const { Configuration, OpenAIApi } = require('openai');
 const fs = require("fs/promises");
-const SendErrorEmbed = require('../../../../utils/functions/SendErrorEmbed');
+const SendErrorEmbed = require('@functions/SendErrorEmbed');
 module.exports = {
     name: "ask",
     description: "Ask a question to ChatGPT-3.5-turbo",
@@ -59,7 +59,7 @@ module.exports = {
                     await fs.unlink(`./answer-${discriminator}.txt`);
                 }
             } else {
-                message.reply("Invalid prompt.");
+                SendErrorEmbed(message, "Invalid prompt.", "yellow");
             }
         } catch (e) {
             logger.error(e.stack);

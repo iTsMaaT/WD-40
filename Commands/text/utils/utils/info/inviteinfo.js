@@ -2,6 +2,7 @@ module.exports = {
     name: "inviteinfo",
     description: "Gives info on an invite",
     category: "info",
+    aliases: ['iinfo'],
     async execute(logger, client, message, args) {
         message.channel.sendTyping();
         const inviteCode = args[0].replace("https://discord.gg/", "").replace("https://discord.com/invite/", "");

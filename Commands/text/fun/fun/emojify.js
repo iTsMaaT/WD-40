@@ -1,0 +1,78 @@
+const SendErrorEmbed = require("@functions/SendErrorEmbed.js");
+
+module.exports = {
+    name: "emojify",
+    description: "Transform a string into emotes",
+    usage: "< [Prompt] >",
+    category: "fun",
+    execute(logger, client, message, args) {
+        const emoteMap = {
+            a: '🇦',
+            b: '🇧',
+            c: '🇨',
+            d: '🇩',
+            e: '🇪',
+            f: '🇫',
+            g: '🇬',
+            h: '🇭',
+            i: '🇮',
+            j: '🇯',
+            k: '🇰',
+            l: '🇱',
+            m: '🇲',
+            n: '🇳',
+            o: '🇴',
+            p: '🇵',
+            q: '🇶',
+            r: '🇷',
+            s: '🇸',
+            t: '🇹',
+            u: '🇺',
+            v: '🇻',
+            w: '🇼',
+            x: '🇽',
+            y: '🇾',
+            z: '🇿',
+            0: '0️⃣',
+            1: '1️⃣',
+            2: '2️⃣',
+            3: '3️⃣',
+            4: '4️⃣',
+            5: '5️⃣',
+            6: '6️⃣',
+            7: '7️⃣',
+            8: '8️⃣',
+            9: '9️⃣',
+            '!': '❗',
+            '?': '❓',
+            '#': '#️⃣',
+            '*': '*️⃣',
+            '+': '➕',
+            '-': '➖',
+            '÷': '➗',
+            '$': '💲',
+            '.': '🔵',
+            ',': '🔻',
+            '<': '⬅',
+            '>': '➡',
+            '^': '🔺',
+        };
+
+        if (!args[0]) SendErrorEmbed(message, "You need a prompt", "yellow");
+
+        const emotesPromt = Array.from(args.join(" ").toLowerCase())
+            .map((char) => emoteMap[char] || char) // Use emote mapping or original character if mapping doesn't exist
+            .join(' ');
+
+        if (emotesPromt.length > 1000) SendErrorEmbed(message, "Prompt too long", "yellow");
+
+        const embed = {
+            color: 0xffffff,
+            title: "Emotified text",
+            description: emotesPromt,
+            timestamp: new Date()
+        };
+
+        message.reply({ embeds: [embed] });
+    }
+};

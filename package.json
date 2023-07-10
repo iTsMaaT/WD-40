@@ -36,6 +36,7 @@
     "ffmpeg": "^0.0.4",
     "ffmpeg-static": "^4.4.1",
     "got": "^11.8.3",
+    "module-alias": "^2.2.3",
     "node-opus": "^0.3.3",
     "openai": "^3.2.1",
     "opusscript": "^0.0.8",
@@ -46,5 +47,9 @@
   },
   "devDependencies": {
     "prisma": "^4.13.0"
+  },
+  "_moduleAliases": {
+    "@root"      : ".",
+    "@functions"  : "./utils/functions"
   }
 }

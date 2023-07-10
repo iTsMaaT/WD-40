@@ -1,12 +1,13 @@
 const got = require('got');
 const cheerio = require('cheerio');
 const https = require('https');
-const SendErrorEmbed = require('../../../../../utils/functions/SendErrorEmbed');
+const SendErrorEmbed = require('@functions/SendErrorEmbed');
 
 module.exports = {
     name: 'linkinfo',
     description: 'Gives info about a link',
     usage: '< [URL] >',
+    aliases: ['linfo'],
     category: 'info',
     cooldown: 10000,
     async execute(logger, client, message, args) {
@@ -39,12 +40,12 @@ module.exports = {
                 ],
             };
 
-            message.channel.send({ embeds: [embed] });
+            message.reply({ embeds: [embed] });
         } catch (error) {
             logger.error(error.stack);
             const responseStatus = error.response?.statusCode || '-';
             const statusDescription = error.response?.statusMessage || 'Unknown Error';
-
+          
             const embed = {
                 color: 0xffffff,
                 title: 'Link Analysis',
@@ -60,8 +61,8 @@ module.exports = {
                     { name: 'Metadata', value: '-' },
                 ],
             };
-
-            message.channel.send({ embeds: [embed] });
+          
+            await message.reply({ embeds: [embed] });
         }
 
         async function analyzeLink(url) {
@@ -96,7 +97,7 @@ module.exports = {
                 pageTitle: pageTitle !== null ? pageTitle : undefined,
                 metadata,
                 scanResults: {
-                    isRateLimited: scanResults.isRateLimited,
+                    isRateLimited: scanResults?.isRateLimited,
                     harmless: scanResults.harmless !== "-" ? scanResults.harmless : undefined,
                     suspicious: scanResults.suspicious !== "-" ? scanResults.suspicious : undefined,
                     malicious: scanResults.malicious !== "-" ? scanResults.malicious : undefined,

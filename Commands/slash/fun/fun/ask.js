@@ -1,7 +1,7 @@
 const { Configuration, OpenAIApi } = require('openai');
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
 const fs = require("fs/promises");
-const CreateUniqueSeed = require("../../../../utils/functions/CreateUniqueSeed.js");
+const CreateUniqueSeed = require("@functions/CreateUniqueSeed.js");
 
 module.exports = {
     name: "ask",

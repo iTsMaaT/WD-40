@@ -1,9 +1,10 @@
-const GetPterodactylInfo = require("../../../../utils/functions/GetPterodactylInfo");
+const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
 
 module.exports = {
     name: 'botinfo',
     description: 'Gives info about the Pterodactyl server',
     category: "utils",
+    aliases: ['binfo'],
     async execute(logger, client, message, args) {
         message.channel.sendTyping();
 

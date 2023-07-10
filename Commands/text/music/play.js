@@ -1,4 +1,4 @@
-const SendErrorEmbed = require("../../../utils/functions/SendErrorEmbed");
+const SendErrorEmbed = require("@functions/SendErrorEmbed");
 const { QueryType } = require('discord-player');
 
 module.exports = {
@@ -36,7 +36,8 @@ module.exports = {
                 },
                 leaveOnEmptyCooldown: 300000,
                 leaveOnEmpty: true,
-                leaveOnEnd: false,
+                leaveOnEnd: true,
+                leaveOnEndCooldown: 300000,
                 bufferingTimeout: 0,
                 volume: 75,
             }

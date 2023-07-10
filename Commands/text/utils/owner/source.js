@@ -1,4 +1,4 @@
-const SplitIntoChunks = require("../../../../utils/functions/SplitIntoChunks");
+const SplitIntoChunks = require("@functions/SplitIntoChunks");
 
 module.exports = {
     name: "source",
