@@ -182,5 +182,14 @@
             "Added new commands:>blacklist\n>brainfuck\n>alphuck",
             "FIxes"
         ]
+    },
+    {
+        "version": "4.7.0",
+        "date": "2023-07-02",
+        "changes": [
+            "Added new commands:\n>emojify\n>uwufy",
+            "Added context commands:\nRight click user > apps > userinfo\nRight click message > apps > translate",
+            "FIxes"
+        ]
     }
 ]
