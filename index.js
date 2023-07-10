@@ -13,8 +13,6 @@ const Discord = require('discord.js');
 
 const getExactDate = require("@functions/getExactDate");
 const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
-const GetUniqueValues = require("@functions/GetUniqueValues");
-const CombineCollections = require("@functions/CombineCollections");
 const SendErrorEmbed = require("@functions/SendErrorEmbed");
 
 var HourlyRam = [0, 0, 0];
@@ -204,7 +202,6 @@ client.on("ready", async () => {
     global.superuser = DefaultSuperuserState;
     if (process.env.SERVER == "dev") global.superuser = 1;
     console.log(`Debug is ${debug ? "en" : "dis"}abled\nSuperuser is ${superuser ? "en" : "dis"}abled`);
-    console.log("The missing commands to translate to the other types are: " + GetUniqueValues(CombineCollections(client.commands.filter(val => !val.private).map((command) => command.name), client.slashcommands.map((command) => command.name))).join(", "));
 
     //start confirmation
     logger.info("Bot started successfully.");
