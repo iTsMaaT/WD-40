@@ -9,15 +9,9 @@ module.exports = {
     category: "utils",
     execute: async (logger, client, message, args) => {
         message.channel.sendTyping();
-        /*
-		TODO
-		amount users in present guild
-		amount bots (?)
-		amount shards
-		version
-		nodejs version
-		
-		*/
+        const addedCommands = new Set();
+        client.commands.each((val) => {if (!val.private && !addedCommands.has(val.name)) { addedCommands.add(val.name); }});
+        
         const PteroInfo = await GetPterodactylInfo();
         const RamUsageFormatted = `${PteroInfo.ram.usage.clean} / ${PteroInfo.ram.limit.clean} (${PteroInfo.ram.pourcentage.clean})`;
         const prefix = global.GuildManager.GetPrefix(message.guild);
@@ -27,7 +21,7 @@ module.exports = {
         const WDVersion = changelog.slice(-1).map(({version}) => { return version; }).join();
         const Shards = client.options.shardCount ?? 1;
         const nodeVersion = process.version;
-        const amountTextCommands = client.commands.filter(val => !val.private).size;
+        const amountTextCommands = addedCommands.size;
         const amountSlashCommands = client.slashcommands.size;
         const totalUsers = client.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0);
         const userHere = message.guild.memberCount;
