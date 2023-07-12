@@ -8,24 +8,20 @@ module.exports = {
     async execute(logger, client, message, args) {
         message.channel.sendTyping();
 
-        if (message.channel.nsfw) {
-            await got("http://shibe.online/api/birds")
-                .then(response => {
-                    var url = JSON.parse(response.body)[0];
+        await got("http://shibe.online/api/birds")
+            .then(response => {
+                var url = JSON.parse(response.body)[0];
 
-                    NekoEmbed = {
-                        color: 0xffffff,
-                        title: `Enjoy!`,
-                        image: {
-                            url: url,
-                        },
-                        timestamp: new Date(),
-                    };
+                NekoEmbed = {
+                    color: 0xffffff,
+                    title: `Enjoy!`,
+                    image: {
+                        url: url,
+                    },
+                    timestamp: new Date(),
+                };
 
-                    message.reply({ embeds: [NekoEmbed] });
-                });
-        } else {
-            return SendErrorEmbed(message, "The channel you are in isn't NSFW", "yellow");
-        }
+                message.reply({ embeds: [NekoEmbed] });
+            });
     }
 };
