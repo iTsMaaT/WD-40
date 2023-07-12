@@ -4,7 +4,7 @@ const fs = require("fs/promises");
 module.exports = {
     name: "brainfuck",
     description: "Translates a string to brainfuck",
-    category: "fun",
+    category: "esolangs",
     usage: "< String >",
     aliases: ['bf'],
     async execute(logger, client, message, args) {

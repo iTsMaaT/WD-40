@@ -4,7 +4,7 @@ const fs = require("fs/promises");
 module.exports = {
     name: "alphuck",
     description: "Translates a string to alphuck",
-    category: "fun",
+    category: "esolangs",
     usage: "< String >",
     async execute(logger, client, message, args) {
         message.channel.sendTyping();
