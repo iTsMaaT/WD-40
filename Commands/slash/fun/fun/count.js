@@ -65,7 +65,7 @@ module.exports = {
                 color: 0xffffff,
                 title: `Counting for:`,
                 description: `
-Guild ID: ${await interaction.guild.name (interaction.guild.id)}
+Guild ID: ${await interaction.guild.name} (${interaction.guild.id})}
 Channel: ${Channel?.value ? await client.channels.fetch(Channel).name : "**-**"}
 User: ${User ? await User.tag : "**-**"}
 Prompt: ${String?.value ?? "**-**"}
