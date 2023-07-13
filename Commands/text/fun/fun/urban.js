@@ -23,6 +23,7 @@ module.exports = {
                     var definition = urban.list[0].definition.replace(/[[\]]/g, "");
                     var example = urban.list[0].example.replace(/[[\]]/g, "");
                     var author = urban.list[0].author;
+                    var id = urban.list[0].defid;
     
                     const UrbanEmbed = {
                         color: 0xffffff,
@@ -30,7 +31,7 @@ module.exports = {
                         url: urban.list[0].permalink,
                         description: `**Definition**: ${definition}\n\n**Example**: ${example}`,
                         timestamp: new Date(),
-                        footer: { text: `ID : By: ${author}` }
+                        footer: { text: `ID : ${id} | By: ${author}` }
                     };
     
                     message.reply({ embeds: [UrbanEmbed] });
