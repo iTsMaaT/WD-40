@@ -1,6 +1,4 @@
 const { Events } = require('discord.js');
-const FetchReddit = require("@functions/FetchReddit.js");
-const StringReact = require('@functions/StringReact.js');
 const { blacklist, whitelist } = require("@root/utils/config.json");
 
 module.exports = {
@@ -17,51 +15,30 @@ module.exports = {
             message.reply(`**Prefix** : ${prefix}\n**Help command** : ${prefix}help`);
         }
 
-        //Votes for the memes
-        if (message.attachments.size > 0 || message.content.startsWith("https://") || message.content.startsWith("http://")) {
-            if (message.channel.name.includes('meme')) {
-                message.react('👍')
-                    .then(() => message.react('👎'))
-                    .then(() => message.react('♻️'))
-                    .then(() => message.react('💀'))
-                    .then(() => message.react('🤨'))
-                    .then(() => message.react("😎"));
+        //Snowflake reaction
+        if (snowflakeData != []) {
+            const expected = [parseInt(message.guildId), parseInt(message.author.id)];
+            const exists = snowflakeData.filter(v => {
+                return v.equals(expected);
+            }).length >= 1;
+            if (exists) {
+                message.react('❄️');
             }
         }
 
         //Auto-responses
         if (global.GuildManager.GetResponses(message.guild)) {
 
-            if (message.type == "GUILD_MEMBER_JOIN") StringReact(client, message.channel.id, message.id, "hi");
-
-            //Sends furry porn in DMs of anyone that says "sex"
-            if (message.content.toLowerCase() == "sex") {
-                message.author.send({ embeds: [await FetchReddit(true, "furrypornsubreddit", "yiff", "furryonhuman")] });
-
-            }
-
-            //reacts S-T-F-U when gros gaming or smartass is said
-            if (message.content.toLowerCase().includes("gros gaming") || message.content.toLowerCase().includes("smartass") || (message.content.toLowerCase().includes("edging") && !message.author.id == USERID.dada129)) {
-                message.react('🇸')
-                    .then(() => message.react('🇹'))
-                    .then(() => message.react('🇫'))
-                    .then(() => message.react('🇺'));
-            }
-
-            //Deletes the message if it has edging and is said by dada
-            if (message.content.toLowerCase().includes("edging") && message.author.id == USERID.dada129) {
-                message.delete();
-            }
-
-            //what? eveeeer
-            if (message.content.toLowerCase() == `what` || message.content == `what?` || message.content == `What?` ||
-                message.content.toLowerCase() == `who` || message.content == `who?` || message.content == `Who?`) {
-                message.reply("ever!");
-            }
-
-            //ever what?
-            if (message.content.toLowerCase() == `ever`) {
-                message.reply("What?");
+            //Votes for the memes
+            if (message.attachments.size > 0 || message.content.startsWith("https://") || message.content.startsWith("http://")) {
+                if (message.channel.name.includes('meme')) {
+                    message.react('👍')
+                        .then(() => message.react('👎'))
+                        .then(() => message.react('♻️'))
+                        .then(() => message.react('💀'))
+                        .then(() => message.react('🤨'))
+                        .then(() => message.react("😎"));
+                }
             }
 
             //skull reaction to skull emoji
@@ -69,50 +46,9 @@ module.exports = {
                 message.react('💀');
             }
 
-            //Snowflake reaction
-            if (snowflakeData != []) {
-                const expected = [parseInt(message.guildId), parseInt(message.author.id)];
-                const exists = snowflakeData.filter(v => {
-                    return v.equals(expected);
-                }).length >= 1;
-                if (exists) {
-                    message.react('❄️');
-                }
-            }
-
-            //reacts :gorilla: when pinging iTsMaaT
-            if (message.content.includes("<@411996978583699456>")) {
-                message.react('🦍');
-            }
-
-            //reacts :chipmunk: when pinging phildiop
-            if (message.content.includes("<@348281625173295114>")) {
-                message.react('🐿️');
-            }
-
-            //answers your mom when asking who's at break
-            if (message.content.toLowerCase().includes("en pause")) {
-                message.channel.send("Ta mère");
-            }
-
             //Ping fail if doesnt have @everyone perm
             if (message.member && !message.member.permissions.has("MentionEveryone") && (message.content.includes("@everyone") || message.content.includes("@here"))) {
                 message.reply("Ping fail L");
-            }
-
-            //answers bruh to bruh
-            if (message.content.toLowerCase() == "bruh") {
-                message.reply("bruh");
-            }
-
-            //Reacts the stuff meme when a message includes "stuff"
-            if (message.content.toLowerCase().includes("stuff")) {
-                message.react("<:stuff:1099738190966960179>");
-            }
-
-            //Replies when someone does a mogus reference
-            if (message.content.toLowerCase() == "sus" || message.content.toLowerCase() == "amogus" || message.content.toLowerCase() == "among us") {
-                //message.reply("No.");
             }
         }
     },

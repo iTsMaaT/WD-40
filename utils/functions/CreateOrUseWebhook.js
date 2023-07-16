@@ -1,6 +1,6 @@
 const CreateOrUseWebhook = async function(message, name) {
-    let webhook = message.channel.fetchWebhooks();
-    webhook = webhook.filter(webhook => webhook.name == name)[0];
+    const webhooks = await message.channel.fetchWebhooks();
+    let webhook = webhooks.filter(webhook => webhook.name == name)[0];
 
     if (!webhook) {
         webhook = await message.channel.createWebhook({
