@@ -18,43 +18,56 @@ module.exports = {
 
         const text = args.join(' ');
 
-        if (text.lenght > 200) return SendErrorEmbed(message, "The prompt must be shorter than 200 characters", "yellow");
+        if (text.length > 1000) return SendErrorEmbed(message, "The prompt must be shorter than 1000 characters", "yellow");
 
         try {
             connection = joinVoiceChannel({
                 channelId: message.member.voice.channel.id,
-                guildId: message.channel.guild.id,
-                adapterCreator: message.channel.guild.voiceAdapterCreator,
+                guildId: message.guild.id,
+                adapterCreator: message.guild.voiceAdapterCreator,
             });
         } catch(err) {
             logger.error(err);
-            return SendErrorEmbed(message, "Connection the the voice channel failed", "red");
+            return SendErrorEmbed(message, "Connection to the voice channel failed", "red");
         }
 
-        const url = googleTTS.getAudioUrl(text, {
+        const audioUrls = googleTTS.getAllAudioUrls(text, {
             lang: 'fr',
             slow: true,
             host: 'https://translate.google.com',
+            splitPunct: '-',
         });
 
         try {
-            const resource = createAudioResource(url, {
-                inlineVolume: true
-            });
+            const resources = audioUrls.map(audio => audio.url);
 
-            const player = createAudioPlayer();
-            connection.subscribe(player);
-            player.play(resource);
+            let currentIndex = 0; // Keep track of the current audio index
+
+            const playNextAudio = () => {
+                if (currentIndex < resources.length) {
+                    const resource = createAudioResource(resources[currentIndex]);
+
+                    const player = createAudioPlayer();
+                    connection.subscribe(player);
+                    player.play(resource);
+
+                    player.on(AudioPlayerStatus.Idle, () => {
+                        player.stop();
+
+                        currentIndex++; // Move to the next audio index
+                        playNextAudio(); // Play the next audio
+                    });
+                } else {
+                    connection.destroy(); // No more audio elements, destroy the connection
+                }
+            };
+
+            playNextAudio(); // Start playing the first audio
         } catch (err) {
             logger.error(err);
             return SendErrorEmbed(message, "Error while trying to play the TTS", "red");
         }
 
-        connection.on(AudioPlayerStatus.Idle, () => {
-            player.stop();
-            connection.destroy();
-        });
-
-        message.reply({ embeds: [{title : "Attempting to join the Voice Channel...", timestamp : new Date()}] });
+        message.reply({ embeds: [{ title: "Playing the TTS", timestamp: new Date(), color: 0xffffff }] });
     },
 };
