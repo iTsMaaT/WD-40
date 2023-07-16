@@ -280,9 +280,16 @@ client.on("messageCreate", async (message) => {
 
     //Text command executing
     const prefix = global.GuildManager.GetPrefix(message.guild);
-    if (message.content.startsWith(prefix)) {
-        const args = message.content.slice(prefix.length).split(/ +/);
-        const commandName = args.shift().toLowerCase();
+    if (message.content.startsWith(prefix) || message.content.startsWith(`<@${client.user.id}>`)) {
+        let args, commandName;
+        if (!message.content.startsWith(`<@${client.user.id}> `)) {
+            args = message.content.slice(prefix.length).split(/ +/);
+            commandName = args.shift().toLowerCase();
+        } else {
+            args = message.content.slice().split(/ +/);
+            args.shift();
+            commandName = args.shift().toLowerCase();
+        }
 
         // Check if the command or alias exists
         const command = client.commands.get(commandName);
