@@ -191,5 +191,15 @@
             "Added context commands:\nRight click user > apps > userinfo\nRight click message > apps > translate",
             "Fixes"
         ]
+    },
+    {
+        "version": "4.8.0",
+        "date": "2023-07-02",
+        "changes": [
+            "Added new commands:\n>tts\n>fakemessage",
+            "Moved brainfuck and alphfuck to esolangs category",
+            "Can now ping the bot instead of using prefix to execute a command, pinging without any argument will give the guild's prefix",
+            "Fixes"
+        ]
     }
 ]
