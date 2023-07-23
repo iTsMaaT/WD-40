@@ -6,6 +6,7 @@ module.exports = {
     category: "admin",
     usage: "< -mute / -unmute >",
     admin: true,
+    aliases: ['ma'],
     execute(logger, client, message, args) {
   
         // Check if the user is in a voice channel
@@ -30,7 +31,7 @@ module.exports = {
                     try {
                         await member.voice.setMute(true);
                     } catch (error) {
-                        console.error(`Failed to mute member ${member.user.tag}:`, error);
+                        logger.error(`Failed to mute member ${member.user.tag}:`);
                     }
                 }
             });
@@ -42,7 +43,7 @@ module.exports = {
                 try {
                     await member.voice.setMute(false);
                 } catch (error) {
-                    console.error(`Failed to unmute member ${member.user.tag}:`, error);
+                    logger.error(`Failed to unmute member ${member.user.tag}:`);
                 }
             });
   

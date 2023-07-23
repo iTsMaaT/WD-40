@@ -6,6 +6,7 @@ module.exports = {
     category: "admin",
     usage: "< -deafen / -undeafen >",
     admin: true,
+    aliases: ['deafa'],
     execute(logger, client, message, args) {
       
         // Check if the user is in a voice channel
@@ -42,12 +43,12 @@ module.exports = {
                 try {
                     await member.voice.setDeaf(false);
                 } catch (error) {
-                    console.error(`Failed to undeafen member ${member.user.tag}:`, error);
+                    logger.error(`Failed to undeafen member ${member.user.tag}:`);
                 }
             });
             
             embed.title = 'Successfully undeafened all members.';
-            message.reply({ embeds: [enbed] });
+            message.reply({ embeds: [embed] });
         } else {
             SendErrorEmbed(message, 'Invalid argument. Please specify either "deafen" or "undeafen".', "yellow");
         }
