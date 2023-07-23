@@ -21,7 +21,8 @@ module.exports = {
                 .setTimestamp();
             message.reply({ embeds: [skipped_embed] });
         } catch (e) {
-            SendErrorEmbed(message, "An error occurred.", "red", e);
+            logger.error(e);
+            SendErrorEmbed(message, "An error occurred.", "red");
         }
     }
 }; 
