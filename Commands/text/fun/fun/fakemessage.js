@@ -22,15 +22,12 @@ module.exports = {
             return SendErrorEmbed(message, "Couldn't fetch the user", "red");
         });
 
-        console.log(User);
-
         // Create a webhook in the target channel
         const webhook = await CreateOrUseWebhook(message, 'FakeMessage');
 
-
         // Send the fake message using the webhook
         await webhook.send({
-            username: User.user.username,
+            username: User.nickname || User.user.username,
             avatarURL: User.displayAvatarURL({ format: 'png' }),
             content: args.join(" ")
         });
