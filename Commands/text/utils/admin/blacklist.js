@@ -9,8 +9,7 @@ module.exports = {
     async execute(logger, client, message, args) {
         if (!args[0]) return SendErrorEmbed(message, "You did not provide a user.", "yellow");
         if (!args[1]) return SendErrorEmbed(message, "You did not provide a permission.", "yellow");
-        let target = "";
-        let owner = "";
+        let target, owner;
 
         const executor = await message.guild.members.fetch(message.author.id);
         const permission = args[1];
@@ -26,7 +25,7 @@ module.exports = {
             target = await message.guild.members.fetch(id(args[0]));
             owner = await message.guild.fetchOwner();
         } catch(err) {
-            return SendErrorEmbed(message, "Couldn't find the user", "yellow");
+            return SendErrorEmbed(message, "Couldn't find the specified user", "yellow");
         }
         if (!commandArray.includes(permission)) return SendErrorEmbed(message, "Invalid permission, must be a category or command name.", "yellow");
 
