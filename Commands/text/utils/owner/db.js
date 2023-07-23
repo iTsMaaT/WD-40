@@ -10,19 +10,10 @@ module.exports = {
         if (message.author.id != process.env.OWNER_ID) return;
         let data;
 
-        if (!args) {
-            return message.reply('Please provide a table name!');
-        }
+        const tables = Object.keys(global.prisma);
+        const tableList = tables.filter(name => !name.startsWith("_") && !name.startsWith("$"));
 
-        const option = args[0];
-
-        if (option === '-t') {
-            // List all tables
-            const tables = Object.keys(global.prisma);
-            const tableList = tables.filter(name => !name.startsWith("_") && !name.startsWith("$")).join(', ');
-
-            return message.reply(`Tables: ${tableList}`);
-        }
+        if (args[0] === '-t' || !args[0] || !tableList.includes(args[0])) return message.reply(`Tables: ${tableList.join(', ')}`);
 
         const tableName = args[0];
         const sent = await message.reply({ content: `Fetching the DB...`, fetchReply: true });
@@ -71,11 +62,10 @@ module.exports = {
             // Create a text file
             const fileName = `./${tableName}_data.txt`;
             await fs.writeFile(fileName, table, { encoding: 'utf8' });
-            await sent.edit(`Operation took ${prettyMilliseconds(Date.now() - sent.createdTimestamp)}`);
-            await message.reply({ files: [fileName] });
+            await sent.edit({ content: `Operation took ${prettyMilliseconds(Date.now() - sent.createdTimestamp)}`, files: [fileName]});
             await fs.unlink(fileName);
         } catch (error) {
-            console.error(error.stack);
+            logger.error(error.stack);
             sent.edit('An error occurred while fetching data.');
         }
     },
