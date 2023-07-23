@@ -1,3 +1,5 @@
+const { PresenceUpdateStatus } = require("discord.js");
+
 module.exports = {
     name: "status",
     description: "Changes the bot's activity status",
@@ -11,22 +13,28 @@ module.exports = {
         switch(args[0] ?? "dnd") {
         case "donotdisturb":
         case "dnd": 
-            client.user.setPresence({ status: 'dnd' });
+        case "red":
+            client.user.setPresence({ status: PresenceUpdateStatus.DoNotDisturb });
             break;
-        case "online" : {
-            client.user.setPresence({ status: 'online' });
+        case "online" :
+        case "green":
+        case "available":
+            client.user.setPresence({ status: PresenceUpdateStatus.Online });
             break;
-        }
         case "invisible":
-        case "offline" : 
-            client.user.setPresence({ status: 'invisible' });
+        case "grey":
+        case "gray": 
+            client.user.setPresence({ status: PresenceUpdateStatus.Invisible });
             break;
-        case "idle" : {
-            client.user.setPresence({ status: 'idle' });
+        case "idle":
+        case "yellow":
+            client.user.setPresence({ status: PresenceUpdateStatus.Idle });
             break;
-        }
+        case "offline":
+            client.user.setPresence({ status: PresenceUpdateStatus.Offline });
+            break;
         default : {
-            client.user.setPresence({ status: 'dnd' });
+            client.user.setPresence({ status: PresenceUpdateStatus.Online });
         }
         }
         message.reply("Status changed to: " + args[0] ?? "dnd");
