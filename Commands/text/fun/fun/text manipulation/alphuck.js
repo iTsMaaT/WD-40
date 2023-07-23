@@ -1,10 +1,9 @@
 const SendErrorEmbed = require("@functions/SendErrorEmbed");
-const fs = require("fs/promises");
 
 module.exports = {
     name: "alphuck",
     description: "Translates a string to alphuck",
-    category: "esolangs",
+    category: "text manipulation",
     usage: "< String >",
     async execute(logger, client, message, args) {
         message.channel.sendTyping();
@@ -14,10 +13,7 @@ module.exports = {
             if (bf.length < 2000) {
                 await message.reply(`\`\`\`alphuck\n${bf}\`\`\``);
             } else {
-                const discriminator = Math.floor(Math.random() * 99999) + 1;
-                fs.writeFile(`./bf-${discriminator}.txt`, bf.toString(), { encoding: "utf8" });
-                await message.reply({ files: [`./bf-${discriminator}.txt`] });
-                fs.unlink(`./bf-${discriminator}.txt`);
+                SendErrorEmbed(message, "The result is too long (>2000)", "yellow");
             }
         } catch(err) {
             logger.error(err.stack);
