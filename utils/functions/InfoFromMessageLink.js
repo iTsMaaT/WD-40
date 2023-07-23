@@ -3,7 +3,7 @@ const InfoFromMessageLink = function(link) {
     return InfoArray;
     /*
     [0]: Guild ID
-    [1]: Chanel ID
+    [1]: Channel ID
     [2]: Message ID
     */
 };

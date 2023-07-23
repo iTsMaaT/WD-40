@@ -7,6 +7,7 @@ module.exports = {
     category: "admin",
     usage: "< channelID >",
     admin: true,
+    aliases: ['mova'],
     execute(logger, client, message, args) {
   
         // Check if the user is in a voice channel
@@ -40,7 +41,7 @@ module.exports = {
                 try {
                     await member.voice.setChannel(targetChannel);
                 } catch (error) {
-                    console.error(`Failed to move member ${member.user.tag}:`, error);
+                    logger.error(`Failed to move member ${member.user.tag}:`);
                 }
             }
         });
