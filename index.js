@@ -142,7 +142,7 @@ client.on("ready", async () => {
     console.log("Setting up activity status...");
     activities[7] = activities[7].replace("Placeholder01", (100 / activities.length).toFixed(2));
     activities[8] = activities[8].replace("Placeholder02", activities.length - 1);
-    await client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
+    client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
     console.log("Activity status setup done.");
 
     console.log("Creating the cron jobs...");
@@ -322,6 +322,7 @@ client.on("messageCreate", async (message) => {
 
         // Execute the command
         try {
+            message.channel.sendTyping();
             await command.execute(logger, client, message, args);
         } catch (error) {
             logger.error(error.stack);
