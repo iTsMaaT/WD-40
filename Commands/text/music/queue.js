@@ -1,14 +1,19 @@
 const { EmbedBuilder } = require("discord.js");
 const { useQueue } = require('discord-player');
+const SendErrorEmbed = require("@functions/SendErrorEmbed");
 
 module.exports = {
     name: "queue",
     description: "Shows the current queue for songs",
-    usage: "< [Page]: page to go to (optional) >",
     category: "music",
     aliases: ['q'],
     execute(logger, client, message, args) {
-        const queue = useQueue(message.guild.id);
+        let queue;
+        if (message.author.id == process.env.OWNER_ID) {
+            queue = useQueue(parseInt(args[0]));
+        } else {
+            queue = useQueue(message.guild.id);
+        }
         if (!queue || !queue.tracks || !queue.currentTrack) return SendErrorEmbed(message, "There is nothing in the queue / currently playing.", "yellow");
 
         const songs = queue.tracks.size;
