@@ -9,6 +9,6 @@ module.exports = {
         setTimeout(function () {
             global.prisma.$disconnect();
             process.exit(1);
-        }, 1000 * 3);
+        }, 1000 * 3);   
     },
 };
