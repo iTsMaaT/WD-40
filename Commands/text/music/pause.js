@@ -4,7 +4,7 @@ const { useQueue, useTimeline } = require('discord-player');
 
 module.exports = {
     name: "pause",
-    description: "Pause currently playing music",
+    description: "Pause / Resumes currently playing music",
     category: "music",
     execute(logger, client, message, args) {
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
