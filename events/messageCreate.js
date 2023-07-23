@@ -6,14 +6,19 @@ module.exports = {
     once: false,
     async execute(client, logger, message) {
         if (message.author.bot) return;
-        if (superuser && (message.author.id != process.env.OWNER_ID || !whitelist.includes(message.author.id))) return;
         if (!message.guild) return;
-        if (blacklist.includes(message.author.id)) return;
 
-        //Gives the prefix if the bot is pinged
-        if (message.content == "<@1036485458827415633>") {
-            message.reply(`**Prefix** : ${prefix}\n**Help command** : ${prefix}help`);
+        if (message.content.trim() == `<@${client.user.id}>`) {
+            const embed = {
+                color: 0xffffff,
+                description: `**Prefix** : ${prefix}\n**Help command** : ${prefix}help`,
+                timestamp: new Date()
+            };
+            message.reply({ embeds: [embed] });
         }
+
+        if (superuser && (message.author.id != process.env.OWNER_ID && whitelist.includes(message.author.id))) return;
+        if (blacklist.includes(message.author.id)) return;
 
         //Snowflake reaction
         if (snowflakeData != []) {
