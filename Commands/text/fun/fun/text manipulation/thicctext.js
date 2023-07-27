@@ -42,7 +42,7 @@ module.exports = {
         };
         
       
-        // Converts the compatible characters to their upside down counterparts
+        // Converts the compatible characters to their t h i c c counterparts
         let resultText = '';
         for (let i = 0; i < prompt.length; i++) {
             const character = prompt[i];

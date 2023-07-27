@@ -43,7 +43,7 @@ module.exports = {
           
         
       
-        // Converts the compatible characters to their upside down counterparts
+        // Converts lowercase letters to small caps
         let resultText = '';
         for (let i = 0; i < prompt.length; i++) {
             const character = prompt[i];

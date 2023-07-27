@@ -15,10 +15,11 @@ module.exports = {
         if (!queue || !queue.tracks) return SendErrorEmbed(message, "There is nothing playing.", "yellow");
         switch (args[0]?.toLowerCase() ?? "queue") {
         case 'off':
-            queue.setRepeatMode(QueueRepeatMode.TRACK);
+            queue.setRepeatMode(QueueRepeatMode.OFF);
             break;
         case 'song':
-            queue.setRepeatMode(QueueRepeatMode.OFF);
+        case 'track':
+            queue.setRepeatMode(QueueRepeatMode.TRACK);
             break;
         case 'queue':
             queue.setRepeatMode(QueueRepeatMode.QUEUE);
@@ -27,12 +28,12 @@ module.exports = {
             queue.setRepeatMode(QueueRepeatMode.AUTOPLAY);
             break;
         default:
-            SendErrorEmbed(message, "Invalid loop type.", "yellow");
+            SendErrorEmbed(message, "Invalid loop type. (Needs to be: off, queue, song or autoplay)", "yellow");
         }
 
         const repeat_mode_embed = new EmbedBuilder()
             .setColor("#ffffff")
-            .setDescription(`Set repeat mode to \`${args[0]}\``)
+            .setDescription(`Set repeat mode to \`${args[0] ?? "Queue"}\``)
             .setTimestamp();
         message.reply({ embeds: [repeat_mode_embed]  });
     }

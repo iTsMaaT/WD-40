@@ -77,7 +77,7 @@ module.exports = {
             for (let i = 0; i < word.length; i++) {
                 const character = word[i];
 
-                //If is in the list, convert it and add a space
+                //If it is in the list, convert it and add a space
                 if (Object.prototype.hasOwnProperty.call(conversionMap, character)) {
                     morseCode += conversionMap[character];
                     morseCode += " ";

@@ -2,7 +2,7 @@ const SendErrorEmbed = require("@functions/SendErrorEmbed");
 
 module.exports = {
     name: "upsidedown",
-    description: "Reverts a prompt vertically and horizontally",
+    description: "Reverts a prompt ʌǝɹʇᴉɔɐllʎ and yllatnoziroh",
     category: "text manipulation",
     usage: "< String >",
     aliases: ['ud'],
@@ -60,6 +60,7 @@ module.exports = {
             '6': '9',
         };
 
+        //Inverts the prompt
         const InvertedPrompt = prompt.split("").reverse().join(""); 
       
         // Converts the compatible characters to their upside down counterparts

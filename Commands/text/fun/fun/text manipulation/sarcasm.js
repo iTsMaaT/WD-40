@@ -15,7 +15,7 @@ module.exports = {
 
         for (word of prompt) {
             for (let i = 0; i < word.length; i++) {
-                if (word[i] == " ") continue;
+                //Alternates between lower and upper case for each chars
                 index++;
                 if (index % 2 == 0) {
                     sarcasm += word[i].toLowerCase();

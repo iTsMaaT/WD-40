@@ -8,7 +8,10 @@ module.exports = {
     async execute(logger, client, message, args) {
         message.channel.sendTyping();
         if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");
+
         const bf = brainfuckToAlphuck(stringToBF(args.join(" ")));
+
+        //Tries to send the code
         try {
             if (bf.length < 2000) {
                 await message.reply(`\`\`\`alphuck\n${bf}\`\`\``);
@@ -20,6 +23,7 @@ module.exports = {
             return SendErrorEmbed(message, "An error occured", "red");
         }
 
+        //Converts a char to brainfuck
         function charToBF(char) {
             let buffer = "[-]>[-]<";
             for (let i = 0; i < Math.floor(char.charCodeAt(0) / 10); i++) {
@@ -33,6 +37,7 @@ module.exports = {
             return buffer;
         }
           
+        //Converts a delta to brainfuck
         function deltaToBF(delta) {
             let buffer = "";
             for (let i = 0; i < Math.floor(Math.abs(delta) / 10); i++) {
@@ -56,6 +61,7 @@ module.exports = {
             return buffer;
         }
           
+        //Takes a string and translates it to brainfuck
         function stringToBF(string, commented) {
             let buffer = "";
             if (string === null || string === undefined) {
@@ -75,6 +81,7 @@ module.exports = {
             return buffer;
         }
 
+        //Takes the brainfuck code, and changes it to alphuck
         function brainfuckToAlphuck(brainfuckCode) {
             // Replace Brainfuck characters with Alphuck characters
             const conversionMap = {
