@@ -1,11 +1,12 @@
 const SendErrorEmbed = require("@functions/SendErrorEmbed");
 const id = require("@functions/id");
+const { PermissionsBitField } = require('discord.js');
 
 module.exports = {
     name: 'blacklist',
     description: 'Blacklist a user from using commands',
     usage: "< ID: ID of the user to blacklist, Permission: command or category to blacklist the user from >",
-    category: 'utils',
+    category: 'admin',
     async execute(logger, client, message, args) {
         if (!args[0]) return SendErrorEmbed(message, "You did not provide a user.", "yellow");
         if (!args[1]) return SendErrorEmbed(message, "You did not provide a permission.", "yellow");
@@ -31,8 +32,8 @@ module.exports = {
 
         if (target.id == executor.id) return SendErrorEmbed(message, "You cannot blacklist yourself", "yellow");
         if (target.id == owner.id) return SendErrorEmbed(message, "You cannot blacklist the guild's owner", "yellow");
-        if (executor.permissions.has("Administrator") && target.permissions.has("Administrator")) return SendErrorEmbed(message, "You cannot blacklist another server admin", "yellow");
-        if (!executor.permissions.has("Administrator")) return SendErrorEmbed(message, "You must be a server admin to execute that command", "yellow");
+        if (executor.permissions.has(PermissionsBitField.Flags.Administrator) && target.permissions.has(PermissionsBitField.Flags.Administrator)) return SendErrorEmbed(message, "You cannot blacklist another server admin", "yellow");
+        if (!executor.permissions.has(PermissionsBitField.Flags.Administrator)) return SendErrorEmbed(message, "You must be a server admin to execute that command", "yellow");
        
         const embed = {
             color: 0xffffff,

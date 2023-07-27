@@ -91,7 +91,7 @@ loadFiles('./Commands/slash/', (slashcommand, fileName) => {
         client.slashcommands.set(slashcommand.name, slashcommand);
         discoveredCommands.push(slashcommand);
     } else {
-        logger.error(`[WARNING] The command ${fileName} is missing a required "data" or "execute" property.`);
+        logger.error(`[WARNING] The (/) command ${fileName} is missing a required "name", "execute", or "type" property.`);
     }
 });
 
@@ -112,7 +112,7 @@ loadFiles('./Commands/context/', (contextcommand, fileName) => {
         client.contextCommands.set(contextcommand.name, contextcommand);
         discoveredCommands.push(contextcommand);
     } else {
-        logger.error(`[WARNING] The command ${fileName} is missing a required "name", "execute", or "description" property.`);
+        logger.error(`[WARNING] The (ctx) command ${fileName} is missing a required "name", "execute", or "type" property.`);
     }
 });
 

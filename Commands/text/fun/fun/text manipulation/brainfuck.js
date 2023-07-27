@@ -9,7 +9,10 @@ module.exports = {
     async execute(logger, client, message, args) {
         message.channel.sendTyping();
         if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");
+
         const bf = stringToBF(args.join(" "));
+
+        //Tries to send the code
         try {
             if (bf.length < 2000) {
                 await message.reply(`\`\`\`brainfuck\n${bf}\`\`\``);
@@ -21,6 +24,7 @@ module.exports = {
             return SendErrorEmbed(message, "An error occured", "red");
         }
 
+        //Converts a char to brainfuck
         function charToBF(char) {
             let buffer = "[-]>[-]<";
             for (let i = 0; i < Math.floor(char.charCodeAt(0) / 10); i++) {
@@ -33,7 +37,8 @@ module.exports = {
             buffer += ".<";
             return buffer;
         }
-          
+
+        //Converts a delta to brainfuck
         function deltaToBF(delta) {
             let buffer = "";
             for (let i = 0; i < Math.floor(Math.abs(delta) / 10); i++) {
@@ -56,7 +61,8 @@ module.exports = {
             buffer += ".<";
             return buffer;
         }
-          
+        
+        //Takes a string and translates it to brainfuck
         function stringToBF(string, commented) {
             let buffer = "";
             if (string === null || string === undefined) {

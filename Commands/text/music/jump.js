@@ -29,7 +29,6 @@ module.exports = {
         if (!args[0]) return SendErrorEmbed(message, "Please enter a number to skip to.", "yellow");
 
         const trackResolvable = queue.tracks.at(jump);
-        console.log(trackResolvable);
 
         if (isNaN(track) || !trackResolvable) return SendErrorEmbed(message, `Couldn't find song to skip to.`, "red");
 
