@@ -63,7 +63,7 @@ module.exports = {
         if (!args[0]) SendErrorEmbed(message, "You need a prompt", "yellow");
 
         // Use emote mapping or original character if mapping doesn't exist
-        const emotesPromt = Array.from(args.join(" ").toLowerCase()).map((char) => emoteMap[char] || char).join(" ");
+        const emotesPromt = Array.from(args.join("🌌").toLowerCase()).map((char) => emoteMap[char] || char).join(" ");
 
         if (emotesPromt.length > 1000) SendErrorEmbed(message, "Prompt too long", "yellow");
 
