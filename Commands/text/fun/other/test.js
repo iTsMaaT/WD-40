@@ -33,6 +33,6 @@ module.exports = {
             + "\n" +
             GetUniqueValues(["a", "a", "s", "r", "r", "e", "x", "v", "v"])
             
-        );  
+        );
     }
 };
