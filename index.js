@@ -14,8 +14,7 @@ const Discord = require('discord.js');
 const getExactDate = require("@functions/getExactDate");
 const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
 const SendErrorEmbed = require("@functions/SendErrorEmbed");
-
-var HourlyRam = [0, 0, 0];
+const HourlyRam = [0, 0, 0];
 
 dotenv.config();
 
@@ -35,8 +34,8 @@ global.debug = 1;
 global.SmartRestartEnabled = 0;
 
 // Add array.equals()
-Array.prototype.equals = function (b) {
-    return this.length == b.length && this.every((v, i) => v === b[i]);
+Array.prototype.equals = function (otherArray) {
+    return this.length === otherArray.length && this.every((value, index) => value === otherArray[index]);
 };
 
 //music
@@ -139,9 +138,11 @@ client.on("ready", async () => {
     await client.application.commands.set(discoveredCommands);
     console.log("Slash command setup done.");
 
-    console.log("Setting up activity status...");
-    activities[7] = activities[7].replace("Placeholder01", (100 / activities.length).toFixed(2));
-    activities[8] = activities[8].replace("Placeholder02", activities.length - 1);
+    console.log(`Setting up activity status... (${activities.length} statuses)`);
+    for (activity of activities) {
+        activity.replace("Placeholder01", (100 / activities.length).toFixed(2));
+        activity.replace("Placeholder02", activities.length - 1);
+    }
     client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
     console.log("Activity status setup done.");
 
