@@ -31,7 +31,7 @@ module.exports = {
         const ping = client.ws.ping + "ms";
         const botAge = prettyMilliseconds(Date.now() - client.user.createdAt);
         const totalExecutedCommands = await global.prisma.logs.count({ where: { Value: { contains: "Executing [", } } });
-        const VoicesPlaying = Array.from(client.voice.adapters.keys()).length;
+        const VoicesPlaying = client.voice.adapters.size;
       
         const lastExecutedCommands = (await global.prisma.message.findMany({
             where: {
