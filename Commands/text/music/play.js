@@ -8,6 +8,7 @@ module.exports = {
     usage: "< [Song]: song link or query >",
     category: "music",
     async execute(logger, client, message, args) {
+        let res;
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
 
         const string = args.join(' ');
@@ -21,27 +22,39 @@ module.exports = {
 
         const msg = await message.reply({ embeds: [play_embed] });
 
-        const research = await player.search(string, {
-            requestedBy: message.member,
-            searchEngine: QueryType.AUTO
-        });
+        try {
+            const research = await player.search(string, {
+                requestedBy: message.member,
+                searchEngine: QueryType.AUTO
+            });
 
-        if (!research.hasTracks()) return SendErrorEmbed(message, "No results found", "red");
+            if (!research.hasTracks()) return SendErrorEmbed(message, "No results found", "red");
 
-        const res = await player.play(message.member.voice.channel.id, research, {
-            nodeOptions: {
-                metadata: {
-                    channel: message.channel,
-                    requestedBy: message.author
-                },
-                leaveOnEmptyCooldown: 300000,
-                leaveOnEmpty: true,
-                leaveOnEnd: true,
-                leaveOnEndCooldown: 300000,
-                bufferingTimeout: 0,
-                volume: 75,
-            }
-        });
+            res = await player.play(message.member.voice.channel.id, research, {
+                nodeOptions: {
+                    metadata: {
+                        channel: message.channel,
+                        requestedBy: message.author
+                    },
+                    leaveOnEmptyCooldown: 300000,
+                    leaveOnEmpty: true,
+                    leaveOnEnd: true,
+                    leaveOnEndCooldown: 300000,
+                    bufferingTimeout: 0,
+                    volume: 75,
+                }
+            });
+            logger.music(`Playing ${string}`); 
+        } catch (err) {
+
+            embed = {
+                color: 0xff0000,
+                description: `Failed to fetch / play the reqested track`,
+                timestamp: new Date(),
+            };
+
+            await msg.edit({ embeds: [embed] });
+        }
 
         embed = {
             color: 0xffffff,
