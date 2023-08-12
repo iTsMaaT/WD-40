@@ -7,14 +7,13 @@ module.exports = {
     usage: "< -p [...]: post, -u [...]: user>",
     category: "fun",
     execute: async (logger, client, message, args) => {
-        message.channel.sendTyping();
-        var sent = "";
+        let sent = "";
         if (args.length == 2 && args[0] == "-p") {
             //Gore subreddits blacklist
             if (args[1] != "eyeblech" && args[1] != "gore" && args[1] != "guro") {
                 let RedditImage = "";
                 var RedditTries = 1;
-                sent = await message.channel.send({ content: `Attempt ${RedditTries}/10`, fetchreply: true });
+                sent = await message.reply({ content: `Attempt ${RedditTries}/10`});
                 //Tries to fetch a post 10 times
                 for (let i = 0; i <= 10; i++) {
                     try {
@@ -28,7 +27,7 @@ module.exports = {
                         RedditTries += 1;
                         //Updates the counter
                         if (RedditTries % 2 == 0 && RedditTries <= 10) {
-                            sent.edit({ content: `Attempt ${RedditTries}/10`, fetchreply: true });
+                            sent.edit({ content: `Attempt ${RedditTries}/10`});
                         }
                         if (RedditImage.endsWith(".jpg") || RedditImage.endsWith(".png") || RedditImage.endsWith(".gif")) {
                             if (!PostNsfw || (PostNsfw && message.channel.nsfw)) {
@@ -45,8 +44,7 @@ module.exports = {
                                 };
 
 
-                                sent.edit({ content: `Attempt ${RedditTries}/10`, fetchreply: true });
-                                sent.edit({ embeds: [embed]  });
+                                sent.edit({ content: `Attempt ${RedditTries}/10`, embeds: [embed]});
                                 logger.info(RedditImage);
                                 return;
                             } else {
