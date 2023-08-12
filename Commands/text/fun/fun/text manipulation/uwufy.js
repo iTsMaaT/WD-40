@@ -9,13 +9,13 @@ module.exports = {
         
         if (!args[0]) SendErrorEmbed(message, "You need a prompt", "yellow");
 
-        const UwUpromtpt = uwufyText(args.join(" "));
-        if (UwUpromtpt.length > 1000) SendErrorEmbed(message, "Prompt too long", "yellow");
+        const UwUprompt = uwufyText(args.join(" "));
+        if (UwUprompt.length > 1000) SendErrorEmbed(message, "Prompt too long", "yellow");
 
         const embed = {
             color: 0xffffff,
             title: "UwUfied text",
-            description: UwUpromtpt,
+            description: UwUprompt,
             timestamp: new Date()
         };
 
