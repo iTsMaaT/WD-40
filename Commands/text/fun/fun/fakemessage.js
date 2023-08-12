@@ -33,7 +33,6 @@ module.exports = {
         });
 
         // Delete the webhook after sending the fake message
-        webhook.delete();
         message.delete();
 
     },
