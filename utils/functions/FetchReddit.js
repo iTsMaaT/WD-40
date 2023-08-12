@@ -3,8 +3,6 @@ const got = require("got");
 const FetchReddit = async function (ChannelNSFW, ...subreddits) {
     try {
         const subreddit = subreddits[Math.floor(Math.random() * subreddits.length)];
-        console.log(subreddit);
-
         let PostImage = "";
         let embed;
 
@@ -46,7 +44,7 @@ const FetchReddit = async function (ChannelNSFW, ...subreddits) {
             color: 0xff0000,
             title: "Error while fetching the post",
         };
-        console.error("Error while fetching a post: " + err);
+        logger.error("Error while fetching a post: " + err);
         return embed;
     }
 };
