@@ -3,18 +3,18 @@ const prettyMilliseconds = require('pretty-ms');
 const got = require("got");
 
 const GetPterodactylInfo = async function () {
-    var serverName = "";
-    var RAMlimit = "";
-    var CPUlimit = "";
-    var DISKlimit = "";
-    var IPalias = "";
-    var IPport = "";
-    var RAMusage = "";
-    var CPUusage = "";
-    var DISKusage = "";
-    var NETWORKin = "";
-    var NETWORKout = "";
-    var BOTuptime = "";
+    let serverName = "";
+    let RAMlimit = "";
+    let CPUlimit = "";
+    let DISKlimit = "";
+    let IPalias = "";
+    let IPport = "";
+    let RAMusage = "";
+    let CPUusage = "";
+    let DISKusage = "";
+    let NETWORKin = "";
+    let NETWORKout = "";
+    let BOTuptime = "";
 
     try {
         const [serverResponse, resourcesResponse] = await Promise.all([
