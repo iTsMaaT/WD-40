@@ -64,7 +64,6 @@ process.on("unhandledRejection", (err) => {
 client.commands = new Discord.Collection();
 client.slashcommands = new Discord.Collection();
 client.contextCommands = new Discord.Collection();
-client.events = new Discord.Collection();
 const cooldowns = new Map();
 
 //File finder/loader
@@ -134,9 +133,12 @@ client.on("ready", async () => {
     await global.GuildManager.init(guilds);
     console.log("Guild manager initiation done.");
 
-    console.log("Setting up slash commands...");
+    console.log("Setting up commands...");
     await client.application.commands.set(discoveredCommands);
-    console.log("Slash command setup done.");
+    console.log(`${client.slashcommands.size} (/) commands`);
+    console.log(`${client.contextCommands.size} (ctx) commands`);
+    console.log(`${client.commands.size} (text) commands (including aliases)`);
+    console.log("commands setup done.");
 
     console.log(`Setting up activity status... (${activities.length} statuses)`);
     for (activity of activities) {
@@ -257,7 +259,7 @@ client.on(Events.InteractionCreate, async interaction => {
 client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
     if (superuser && (message.author.id != process.env.OWNER_ID && whitelist.includes(message.author.id))) return;
-    if (!message.guild) return;
+    if (!message.guild) return message.reply("Commands cannot be executed inside DMs.");
     if (blacklist.includes(message.author.id)) return;
 
     try {
@@ -323,7 +325,7 @@ client.on("messageCreate", async (message) => {
 
         // Execute the command
         try {
-            message.channel.sendTyping();
+            await message.channel.sendTyping();
             await command.execute(logger, client, message, args);
         } catch (error) {
             logger.error(error.stack);

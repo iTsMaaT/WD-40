@@ -24,7 +24,7 @@ const NumberToWord = function(s) {
     var str = '';
     var sk = 0;
 
-    for (var i = 0; i < x; i++) {
+    for (let i = 0; i < x; i++) {
         if ((x - i) % 3 == 2) {
             if (n[i] == '1') {
                 str += tn[Number(n[i + 1])] + ' ';
@@ -49,7 +49,7 @@ const NumberToWord = function(s) {
     }
 
     if (x != s.length) {
-        var y = s.length;
+        const y = s.length;
         str += 'point ';
         for (i = x + 1; i < y; i++)
             str += dg[n[i]] + ' ';

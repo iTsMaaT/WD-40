@@ -48,6 +48,12 @@ async function writeLogToFile(log, client, type) {
     case "SEVERE":
         color = "\x1b[31m"; // Red
         break;
+    case "MUSIC":
+        color = "\x1b[34m"; // Blue
+        break;
+    case "WARNING":
+        color = "\x1b[35m"; // Magenta
+        break;
     default:
         color = "\x1b[0m"; // Reset color
         break;

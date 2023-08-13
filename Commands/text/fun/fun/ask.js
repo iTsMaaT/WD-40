@@ -48,6 +48,7 @@ module.exports = {
                     .catch((error) => {
                         logger.error(`OPENAI ERR: ${error}`);
                         if (error.response.status === 429) return SendErrorEmbed(message, "Funds needed to keep running", "yellow");
+                        return;
                     });
 
                 if (result.data.choices[0].message.content.length < 2000) {

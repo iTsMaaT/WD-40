@@ -60,7 +60,7 @@ module.exports = {
                 fields: [
                     { name: "User ID", value: target.id },
                     { name: "Status", value: presenceStatus},
-                    { name: "Account Age", value: `<t:${parseInt(target.createdTimestamp / 1000)}:R>` },
+                    { name: "Account Age", value: `<t:${parseInt(target.user.createdTimestamp / 1000)}:R>` },
                     { name: "Member Since", value: `${target.joinedTimestamp ? `<t:${parseInt(target.joinedTimestamp / 1000)}:R>` : `-`}` },
                     { name: "Custom Status", value: custom_status },
                     { name: "Activity Title", value: activity_name },
