@@ -8,7 +8,8 @@
     "lint": "eslint --no-fix .",
     "prisma:migrate": "npx prisma migrate dev",
     "prisma:deploy": "npx prisma migrate deploy",
-    "prisma:push": "npx prisma db push"
+    "prisma:push": "npx prisma db push",
+    "code": "code WD-40.code-workspace"
   },
   "repository": {
     "type": "git",
