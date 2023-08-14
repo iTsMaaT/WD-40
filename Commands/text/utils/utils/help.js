@@ -52,6 +52,15 @@ module.exports = {
 
         const categories = Object.keys(categorymapper);
 
+        const FirstPageEmbed = {
+            title: "Command categories",
+            description: `**The prefix is:** \`${prefix}\`\n\nTotal commands: ${addedCommands.size}\n${categories
+                .map((category, index) => `**Page ${index + 1}:** ${category.toUpperCase()}`)
+                .join("\n")}`,
+            color: 0xffffff, // Embed color (you can change it to any color you like)
+            footer: { text: `Buttons expire after 2 minutes. | Created by @itsmaat` }
+        };
+
         //console.log(require('discord.js').version)
 
         const FisrtPage = new ButtonBuilder()
@@ -83,14 +92,7 @@ module.exports = {
         const row = new ActionRowBuilder()
             .addComponents(FisrtPage, PreviousPage, PageNumber, NextPage, LastPage);
 
-        var embed = {
-            title: "Command categories",
-            description: `**The prefix is:** \`${prefix}\`\n\nTotal commands: ${addedCommands.size}\n${categories
-                .map((category, index) => `**Page ${index + 1}:** ${category.toUpperCase()}`)
-                .join("\n")}`,
-            color: 0xffffff, // Embed color (you can change it to any color you like)
-            footer: { text: `Buttons expire after 2 minutes. | Created by @itsmaat` }
-        };
+        var embed = FirstPageEmbed;
 
         row.components[0].setDisabled(true);
         row.components[1].setDisabled(true);
@@ -129,20 +131,7 @@ module.exports = {
             row.components[2].setLabel(`${counter} / ${categories.length}`);
 
             if (counter == 0) {
-                embed = {
-                    title: "Command categories",
-                    description: `**The prefix is:** \`${prefix}\`\n\nTotal commands: ${addedCommands.size}\n${categories
-                        .map((category, index) => `**Page ${index + 1}:** ${category.toUpperCase()}`)
-                        .join("\n")}`,
-                    color: 0xffffff, // Embed color (you can change it to any color you like)
-                    footer: { text: `Buttons expire after 2 minutes. | Created by @itsmaat` }
-                };
-
-                await row.components[0].setDisabled(counter == 0);
-                await row.components[1].setDisabled(counter == 0);
-                await row.components[3].setDisabled(counter == categories.length);
-                await row.components[4].setDisabled(counter == categories.length);
-
+                embed = FirstPageEmbed;
             } else {
                 const currentCategory = categories[counter - 1];
                 embed = {
@@ -150,12 +139,12 @@ module.exports = {
                     description: categorymapper[categories[counter - 1]],
                     color: 0xffffff, // Embed color (you can change it to any color you like)
                 };
-
-                await row.components[0].setDisabled(counter == 0);
-                await row.components[1].setDisabled(counter == 0);
-                await row.components[3].setDisabled(counter == categories.length);
-                await row.components[4].setDisabled(counter == categories.length);
             }
+            
+            await row.components[0].setDisabled(counter == 0);
+            await row.components[1].setDisabled(counter == 0);
+            await row.components[3].setDisabled(counter == categories.length);
+            await row.components[4].setDisabled(counter == categories.length);
 
             helpMessage.edit({
                 embeds: [embed],
