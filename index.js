@@ -141,9 +141,9 @@ client.on("ready", async () => {
     console.log("commands setup done.");
 
     console.log(`Setting up activity status... (${activities.length} statuses)`);
-    for (activity of activities) {
-        activity.replace("Placeholder01", (100 / activities.length).toFixed(2));
-        activity.replace("Placeholder02", activities.length - 1);
+    for (let i = 0; i < activities.length; i++) {
+        activities[i] = activities[i].replace("Placeholder01", (100 / activities.length).toFixed(2));
+        activities[i] = activities[i].replace("Placeholder02", activities.length - 1);
     }
     client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
     console.log("Activity status setup done.");
