@@ -4,7 +4,7 @@ const SendErrorEmbed = require("@functions/SendErrorEmbed");
 module.exports = {
     name: "translate",
     description: "Translate the replied to message",
-    usage: "Will translate the message the user replied to",
+    usage: "< Will translate the message the user replied to >",
     category: "utils",
     async execute(logger, client, message, args) {
         const LanguageCode = message.guild.preferredLocale.split("-")[0].toString().toLowerCase();
@@ -27,7 +27,7 @@ module.exports = {
                 title: "Translation",
                 fields: [
                     { name: "**Original: **", value: text },
-                    { name:  "**English: **", value: limitString(enTr.text, 1000) },
+                    { name: "**English: **", value: limitString(enTr.text, 1000) },
                 ],
                 footer: { text: ""},
                 timestamp: new Date(),        
