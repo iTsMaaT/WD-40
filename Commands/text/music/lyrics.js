@@ -4,7 +4,7 @@ const { EmbedBuilder } = require("discord.js");
 
 module.exports = {
     name: "lyrics",
-    description: "Removes a given track",
+    description: "Gives lyrics for the currently playing song",
     usage: "< [Track]: track to remove >",
     category: "music",
     async execute(logger, client, message, args) {
