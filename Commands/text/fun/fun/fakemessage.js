@@ -5,6 +5,7 @@ const SendErrorEmbed = require("@functions/SendErrorEmbed.js");
 module.exports = {
     name: 'fakemessage',
     description: 'Create a fake message using webhooks',
+    usage: '< [Prompt] >',
     category: 'fun',
     aliases: ['fmsg'],
     async execute(logger, client, message, args) {

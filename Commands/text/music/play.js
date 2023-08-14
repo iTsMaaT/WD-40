@@ -44,7 +44,7 @@ module.exports = {
                     volume: 75,
                 }
             });
-            logger.music(`Playing ${string}`); 
+            logger.music(`Playing [${string}]`); 
         } catch (err) {
 
             embed = {
