@@ -5,7 +5,6 @@ module.exports = {
     description: 'Good luck',
     category: "posts",
     async execute(logger, client, message, args) {
-        message.channel.sendTyping();
         message.reply({ embeds: [await FetchReddit(message.channel.nsfw, "quebec", "quebeclibre", "metaquebec")] });
     }
 };

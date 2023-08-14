@@ -4,7 +4,6 @@ module.exports = {
     description: "le funny",
     category: "fun",
     async execute(logger, client, message, args) {
-        message.channel.sendTyping();
 
         await got("https://v2.jokeapi.dev/joke/Any")
             .then(response => {

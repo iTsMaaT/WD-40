@@ -6,7 +6,6 @@ module.exports = {
     description: 'leg',
     category: "NSFW",
     async execute(logger, client, message, args) {
-        message.channel.sendTyping();
 
         if (message.channel.nsfw) {
             await got("https://nekobot.xyz/api/image?type=thigh")

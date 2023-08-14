@@ -6,7 +6,6 @@ module.exports = {
     category: "info",
     aliases: ['binfo'],
     async execute(logger, client, message, args) {
-        message.channel.sendTyping();
 
         const PteroInfo = await GetPterodactylInfo();
         const embed = {

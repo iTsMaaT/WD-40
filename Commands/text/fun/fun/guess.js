@@ -3,7 +3,7 @@ module.exports = {
     name: "guess",
     description: "Guess a character with akinator",
     category: "fun",
-    execute: async(logger, client, message, args) =>{
+    execute: async(logger, client, message, args) => {
         akinator(message, {
             language: "en", // Defaults to "en"
             childMode: false, // Defaults to "false"

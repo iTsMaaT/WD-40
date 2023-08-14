@@ -6,7 +6,6 @@ module.exports = {
     description: 'why',
     category: "NSFW",
     async execute(logger, client, message, args) {
-        message.channel.sendTyping();
 
         if (message.channel.nsfw) {
             await got("https://nekobot.xyz/api/image?type=anal")

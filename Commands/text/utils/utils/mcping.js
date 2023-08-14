@@ -8,7 +8,7 @@ module.exports = {
     usage: "< [IP]: mc server ip, [Port]: the port of the server (optional) >",
     category: "utils",
     async execute(logger, client, message, args) {
-        message.channel.sendTyping();
+
         if (args[1]) { var port = ":" + parseInt(args[1]); }
         got(`https://api.mcstatus.io/v2/status/java/${args[0]}${port ?? ""}`)
             .then(async response => {

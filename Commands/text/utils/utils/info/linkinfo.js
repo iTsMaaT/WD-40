@@ -11,7 +11,7 @@ module.exports = {
     category: 'info',
     cooldown: 10000,
     async execute(logger, client, message, args) {
-        message.channel.sendTyping();
+
         const agent = new https.Agent({ keepAlive: true });
         if (!args[0]) return SendErrorEmbed(message, "Please provide a URL", "yellow");
         const link = args[0];

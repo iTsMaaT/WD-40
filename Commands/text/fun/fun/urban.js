@@ -5,7 +5,6 @@ module.exports = {
     usage: "< [Prompt] >",
     category: "fun",
     async execute(logger, client, message, args) {
-        message.channel.sendTyping();
 
         await got(`https://api.urbandictionary.com/v0/define?term=${encodeURIComponent(args.slice(0).join(" "))}`)
             .then(response => {

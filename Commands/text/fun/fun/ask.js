@@ -7,8 +7,6 @@ module.exports = {
     usage: "< -p: Personality, [ANY]: The prompt>",
     category: "fun",
     execute: async (logger, client, message, args) => {
-        message.channel.sendTyping();
-
         try {
             if (args[0] == "-p" && message.member.permissions.has("Administrator") && message.author.id == process.env.OWNER_ID) {
                 args.shift();
