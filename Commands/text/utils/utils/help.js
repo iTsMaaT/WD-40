@@ -89,7 +89,7 @@ module.exports = {
                 .map((category, index) => `**Page ${index + 1}:** ${category.toUpperCase()}`)
                 .join("\n")}`,
             color: 0xffffff, // Embed color (you can change it to any color you like)
-            footer: { text: `Buttons expire after 2 minutes.` }
+            footer: { text: `Buttons expire after 2 minutes. | Created by @itsmaat` }
         };
 
         row.components[0].setDisabled(true);
@@ -135,7 +135,7 @@ module.exports = {
                         .map((category, index) => `**Page ${index + 1}:** ${category.toUpperCase()}`)
                         .join("\n")}`,
                     color: 0xffffff, // Embed color (you can change it to any color you like)
-                    footer: { text: `Buttons expire after 2 minutes.` }
+                    footer: { text: `Buttons expire after 2 minutes. | Created by @itsmaat` }
                 };
 
                 await row.components[0].setDisabled(counter == 0);
