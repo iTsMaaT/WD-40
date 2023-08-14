@@ -4,7 +4,7 @@ module.exports = {
     name: "emojify",
     description: "Transform a string into emotes",
     usage: "< [Prompt] >",
-    category: "fun",
+    category: "text manipulation",
     execute(logger, client, message, args) {
 
         //Map of all characters to emotes
