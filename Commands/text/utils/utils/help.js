@@ -5,61 +5,60 @@ module.exports = {
     name: "help",
     description: "Lists commands",
     category: "utils",
-    private: true,
+    private: false,
     async execute(logger, client, message, args) {
+
+        if (args[0]) {
+            const CommandName = client.commands.get(args[0]);
+            if (!CommandName || CommandName.private) return SendErrorEmbed(message, "This command doesn't exist.", "red");
+
+            var CommandEmbed = {
+                title: `**${CommandName.name}** ${CommandName.usage ?? ""}`,
+                color: 0xffffff,
+                description: CommandName.description,
+                timestamp: new Date(),
+            };
+            return message.reply({ embeds: [CommandEmbed]  });
+            
+        }
         //Finds all command files and separate them from categories, then use page to list the commands per category
 
         let counter = 0;
+        const chunkSize = 10; // Number of elements in each chunk
         const prefix = global.GuildManager.GetPrefix(message.guild);
+        
         const categorymapper = {};
         const addedCommands = new Set(); // Keep track of added commands
-
-        if (args[0] == "-u") {
-            client.commands.each((val) => {
-                if (!val.private && !addedCommands.has(val.name)) {
-                    if (categorymapper[val.category]) {
-                        categorymapper[val.category] += (`**${val.name}: **` + prettyString(val.usage ?? "-", "first")) + "\r\n";
-                    } else {
-                        categorymapper[val.category] = (`**${val.name}: **` + prettyString(val.usage ?? "-", "first")) + "\r\n";
-                    }
-                    addedCommands.add(val.name);
+        client.commands.each((val) => {
+            if (!val.private && !addedCommands.has(val.name)) {
+                if (categorymapper[val.category]) {
+                    categorymapper[val.category][`**${val.name}${val.aliases ? ` [${(val.aliases).join(", ")}]` : ""}: **`] = (prettyString(val.description, "first", true));
+                } else {
+                    categorymapper[val.category] = {};
                 }
-            });
-        } else if (!args[0]) {
-            client.commands.each((val) => {
-                if (!val.private && !addedCommands.has(val.name)) {
-                    if (categorymapper[val.category]) {
-                        categorymapper[val.category] += (`**${val.name}${val.aliases ? ` [${(val.aliases).join(", ")}]` : ""}: **` + prettyString(val.description, "first", true)) + "\r\n";
-                    } else {
-                        categorymapper[val.category] = (`**${val.name}: **` + prettyString(val.description, "first", true)) + "\r\n";
-                    }
-                    addedCommands.add(val.name);
-                }
-            });
-        } else if (args[0]) {
-            const CommandName = client.commands.get(args[0]);
-            if (!CommandName) SendErrorEmbed(message, "This command doesn't exist.", "red");
-            if (!CommandName.private) {
-                var CommandEmbed = {
-                    title: `**${CommandName.name}** ${CommandName.usage ?? ""}`,
-                    color: 0xffffff,
-                    description: CommandName.description,
-                    timestamp: new Date(),
-                };
-                return message.reply({ embeds: [CommandEmbed]  });
+                addedCommands.add(val.name);
             }
-        }
+        });
+        
+        const groupedObject = {};
+        Object.keys(categorymapper).forEach(category => {
+            const commands = categorymapper[category];
+            const commandsArray = Object.entries(commands);
+  
+            for (let i = 0; i < commandsArray.length; i += chunkSize) {
+                const chunkCommands = commandsArray.slice(i, i + chunkSize);
+                const chunkedCategory = `${category} (${Math.floor(i / chunkSize) + 1})`;
+    
+                groupedObject[chunkedCategory] = chunkCommands.map(([name, value]) => ({
+                    name,
+                    value,
+                }));
+            }
+        });
 
-        const categories = Object.keys(categorymapper);
+        console.log(groupedObject);
 
-        const FirstPageEmbed = {
-            title: "Command categories",
-            description: `**The prefix is:** \`${prefix}\`\n\nTotal commands: ${addedCommands.size}\n${categories
-                .map((category, index) => `**Page ${index + 1}:** ${category.toUpperCase()}`)
-                .join("\n")}`,
-            color: 0xffffff, // Embed color (you can change it to any color you like)
-            footer: { text: `Buttons expire after 2 minutes. | Created by @itsmaat` }
-        };
+        const categories = Object.keys(groupedObject);
 
         //console.log(require('discord.js').version)
 
@@ -92,12 +91,27 @@ module.exports = {
         const row = new ActionRowBuilder()
             .addComponents(FisrtPage, PreviousPage, PageNumber, NextPage, LastPage);
 
-        var embed = FirstPageEmbed;
+        const pages = [];
+        categories.map((category, index) => {
+            const categoryName = category.split(" ")[0]; // Get the category name
+            if (index === 0 || categoryName !== categories[index - 1].split(" ")[0]) {
+                pages.push(`**Page ${index + 1}:** ${categoryName.toUpperCase()}`);
+            }
+        });
+
+        const categoryEmbed = {
+            title: "Command categories",
+            description: `**The prefix is:** \`${prefix}\`\n\nTotal commands: ${addedCommands.size}\n${pages.join("\n")}`,
+            color: 0xffffff,
+            footer: { text: `Buttons expire after 2 minutes.` }
+        };
+              
+              
 
         row.components[0].setDisabled(true);
         row.components[1].setDisabled(true);
         const helpMessage = await message.reply({
-            embeds: [embed],
+            embeds: [categoryEmbed],
             components: [row],
             allowedMentions: { repliedUser: false },
         });
@@ -112,7 +126,7 @@ module.exports = {
             time: 120000,
             dispose: true
         });
-
+        
         collector.on("collect", async (interaction) => {
 
             if (interaction.customId === 'next') {
@@ -131,20 +145,26 @@ module.exports = {
             row.components[2].setLabel(`${counter} / ${categories.length}`);
 
             if (counter == 0) {
-                embed = FirstPageEmbed;
+                embed = categoryEmbed;
+
+                await row.components[0].setDisabled(counter == 0);
+                await row.components[1].setDisabled(counter == 0);
+                await row.components[3].setDisabled(counter == categories.length);
+                await row.components[4].setDisabled(counter == categories.length);
+
             } else {
                 const currentCategory = categories[counter - 1];
                 embed = {
-                    title: `Commands for category: ${currentCategory.toUpperCase()}`,
-                    description: categorymapper[categories[counter - 1]],
+                    title: `Commands for category: ${currentCategory.toUpperCase().replace(" (1)", "")}`,
+                    fields: groupedObject[currentCategory],
                     color: 0xffffff, // Embed color (you can change it to any color you like)
                 };
+
+                await row.components[0].setDisabled(counter == 0);
+                await row.components[1].setDisabled(counter == 0);
+                await row.components[3].setDisabled(counter == categories.length);
+                await row.components[4].setDisabled(counter == categories.length);
             }
-            
-            await row.components[0].setDisabled(counter == 0);
-            await row.components[1].setDisabled(counter == 0);
-            await row.components[3].setDisabled(counter == categories.length);
-            await row.components[4].setDisabled(counter == categories.length);
 
             helpMessage.edit({
                 embeds: [embed],
