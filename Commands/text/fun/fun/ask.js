@@ -37,32 +37,32 @@ module.exports = {
                     });
                 });
 
-                const result = await openai
-                    .createChatCompletion({
+                try {
+                    const result = await openai.createChatCompletion({
                         model: 'gpt-3.5-turbo',
                         messages: conversationLog,
                         // max_tokens: 256, // limit token usage
-                    })
-                    .catch((error) => {
-                        logger.error(`OPENAI ERR: ${error}`);
-                        if (error.response.status === 429) return SendErrorEmbed(message, "Funds needed to keep running", "yellow");
-                        return;
                     });
-
-                if (result.data.choices[0].message.content.length < 2000) {
-                    await message.reply({ content: result.data.choices[0].message.content, allowedMentions: { repliedUser: true }});
-                } else {
-                    const discriminator = Math.floor(Math.random() * 99999) + 1;
-                    await fs.writeFile(`./answer-${discriminator}.txt`, result.data.choices[0].message.content, { encoding: "utf8" });
-                    await message.reply({ files: [`./answer-${discriminator}.txt`] });
-                    await fs.unlink(`./answer-${discriminator}.txt`);
+                
+                    if (result.data.choices[0].message.content.length < 2000) {
+                        await message.reply({ content: result.data.choices[0].message.content, allowedMentions: { repliedUser: true } });
+                    } else {
+                        const discriminator = Math.floor(Math.random() * 99999) + 1;
+                        await fs.writeFile(`./answer-${discriminator}.txt`, result.data.choices[0].message.content, { encoding: "utf8" });
+                        await message.reply({ files: [`./answer-${discriminator}.txt`] });
+                        await fs.unlink(`./answer-${discriminator}.txt`);
+                    }
+                } catch (error) {
+                    logger.error(`OPENAI ERR: ${error}`);
+                    if (error.response && error.response.status === 429) {
+                        SendErrorEmbed(message, "Funds needed to keep running", "yellow");
+                    } else {
+                        SendErrorEmbed(message, "An error occurred", "red");
+                    }
                 }
-            } else {
-                SendErrorEmbed(message, "Invalid prompt.", "yellow");
             }
-        } catch (e) {
-            logger.error(e.stack);
-            SendErrorEmbed(message, "An error occured", "red");
+        } catch (err) {
+            SendErrorEmbed(message, "An error occurred", "red");
         }
     }
 };
