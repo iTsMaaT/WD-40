@@ -9,7 +9,7 @@ module.exports = {
     category: "utils",
     async execute(logger, client, message, args) {
 
-        if (args[1]) { var port = ":" + parseInt(args[1]); }
+        if (args[1]) var port = ":" + parseInt(args[1]);
         got(`https://api.mcstatus.io/v2/status/java/${args[0]}${port ?? ""}`)
             .then(async response => {
                 const server = JSON.parse(response.body);
@@ -31,8 +31,8 @@ module.exports = {
                     },
                     fields: [
                         { name: "Server Version", value: server.version.name_clean },
-                        { name: "Players Online", value: `${server.players.online}/${server.players.max}` },
                         { name: "MOTD (May Not Display Accurately)", value: server.motd.clean ?? "`N/A`" },
+                        { name: "Players Online", value: `${server.players.online}/${server.players.max}` },
                     ],
                     timestamp: new Date(),
                 };
@@ -45,9 +45,8 @@ module.exports = {
                     }
                     serverStatusEmbed.fields.push({ name: "Player list", value: playerNames.join(", ") });
                 }
-
-                if (server.icon) return message.reply({ embeds: [serverStatusEmbed], files: [imgfile] });
-                message.reply({ embeds: [serverStatusEmbed] });
+                
+                message.reply({ embeds: [serverStatusEmbed], files: [imgfile] });
             });
     },
 };
