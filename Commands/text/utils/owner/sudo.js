@@ -75,7 +75,7 @@ module.exports = {
                 `
 **-s** : Sends a message in a channel (\`>sudo -s <Channel ID> <Message>\`)
 
-**-r** : Replies to a message in a channel (\`>sudo -r <Channel ID> <Message ID> <Message>\`)
+**-r** : Replies to a message in a channel (\`>sudo -r <Message link> <Message>\`)
 
 **-e** : Reacts to a message with letters from a string (\`>sudo -e  <Channel ID> <Message ID> <String that will be converted to emotes>\`)
 
