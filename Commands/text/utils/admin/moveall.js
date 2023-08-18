@@ -37,7 +37,7 @@ module.exports = {
   
         // Move all members except the executor to the target channel
         voiceChannel.members.forEach(async (member) => {
-            if (member.id !== message.author.id) {
+            if (!member.user.bot && member.id !== message.author.id) {
                 try {
                     await member.voice.setChannel(targetChannel);
                 } catch (error) {

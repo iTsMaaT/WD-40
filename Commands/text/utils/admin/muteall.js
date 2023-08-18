@@ -27,7 +27,7 @@ module.exports = {
         if (action === '-mute') {
         // Mute all members except the executor
             voiceChannel.members.forEach(async (member) => {
-                if (member.id !== message.author.id) {
+                if (!member.user.bot && member.id !== message.author.id) {
                     try {
                         await member.voice.setMute(true);
                     } catch (error) {
