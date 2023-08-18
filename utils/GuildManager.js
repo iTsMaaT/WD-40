@@ -145,7 +145,11 @@ module.exports = (function(prisma) {
             return bl[userId] === null || bl[userId] === undefined || !bl[userId].includes(permission?.toLowerCase());
         }
 
-        return { GrantPermission, DenyPermission, CheckPermission };
+        function GetPermissions(userId) {
+            return bl[userId];
+        }
+
+        return { GrantPermission, DenyPermission, CheckPermission, GetPermissions };
     }
 
     const blacklist = {};
