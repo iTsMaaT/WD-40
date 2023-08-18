@@ -24,7 +24,7 @@ module.exports = {
         //Finds all command files and separate them from categories, then use page to list the commands per category
 
         let counter = 0;
-        const chunkSize = 10; // Number of elements in each chunk
+        const chunkSize = 7; // Number of elements in each chunk
         const prefix = global.GuildManager.GetPrefix(message.guild);
         
         const categorymapper = {};
@@ -49,18 +49,11 @@ module.exports = {
                 const chunkCommands = commandsArray.slice(i, i + chunkSize);
                 const chunkedCategory = `${category} (${Math.floor(i / chunkSize) + 1})`;
     
-                groupedObject[chunkedCategory] = chunkCommands.map(([name, value]) => ({
-                    name,
-                    value,
-                }));
+                groupedObject[chunkedCategory] = chunkCommands.map(([name, value]) => ({ name, value }));
             }
         });
 
-        console.log(groupedObject);
-
         const categories = Object.keys(groupedObject);
-
-        //console.log(require('discord.js').version)
 
         const FisrtPage = new ButtonBuilder()
             .setCustomId('first')
