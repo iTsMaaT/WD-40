@@ -16,41 +16,63 @@ module.exports = {
         const guild = await client.guilds.fetch(interaction.guildId);
         const user = interaction.options.getUser("user");
         const id = user ?? interaction.user.id;
-        //Info of the user executing the command
-        try {
-            
-            const target = await guild.members.fetch(id);
-            const status = await guild.presences.resolve(id);
-            console.log(status);
-            try {
-                var custom_status = status.activities[0]?.state ?? "`No status`";
-                var activity_name = status.activities[1]?.name ?? "`No activity name`";
-                var activity_details = status.activities[1]?.details ?? "`No activity details`";
-            } catch {
-                custom_status = "`No status`";
-                activity_name = "`No activity name`";
-                activity_details = "`No activity details`";
-            }
-            interaction.reply({
-                content: `
-**User Informations For**: \`${target.user.tag}\`
         
-**User ID**: ${target.user.id}
-**Account age**: <t:${parseInt(target.user.createdTimestamp / 1000)}:R>
-**Member of this server since**: <t:${parseInt(target.joinedTimestamp / 1000)}:R>
-**Status**: ${custom_status}
-**Activity Title**: ${activity_name}
-**Activity Details**: ${activity_details}
-**Highest Role**: ${target.roles.highest.name}
+        let target;
+        let status;
 
+        try {
+            target = await guild.members.fetch(id);
+            status = await guild.presences.resolve(id);
+        } catch (e) {
+            if (e.code === 10007) {
+                try {
+                    target = await client.users.fetch(id);
+                    status = null; // No presence information available
+                } catch (err) {
+                    console.log(err);
+                    return SendErrorEmbed(interaction, "User not found.", "red");
+                }
+            } else {
+                console.log(e);
+                return SendErrorEmbed(interaction, "An error occurred while fetching the user.", "red");
+            }
+        }
 
+        try {
+            var custom_status = status?.activities[0]?.state ?? "`No status`";
+            var activity_name = status?.activities[1]?.name ?? "`No activity name`";
+            var activity_details = status?.activities[1]?.details ?? "`No activity details`";
+        } catch {
+            custom_status = "-";
+            activity_name = "-";
+            activity_details = "-";
+        }
 
-        ` 
-            });
-            /***Roles**:
-            ${target.roles.cache.map(r => r).join(" ")}*/
+        try {
+            const presenceStatus = target?.presence?.status || "Offline";
+            const userInfoEmbed = {
+                title: "User Information",
+                description: `User Information For: <@${target.id}>`,
+                thumbnail: {
+                    url: target.avatarURL({ dynamic: true }) || "",
+                },
+                fields: [
+                    { name: "User ID", value: target.id },
+                    { name: "Status", value: presenceStatus},
+                    { name: "Account Age", value: `<t:${parseInt(target.user.createdTimestamp / 1000)}:R>` },
+                    { name: "Member Since", value: `${target.joinedTimestamp ? `<t:${parseInt(target.joinedTimestamp / 1000)}:R>` : `-`}` },
+                    { name: "Custom Status", value: custom_status },
+                    { name: "Activity Title", value: activity_name },
+                    { name: "Activity Details", value: activity_details },
+                    { name: "Highest Role", value: target.roles?.highest?.name || "-" },
+                ],
+                timestamp: new Date(),
+                color: 0xffffff,
+            };
+
+            message.reply({ embeds: [userInfoEmbed]  });
         } catch (err) {
-            interaction.reply(`Invalid user / id, User offline or an error occurred\n\`${err}\``);
+            SendErrorEmbed(interaction, "Error.", "red", err);
         }
     }
 };
