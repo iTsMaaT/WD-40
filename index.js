@@ -64,7 +64,8 @@ process.on("unhandledRejection", (err) => {
 client.commands = new Discord.Collection();
 client.slashcommands = new Discord.Collection();
 client.contextCommands = new Discord.Collection();
-const cooldowns = new Map();
+const TextCooldowns = new Map();
+const SlashCooldowns = new Map();
 
 //File finder/loader
 function loadFiles(folder, callback) {
@@ -230,6 +231,20 @@ client.on(Events.InteractionCreate, async interaction => {
 
         if (!slash) return console.error(`No command matching ${interaction.commandName} was found.`);
 
+        // Check command cooldown
+        if (SlashCooldowns.has(interaction.author.id)) {
+            const cooldown = SlashCooldowns.get(interaction.author.id);
+            const timeLeft = cooldown - Date.now();
+            if (timeLeft > 0) {
+                interaction.reply(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before using that command again.`);
+                return;
+            }
+        }
+
+        // Set command cooldown
+        const cooldownTime = slash.cooldown || 0;
+        SlashCooldowns.set(interaction.author.id, Date.now() + cooldownTime);
+
         try {
         //execute the slash command
             await slash.execute(logger, interaction, client);
@@ -320,8 +335,8 @@ client.on("messageCreate", async (message) => {
         }
 
         // Check command cooldown
-        if (cooldowns.has(message.author.id)) {
-            const cooldown = cooldowns.get(message.author.id);
+        if (TextCooldowns.has(message.author.id)) {
+            const cooldown = TextCooldowns.get(message.author.id);
             const timeLeft = cooldown - Date.now();
             if (timeLeft > 0) {
                 message.reply(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before using that command again.`);
@@ -331,7 +346,7 @@ client.on("messageCreate", async (message) => {
 
         // Set command cooldown
         const cooldownTime = command.cooldown || 0;
-        cooldowns.set(message.author.id, Date.now() + cooldownTime);
+        TextCooldowns.set(message.author.id, Date.now() + cooldownTime);
 
         // Logging every executed commands
         logger.info(`

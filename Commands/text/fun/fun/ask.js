@@ -9,13 +9,18 @@ module.exports = {
     execute: async (logger, client, message, args) => {
         try {
             const prompt = `When responding to the following prompt, try to condense your response. Make sure it is under 2000 characters. Prompt: ${args.join(" ")}`;
-            const result = await got(`${process.env.PALM_API_PROXY_URL}?api_key=${process.env.PALM_API_KEY}&prompt=${encodeURIComponent(prompt)}`);
+            const result = await got(`${process.env.PALM_API_PROXY_URL}?api_key=${process.env.PALM_API_KEY}&prompt=${encodeURIComponent(prompt)}`, {
+                timeout: {
+                    request: 10000
+                }
+            });
+            
             const response = JSON.parse(result.body).response;
-        
             message.reply(limitString(response, 2000));
 
         } catch(err) {
-            SendErrorEmbed(message, "An error occured.", "red");
+            if (err.name == 'TimeoutError') return SendErrorEmbed(message, "I do not wish to answer that question. (Request timed out)", "yellow");
+            SendErrorEmbed(message, "An error occurred.", "red");
         }
 
         function limitString(string, limit) {
