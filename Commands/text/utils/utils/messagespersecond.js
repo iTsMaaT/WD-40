@@ -4,7 +4,6 @@ module.exports = {
     category: "utils",
     aliases: ['mps'],
     async execute(logger, client, message, args) {
-        message.channel.sendTyping();
 
         const messages = await message.channel.messages.fetch({ limit: 100 });
 

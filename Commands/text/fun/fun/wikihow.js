@@ -4,7 +4,6 @@ module.exports = {
     description: "Gives a random image from wikihow",
     category: "fun",
     async execute(logger, client, message, args) {
-        message.channel.sendTyping();
 
         const req = await got("https://www.wikihow.com/api.php?action=query&generator=random&prop=imageinfo&format=json&iiprop=url&grnnamespace=6", { https: { rejectUnauthorized: false } });
         const json = await JSON.parse(req.body);

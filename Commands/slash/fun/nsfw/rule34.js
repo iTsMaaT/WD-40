@@ -23,10 +23,24 @@ module.exports = {
 
                 const data = JSON.parse(response.body);
                 const post = data[Math.floor(Math.random() * data.length)];
-                interaction.editReply({ content: post.file_url  });
+
+                const RuleEmbed = {
+                    color: 0xffffff,
+                    title: `Posted by: ${post.owner}`,
+                    image: {
+                        url: post.file_url,
+                    },
+                    timestamp: new Date(),
+                };
+                interaction.reply({ embeds: [RuleEmbed] });
             } catch (err) {
-                interaction.editReply({ content: "An error occured, probably a invalid tag.", ephemeral: true });
-                logger.error(error);
+                const RuleEmbed = {
+                    color: 0xff0000,
+                    title: `An error occured, probably a invalid tag`,
+                    timestamp: new Date(),
+                };
+                interaction.reply({ embeds: [RuleEmbed] });
+                logger.error(err);
             }
         } else {
             interaction.editRyply({ content: "The channel you are in isn't NSFW"  });

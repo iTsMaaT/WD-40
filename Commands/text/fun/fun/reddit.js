@@ -8,6 +8,7 @@ module.exports = {
     category: "fun",
     execute: async (logger, client, message, args) => {
         let sent = "";
+        
         if (args.length == 2 && args[0] == "-p") {
             //Gore subreddits blacklist
             if (args[1] != "eyeblech" && args[1] != "gore" && args[1] != "guro") {

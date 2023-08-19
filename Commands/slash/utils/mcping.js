@@ -3,10 +3,6 @@ const got = require("got");
 const SendErrorEmbed = require("@functions/SendErrorEmbed");
 const { AttachmentBuilder } = require("discord.js");
 
-const options = {
-    timeout: 1000 * 5, // timeout in milliseconds
-    enableSRV: true // SRV record lookup
-};
 module.exports = {
     name: 'mcping',
     description: 'Ping a minecraft server',
@@ -51,8 +47,8 @@ module.exports = {
                     },
                     fields: [
                         { name: "Server Version", value: server.version.name_clean },
-                        { name: "Players Online", value: `${server.players.online}/${server.players.max}` },
                         { name: "MOTD (May Not Display Accurately)", value: server.motd.clean ?? "`N/A`" },
+                        { name: "Players Online", value: `${server.players.online}/${server.players.max}` },
                     ],
                     timestamp: new Date(),
                 };
@@ -66,8 +62,7 @@ module.exports = {
                     serverStatusEmbed.fields.push({ name: "Player list", value: playerNames.join(", ") });
                 }
     
-                if (server.icon) return interaction.editReply({ embeds: [serverStatusEmbed], files: [imgfile]  });
-                interaction.editReply({ embeds: [serverStatusEmbed]  });
+                interaction.editReply({ embeds: [serverStatusEmbed], files: [imgfile]  });
             });
     }
 };

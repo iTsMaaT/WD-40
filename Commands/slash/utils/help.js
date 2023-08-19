@@ -1,34 +1,71 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ApplicationCommandOptionType } = require("discord.js");
 
 module.exports = {
     name: "help",
     description: "Lists commands",
+    options: [
+        {
+            name: "command",
+            type: ApplicationCommandOptionType.String,
+            description: "Get help for a specific command",
+            required: false,
+        },
+    ],
     async execute(logger, interaction, client) {
+        const command = interaction.options.get("command")?.value;
         //Finds all command files and separate them from categories, then use page to list the commands per category, -admin shows the private ones (admin or iTsMaaT only)
-        await interaction.deferReply();
+        if (command) {
+            const CommandName = client.commands.get(command);
+            if (!CommandName || CommandName.private) return SendErrorEmbed(interaction, "This command doesn't exist.", "red");
+
+            var CommandEmbed = {
+                title: `**${CommandName.name}** ${CommandName.usage ?? ""}`,
+                color: 0xffffff,
+                description: CommandName.description,
+                timestamp: new Date(),
+            };
+            return interaction.reply({ embeds: [CommandEmbed]  });
+            
+        }
+        //Finds all command files and separate them from categories, then use page to list the commands per category
+
         let counter = 0;
-        //let helpmessagebuilder = "";
-        const prefix = global.GuildManager.GetPrefix(interaction.guild);
-        //helpmessagebuilder += `**The prefix is:** \`${prefix}\`\n\n`
+        const chunkSize = 7; // Number of elements in each chunk
+        const prefix = global.GuildManager.GetPrefix(message.guild);
+        
         const categorymapper = {};
+        const addedCommands = new Set(); // Keep track of added commands
         client.commands.each((val) => {
-            if (!val.private) {
+            if (!val.private && !addedCommands.has(val.name)) {
                 if (categorymapper[val.category]) {
-                    categorymapper[val.category] += (`**${val.name}: **` + val.description.charAt(0).toUpperCase() + val.description.slice(1)) + "\r\n";
+                    categorymapper[val.category][`**${val.name}${val.aliases ? ` [${(val.aliases).join(", ")}]` : ""}: **`] = (prettyString(val.description, "first", true));
                 } else {
-                    categorymapper[val.category] = (`**${val.name}: **` + val.description.charAt(0).toUpperCase() + val.description.slice(1)) + "\r\n";
+                    categorymapper[val.category] = {};
                 }
+                addedCommands.add(val.name);
             }
         });
-        const categories = Object.keys(categorymapper);
+        
+        const groupedObject = {};
+        Object.keys(categorymapper).forEach(category => {
+            const commands = categorymapper[category];
+            const commandsArray = Object.entries(commands);
+  
+            for (let i = 0; i < commandsArray.length; i += chunkSize) {
+                const chunkCommands = commandsArray.slice(i, i + chunkSize);
+                const chunkedCategory = `${category} (${Math.floor(i / chunkSize) + 1})`;
+    
+                groupedObject[chunkedCategory] = chunkCommands.map(([name, value]) => ({ name, value }));
+            }
+        });
 
-        //console.log(require('discord.js').version)
+        const categories = Object.keys(groupedObject);
 
         const FisrtPage = new ButtonBuilder()
             .setCustomId('first')
             .setLabel('◀◀')
             .setStyle(ButtonStyle.Success);
-            
+
         const LastPage = new ButtonBuilder()
             .setCustomId('last')
             .setLabel('▶▶')
@@ -53,30 +90,41 @@ module.exports = {
         const row = new ActionRowBuilder()
             .addComponents(FisrtPage, PreviousPage, PageNumber, NextPage, LastPage);
 
-        var CategoriesPage = `__Command categories__ (\`>help <page number>\` to see the commands)\n**The prefix is: **\`${prefix}\`\n`;
-        for (let i = 0; i < categories.length; i++) {
-            CategoriesPage += `**Page ${i + 1}** : ${categories[i].toUpperCase()}\n`;
-        }
-
-        row.components[0].setDisabled(true);
-        row.components[1].setDisabled(true);
-        var HelpFull = await interaction.editReply({
-            content: CategoriesPage,
-            components: [row],
+        const pages = [];
+        categories.map((category, index) => {
+            const categoryName = category.split(" ")[0]; // Get the category name
+            if (index === 0 || categoryName !== categories[index - 1].split(" ")[0]) {
+                pages.push(`**Page ${index + 1}:** ${categoryName.toUpperCase()}`);
+            }
         });
 
+        const categoryEmbed = {
+            title: "Command categories",
+            description: `**The prefix is:** \`${prefix}\`\n\nTotal commands: ${addedCommands.size}\n${pages.join("\n")}`,
+            color: 0xffffff,
+            footer: { text: `Buttons expire after 2 minutes.` }
+        };
+              
+        row.components[0].setDisabled(true);
+        row.components[1].setDisabled(true);
+        const helpMessage = await interaction.reply({
+            embeds: [categoryEmbed],
+            components: [row],
+            allowedMentions: { repliedUser: false },
+        });
+
+
         const filter = (interaction) => {
-            if (interaction.user.id == interaction.user.id) return true;
+            if (interaction.user.id == message.author.id) return true;
         };
 
-        const collector = HelpFull.createMessageComponentCollector({
+        const collector = helpMessage.createMessageComponentCollector({
             filter,
             time: 120000,
             dispose: true
         });
-
+        
         collector.on("collect", async (interaction) => {
-
 
             if (interaction.customId === 'next') {
                 counter++;
@@ -94,40 +142,47 @@ module.exports = {
             row.components[2].setLabel(`${counter} / ${categories.length}`);
 
             if (counter == 0) {
-                // If we're on the first page, show the categories page
-                await HelpFull.edit({
-                    content: CategoriesPage,
-                    components: [row],
-                });
+                embed = categoryEmbed;
+
+                await row.components[0].setDisabled(counter == 0);
+                await row.components[1].setDisabled(counter == 0);
+                await row.components[3].setDisabled(counter == categories.length);
+                await row.components[4].setDisabled(counter == categories.length);
+
             } else {
-                // Otherwise, show the commands for the current category
-                let HelpFullPage = `__Commands for category : **${categories[counter - 1].toUpperCase()}**__\n`;
-                HelpFullPage += categorymapper[categories[counter - 1]];
-                await HelpFull.edit({
-                    content: HelpFullPage,
-                    components: [row],
-                });
+                const currentCategory = categories[counter - 1];
+                embed = {
+                    title: `Commands for category: ${currentCategory.toUpperCase().replace(" (1)", "")}`,
+                    fields: groupedObject[currentCategory],
+                    color: 0xffffff, // Embed color (you can change it to any color you like)
+                };
+
+                await row.components[0].setDisabled(counter == 0);
+                await row.components[1].setDisabled(counter == 0);
+                await row.components[3].setDisabled(counter == categories.length);
+                await row.components[4].setDisabled(counter == categories.length);
             }
 
-            // Update the button states based on the current page number
-            await row.components[0].setDisabled(counter == 0);
-            await row.components[1].setDisabled(counter == 0);
-            await row.components[3].setDisabled(counter == categories.length);
-            await row.components[4].setDisabled(counter == categories.length);
+            helpMessage.edit({
+                embeds: [embed],
+                components: [row],
+                allowedMentions: { repliedUser: false },
+            });
 
             await interaction.update({
+                embeds: [embed],
                 components: [row],
             });
         });
 
-        collector.on("end", async (interaction) => {
-            const messageContent = `${HelpFull.content}\n[\`Buttons expired.\`]`;
+        collector.on("end", async () => {
             row.components.forEach(component => {
                 component.setDisabled(true);
             });
-            await HelpFull.edit({
-                content: messageContent,
+            await helpMessage.edit({
+                embeds: [embed],
                 components: [row],
+                allowedMentions: { repliedUser: false }
             });
         });
     }

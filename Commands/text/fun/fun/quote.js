@@ -6,7 +6,7 @@ module.exports = {
     category: "fun",
     usage: "< [Any]: Text quote, -i: image>",
     async execute(logger, client, message, args) {
-        message.channel.sendTyping();
+
         if (!args[0]) {
             const quote = JSON.parse((await got(`https://inspirobot.me/api?generateFlow=1`)).body);
             const quoteText = quote.data.filter(x => x.type == "quote")[0].text.replace(/(\[pause [0-9]+\])/g, "");

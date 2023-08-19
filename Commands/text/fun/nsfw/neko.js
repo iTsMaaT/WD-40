@@ -6,7 +6,6 @@ module.exports = {
     description: "meow mrrrr~~ ฅ(＾・ω・＾ฅ)",
     category: "NSFW",
     async execute(logger, client, message, args) {
-        message.channel.sendTyping();
 
         if (message.channel.nsfw) {
             await got("https://nekos.life/api/neko")

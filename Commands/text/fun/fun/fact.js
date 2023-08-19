@@ -4,8 +4,7 @@ module.exports = {
     description: "Get a random fact",
     category: "fun",
     execute(logger, client, message, args) {
-        message.channel.sendTyping();
-
+        
         got("https://uselessfacts.jsph.pl/random.json?language=en")
             .then(response => {
                 const fact = JSON.parse(response.body);

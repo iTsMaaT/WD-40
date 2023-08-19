@@ -6,7 +6,6 @@ module.exports = {
     category: "text manipulation",
     usage: "< String >",
     async execute(logger, client, message, args) {
-        message.channel.sendTyping();
         if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");
 
         const bf = brainfuckToAlphuck(stringToBF(args.join(" ")));

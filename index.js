@@ -177,7 +177,7 @@ client.on("ready", async () => {
 
     const SmartRestart = new cron.CronJob('* * * * *', async () => {
         if (SmartRestartEnabled) {
-            if (Array.from(client.voice.adapters.keys()).length == 0) {
+            if (client.voice.adapters.size == 0) {
                 logger.severe(`Restart requested from discord`);
                 client.channels.cache.get("1037141235451842701").send(`Restart requested from discord for reason : \`Smart restart\``);
 
@@ -233,8 +233,14 @@ client.on(Events.InteractionCreate, async interaction => {
         try {
         //execute the slash command
             await slash.execute(logger, interaction, client);
+
             //Logging the command
-            logger.info(`Executing [/${interaction.commandName}]\nby    [${interaction.user.tag} (${interaction.user.id})]\nin    [${interaction.channel.name} (${interaction.channel.id})]\nfrom  [${interaction.guild.name} (${interaction.guild.id})]`);
+            logger.info(`Executing [/${interaction.commandName}]
+            by    [${interaction.user.tag} (${interaction.user.id})]
+            in    [${interaction.channel.name} (${interaction.channel.id})]
+            from  [${interaction.guild.name} (${interaction.guild.id})]`
+                .replace(/^\s+/gm, ''));
+
         } catch (error) {
             logger.error(`Error executing slash command [${interaction.commandName}]`);
             logger.error(error);
@@ -247,7 +253,14 @@ client.on(Events.InteractionCreate, async interaction => {
 
         try {
             await context.execute(logger, interaction, client);
-            logger.info(`Executing [${interaction.commandName} (${context.type === 2 ? "User" : "Message"})]\nby    [${interaction.user.tag} (${interaction.user.id})]\nin    [${interaction.channel.name} (${interaction.channel.id})]\nfrom  [${interaction.guild.name} (${interaction.guild.id})]`);
+
+            logger.info(`
+            Executing [${interaction.commandName} (${context.type === 2 ? "User" : "Message"})]
+            by   [${interaction.user.tag} (${interaction.user.id})]
+            in   [${interaction.channel.name} (${interaction.channel.id})]
+            from [${interaction.guild.name} (${interaction.guild.id})]`
+                .replace(/^\s+/gm, ''));
+
         } catch (error) {
             logger.error(`Error executing context menu command [${interaction.commandName}]`);
             logger.error(error);
@@ -321,8 +334,13 @@ client.on("messageCreate", async (message) => {
         cooldowns.set(message.author.id, Date.now() + cooldownTime);
 
         // Logging every executed commands
-        logger.info(`Executing [${message.content}]\nby    [${message.member.user.tag} (${message.author.id})]\nin    [${message.channel.name} (${message.channel.id})]\nfrom  [${message.guild.name} (${message.guild.id})]`);
-
+        logger.info(`
+        Executing [${message.content}]
+        by    [${message.member.user.tag} (${message.author.id})]
+        in    [${message.channel.name} (${message.channel.id})]
+        from  [${message.guild.name} (${message.guild.id})]`
+            .replace(/^\s+/gm, ''));
+        
         // Execute the command
         try {
             await message.channel.sendTyping();

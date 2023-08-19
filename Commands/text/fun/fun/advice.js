@@ -4,8 +4,6 @@ module.exports = {
     description: "Get a random advice",
     category: "fun",
     execute(logger, client, message, args) {
-        message.channel.sendTyping();
-
         got("https://api.adviceslip.com/advice")
             .then(response => {
                 const advice = JSON.parse(response.body);

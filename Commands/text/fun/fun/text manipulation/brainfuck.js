@@ -6,8 +6,7 @@ module.exports = {
     category: "text manipulation",
     usage: "< String >",
     aliases: ['bf'],
-    async execute(logger, client, message, args) {
-        message.channel.sendTyping();
+    async execute(logger, client, message, args) {    
         if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");
 
         const bf = stringToBF(args.join(" "));

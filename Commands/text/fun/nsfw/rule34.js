@@ -7,7 +7,7 @@ module.exports = {
     usage: "< [Any]: tags...>",
     category: "NSFW",
     execute: async (logger, client, message, args) => {
-        message.channel.sendTyping();
+
         if (message.channel.nsfw) {
             try {
                 const url = 'http://rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=' + args.join('+');

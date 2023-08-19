@@ -9,12 +9,12 @@ module.exports = {
         if (message.author.id == process.env.OWNER_ID && !args[0]) {
             const YesRestart = new ButtonBuilder()
                 .setCustomId('yes')
-                .setLabel('YES')
+                .setLabel('Yes')
                 .setStyle(ButtonStyle.Success);
 
             const NoRestart = new ButtonBuilder()
                 .setCustomId('no')
-                .setLabel('NO')
+                .setLabel('No')
                 .setStyle(ButtonStyle.Danger);
 
             const row = new ActionRowBuilder()
@@ -68,11 +68,15 @@ module.exports = {
                         ConfirmationMessage.edit({ components: [row] });
                     });
                 }
+                
+                interaction.update({
+                    components: [row],
+                });
             });
           
-            collector.on('end', () => {
+            collector.on('end', async () => {
                 row.components.forEach((component) => component.setDisabled(true));
-                ConfirmationMessage.edit({ components: [row], embeds: [embed] });
+                await ConfirmationMessage.edit({ components: [row], embeds: [embed] });
             });
         }
 
