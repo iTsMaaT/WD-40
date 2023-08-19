@@ -210,5 +210,16 @@
             "Moved brainfuck and alphfuck to Text Manipulation category",
             "Fixes"
         ]
+    },
+    {
+        "version": "4.10.0",
+        "date": "2023-18-19",
+        "changes": [
+            ">ask: Switched from chatGPT to PaLM (Google AI), no need to jailbreak!",
+            ">blacklist: no permission argument gives the list of blacklists for the specified user",
+            ">help: Uses fields instead of the embed's description. Better limits",
+            ">moveall, >deafenall and >muteall: doesn't affect bots anymore",
+            "Lots of fixes"
+        ]
     }
 ]
