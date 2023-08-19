@@ -1,68 +1,29 @@
-const { Configuration, OpenAIApi } = require('openai');
-const fs = require("fs/promises");
 const SendErrorEmbed = require('@functions/SendErrorEmbed');
+const got = require("got");
 module.exports = {
     name: "ask",
-    description: "Ask a question to ChatGPT-3.5-turbo",
-    usage: "< -p: Personality, [ANY]: The prompt>",
+    description: "Ask a question to PaLM",
+    usage: "< prompt >",
     category: "fun",
+    cooldown: 5000,
     execute: async (logger, client, message, args) => {
         try {
-            if (args[0] == "-p" && message.member.permissions.has("Administrator") && message.author.id == process.env.OWNER_ID) {
-                args.shift();
-                await global.GuildManager.SetPersonality(message.guild, args.join(" "));
-                message.reply({ content: 'Prompt successfully changed.', allowedMentions: { repliedUser: false } });
-            } else if (args[0]) {
-                const perso = global.GuildManager.GetPersonality(message.guild)?.toString();
-                if (!perso) { 
-                    global.GuildManager.init(message.guild);
-                    global.GuildManager.GetPersonality(message.guild).toString();
-                }
-                const conversationLog = [{ role: 'system', content: perso}];
-                const configuration = new Configuration({
-                    apiKey: process.env.OPENAI_API_KEY,
-                });
-                const openai = new OpenAIApi(configuration);
+            const prompt = `When responding to the following prompt, try to condense your response. Make sure it is under 2000 characters. Prompt: ${args.join(" ")}`;
+            const result = await got(`${process.env.PALM_API_PROXY_URL}?api_key=${process.env.PALM_API_KEY}&prompt=${encodeURIComponent(prompt)}`);
+            const response = JSON.parse(result.body).response;
+        
+            message.reply(limitString(response, 2000));
 
-                const prevMessages = await message.channel.messages.fetch({ limit: 10 });
-                prevMessages.reverse();
+        } catch(err) {
+            SendErrorEmbed(message, "An error occured.", "red");
+        }
 
-                prevMessages.forEach((msg) => {
-                    if (msg.author.id !== client.user.id && message.author.bot) return;
-                    if (msg.author.id !== message.author.id) return;
-
-                    conversationLog.push({
-                        role: 'user',
-                        content: msg.content.replace(">ask", ""),
-                    });
-                });
-
-                try {
-                    const result = await openai.createChatCompletion({
-                        model: 'gpt-3.5-turbo',
-                        messages: conversationLog,
-                        // max_tokens: 256, // limit token usage
-                    });
-                
-                    if (result.data.choices[0].message.content.length < 2000) {
-                        await message.reply({ content: result.data.choices[0].message.content, allowedMentions: { repliedUser: true } });
-                    } else {
-                        const discriminator = Math.floor(Math.random() * 99999) + 1;
-                        await fs.writeFile(`./answer-${discriminator}.txt`, result.data.choices[0].message.content, { encoding: "utf8" });
-                        await message.reply({ files: [`./answer-${discriminator}.txt`] });
-                        await fs.unlink(`./answer-${discriminator}.txt`);
-                    }
-                } catch (error) {
-                    logger.error(`OPENAI ERR: ${error}`);
-                    if (error.response && error.response.status === 429) {
-                        SendErrorEmbed(message, "Funds needed to keep running", "yellow");
-                    } else {
-                        SendErrorEmbed(message, "An error occurred", "red");
-                    }
-                }
+        function limitString(string, limit) {
+            if (string.length <= limit) {
+                return string;
+            } else {
+                return string.substring(0, limit - 3) + "...";
             }
-        } catch (err) {
-            SendErrorEmbed(message, "An error occurred", "red");
         }
     }
 };
