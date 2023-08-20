@@ -262,7 +262,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
         } catch (error) {
             logger.error(`Error executing slash command [${interaction.commandName}]`);
-            logger.error(error);
+            logger.error(error.stack);
         }
     } else if (interaction.isContextMenuCommand()) {
         
