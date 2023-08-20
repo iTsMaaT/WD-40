@@ -1,4 +1,5 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
+const SendErrorEmbed = require("@functions/SendErrorEmbed");
 
 module.exports = {
     name: "ask",
@@ -6,8 +7,8 @@ module.exports = {
     type: ApplicationCommandType.ChatInput,
     options: [
         {
-            name: "data",
-            description: "The prompt",
+            name: "prompt",
+            description: "The question to ask Google's AI",
             type: ApplicationCommandOptionType.String,
             required: true,
         },
