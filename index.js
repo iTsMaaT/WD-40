@@ -53,7 +53,11 @@ prisma.snowflake.findMany().then(v => {
 
 //Error handler
 //Gotta Catch ’Em All!
-process.on("unhandledRejection", (err) => {
+process.on("unhandledRejection", (err, promise) => {
+    logger.error("Unhandled Promise Rejection: " + err.stack);
+});
+
+process.on("uncaughtException", (err) => {
     if (err.code === 10008) return logger.error(err.stack);
     logger.error(err.stack);
     client?.channels?.cache?.get("1037141235451842701")?.send(`Error caught <@411996978583699456>! <#1069811223950016572>`);
@@ -232,8 +236,8 @@ client.on(Events.InteractionCreate, async interaction => {
         if (!slash) return console.error(`No command matching ${interaction.commandName} was found.`);
 
         // Check command cooldown
-        if (SlashCooldowns.has(interaction.author.id)) {
-            const cooldown = SlashCooldowns.get(interaction.author.id);
+        if (SlashCooldowns.has(interaction.user.id)) {
+            const cooldown = SlashCooldowns.get(interaction.user.id);
             const timeLeft = cooldown - Date.now();
             if (timeLeft > 0) {
                 interaction.reply(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before using that command again.`);
@@ -243,7 +247,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
         // Set command cooldown
         const cooldownTime = slash.cooldown || 0;
-        SlashCooldowns.set(interaction.author.id, Date.now() + cooldownTime);
+        SlashCooldowns.set(interaction.user.id, Date.now() + cooldownTime);
 
         try {
         //execute the slash command
