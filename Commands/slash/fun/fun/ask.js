@@ -1,9 +1,9 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const got = require("got");
 
 module.exports = {
     name: "ask",
-    description: "Ask a question to ChatGPT-3.5-turbo",
+    description: "Ask a question to PaLM",
     type: ApplicationCommandType.ChatInput,
     options: [
         {
@@ -13,18 +13,34 @@ module.exports = {
             required: true,
         },
     ],
+    cooldown: 5000,
     execute: async (logger, interaction, client) => {
         await interaction.deferReply();
-
-        try {
-            const prompt = `When responding to the following prompt, try to condense your response. Make sure it is under 2000 characters. Prompt: ${interaction.options.get("data").value}`;
-            const result = await got(`${process.env.PALM_API_PROXY_URL}?api_key=${process.env.PALM_API_KEY}&prompt=${encodeURIComponent(prompt)}`);
-            const response = JSON.parse(result.body).response;
         
-            await interaction.editReply(limitString(response, 2000));
+        try {
+            const prompt = `When responding to the following prompt, try to condense your response. Make sure it is under 2000 characters. Prompt: ${interaction.options.get("prompt").value}`;
+            const result = await got(`${process.env.PALM_API_PROXY_URL}?api_key=${process.env.PALM_API_KEY}&prompt=${encodeURIComponent(prompt)}`, {
+                timeout: {
+                    request: 10000
+                }
+            });
+            
+            const response = JSON.parse(result.body).response;
+            interaction.editReply(limitString(response, 2000));
 
         } catch(err) {
-            await SendErrorEmbed(interaction, "An error occured.", "red");
+            const ErrorEmbed = {
+                title: "An error occured.",
+                timestamp: new Date(),
+                color: 0xff0000,
+            };
+
+            if (err.name == 'TimeoutError') {
+                ErrorEmbed.title = "I do not wish to answer that question. (Request timed out)";
+                ErrorEmbed.color = 0xffff00;
+            }
+
+            await interaction.editReply({ embeds: [ErrorEmbed] });
         }
 
         function limitString(string, limit) {
