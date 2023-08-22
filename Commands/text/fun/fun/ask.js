@@ -19,6 +19,7 @@ module.exports = {
             message.reply(limitString(response, 2000));
 
         } catch(err) {
+            logger.error(err.stack);
             if (err.name == 'TimeoutError') return SendErrorEmbed(message, "I do not wish to answer that question. (Request timed out)", "yellow");
             SendErrorEmbed(message, "An error occurred.", "red");
         }

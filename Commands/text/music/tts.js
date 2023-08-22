@@ -16,6 +16,8 @@ module.exports = {
         if (!args[0]) return SendErrorEmbed(message, "You must provide a prompt.", "yellow");
         if (queue || queue?.tracks || queue?.currentTrack) return SendErrorEmbed(message, "You must stop the music before playing TTS.", "yellow");
 
+        if (args.filter(word => word.length > 200).length) return SendErrorEmbed(message, "The prompt contains a word longer than 200 characters", "yellow");
+
         const text = args.join(' ');
 
         if (text.length > 1000) return SendErrorEmbed(message, "The prompt must be shorter than 1000 characters", "yellow");

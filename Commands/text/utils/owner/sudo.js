@@ -32,25 +32,26 @@ module.exports = {
             }
             //Reacts to a given message in a given channel
             else if (sudoprefix == "-e") {
-                if (args.length > 2) {
-                    const ChannelID = args.shift();
-                    const MsgID = args.shift();
+                if (args[1]) {
+                    const LinkArray = infoFromMessageLink(args.shift());
+                    const ChannelID = LinkArray[1];
+                    const MsgID = LinkArray[2];
                     const letters = args.shift().toUpperCase();
 
                     for (i = 0; i < letters.length; i++) {
                         if (letters[i] === " ") continue;
                         const letter = letters[i];
-                        client.channels.cache.get(ChannelID).messages.fetch({ cache: false, message: MsgID })
+                        await client.channels.cache.get(ChannelID).messages.fetch({ cache: false, message: MsgID })
                             .then(m => {
                                 m.react(String.fromCodePoint(letter.codePointAt(0) - 65 + 0x1f1e6));
                             }).catch((err) => message.reply("Unable to find message. " + err));
                     }
                     message.reply({ content: "Sudo successful.", allowedMentions: { repliedUser: false } });
                     logger.info(`Sudo -e used by ${message.author.tag} (${message.author.id}) in <#${ChannelID}>`);
-                }
-                else {
-                    const ChannelID = args.shift();
-                    const MsgID = args.shift();
+                } else {
+                    const LinkArray = infoFromMessageLink(args.shift());
+                    const ChannelID = LinkArray[1];
+                    const MsgID = LinkArray[2];
                     client.channels.cache.get(ChannelID).messages.fetch({ cache: false, message: MsgID })
                         .then(m => {
                             m.reactions.removeAll();
@@ -89,9 +90,6 @@ module.exports = {
                 message.reply(`Unknown parameter (use \`>sudo -help\` for help)`);
             }
             
-        } else {
-            //If normal user, blocks access to the command
-            message.reply(`You are not allowed to execute that command`);
         }
     }
 };
