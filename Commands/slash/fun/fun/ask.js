@@ -29,6 +29,7 @@ module.exports = {
             interaction.editReply(limitString(response, 2000));
 
         } catch(err) {
+            logger.error(err.stack);
             const ErrorEmbed = {
                 title: "An error occured.",
                 timestamp: new Date(),
