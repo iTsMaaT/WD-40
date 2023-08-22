@@ -10,7 +10,7 @@ module.exports = {
 
         if (message.author.id != process.env.OWNER_ID) return;
 
-        switch(args[0] ?? "dnd") {
+        switch(args[0]) {
         case "donotdisturb":
         case "dnd": 
         case "red":
@@ -23,20 +23,18 @@ module.exports = {
             break;
         case "invisible":
         case "grey":
-        case "gray": 
+        case "gray":
+        case "offline": 
             client.user.setPresence({ status: PresenceUpdateStatus.Invisible });
             break;
         case "idle":
         case "yellow":
             client.user.setPresence({ status: PresenceUpdateStatus.Idle });
             break;
-        case "offline":
-            client.user.setPresence({ status: PresenceUpdateStatus.Offline });
-            break;
         default : {
             client.user.setPresence({ status: PresenceUpdateStatus.Online });
         }
         }
-        message.reply("Status changed to: " + args[0] ?? "dnd");
+        message.reply("Status changed to: " + args[0] ?? "Online");
     }
 };
