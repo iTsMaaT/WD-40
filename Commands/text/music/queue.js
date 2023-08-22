@@ -9,7 +9,7 @@ module.exports = {
     aliases: ['q'],
     execute(logger, client, message, args) {
         let queue;
-        if (message.author.id == process.env.OWNER_ID) {
+        if (message.author.id == process.env.OWNER_ID && args[0]) {
             queue = useQueue(parseInt(args[0]));
         } else {
             queue = useQueue(message.guild.id);
