@@ -206,6 +206,7 @@ client.on("ready", async () => {
     console.log("Cron job setup done.");
     console.log("Discord.js version: " + require('discord.js').version);
     console.log(`There is ${client.options.shardCount} shard${client.options.shardCount > 1 ? "s" : ""} spawned`);
+    whitelist.push(process.env.OWNER_ID);
     global.debug = DefaultDebugState;
     global.superuser = DefaultSuperuserState;
     if (process.env.SERVER == "dev") global.superuser = 1;
@@ -290,7 +291,7 @@ client.on(Events.InteractionCreate, async interaction => {
 //Text command executing
 client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
-    if (superuser && (message.author.id != process.env.OWNER_ID && whitelist.includes(message.author.id))) return;
+    if (superuser && !whitelist.includes(message.author.id)) return;
     if (!message.guild) return message.reply("Commands cannot be executed inside DMs.");
     if (blacklist.includes(message.author.id)) return;
 
