@@ -7,11 +7,12 @@ module.exports = {
     aliases: ['tetesaclaque'],
     async execute(logger, client, message, args) {
         const tacs = ["fernand","gabriel_samuel","ginette_tony","jimmy_rejean","julie_simon","les_chasseurs","monique_lucien","natacha","oncleTom","pilote","raoul","rene_charles","ti_papoutes","turcotte","yvon"];
+        const unchangedtac = ["les_chasseurs","rene_charles","ti_papoutes"];
         let tac = tacs[Math.floor(Math.random() * tacs.length)];
         const tacimage = `https://www.tetesaclaques.tv/public/images/series/fr-ca/${tac}.png`;
         
         if (tac == "oncleTom") tac = "oncle tom";
-        if (tac.includes("_") && tac != "rene_charles") tac = tac.split("_")[Math.floor(Math.random() * 2)];
+        if (tac.includes("_") && !tac.includes(unchangedtac)) tac = tac.split("_")[Math.floor(Math.random() * 2)];
         tac = prettyString(tac, "first", false);
 
         const embed = {
