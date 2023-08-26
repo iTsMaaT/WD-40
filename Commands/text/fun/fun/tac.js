@@ -12,7 +12,13 @@ module.exports = {
         const tacimage = `https://www.tetesaclaques.tv/public/images/series/fr-ca/${tac}.png`;
         
         if (tac == "oncleTom") tac = "oncle tom";
-        if (tac.includes("_") && !tac.includes(unchangedtac)) tac = tac.split("_")[Math.floor(Math.random() * 2)];
+        if (tac == "rene_charles") tac = "Rene-Charles";
+        if (tac == "pilote") tac = "le pilote";
+        if (tac.includes("_") && !unchangedtac.includes(tac)) {
+            tac = tac.split("_")[Math.floor(Math.random() * 2)];
+        } else if (tac.includes("_")) {
+            tac = tac.replace("_", " ");
+        }
         tac = prettyString(tac, "first", false);
 
         const embed = {
