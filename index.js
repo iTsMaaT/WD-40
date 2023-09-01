@@ -129,7 +129,7 @@ loadFiles('./events/', function (event) {
 });
 
 //Bot setup on startup
-client.on("ready", async () => {
+client.once(Events.ClientReady, async () => {
 
     logger.info(`Bot starting on [${process.env.SERVER}]...`);
 
@@ -181,19 +181,17 @@ client.on("ready", async () => {
     });
 
     const SmartRestart = new cron.CronJob('* * * * *', async () => {
-        if (SmartRestartEnabled) {
-            if (client.voice.adapters.size == 0) {
-                logger.severe(`Restart requested from discord`);
-                client.channels.cache.get("1037141235451842701").send(`Restart requested from discord for reason : \`Smart restart\``);
+        if (client.voice.adapters.size == 0 && SmartRestartEnabled) {
+            logger.severe(`Restart requested from discord`);
+            client.channels.cache.get("1037141235451842701").send(`Restart requested from discord for reason : \`Smart restart\``);
 
-                //After 3s, closes the database and then exits the process
-                setTimeout(function () {
+            //After 3s, closes the database and then exits the process
+            setTimeout(function () {
                 /****************/
-                    global.prisma.$disconnect();
-                    process.exit(1);
+                global.prisma.$disconnect();
+                process.exit(1);
                 /****************/
-                }, 1000 * 3);
-            }
+            }, 1000 * 3);
         }
     });
 
@@ -224,7 +222,7 @@ client.on("ready", async () => {
 });
 
 //Debug event
-client.on('debug', debug => {
+client.on(Events.Debug, debug => {
     if (global.debug) console.log(debug);
 });
 
@@ -289,7 +287,7 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 
 //Text command executing
-client.on("messageCreate", async (message) => {
+client.on(Events.MessageCreate, async (message) => {
     if (message.author.bot) return;
     if (superuser && !whitelist.includes(message.author.id)) return;
     if (!message.guild) return message.reply("Commands cannot be executed inside DMs.");
