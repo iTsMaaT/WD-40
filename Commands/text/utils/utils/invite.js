@@ -1,10 +1,11 @@
 const { ChannelType, PermissionsBitField } = require('discord.js');
+const SendErrorEmbed = require("@functions/SendErrorEmbed.js");
 
 module.exports = {
     name: "invite",
     category: "utils",
-    description: "Makes a list of the guilds the bot is in",
-    private: true,
+    description: "Creates a invite to the rules or announcements channel",
+    private: false,
     async execute(logger, client, message, args) {
 
         if (!message.member.permissions.has("Administrator") || !message.author.id == process.env.OWNER_ID) SendErrorEmbed(message, "You need to be administrator to execute this command", "yellow");
