@@ -11,8 +11,9 @@ module.exports = {
         let res;
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
 
-        const string = args.join(' ');
-        if (!string) return SendErrorEmbed(message, "Please enter a song URL or query to search.", "yellow");
+        let string = args.join(' ');
+        if (!string) string = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+        //return SendErrorEmbed(message, "Please enter a song URL or query to search.", "yellow");
 
         play_embed = {
             color: 0xffffff,
@@ -45,8 +46,18 @@ module.exports = {
                 }
             });
             logger.music(`Playing [${string}]`); 
+
+            embed = {
+                color: 0xffffff,
+                description: `Successfully enqueued${res.track.playlist ? ` **track(s)** from: **${res.track.playlist.title}**` : `: **${res.track.title}**`}`,
+                timestamp: new Date(),
+            };
+    
+            await msg.edit({ embeds: [embed] });
+
         } catch (err) {
 
+            console.log(err);
             embed = {
                 color: 0xff0000,
                 description: `Failed to fetch / play the reqested track`,
@@ -55,13 +66,5 @@ module.exports = {
 
             await msg.edit({ embeds: [embed] });
         }
-
-        embed = {
-            color: 0xffffff,
-            description: `Successfully enqueued${res.track.playlist ? ` **track(s)** from: **${res.track.playlist.title}**` : `: **${res.track.title}**`}`,
-            timestamp: new Date(),
-        };
-
-        await msg.edit({ embeds: [embed] });
     }
 };

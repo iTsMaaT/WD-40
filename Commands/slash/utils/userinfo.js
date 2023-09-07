@@ -1,4 +1,5 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
+const SendErrorEmbed = require("@functions/SendErrorEmbed");
 
 module.exports = {
     name: 'userinfo',
@@ -30,11 +31,11 @@ module.exports = {
                     status = null; // No presence information available
                 } catch (err) {
                     console.log(err);
-                    return SendErrorEmbed(interaction, "User not found.", "red");
+                    await interaction.editReply({ embeds: [{title: "User not found", color: 0xff0000, timestamp: new Date()}] });
                 }
             } else {
                 console.log(e);
-                return SendErrorEmbed(interaction, "An error occurred while fetching the user.", "red");
+                return await interaction.editReply({ embeds: [{title: "An error occured.", color: 0xff0000, timestamp: new Date()}] });
             }
         }
 
@@ -70,9 +71,9 @@ module.exports = {
                 color: 0xffffff,
             };
 
-            message.reply({ embeds: [userInfoEmbed]  });
+            await interaction.editReply({ embeds: [userInfoEmbed]  });
         } catch (err) {
-            SendErrorEmbed(interaction, "Error.", "red", err);
+            await interaction.editReply({ embeds: [{title: "An error occured.", color: 0xff0000, timestamp: new Date()}] });
         }
     }
 };

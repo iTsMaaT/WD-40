@@ -16,18 +16,11 @@ module.exports = {
 
                 if (!server.online) return SendErrorEmbed(message, `${server.eula_blocked ? "The server is banned by Mojang." : "Server offline or nonexistant."}`, "red");
 
-
-                if (server.icon) {
-                    const data = server.icon.split(',')[1];
-                    const buf = Buffer.from(data, 'base64');
-                    var imgfile = new AttachmentBuilder(buf, 'img.png');
-                }
-
                 const serverStatusEmbed = {
                     title: `Server Status for ${server.host} (Port: ${server.port})`,
                     color: 0xffffff,
                     thumbnail: {
-                        url: 'attachment://file.jpg' || "",
+                        url: `https://api.mcstatus.io/v2/icon/${args[0]}${port ?? ""}` || "",
                     },
                     fields: [
                         { name: "Server Version", value: server.version.name_clean },
@@ -46,7 +39,6 @@ module.exports = {
                     serverStatusEmbed.fields.push({ name: "Player list", value: playerNames.join(", ") });
                 }
                 
-                if (server.icon) return message.reply({ embeds: [serverStatusEmbed], files: [imgfile] });
                 message.reply({ embeds: [serverStatusEmbed] });
             });
     },

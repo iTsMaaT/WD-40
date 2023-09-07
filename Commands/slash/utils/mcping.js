@@ -30,9 +30,8 @@ module.exports = {
             .then(async response => {
                 const server = JSON.parse(response.body);
     
-                if (!server.online) return SendErrorEmbed(interaction, `${server.eula_blocked ? "The server is banned by Mojang." : "Server offline or nonexistent."}`, "red");
-    
-            
+                if (!server.online) await interaction.editReply({ embeds: [{title: `${server.eula_blocked ? "The server is banned by Mojang." : "Server offline or nonexistent."}`, color: 0xff0000, timestamp: new Date()}] });
+   
                 if (server.icon) {
                     const data = server.icon.split(',')[1];
                     const buf = Buffer.from(data, 'base64');

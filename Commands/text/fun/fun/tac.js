@@ -1,4 +1,5 @@
 const prettyString = require("@functions/prettyString.js");
+const SendErrorEmbed = require("@functions/SendErrorEmbed");
 
 module.exports = {
     name: "tac",
@@ -21,15 +22,19 @@ module.exports = {
         }
         tac = prettyString(tac, "first", false);
 
-        const embed = {
-            title: `You are ${tac}!`,
-            image: {
-                url: tacimage,
-            },
-            color: 0xffffff,
-            timestamp: new Date(),
-        };
-
-        message.reply({ embeds: [embed] });
+        try {
+            const embed = {
+                title: `You are ${tac}!`,
+                image: {
+                    url: tacimage,
+                },
+                color: 0xffffff,
+                timestamp: new Date(),
+            };
+            
+            message.reply({ embeds: [embed] });
+        } catch(err) {
+            return SendErrorEmbed(message, "An error occured", "red");
+        }
     },
 };

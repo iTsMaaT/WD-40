@@ -9,7 +9,7 @@ module.exports = {
     async execute(logger, client, message, args) {
         if ( !message.member.permissions.has("Administrator") || !message.author.id == process.env.OWNER_ID) SendErrorEmbed(message, "You need to be administrator to execute this command", "yellow");
         
-        if (args[0] !== "-e" && args[0] !== "-s") return SendErrorEmbed(message, "Invalid argument", "yellow");
+        if (!args[1] || args[0] !== "-e" && args[0] !== "-s") return SendErrorEmbed(message, "Invalid argument", "yellow");
 
         const tag = ":dotted_line_face:";
         const name = args[1].toString();

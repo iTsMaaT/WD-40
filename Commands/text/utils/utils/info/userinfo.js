@@ -48,23 +48,24 @@ module.exports = {
             activity_name = "-";
             activity_details = "-";
         }
+        console.log(target);
 
         try {
             const presenceStatus = target?.presence?.status || "Offline";
             const userInfoEmbed = {
-                title: "User Information",
+                title: target.globalName,
                 description: `User Information For: <@${target.id}>`,
                 thumbnail: {
                     url: target.avatarURL({ dynamic: true }) || "",
                 },
                 fields: [
-                    { name: "User ID", value: target.id },
-                    { name: "Status", value: presenceStatus},
-                    { name: "Account Age", value: `<t:${parseInt(target.user.createdTimestamp / 1000)}:R>` },
-                    { name: "Member Since", value: `${target.joinedTimestamp ? `<t:${parseInt(target.joinedTimestamp / 1000)}:R>` : `-`}` },
-                    { name: "Custom Status", value: custom_status },
-                    { name: "Activity Title", value: activity_name },
-                    { name: "Activity Details", value: activity_details },
+                    { name: "User ID", value: target.id || "-" },
+                    { name: "Status", value: presenceStatus || "-"},
+                    { name: "Account Age", value: `${target?.user?.createdTimestamp ? `<t:${parseInt(target?.user?.createdTimestamp / 1000)}:R>` : "-"}` },
+                    { name: "Member Since", value: `${target.joinedTimestamp ? `<t:${parseInt(target?.joinedTimestamp / 1000)}:R>` : `-`}` },
+                    { name: "Custom Status", value: custom_status || "-" },
+                    { name: "Activity Title", value: activity_name || "-" },
+                    { name: "Activity Details", value: activity_details || "-" },
                     { name: "Highest Role", value: target.roles?.highest?.name || "-" },
                 ],
                 timestamp: new Date(),
@@ -73,7 +74,8 @@ module.exports = {
 
             message.reply({ embeds: [userInfoEmbed]  });
         } catch (err) {
-            SendErrorEmbed(message, "Error.", "red", err);
+            console.log(err);
+            SendErrorEmbed(message, "An error occured.", "red");
         }
     },
 };

@@ -1,32 +1,32 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const prettyString = require("@functions/prettyString.js");
 const SendErrorEmbed = require("@functions/SendErrorEmbed.js");
+
 module.exports = {
     name: "help",
     description: "Lists commands",
     category: "utils",
     private: false,
+    usage: "< [Command name (Optional)] >",
     async execute(logger, client, message, args) {
+        const prefix = global.GuildManager.GetPrefix(message.guild);
+        //const chunkSize = 7; // Number of elements in each chunk
 
         if (args[0]) {
             const CommandName = client.commands.get(args[0]);
             if (!CommandName || CommandName.private) return SendErrorEmbed(message, "This command doesn't exist.", "red");
 
             var CommandEmbed = {
-                title: `**${CommandName.name}** ${CommandName.usage ?? ""}`,
+                title: `**${prefix}${CommandName.name}** ${CommandName.usage ?? ""}`,
                 color: 0xffffff,
                 description: CommandName.description,
                 timestamp: new Date(),
             };
             return message.reply({ embeds: [CommandEmbed]  });
-            
         }
         //Finds all command files and separate them from categories, then use page to list the commands per category
 
         let counter = 0;
-        const chunkSize = 7; // Number of elements in each chunk
-        const prefix = global.GuildManager.GetPrefix(message.guild);
-        
         const categorymapper = {};
         const addedCommands = new Set(); // Keep track of added commands
         client.commands.each((val) => {
@@ -44,7 +44,8 @@ module.exports = {
         Object.keys(categorymapper).forEach(category => {
             const commands = categorymapper[category];
             const commandsArray = Object.entries(commands);
-  
+            const chunkSize = Math.ceil(commandsArray.length / Math.ceil(commandsArray.length / 8)); 
+             
             for (let i = 0; i < commandsArray.length; i += chunkSize) {
                 const chunkCommands = commandsArray.slice(i, i + chunkSize);
                 const chunkedCategory = `${category} (${Math.floor(i / chunkSize) + 1})`;
