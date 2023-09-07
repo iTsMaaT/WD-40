@@ -6,9 +6,8 @@ module.exports = {
     category: "utils",
     description: "Creates a invite to the rules or announcements channel",
     private: false,
+    admin: true,
     async execute(logger, client, message, args) {
-
-        if (!message.member.permissions.has("Administrator") || !message.author.id == process.env.OWNER_ID) SendErrorEmbed(message, "You need to be administrator to execute this command", "yellow");
 
         const guild = message.guild;
 
