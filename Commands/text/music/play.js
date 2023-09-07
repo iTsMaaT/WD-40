@@ -46,8 +46,18 @@ module.exports = {
                 }
             });
             logger.music(`Playing [${string}]`); 
+
+            embed = {
+                color: 0xffffff,
+                description: `Successfully enqueued${res.track.playlist ? ` **track(s)** from: **${res.track.playlist.title}**` : `: **${res.track.title}**`}`,
+                timestamp: new Date(),
+            };
+    
+            await msg.edit({ embeds: [embed] });
+
         } catch (err) {
 
+            console.log(err);
             embed = {
                 color: 0xff0000,
                 description: `Failed to fetch / play the reqested track`,
@@ -56,13 +66,5 @@ module.exports = {
 
             await msg.edit({ embeds: [embed] });
         }
-
-        embed = {
-            color: 0xffffff,
-            description: `Successfully enqueued${res.track.playlist ? ` **track(s)** from: **${res.track.playlist.title}**` : `: **${res.track.title}**`}`,
-            timestamp: new Date(),
-        };
-
-        await msg.edit({ embeds: [embed] });
     }
 };
