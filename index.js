@@ -44,8 +44,8 @@ global.player = new Player(client, {
     ytdlOptions: {
         requestOptions: {
             headers: {
-                cookie: "aAjctJ90oqFEp-Tus-Us5HvnT1NrhM4L2rGbHVejbMIYNWc3LCfQFQ_Z4xPfZlwH9Uq6MQ.",
-                "x-youtube-identity-token": process.env.YOUTUBE_COOKIE
+                cookie: process.env.YOUTUBE_COOKIE,
+                "x-youtube-identity-token": process.env.YOUTUBE_TOKEN
             }
         }
     },
