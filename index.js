@@ -40,7 +40,16 @@ Array.prototype.equals = function (otherArray) {
 
 //music
 const { Player } = require('discord-player');
-global.player = new Player(client);
+global.player = new Player(client, {
+    ytdlOptions: {
+        requestOptions: {
+            headers: {
+                cookie: process.env.YOUTUBE_COOKIE,
+                "x-youtube-identity-token": process.env.YOUTUBE_TOKEN
+            }
+        }
+    },
+});
 player.extractors.loadDefault();
 
 //Logger system and databases
