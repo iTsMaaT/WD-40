@@ -46,7 +46,7 @@
     "pretty-ms": "^7.0.1",
     "puppeteer": "^21.1.1",
     "sodium": "^3.0.2",
-    "ytdl-core": "^4.10.0"
+    "ytdl-core": "^4.9.1"
   },
   "devDependencies": {
     "prisma": "^4.13.0"
