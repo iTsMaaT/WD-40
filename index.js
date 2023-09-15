@@ -225,7 +225,7 @@ client.once(Events.ClientReady, async () => {
     console.log(`Debug is ${debug ? "en" : "dis"}abled\nSuperuser is ${superuser ? "en" : "dis"}abled`);
 
     //start confirmation
-    logger.info("Bot started successfully.");
+    await logger.info("Bot started successfully.");
     const interval = setInterval(() => {
         if (client.ws.ping !== -1) {
             client.channels.cache.get("1037141235451842701").send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
