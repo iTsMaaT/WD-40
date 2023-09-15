@@ -2,7 +2,7 @@ const ToEngineerNotation = function(number) {
     if (number === 0) return '0';
 
     const k = 1024;
-    const sizes = ['', 'K', 'M', 'G', 'T', 'P'];
+    const sizes = ['', 'k', 'm', 'g', 't', 'p'];
 
     // Calculate the logarithm of the value in base 'k' (1024)
     const i = Math.floor(Math.log(number) / Math.log(k));
