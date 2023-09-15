@@ -12,6 +12,8 @@ module.exports = {
         let res, research;
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
 
+        const Attachment = message.attachments.first()?.attachment;
+
         let string = args.join(' ');
         if (!string) string = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
         //return SendErrorEmbed(message, "Please enter a song URL or query to search.", "yellow");
@@ -40,7 +42,7 @@ module.exports = {
                 await msg.edit({ embeds: [embed] });
             }
 
-            res = await player.play(message.member.voice.channel.id, research, {
+            res = await player.play(message.member.voice.channel.id, Attachment ?? research, {
                 nodeOptions: {
                     metadata: {
                         channel: message.channel,
@@ -54,7 +56,7 @@ module.exports = {
                     volume: 75,
                 }
             });
-            logger.music(`Playing [${string}]`); 
+            logger.music(`Playing [${res.track.title}]`); 
 
             embed = {
                 color: 0xffffff,
@@ -65,6 +67,7 @@ module.exports = {
             await msg.edit({ embeds: [embed] });
 
         } catch (err) {
+            logger.error(err.stack);
 
             if (err.toString().includes("Error: Status code: 410")) {
 
@@ -98,19 +101,22 @@ module.exports = {
                             volume: 75,
                         }
                     });
-                    logger.music(`Playing [${string}]`); 
+                    logger.music(`Playing [${res.track.title}]`); 
     
                     embed = {
                         color: 0xffffff,
                         description: `Successfully enqueued${res.track.playlist ? ` **track(s)** from: **${res.track.playlist.title}**` : `: **${res.track.title}**`}`,
                         timestamp: new Date(),
-                        footer: { text: "Used SoundCloud instead of Youtube due to age restriction" }
+                        footer: { text: "Attempted to use SoundCloud instead of Youtube due to age restriction" }
                     };
 
                     await msg.edit({ embeds: [embed] });
 
                     return;
                 } catch(err) {
+
+                    logger.error(err.stack);
+
                     embed = {
                         color: 0xff0000,
                         description: `Failed to fetch / play the reqested track`,

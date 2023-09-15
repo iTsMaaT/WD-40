@@ -14,12 +14,12 @@ module.exports = {
             fields: [
                 { name: "Bot's Ping", value: `\`${client.ws.ping}ms\`` },
                 { name: "Uptime", value: `\`${prettyMilliseconds(client.uptime)}\`` },
-                { name: "Round Trip Latency", value: `\`${sent.createdTimestamp - message.createdTimestamp}ms\`` },
+                { name: "Round Trip Latency", value: `\`${sent.createdTimestamp - interaction.createdTimestamp}ms\`` },
                 { name: "Bot's Age", value: `<t:${Math.floor(client.user.createdTimestamp / 1000)}:R>` },
             ],
             timestamp: new Date(),
         };
 
-        sent.editReply({ embeds: [pingEmbed] });
+        await sent.edit({ embeds: [pingEmbed] });
     },
 };

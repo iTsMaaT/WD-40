@@ -1,5 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
-const { Client, GatewayIntentBits, Events, Partials } = require("discord.js");
+const { Client, GatewayIntentBits, Events, Partials, ActivityType  } = require("discord.js");
 const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState } = require("./utils/config.json");
 
 require('module-alias/register');
@@ -7,6 +7,7 @@ require('module-alias/register');
 const Logger = require("./utils/log");
 const fs = require('fs');
 
+const got = require("got");
 const cron = require("cron");
 const dotenv = require("dotenv");
 const Discord = require('discord.js');
@@ -54,6 +55,7 @@ player.extractors.loadDefault();
 
 //Logger system and databases
 global.logger = new Logger({ root: __dirname, client });
+console.log = (log) => logger.console(log);
 global.snowflakeData = [];
 prisma.snowflake.findMany().then(v => {
     const result = v.map(v => [parseInt(v.GuildID), parseInt(v.UserID)]);
@@ -139,6 +141,8 @@ loadFiles('./events/', function (event) {
 
 //Bot setup on startup
 client.once(Events.ClientReady, async () => {
+    const response = await got.head("https://discord.gg", { followRedirect: false });
+    const ip = response.socket.remoteAddress;
 
     logger.info(`Bot starting on [${process.env.SERVER}]...`);
 
@@ -158,6 +162,7 @@ client.once(Events.ClientReady, async () => {
     for (let i = 0; i < activities.length; i++) {
         activities[i] = activities[i].replace("Placeholder01", (100 / activities.length).toFixed(2));
         activities[i] = activities[i].replace("Placeholder02", activities.length - 1);
+        activities[i] = activities[i].replace("Placeholder03", ip);
     }
     client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
     console.log("Activity status setup done.");
@@ -227,7 +232,7 @@ client.once(Events.ClientReady, async () => {
             clearInterval(interval);
         }
     }, 500);
-    client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
+    client.user.setActivity(activities[Math.floor(Math.random() * activities.length)], {type: ActivityType.Custom});
 });
 
 //Debug event
