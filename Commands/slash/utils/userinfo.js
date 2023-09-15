@@ -14,6 +14,7 @@ module.exports = {
         },
     ],
     execute: async(logger, interaction, client) => {
+        await interaction.deferReply();
         const guild = await client.guilds.fetch(interaction.guildId);
         const user = interaction.options.getUser("user");
         const id = user ?? interaction.user.id;

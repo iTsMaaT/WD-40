@@ -10,7 +10,6 @@ module.exports = {
     usage: "< [Command name (Optional)] >",
     async execute(logger, client, message, args) {
         const prefix = global.GuildManager.GetPrefix(message.guild);
-        //const chunkSize = 7; // Number of elements in each chunk
 
         if (args[0]) {
             const CommandName = client.commands.get(args[0]);
@@ -19,9 +18,13 @@ module.exports = {
             var CommandEmbed = {
                 title: `**${prefix}${CommandName.name}** ${CommandName.usage ?? ""}`,
                 color: 0xffffff,
-                description: CommandName.description,
+                fields: [{ name: "Description", value: CommandName.description }],
                 timestamp: new Date(),
             };
+
+            if(CommandName.aliases[0]) CommandEmbed.fields.push({ name: "aliases", value: CommandName.aliases.join(", ") });
+            if(CommandName.cooldown) CommandEmbed.fields.push({ name: "cooldown", value: parseInt(CommandName.cooldown) / 1000 + "s" });
+
             return message.reply({ embeds: [CommandEmbed]  });
         }
         //Finds all command files and separate them from categories, then use page to list the commands per category
