@@ -164,7 +164,6 @@ client.once(Events.ClientReady, async () => {
         activities[i] = activities[i].replace("Placeholder02", activities.length - 1);
         activities[i] = activities[i].replace("Placeholder03", ip);
     }
-    client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
     console.log("Activity status setup done.");
 
     console.log("Creating the cron jobs...");
@@ -175,7 +174,7 @@ client.once(Events.ClientReady, async () => {
     });
 
     const DailyActivity = new cron.CronJob('00 00 04 * * *', () => {
-        client.user.setActivity(activities[Math.floor(Math.random() * activities.length)]);
+        client.user.setActivity(activities[Math.floor(Math.random() * activities.length)], {type: ActivityType.Custom});
     });
 
     const RamLeakDetector = new cron.CronJob('0 * * * *', async () => {
@@ -224,11 +223,12 @@ client.once(Events.ClientReady, async () => {
     if (process.env.SERVER == "dev") global.superuser = 1;
     console.log(`Debug is ${debug ? "en" : "dis"}abled\nSuperuser is ${superuser ? "en" : "dis"}abled`);
 
+    console.log("Waiting for websocket to successfully connect.");
     //start confirmation
-    await logger.info("Bot started successfully.");
     const interval = setInterval(() => {
         if (client.ws.ping !== -1) {
             client.channels.cache.get("1037141235451842701").send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
+            logger.info("Bot started successfully.");
             clearInterval(interval);
         }
     }, 500);
@@ -274,6 +274,15 @@ client.on(Events.InteractionCreate, async interaction => {
                 .replace(/^\s+/gm, ''));
 
         } catch (error) {
+            interaction.reply({
+                embeds: [{
+                    title: "An error occured while executing the command",
+                    color: 0xff0000,
+                    timestamp: new Date(),
+                }],
+                ephemeral: true,
+            });
+
             logger.error(`Error executing slash command [${interaction.commandName}]`);
             logger.error(error.stack);
         }
@@ -294,6 +303,15 @@ client.on(Events.InteractionCreate, async interaction => {
                 .replace(/^\s+/gm, ''));
 
         } catch (error) {
+            interaction.reply({
+                embeds: [{
+                    title: "An error occured while executing the command",
+                    color: 0xff0000,
+                    timestamp: new Date(),
+                }],
+                ephemeral: true,
+            });
+            
             logger.error(`Error executing context menu command [${interaction.commandName}]`);
             logger.error(error);
         }
