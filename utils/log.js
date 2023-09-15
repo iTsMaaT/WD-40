@@ -35,8 +35,8 @@ async function writeLogToFile(log, client, type) {
             }
         });
     } catch (ex) {
-        console.log(`\x1b[31m[${getDateTime()} - SEVERE] Unable to write to database\x1b[0m`);
-        console.log(ex);
+        console.info(`\x1b[31m[${getDateTime()} - SEVERE] Unable to write to database\x1b[0m`);
+        console.info(ex);
     }
 
     // Set the color based on the log type
@@ -59,8 +59,9 @@ async function writeLogToFile(log, client, type) {
         break;
     }
 
-    console.log(`${color}${log}\x1b[0m`);
-
+    console.info(`${color}${log}\x1b[0m`);
+    
+    if (type == "CONSOLE") return;
     client?.channels?.cache?.get("1069811223950016572")?.send(`\`\`\`${log}\`\`\``);
 }
 
@@ -82,6 +83,10 @@ class Logger {
 
     info(message) {
         writeLogToFile(`[${getDateTime()} -    INFO] ${message}`, this.options.client, "INFO");
+    }
+
+    console(message) {
+        writeLogToFile(`[${getDateTime()} - CONSOLE] ${message}`, this.options.client, "CONSOLE");
     }
 
     warning(message) {
