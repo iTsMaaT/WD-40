@@ -18,7 +18,7 @@ module.exports = {
 
         const songs = queue.tracks.size;
         const nextSongs = songs > 10 ? `And **${songs - 10}** other song(s)...` : `In the playlist **${songs}** song(s)...`;
-        const tracks = queue.tracks.map((track, i) => `**${i + 1}** - ${track.title} | ${track.author} (requested by : ${track.requestedBy.username})`);
+        const tracks = queue.tracks.map((track, i) => `**${i + 1}** - ${track.title} | ${track.author} (requested by : ${track.requestedBy.displayName})`);
 
 
         const embed = new EmbedBuilder()
