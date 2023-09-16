@@ -27,18 +27,7 @@ function getDateTime() {
 }
 
 async function writeLogToFile(log, client, type) {
-    try {
-        await global.prisma.logs.create({
-            data: {
-                Value: log,
-                Type: type
-            }
-        });
-    } catch (ex) {
-        console.info(`\x1b[31m[${getDateTime()} - SEVERE] Unable to write to database\x1b[0m`);
-        console.info(ex);
-    }
-
+    
     // Set the color based on the log type
     let color;
     switch (type) {
@@ -58,11 +47,23 @@ async function writeLogToFile(log, client, type) {
         color = "\x1b[0m"; // Reset color
         break;
     }
-
-    console.info(`${color}${log}\x1b[0m`);
+    
+    console.logger(`${color}${log}\x1b[0m`);
     
     if (type == "CONSOLE") return;
     client?.channels?.cache?.get("1069811223950016572")?.send(`\`\`\`${log}\`\`\``);
+    
+    try {
+        await global.prisma.logs.create({
+            data: {
+                Value: log,
+                Type: type
+            }
+        });
+    } catch (ex) {
+        console.logger(`\x1b[31m[${getDateTime()} - SEVERE] Unable to write to database\x1b[0m`);
+        console.logger(ex);
+    }
 }
 
 
