@@ -1,5 +1,4 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
 
 module.exports = {
     name: 'userinfo',
