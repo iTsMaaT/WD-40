@@ -6,8 +6,8 @@ require('module-alias/register');
 
 const Logger = require("./utils/log");
 const fs = require('fs');
+const dns = require('dns');
 
-const got = require("got");
 const cron = require("cron");
 const dotenv = require("dotenv");
 const Discord = require('discord.js');
@@ -15,6 +15,7 @@ const Discord = require('discord.js');
 const getExactDate = require("@functions/getExactDate");
 const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
 const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const RandomMinMax = require("@functions/RandomMinMax");
 const HourlyRam = [0, 0, 0];
 
 dotenv.config();
@@ -55,6 +56,7 @@ player.extractors.loadDefault();
 
 //Logger system and databases
 global.logger = new Logger({ root: __dirname, client });
+console.logger = console.log;
 console.log = (log) => logger.console(log);
 global.snowflakeData = [];
 prisma.snowflake.findMany().then(v => {
@@ -141,8 +143,19 @@ loadFiles('./events/', function (event) {
 
 //Bot setup on startup
 client.once(Events.ClientReady, async () => {
-    const response = await got.head("https://discord.gg", { followRedirect: false });
-    const ip = response.socket.remoteAddress;
+
+    const part3 = RandomMinMax(1, 255);
+    const part4 = RandomMinMax(1, 255);
+    let port;
+    if (Math.random() < 0.5)
+        port = 25565;
+    else 
+        RandomMinMax(24500, 26000);
+
+      
+    // Combine the parts into a valid IPv4 address
+    const ipAddress = `192.168.${part3}.${part4}:${port}`;
+    const ip = ipAddress;
 
     logger.info(`Bot starting on [${process.env.SERVER}]...`);
 
