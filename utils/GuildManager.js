@@ -121,7 +121,7 @@ module.exports = (function(prisma) {
                 UpdateUserInDB(userId);
             }
         }
-
+           
         function UpdateUserInDB(userId) {
             prisma.Blacklist.upsert({
                 where: {
@@ -161,5 +161,101 @@ module.exports = (function(prisma) {
         return blacklist[guildId];
     }
 
-    return {init, ToggleResponses, TogglePrefix, GetGuildSettings, AddGuildToDatabase, CheckIfGuildExists, SetActiveOrCreate, GetPrefix, GetResponses, SetPersonality, GetPersonality, GetBlacklist};
+    async function autoReactFn(prisma, guildId) {
+        const bl = {};
+
+        try{
+            const data = await prisma.Reactions.findMany({
+                where: {
+                    GuildID: guildId
+                }
+            });
+
+            if(data.length > 0) {
+                for(const i in data){
+                    const value = data[i];
+                    bl[value.ChannelString] = {
+                        "string": value.String,
+                        "emotes": value.Emotes,
+                    };
+                }
+            }
+        }catch(e) {
+            global.logger.error("Silently failing auto reation init for guild " + guildId + ", " + e.stack);
+        }
+
+        async function addReaction(ChannelPrompt, string, reactions) {
+            if(!bl[ChannelPrompt]) {
+                bl[ChannelPrompt] = {
+                    "string": string,
+                    "emotes": reactions,
+                };
+            }
+            updateReactionDB(guildId, ChannelPrompt);
+        }
+
+        async function removeReaction(ChannelPrompt) {
+            delete bl[ChannelPrompt];
+            updateReactionDB(ChannelPrompt);
+        }
+
+        async function getReactions(ChannelPrompt, string) {
+            if(bl[ChannelPrompt[string]]) return bl[ChannelPrompt[emotes]];
+        }
+
+        async function updateReactionDB(ChannelPrompt) {
+            if (bl[ChannelPrompt]) {
+                const { string, emotes } = bl[ChannelPrompt];
+        
+                try {
+                    await prisma.Reactions.upsert({
+                        where: {
+                            GuildID_ChannelString: {
+                                GuildID: guildId,
+                                ChannelString: ChannelPrompt,
+                            },
+                        },
+                        update: {
+                            String: string,
+                            Emotes: emotes,
+                        },
+                        create: {
+                            GuildID: guildId,
+                            ChannelString: ChannelPrompt,
+                            String: string,
+                            Emotes: emotes,
+                        },
+                    });
+                } catch (e) {
+                    global.logger.error("Error updating reaction in the database: " + e.stack);
+                }
+            }
+        }
+        return { addReaction, removeReaction, getReactions };
+    }
+
+    const reactions = {};
+
+    async function getAutoReactions(guildId) {
+        if(!reactions[guildId]) {
+            reactions[guildId] = await autoReactFn(prisma, guildId);
+        }
+        return reactions[guildId];
+    }
+
+    return {
+        init,
+        ToggleResponses,
+        TogglePrefix,
+        GetGuildSettings,
+        AddGuildToDatabase,
+        CheckIfGuildExists,
+        SetActiveOrCreate,
+        GetPrefix,
+        GetResponses,
+        SetPersonality,
+        GetPersonality,
+        GetBlacklist,
+        getAutoReactions
+    };
 });

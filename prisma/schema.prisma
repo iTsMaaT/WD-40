@@ -72,3 +72,12 @@ model Blacklist {
   Permission  String  @db.Text
   @@unique([GuildID, UserID])
 }
+
+model Reactions {
+  ID              BigInt  @id @default(autoincrement())
+  GuildID         String
+  ChannelString   String
+  String          String  @db.Text
+  Emotes          String 
+  @@unique([GuildID, ChannelString])
+}
