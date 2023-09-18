@@ -1,7 +1,7 @@
 const { ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const SendErrorEmbed = require("@functions/SendErrorEmbed");
 const emoteList = require("@root/utils/emojis.json");
-const GuildManager = require("../../../utils/GuildManager");
+const findClosestMatch = require("@functions/findClosestMatch");
 
 module.exports = {
     name: 'autoreaction',
@@ -19,14 +19,12 @@ module.exports = {
                     type: ApplicationCommandOptionType.String,
                     required: true,
                     max_length: 100
-                },
-                {
+                },{
                     name: "string",
                     description: "The string in messages that enables a reaction (you can use <link>, <attachment> or <media>)",
                     type: ApplicationCommandOptionType.String,
                     required: true,
-                },
-                {
+                },{
                     name: "emotes",
                     description: "The reactions (unicode emotes are preferred)",
                     type: ApplicationCommandOptionType.String,
@@ -45,8 +43,7 @@ module.exports = {
                     type: ApplicationCommandOptionType.String,
                     required: true,
                     max_length: 100
-                },
-                {
+                },{
                     name: "string",
                     description: "The string in messages that enables a reaction (do <media> for attachment and links)",
                     type: ApplicationCommandOptionType.String,
@@ -62,31 +59,34 @@ module.exports = {
     ],
     async execute(logger, interaction, client) {
         const subcommand = interaction.options.getSubcommand();
-        const ChannelPromptInput = interaction.options.get("channel-prompt").value;
-        const StringInput = interaction.options.get("string").value;
+        const ChannelPromptInput = interaction.options.get("channel-prompt")?.value;
+        const StringInput = interaction.options.get("string")?.value;
         const EmotesInput = interaction.options.get("emotes")?.value;
-
-        const autoreactions = GuildManager.getAutoReactions(message.guild.id);
+        
+        const autoreactions = await global.GuildManager.getAutoReactions(interaction.guild.id);
+        const reactions = await autoreactions.getReactions();
 
         switch (subcommand) {
         case "list" : {
-            if (!Object.keys(autoreactions)) return SendErrorEmbed(message, "Theres no auto-reactions in this guild", "yellow", true);
+            if (Object.keys(reactions).length === 0) return SendErrorEmbed(interaction, "Theres no auto-reactions in this guild", "yellow", true);
 
             const embed = {
                 title: "List of auto-reactions",
                 color: 0xffffff,
                 timestamp: new Date(),
+                fields: []
             };
 
-            for (const key in autoreactions) {
-                embed.fields.push({ name: autoreactions[key], value: `**${autoreactions[key].string}**:\n${autoreactions[key].emotes.join("|")}`});
+            console.logger(reactions);
+            for (const key in reactions) {
+                embed.fields.push({ name: key, value: `**${reactions[key].string}**:\n${reactions[key].emotes}`});
             }
 
-            message.reply({ embeds: [embed] });
+            interaction.reply({ embeds: [embed] });
             break;
         }
         case "remove": {
-            if(!autoreactions[ChannelPromptInput]) return SendErrorEmbed(message, "There is no entry for that channel prompt", "yellow", true);
+            if(!reactions[ChannelPromptInput]) return SendErrorEmbed(interaction, "There is no entry for that channel prompt", "yellow", true);
 
             autoreactions.removeReaction(ChannelPromptInput);
             const embed = {
@@ -95,21 +95,24 @@ module.exports = {
                 timestamp: new Date(),
             };
 
-            message.reply({ embeds: [embed] });
+            interaction.reply({ embeds: [embed] });
             break;
         }
         case "add": {
-            const emoteNames = [];
-            const emotes = [];
+            let emotes = [];
     
-            if (/^[a-z:0-9_]+$/.test(EmotesInput)) { 
-                EmotesInput.replace(" ","").split("::").forEach(emote => {emoteNames.push(emote.trim(":"));});
+            if (/^[a-z:0-9_]+$/.test(EmotesInput)) {
+                const emoteNames = EmotesInput.replace(" ","").trim(":").split("::");
                 emoteNames.forEach(emote => {
                     const closestMatch = findClosestMatch(emote, emoteList);
                     if (closestMatch.closestDistance <= 5) emotes.push(emoteList[closestMatch.closestMatch]);
                 });
             } else {
-                emotes.push(...EmotesInput.replace(" ","").split(""));
+                emotes = [...EmotesInput.replace(" ","")].reduce((acc, val) => {
+                    console.log(val);
+                    if(Object.values(emoteList).includes(val)) acc.push(val);
+                    return acc;
+                }, []);
             }
 
             const embed = {
@@ -118,7 +121,7 @@ module.exports = {
                 description: `
                 Channel match prompt: **${ChannelPromptInput}**
                 Entered string: **${StringInput}**
-                Closest found emotes: ${emotes.join(" ")}
+                Closest found emotes: ${emotes.join("|")}
                 Is everything accurate?`
                     .replace(/^\s+/gm, ''),
                 timestamp: new Date(),
@@ -137,11 +140,11 @@ module.exports = {
             const row = new ActionRowBuilder()
                 .addComponents(YesRestart, NoRestart);
     
-            const filter = (interaction) => {
-                return interaction.user.id === message.author.id;
+            const filter = (ButtonInteraction) => {
+                return ButtonInteraction.user.id === interaction.user.id;
             };
                 
-            const ConfirmationMessage = await message.reply({
+            const ConfirmationMessage = await interaction.reply({
                 embeds: [embed],
                 components: [row],
             });
@@ -162,11 +165,7 @@ module.exports = {
                     ConfirmationMessage.edit({ embeds: [embed], components: [row] });
             
                 } else if (interaction.customId === 'no') {
-                    embed.description = `
-                    Recommendation: use unicode emote instead of discord ones, since it will not need to find matches in a pre-determined list.
-                    To do that, you need to add a backslash (\`\\\`) before the emote name
-                    \`\`\`\\:<emote name>:\`\`\``
-                        .replace(/^\s+/gm, '');
+                    embed.description = `Cancelled`;
     
                     ConfirmationMessage.edit({ embeds: [embed], components: [row] }).then(() => {
                         row.components.forEach((component) => component.setDisabled(true));
@@ -187,56 +186,3 @@ module.exports = {
         }
     },
 };
-
-function findClosestMatch(input, values) {
-    // Function to calculate the Levenshtein distance between two strings
-    function levenshteinDistance(s1, s2) {
-        const m = s1.length;
-        const n = s2.length;
-        const dp = [];
-  
-        for (let i = 0; i <= m; i++) {
-            dp[i] = [i];
-        }
-  
-        for (let j = 1; j <= n; j++) {
-            dp[0][j] = j;
-        }
-  
-        for (let i = 1; i <= m; i++) {
-            for (let j = 1; j <= n; j++) {
-                const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
-                dp[i][j] = Math.min(
-                    dp[i - 1][j] + 1,
-                    dp[i][j - 1] + 1,
-                    dp[i - 1][j - 1] + cost
-                );
-            }
-        }
-  
-        return dp[m][n];
-    }
-  
-    // Initialize variables to keep track of the closest match and its distance
-    let closestMatch = null;
-    let closestDistance = Number.MAX_SAFE_INTEGER;
-  
-    // Loop through each value in the array
-    for (const value in values) {
-        // Calculate the Levenshtein distance between the input and the current value
-        const distance = levenshteinDistance(input, value);
-  
-        // If the current distance is smaller than the closest distance, update the closest match
-        if (distance < closestDistance) {
-            closestMatch = value;
-            closestDistance = distance;
-        }
-    }
-  
-    // Return an object containing the closest match, its distance, and potentially more info
-    return {
-        closestMatch,
-        distance: closestDistance,
-    };
-}
-  

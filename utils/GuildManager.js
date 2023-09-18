@@ -173,6 +173,7 @@ module.exports = (function(prisma) {
 
             if(data.length > 0) {
                 for(const i in data){
+                    if (data[i].ChannelString === undefined) continue;
                     const value = data[i];
                     bl[value.ChannelString] = {
                         "string": value.String,
@@ -185,22 +186,27 @@ module.exports = (function(prisma) {
         }
 
         async function addReaction(ChannelPrompt, string, reactions) {
-            if(!bl[ChannelPrompt]) {
-                bl[ChannelPrompt] = {
-                    "string": string,
-                    "emotes": reactions,
-                };
-            }
-            updateReactionDB(guildId, ChannelPrompt);
+            bl[ChannelPrompt] = {
+                "string": string,
+                "emotes": reactions,
+            };
+            await updateReactionDB(ChannelPrompt);
         }
 
         async function removeReaction(ChannelPrompt) {
             delete bl[ChannelPrompt];
-            updateReactionDB(ChannelPrompt);
+            await updateReactionDB(ChannelPrompt);
         }
 
-        async function getReactions(ChannelPrompt, string) {
-            if(bl[ChannelPrompt[string]]) return bl[ChannelPrompt[emotes]];
+        async function matchReactions(ChannelPrompt, string) {
+            //fix exact match
+            if(bl[ChannelPrompt[string]]) {
+                return [...bl[ChannelPrompt[emotes]].replace(" ","")];
+            }
+        }
+
+        async function getReactions() {
+            return bl;
         }
 
         async function updateReactionDB(ChannelPrompt) {
@@ -229,6 +235,15 @@ module.exports = (function(prisma) {
                 } catch (e) {
                     global.logger.error("Error updating reaction in the database: " + e.stack);
                 }
+            } else {
+                await prisma.Reactions.delete({
+                    where: {
+                        GuildID_ChannelString: {
+                            GuildID: guildId,
+                            ChannelString: ChannelPrompt,
+                        },
+                    }
+                });
             }
         }
         return { addReaction, removeReaction, getReactions };
