@@ -165,7 +165,7 @@ module.exports = (function(prisma) {
         const bl = {};
     
         try {
-            const data = await prisma.Reactions?.findMany({
+            const data = await prisma.Reactions.findMany({
                 where: {
                     GuildID: guildId
                 }
@@ -234,6 +234,10 @@ module.exports = (function(prisma) {
         
                         // Check for other matches anywhere in the strings
                         if (String.includes(string)) {
+                            matchedReactions.push(...emotes.split(';'));
+                        }
+
+                        if (string === "<all>") {
                             matchedReactions.push(...emotes.split(';'));
                         }
                     }
