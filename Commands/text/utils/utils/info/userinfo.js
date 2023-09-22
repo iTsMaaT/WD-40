@@ -1,4 +1,5 @@
 const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const prettyString = require("@functions/prettyString.js");
 
 module.exports = {
     name: "userinfo",
@@ -30,11 +31,11 @@ module.exports = {
                     target = await client.users.fetch(id);
                     status = null; // No presence information available
                 } catch (err) {
-                    console.log(err);
+                    logger.log(err);
                     return SendErrorEmbed(message, "User not found.", "red");
                 }
             } else {
-                console.log(e);
+                logger.error(e);
                 return SendErrorEmbed(message, "An error occurred while fetching the user.", "red");
             }
         }
@@ -48,19 +49,24 @@ module.exports = {
             activity_name = "-";
             activity_details = "-";
         }
-        console.log(target);
 
         try {
-            const presenceStatus = target?.presence?.status || "Offline";
+            const FullClientStatus = target?.presence?.clientStatus;
+            let ClientSatus = "";
+            for (const key in FullClientStatus) {
+                if (Object.prototype.hasOwnProperty.call(FullClientStatus, key)) {
+                    ClientSatus += `${prettyString(key, "first", false)}: \`${prettyString(FullClientStatus[key], "first", false)}\n\``;
+                }
+            }
             const userInfoEmbed = {
-                title: target.globalName,
+                title: target.displayName,
                 description: `User Information For: <@${target.id}>`,
                 thumbnail: {
                     url: target.avatarURL({ dynamic: true }) || "",
                 },
                 fields: [
                     { name: "User ID", value: target.id || "-" },
-                    { name: "Status", value: presenceStatus || "-"},
+                    { name: "Status", value: ClientSatus || "Offline"},
                     { name: "Account Age", value: `${target?.user?.createdTimestamp ? `<t:${parseInt(target?.user?.createdTimestamp / 1000)}:R>` : "-"}` },
                     { name: "Member Since", value: `${target.joinedTimestamp ? `<t:${parseInt(target?.joinedTimestamp / 1000)}:R>` : `-`}` },
                     { name: "Custom Status", value: custom_status || "-" },
@@ -74,7 +80,7 @@ module.exports = {
 
             message.reply({ embeds: [userInfoEmbed]  });
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             SendErrorEmbed(message, "An error occured.", "red");
         }
     },

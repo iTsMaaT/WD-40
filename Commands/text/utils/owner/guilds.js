@@ -30,9 +30,9 @@ module.exports = {
 
             // Add fields for each guild
             guilds.forEach(guild => {
-                const userCount = guild.memberCount;
                 const botCount = guild.members.cache.filter(member => member.user.bot).size;
-                const totalCount = userCount + botCount;
+                const userCount = guild.memberCount - botCount;
+                const totalCount = guild.memberCount;
 
                 const userPadding = ' '.repeat(Math.max(userCountArray).toString().length - userCount.toString().length);
                 const botPadding = ' '.repeat(Math.max(botCountArray).toString().length - botCount.toString().length);

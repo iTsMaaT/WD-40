@@ -11,7 +11,7 @@ module.exports = {
         let data;
 
         const tables = Object.keys(global.prisma);
-        const tableList = tables.filter(name => !name.startsWith("_") && !name.startsWith("$"));
+        const tableList = tables.filter(name => !name.startsWith("$"));
 
         if (args[0] === '-t' || !args[0] || !tableList.includes(args[0])) return message.reply(`Tables: ${tableList.join(', ')}`);
 

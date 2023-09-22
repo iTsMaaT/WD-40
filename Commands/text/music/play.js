@@ -29,7 +29,7 @@ module.exports = {
         try {
             research = await player.search(string, {
                 requestedBy: message.member,
-                searchEngine: /https?:\/\/(www\.)?youtube\.com\/playlist\?list=([a-zA-Z0-9_-]+)/.test(string) ? QueryType.YOUTUBE_PLAYLIST : QueryType.AUTO
+                //searchEngine: /https?:\/\/(www\.)?youtube\.com\/playlist\?list=([a-zA-Z0-9_-]+)/.test(string) ? QueryType.YOUTUBE_PLAYLIST : QueryType.AUTO
             });
 
             if (!research.hasTracks()) {

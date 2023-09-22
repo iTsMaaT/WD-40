@@ -24,7 +24,8 @@
         "Amongst Us",
         "Ferme ta yeule",
         "Yes, enqueued is a word.",
-        "Placeholder03"
+        "Placeholder03",
+        "Currently in Placeholder04 guilds"
     ],
     "guildblacklist": [],
 
@@ -35,5 +36,6 @@
     ],
 
     "DefaultSuperuserState": 0,
-    "DefaultDebugState": 0
+    "DefaultDebugState": 0,
+    "AutoCommandMatch": 1
 }

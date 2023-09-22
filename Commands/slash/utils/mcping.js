@@ -1,7 +1,6 @@
-const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
+const { ApplicationCommandType, ApplicationCommandOptionType, SlashCommandBuilder } = require("discord.js");
 const got = require("got");
 const SendErrorEmbed = require("@functions/SendErrorEmbed");
-const { AttachmentBuilder } = require("discord.js");
 
 module.exports = {
     name: 'mcping',

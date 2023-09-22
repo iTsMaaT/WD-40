@@ -31,20 +31,15 @@ module.exports = {
             }
         }
 
+        const autoreactions = await global.GuildManager.getAutoReactions(message.guild.id);
+        const reactions = await autoreactions.matchReactions(message.channel.name, message.content, message.attachments.size > 0);
+        if (reactions) {
+            reactions.forEach(async(reaction) => {
+                await message.react(reaction).catch(() => null);
+            });
+        }
         //Auto-responses
         if (global.GuildManager.GetResponses(message.guild)) {
-
-            //Votes for the memes
-            if (message.attachments.size > 0 || message.content.startsWith("https://") || message.content.startsWith("http://")) {
-                if (message.channel.name.includes('meme')) {
-                    message.react('👍')
-                        .then(() => message.react('👎'))
-                        .then(() => message.react('♻️'))
-                        .then(() => message.react('💀'))
-                        .then(() => message.react('🤨'))
-                        .then(() => message.react("😎"));
-                }
-            }
 
             //skull reaction to skull emoji
             if (message.content.toLowerCase() == `💀`) {

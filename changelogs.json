@@ -221,5 +221,15 @@
             ">moveall, >deafenall and >muteall: doesn't affect bots anymore",
             "Lots of fixes"
         ]
+    },
+    {
+        "version": "4.11.0",
+        "date": "2023-09-21",
+        "changes": [
+            "/autoreaction: You can now configure auto-reactions to certin messages in certain channels",
+            "Even more improvements to >help",
+            "some fixes to the stupid music plugin",
+            "Lots of fixes"
+        ]
     }
 ]
