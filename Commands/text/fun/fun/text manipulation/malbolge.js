@@ -89,30 +89,30 @@ c points at the new instruction
             var opcode = xlat1[(vm.mem[vc] - 33 + vc) % 94];
 
             switch (opcode) {
-            case 'j':
-                vm.d = vmd;
-                break;
-            case 'i':
-                vm.c = vmd;
-                break;
-            case '*':
-                vm.a = vm.mem[vd] = (vmd / 3 | 0) + vmd % 3 * 19683;
-                break;
-            case 'p':
-                vm.a = vm.mem[vd] = op(va, vmd);
-                break;
-            case '<':
-                output = va % 256;
-                break;
-            case '/':
+                case 'j':
+                    vm.d = vmd;
+                    break;
+                case 'i':
+                    vm.c = vmd;
+                    break;
+                case '*':
+                    vm.a = vm.mem[vd] = (vmd / 3 | 0) + vmd % 3 * 19683;
+                    break;
+                case 'p':
+                    vm.a = vm.mem[vd] = op(va, vmd);
+                    break;
+                case '<':
+                    output = va % 256;
+                    break;
+                case '/':
 
-                if (input !== undefined && input !== null)
-                    vm.a = input;
-                else throw WANTS_INPUT;
+                    if (input !== undefined && input !== null)
+                        vm.a = input;
+                    else throw WANTS_INPUT;
 
-                break;
-            case 'v':
-                return EXIT;
+                    break;
+                case 'v':
+                    return EXIT;
             }
 
             if (vm.mem[vm.c] < 33 || vm.mem[vm.c] > 126) {
