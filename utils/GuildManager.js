@@ -165,7 +165,7 @@ module.exports = (function(prisma) {
         const bl = {};
     
         try {
-            const data = await prisma.Reactions?.findMany({
+            const data = await prisma.Reactions.findMany({
                 where: {
                     GuildID: guildId
                 }
