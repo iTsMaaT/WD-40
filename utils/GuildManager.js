@@ -236,6 +236,10 @@ module.exports = (function(prisma) {
                         if (String.includes(string)) {
                             matchedReactions.push(...emotes.split(';'));
                         }
+
+                        if (string === "<all>") {
+                            matchedReactions.push(...emotes.split(';'));
+                        }
                     }
                 }
             }
