@@ -1,6 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const { Client, GatewayIntentBits, Events, Partials, ActivityType  } = require("discord.js");
-const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState } = require("./utils/config.json");
+const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState, AutoCommandMatch } = require("./utils/config.json");
 
 require('module-alias/register');
 
@@ -16,6 +16,7 @@ const getExactDate = require("@functions/getExactDate");
 const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
 const SendErrorEmbed = require("@functions/SendErrorEmbed");
 const RandomMinMax = require("@functions/RandomMinMax");
+const findClosestMatch = require('@functions/findClosestMatch');
 const HourlyRam = [0, 0, 0];
 
 dotenv.config();
@@ -71,9 +72,7 @@ process.on("unhandledRejection", (err, promise) => {
 });
 
 process.on("uncaughtException", (err) => {
-    if (err.code === 10008) return logger.error(err.stack);
-    logger.error(err.stack);
-    client?.channels?.cache?.get("1037141235451842701")?.send(`Error caught <@411996978583699456>! <#1069811223950016572>`);
+    logger.error("Uncaught Exception: " + err.stack);
 });
 
 
@@ -81,6 +80,7 @@ process.on("uncaughtException", (err) => {
 client.commands = new Discord.Collection();
 client.slashcommands = new Discord.Collection();
 client.contextCommands = new Discord.Collection();
+client.consoleCommands = new Discord.Collection();
 const TextCooldowns = new Map();
 const SlashCooldowns = new Map();
 
@@ -133,13 +133,28 @@ loadFiles('./Commands/context/', (contextcommand, fileName) => {
 });
 
 //Event handler
-loadFiles('./events/', function (event) {
+loadFiles('./events/client/', function (event) {
     if (event.once) {
         client.once(event.name, (...args) => event.execute(client, logger, ...args));
     } else {
         client.on(event.name, (...args) => event.execute(client, logger, ...args));
     }
 });
+
+process.stdin.setEncoding('utf8');
+loadFiles('./events/console/', function (event) {
+    client.consoleCommands.set(event.name, event);
+});
+
+process.stdin.on('data', (input) => {
+    const args = input.split(/ +/);
+    const commandName = args.shift().toLowerCase().trim();
+    const command = client.consoleCommands.get(commandName);
+    if (!command) return;
+
+    command.execute(client, logger, ...args);
+});
+
 
 //Bot setup on startup
 client.once(Events.ClientReady, async () => {
@@ -152,7 +167,6 @@ client.once(Events.ClientReady, async () => {
     else 
         RandomMinMax(24500, 26000);
 
-      
     // Combine the parts into a valid IPv4 address
     const ipAddress = `192.168.${part3}.${part4}:${port}`;
     const ip = ipAddress;
@@ -176,6 +190,7 @@ client.once(Events.ClientReady, async () => {
         activities[i] = activities[i].replace("Placeholder01", (100 / activities.length).toFixed(2));
         activities[i] = activities[i].replace("Placeholder02", activities.length - 1);
         activities[i] = activities[i].replace("Placeholder03", ip);
+        activities[i] = activities[i].replace("Placeholder04", client.guilds.cache.size);
     }
     console.log("Activity status setup done.");
 
@@ -372,7 +387,17 @@ client.on(Events.MessageCreate, async (message) => {
 
         // Check if the command or alias exists
         const command = client.commands.get(commandName);
-        if (!command) return;
+        if (!command && AutoCommandMatch) {
+            const commandSet = new Set(client.commands.filter(command => !command.private).map(command => command.name));
+            const commandArray = Array.from(commandSet);
+            const closeMatch = findClosestMatch(commandName, commandArray);
+            if (closeMatch.distance <= 3) {
+                //command = client.commands.get(closeMatch.closestMatch);
+                await message.reply(`Did you mean ${prefix}${closeMatch.closestMatch}?`);
+            }
+        }
+
+        if(!command) return;
         if (command.admin && !message.member.permissions.has("Administrator") || !message.author.id == process.env.OWNER_ID) return SendErrorEmbed(message, "You are not administrator", "red");
 
         const blacklist = await GuildManager.GetBlacklist(message.guild.id);
