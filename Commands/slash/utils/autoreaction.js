@@ -46,7 +46,7 @@ module.exports = {
                     max_length: 100
                 },{
                     name: "string",
-                    description: "The string in messages that enables a reaction (You can do <media>, <links> and <attachments>)",
+                    description: "The string in messages that enables a reaction (You can do <media>, <links>, <attachments>and <all>)",
                     type: ApplicationCommandOptionType.String,
                     required: true,
                     max_length: 100
@@ -196,7 +196,7 @@ module.exports = {
     
                 const collector = ConfirmationMessage.createMessageComponentCollector({
                     filter,
-                    time: 60_000, // The time in milliseconds to wait for a response (15 seconds in this example).
+                    time: 60_000, // The time in milliseconds to wait for a response.
                     max: 1, // The maximum number of interactions to collect.
                 });
 
@@ -212,22 +212,16 @@ module.exports = {
                     Reaction emotes: ${emotes.join("|")}`
                             .replace(/^\s+/gm, '');
                         embed.color = 0xffffff;
-                        
-                        ConfirmationMessage.edit({ embeds: [embed], components: [row] }).then(() => {
-                            row.components.forEach((component) => component.setDisabled(true));
-                            ConfirmationMessage.edit({ components: [row] });
-                        });
             
                     } else if (interaction.customId === 'no') {
                     
                         embed.description = `Cancelled`;
                         embed.color = 0xff0000;
-    
-                        ConfirmationMessage.edit({ embeds: [embed], components: [row] }).then(() => {
-                            row.components.forEach((component) => component.setDisabled(true));
-                            ConfirmationMessage.edit({ components: [row] });
-                        });
+
                     }
+
+                    row.components.forEach((component) => component.setDisabled(true));
+                    await ConfirmationMessage.edit({ embeds: [embed], components: [row] });
                     
                     await interaction.update({
                         components: [row],
