@@ -163,100 +163,153 @@ module.exports = (function(prisma) {
 
     async function autoReactFn(prisma, guildId) {
         const bl = {};
-
-        try{
+    
+        try {
             const data = await prisma.Reactions.findMany({
                 where: {
                     GuildID: guildId
                 }
             });
-
-            if(data.length > 0) {
-                for(const i in data){
+    
+            if (data.length > 0) {
+                for (const i in data) {
                     if (data[i].ChannelString === undefined) continue;
                     const value = data[i];
-                    bl[value.ChannelString] = {
+                    if (!bl[value.ChannelString]) {
+                        bl[value.ChannelString] = [];
+                    }
+                    bl[value.ChannelString].push({
                         "string": value.String,
                         "emotes": value.Emotes,
-                    };
+                    });
                 }
             }
-        }catch(e) {
-            global.logger.error("Silently failing auto reation init for guild " + guildId + ", " + e.stack);
+        } catch (e) {
+            global.logger.error("Silently failing auto reaction init for guild " + guildId + ", " + e.stack);
         }
-
+    
         async function addReaction(ChannelPrompt, string, reactions) {
-            bl[ChannelPrompt] = {
+            if (!bl[ChannelPrompt]) {
+                bl[ChannelPrompt] = [];
+            }
+            bl[ChannelPrompt].push({
                 "string": string,
                 "emotes": reactions,
-            };
-            await updateReactionDB(ChannelPrompt);
+            });
+            await updateReactionDB(ChannelPrompt, string);
         }
-
-        async function removeReaction(ChannelPrompt) {
-            delete bl[ChannelPrompt];
-            await updateReactionDB(ChannelPrompt);
-        }
-
-        async function matchReactions(ChannelPrompt, string) {
-            //fix exact match
-            if(bl[ChannelPrompt[string]]) {
-                return [...bl[ChannelPrompt[emotes]].replace(" ","")];
+    
+        async function removeReaction(ChannelPrompt, string = null) {
+            if (!string) delete bl[ChannelPrompt];
+            if (bl[ChannelPrompt]) {
+                // Remove the entry with the matching string
+                bl[ChannelPrompt] = bl[ChannelPrompt].filter(entry => entry.string !== string);
+                if (bl[ChannelPrompt].length == 0) delete bl[ChannelPrompt];
             }
+            await updateReactionDB(ChannelPrompt, string);
         }
-
+    
+        async function matchReactions(ChannelPrompt, String, hasAttachment = false) {
+            const matchedReactions = [];
+            
+            if (bl) {
+                for (const channelPrompt of Object.keys(bl)) {
+                    if(!ChannelPrompt.includes(channelPrompt)) continue;
+                    for (const entry of bl[channelPrompt]) {
+                        const { string, emotes } = entry;
+        
+                        // Check if the string matches <media> or <link> for URLs
+                        if ((/(https?:\/\/[^\s]+)/.test(String) || hasAttachment) && string === '<media>') {
+                            matchedReactions.push(...emotes.split(';'));
+                        }
+        
+                        if (/(https?:\/\/[^\s]+)/.test(String) && string === '<link>') {
+                            matchedReactions.push(...emotes.split(';'));
+                        }
+        
+                        // Check if the string matches <attachment> for attachments
+                        if (hasAttachment && string === '<attachment>') {
+                            matchedReactions.push(...emotes.split(';'));
+                        }
+        
+                        // Check for other matches anywhere in the strings
+                        if (String.includes(string)) {
+                            matchedReactions.push(...emotes.split(';'));
+                        }
+                    }
+                }
+            }
+        
+            //if (!matchedReactions[0]) return null;
+            return matchedReactions;
+        }
+        
+        
+    
         async function getReactions() {
             return bl;
         }
-
-        async function updateReactionDB(ChannelPrompt) {
+    
+        async function updateReactionDB(ChannelPrompt, String) {
             if (bl[ChannelPrompt]) {
-                const { string, emotes } = bl[ChannelPrompt];
-        
-                try {
+                const EmotesTable = bl[ChannelPrompt].filter(val => val.string === String);
+                console.logger(EmotesTable);
+                if (EmotesTable.length > 0) {
+                    const Emotes = EmotesTable[0].emotes;
+    
+                    // Update or create entries for each string and emotes pair
                     await prisma.Reactions.upsert({
                         where: {
-                            GuildID_ChannelString: {
+                            GuildID_ChannelString_String: {
                                 GuildID: guildId,
                                 ChannelString: ChannelPrompt,
-                            },
+                                String,
+                            }
                         },
                         update: {
-                            String: string,
-                            Emotes: emotes,
+                            Emotes,
                         },
                         create: {
                             GuildID: guildId,
                             ChannelString: ChannelPrompt,
-                            String: string,
-                            Emotes: emotes,
-                        },
+                            String,
+                            Emotes,
+                        }
                     });
-                } catch (e) {
-                    global.logger.error("Error updating reaction in the database: " + e.stack);
+                } else {
+                    await prisma.Reactions.delete({
+                        where: {
+                            GuildID_ChannelString_String: {
+                                GuildID: guildId,
+                                ChannelString: ChannelPrompt,
+                                String,
+                            }
+                        }
+                    });
                 }
             } else {
-                await prisma.Reactions.delete({
+                // Delete all entries for this channel prompt
+                await prisma.Reactions.deleteMany({
                     where: {
-                        GuildID_ChannelString: {
-                            GuildID: guildId,
-                            ChannelString: ChannelPrompt,
-                        },
+                        GuildID: guildId,
+                        ChannelString: ChannelPrompt,
                     }
                 });
             }
         }
-        return { addReaction, removeReaction, getReactions };
+    
+        return { addReaction, removeReaction, matchReactions, getReactions };
     }
-
+    
     const reactions = {};
-
+    
     async function getAutoReactions(guildId) {
-        if(!reactions[guildId]) {
+        if (!reactions[guildId]) {
             reactions[guildId] = await autoReactFn(prisma, guildId);
         }
         return reactions[guildId];
     }
+    
 
     return {
         init,

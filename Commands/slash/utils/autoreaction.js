@@ -1,4 +1,4 @@
-const { ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField } = require("discord.js");
 const SendErrorEmbed = require("@functions/SendErrorEmbed");
 const emoteList = require("@root/utils/emojis.json");
 const findClosestMatch = require("@functions/findClosestMatch");
@@ -24,6 +24,7 @@ module.exports = {
                     description: "The string in messages that enables a reaction (you can use <link>, <attachment> or <media>)",
                     type: ApplicationCommandOptionType.String,
                     required: true,
+                    max_length: 100
                 },{
                     name: "emotes",
                     description: "The reactions (unicode emotes are preferred)",
@@ -45,9 +46,24 @@ module.exports = {
                     max_length: 100
                 },{
                     name: "string",
-                    description: "The string in messages that enables a reaction (do <media> for attachment and links)",
+                    description: "The string in messages that enables a reaction (You can do <media>, <links> and <attachments>)",
                     type: ApplicationCommandOptionType.String,
                     required: true,
+                    max_length: 100
+                },
+            ]
+        },
+        {
+            name: 'removeall',
+            description: "Removes all auto-reactions for a channel prompt",
+            type: ApplicationCommandOptionType.Subcommand,
+            options: [
+                {
+                    name: "channel-prompt",
+                    description: "The prompt that needs to be contained in the channel name",
+                    type: ApplicationCommandOptionType.String,
+                    required: true,
+                    max_length: 100
                 },
             ]
         },
@@ -66,123 +82,163 @@ module.exports = {
         const autoreactions = await global.GuildManager.getAutoReactions(interaction.guild.id);
         const reactions = await autoreactions.getReactions();
 
+        if ((subcommand == "add" || subcommand == "remove" || subcommand == "removeall") && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) return SendErrorEmbed(interaction, "You must be a administrator to execute this action", "yellow", true);
+
         switch (subcommand) {
-        case "list" : {
-            if (Object.keys(reactions).length === 0) return SendErrorEmbed(interaction, "Theres no auto-reactions in this guild", "yellow", true);
-
-            const embed = {
-                title: "List of auto-reactions",
-                color: 0xffffff,
-                timestamp: new Date(),
-                fields: []
-            };
-
-            console.logger(reactions);
-            for (const key in reactions) {
-                embed.fields.push({ name: key, value: `**${reactions[key].string}**:\n${reactions[key].emotes}`});
+            case "list": {
+                if (Object.keys(reactions).length === 0) return SendErrorEmbed(interaction, "There are no auto-reactions in this guild", "yellow", true);
+            
+                const embed = {
+                    title: "List of auto-reactions",
+                    color: 0xffffff,
+                    timestamp: new Date(),
+                    fields: [],
+                };
+            
+                for (const channelPrompt in reactions) {
+                    const entries = reactions[channelPrompt];
+                    let fieldValue = "";
+            
+                    for (const entry of entries) {
+                        fieldValue += `String: ${entry.string}\nEmotes: ${entry.emotes.replace(";", "|")}\n\n`;
+                    }
+            
+                    embed.fields.push({ name: channelPrompt, value: fieldValue });
+                }
+            
+                interaction.reply({ embeds: [embed] });
+                break;
             }
+            
+            case "remove": {
+                if(!reactions[ChannelPromptInput]) return SendErrorEmbed(interaction, "There is no entry for that channel prompt", "yellow", true);
 
-            interaction.reply({ embeds: [embed] });
-            break;
-        }
-        case "remove": {
-            if(!reactions[ChannelPromptInput]) return SendErrorEmbed(interaction, "There is no entry for that channel prompt", "yellow", true);
+                autoreactions.removeReaction(ChannelPromptInput, StringInput);
+                const embed = {
+                    title: `Removed auto-reaction entry for channel prompt: **${ChannelPromptInput}**`,
+                    color: 0xffffff,
+                    timestamp: new Date(),
+                };
 
-            autoreactions.removeReaction(ChannelPromptInput);
-            const embed = {
-                title: "Removed auto-reaction entry for channel prompt: " + ChannelPromptInput,
-                color: 0xffffff,
-                timestamp: new Date(),
-            };
+                interaction.reply({ embeds: [embed] });
+                break;
+            }
+            case "removeall": {
+                if(!reactions[ChannelPromptInput]) return SendErrorEmbed(interaction, "There is no entry for that channel prompt", "yellow", true);
 
-            interaction.reply({ embeds: [embed] });
-            break;
-        }
-        case "add": {
-            let emotes = [];
+                autoreactions.removeReaction(ChannelPromptInput);
+                const embed = {
+                    title: `Removed auto-reaction entry for channel prompt: **${ChannelPromptInput}**`,
+                    color: 0xffffff,
+                    timestamp: new Date(),
+                };
+
+                interaction.reply({ embeds: [embed] });
+                break;
+            }
+            case "add": {
+
+                if(Object.keys(reactions).length >= 20) return SendErrorEmbed(interaction, "You cannot have more than 20 auto-reactions", "yellow", true);
+
+                if (reactions[ChannelPromptInput]) {
+                    const existingEntry = reactions[ChannelPromptInput].find(entry => entry.string === StringInput);
+                    if (existingEntry) return SendErrorEmbed(interaction, "An entry for that channel prompt and string combination already exists.", "red", true);
+                }
+
+                let emotes = [];
     
-            if (/^[a-z:0-9_]+$/.test(EmotesInput)) {
-                const emoteNames = EmotesInput.replace(" ","").trim(":").split("::");
-                emoteNames.forEach(emote => {
-                    const closestMatch = findClosestMatch(emote, emoteList);
-                    if (closestMatch.closestDistance <= 5) emotes.push(emoteList[closestMatch.closestMatch]);
-                });
-            } else {
-                emotes = [...EmotesInput.replace(" ","")].reduce((acc, val) => {
-                    console.log(val);
-                    if(Object.values(emoteList).includes(val)) acc.push(val);
-                    return acc;
-                }, []);
-            }
+                if (/^[a-z:0-9_]+$/.test(EmotesInput)) {
+                    const emoteNames = EmotesInput.replace(" ","").trim(":").split("::");
+                    emoteNames.forEach(emote => {
+                        const closestMatch = findClosestMatch(emote, emoteList);
+                        if (closestMatch.closestDistance <= 5) emotes.push(emoteList[closestMatch.closestMatch]);
+                    });
+                } else {
+                    emotes = [...EmotesInput.replace(" ","")].reduce((acc, val) => {
+                        if(Object.values(emoteList).includes(val)) acc.push(val);
+                        return acc;
+                    }, []);
+                }
 
-            const embed = {
-                color: 0xffff00,
-                title: "Auto-reactions",
-                description: `
+                const embed = {
+                    color: 0xffff00,
+                    title: "Auto-reactions",
+                    description: `
                 Channel match prompt: **${ChannelPromptInput}**
                 Entered string: **${StringInput}**
                 Closest found emotes: ${emotes.join("|")}
                 Is everything accurate?`
-                    .replace(/^\s+/gm, ''),
-                timestamp: new Date(),
-            };
+                        .replace(/^\s+/gm, ''),
+                    timestamp: new Date(),
+                };
 
-            const YesRestart = new ButtonBuilder()
-                .setCustomId('yes')
-                .setLabel('Yes')
-                .setStyle(ButtonStyle.Success);
+                const YesRestart = new ButtonBuilder()
+                    .setCustomId('yes')
+                    .setLabel('Yes')
+                    .setStyle(ButtonStyle.Success);
     
-            const NoRestart = new ButtonBuilder()
-                .setCustomId('no')
-                .setLabel('No')
-                .setStyle(ButtonStyle.Danger);
+                const NoRestart = new ButtonBuilder()
+                    .setCustomId('no')
+                    .setLabel('No')
+                    .setStyle(ButtonStyle.Danger);
     
-            const row = new ActionRowBuilder()
-                .addComponents(YesRestart, NoRestart);
+                const row = new ActionRowBuilder()
+                    .addComponents(YesRestart, NoRestart);
     
-            const filter = (ButtonInteraction) => {
-                return ButtonInteraction.user.id === interaction.user.id;
-            };
+                const filter = (ButtonInteraction) => {
+                    return ButtonInteraction.user.id === interaction.user.id;
+                };
                 
-            const ConfirmationMessage = await interaction.reply({
-                embeds: [embed],
-                components: [row],
-            });
-    
-            const collector = ConfirmationMessage.createMessageComponentCollector({
-                filter,
-                time: 15000, // The time in milliseconds to wait for a response (15 seconds in this example).
-                max: 1, // The maximum number of interactions to collect.
-            });
-
-            collector.on('collect', (interaction) => {
-                if (interaction.customId === 'yes') {
-
-                    autoreactions.addReaction(ChannelPromptInput, StringInput, EmotesInput);
-
-                    embed.description = `Auto-reactions added successfuly`;
-                        
-                    ConfirmationMessage.edit({ embeds: [embed], components: [row] });
-            
-                } else if (interaction.customId === 'no') {
-                    embed.description = `Cancelled`;
-    
-                    ConfirmationMessage.edit({ embeds: [embed], components: [row] }).then(() => {
-                        row.components.forEach((component) => component.setDisabled(true));
-                        ConfirmationMessage.edit({ components: [row] });
-                    });
-                }
-                    
-                interaction.update({
+                const ConfirmationMessage = await interaction.reply({
+                    embeds: [embed],
                     components: [row],
                 });
-            });
+    
+                const collector = ConfirmationMessage.createMessageComponentCollector({
+                    filter,
+                    time: 60_000, // The time in milliseconds to wait for a response (15 seconds in this example).
+                    max: 1, // The maximum number of interactions to collect.
+                });
+
+                collector.on('collect', async(interaction) => {
+                    if (interaction.customId === 'yes') {
+
+                        autoreactions.addReaction(ChannelPromptInput, StringInput, emotes.join(";"));
+
+                        embed.description = `
+                    **Auto-reaction added successfuly**:
+                    Channel match prompt: **${ChannelPromptInput}**
+                    String match: **${StringInput}**
+                    Reaction emotes: ${emotes.join("|")}`
+                            .replace(/^\s+/gm, '');
+                        embed.color = 0xffffff;
+                        
+                        ConfirmationMessage.edit({ embeds: [embed], components: [row] }).then(() => {
+                            row.components.forEach((component) => component.setDisabled(true));
+                            ConfirmationMessage.edit({ components: [row] });
+                        });
+            
+                    } else if (interaction.customId === 'no') {
+                    
+                        embed.description = `Cancelled`;
+                        embed.color = 0xff0000;
+    
+                        ConfirmationMessage.edit({ embeds: [embed], components: [row] }).then(() => {
+                            row.components.forEach((component) => component.setDisabled(true));
+                            ConfirmationMessage.edit({ components: [row] });
+                        });
+                    }
+                    
+                    await interaction.update({
+                        components: [row],
+                    });
+                });
               
-            collector.on('end', async () => {
-                row.components.forEach((component) => component.setDisabled(true));
-                await ConfirmationMessage.edit({ components: [row], embeds: [embed] });
-            });
-        }
+                collector.on('end', async () => {
+                    row.components.forEach((component) => component.setDisabled(true));
+                    await ConfirmationMessage.edit({ components: [row], embeds: [embed] });
+                });
+            }
         }
     },
 };

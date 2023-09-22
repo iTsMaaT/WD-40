@@ -77,7 +77,7 @@ model Reactions {
   ID              BigInt  @id @default(autoincrement())
   GuildID         String
   ChannelString   String
-  String          String  @db.Text
+  String          String
   Emotes          String 
-  @@unique([GuildID, ChannelString])
-}
+  @@unique([GuildID, ChannelString, String])
+  }
