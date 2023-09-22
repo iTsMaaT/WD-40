@@ -14,21 +14,21 @@ module.exports = {
 
         if (!queue || !queue.tracks) return SendErrorEmbed(message, "There is nothing playing.", "yellow");
         switch (args[0]?.toLowerCase() ?? "queue") {
-        case 'off':
-            queue.setRepeatMode(QueueRepeatMode.OFF);
-            break;
-        case 'song':
-        case 'track':
-            queue.setRepeatMode(QueueRepeatMode.TRACK);
-            break;
-        case 'queue':
-            queue.setRepeatMode(QueueRepeatMode.QUEUE);
-            break;
-        case 'autoplay':
-            queue.setRepeatMode(QueueRepeatMode.AUTOPLAY);
-            break;
-        default:
-            SendErrorEmbed(message, "Invalid loop type. (Needs to be: off, queue, song or autoplay)", "yellow");
+            case 'off':
+                queue.setRepeatMode(QueueRepeatMode.OFF);
+                break;
+            case 'song':
+            case 'track':
+                queue.setRepeatMode(QueueRepeatMode.TRACK);
+                break;
+            case 'queue':
+                queue.setRepeatMode(QueueRepeatMode.QUEUE);
+                break;
+            case 'autoplay':
+                queue.setRepeatMode(QueueRepeatMode.AUTOPLAY);
+                break;
+            default:
+                SendErrorEmbed(message, "Invalid loop type. (Needs to be: off, queue, song or autoplay)", "yellow");
         }
 
         const repeat_mode_embed = new EmbedBuilder()

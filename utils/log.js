@@ -31,21 +31,21 @@ async function writeLogToFile(log, client, type) {
     // Set the color based on the log type
     let color;
     switch (type) {
-    case "ERROR":
-        color = "\x1b[33m"; // Yellow
-        break;
-    case "SEVERE":
-        color = "\x1b[31m"; // Red
-        break;
-    case "MUSIC":
-        color = "\x1b[34m"; // Blue
-        break;
-    case "WARNING":
-        color = "\x1b[35m"; // Magenta
-        break;
-    default:
-        color = "\x1b[0m"; // Reset color
-        break;
+        case "ERROR":
+            color = "\x1b[33m"; // Yellow
+            break;
+        case "SEVERE":
+            color = "\x1b[31m"; // Red
+            break;
+        case "MUSIC":
+            color = "\x1b[34m"; // Blue
+            break;
+        case "WARNING":
+            color = "\x1b[35m"; // Magenta
+            break;
+        default:
+            color = "\x1b[0m"; // Reset color
+            break;
     }
     
     console.logger(`${color}${log}\x1b[0m`);
