@@ -122,8 +122,8 @@ module.exports = (function(prisma) {
             }
         }
            
-        function UpdateUserInDB(userId) {
-            prisma.Blacklist.upsert({
+        async function UpdateUserInDB(userId) {
+            await prisma.Blacklist.upsert({
                 where: {
                     GuildID_UserID: {
                         GuildID: guildId,
@@ -165,7 +165,7 @@ module.exports = (function(prisma) {
         const bl = {};
     
         try {
-            const data = await prisma.Reactions.findMany({
+            const data = await prisma.Reactions?.findMany({
                 where: {
                     GuildID: guildId
                 }
@@ -253,7 +253,6 @@ module.exports = (function(prisma) {
         async function updateReactionDB(ChannelPrompt, String) {
             if (bl[ChannelPrompt]) {
                 const EmotesTable = bl[ChannelPrompt].filter(val => val.string === String);
-                console.logger(EmotesTable);
                 if (EmotesTable.length > 0) {
                     const Emotes = EmotesTable[0].emotes;
     
