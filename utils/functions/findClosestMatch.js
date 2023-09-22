@@ -32,14 +32,28 @@ const findClosestMatch = (input, values) => {
     let closestDistance = Number.MAX_SAFE_INTEGER;
   
     // Loop through each value in the array
-    for (const value in values) {
+
+    if (Array.isArray(values)) {
+        for (const value of values) {
+            // Calculate the Levenshtein distance between the input and the current value
+            const distance = levenshteinDistance(input, value);
+      
+            // If the current distance is smaller than the closest distance, update the closest match
+            if (distance < closestDistance) {
+                closestMatch = value;
+                closestDistance = distance;
+            }
+        }
+    } else {
+        for (const value in values) {
         // Calculate the Levenshtein distance between the input and the current value
-        const distance = levenshteinDistance(input, value);
+            const distance = levenshteinDistance(input, value);
   
-        // If the current distance is smaller than the closest distance, update the closest match
-        if (distance < closestDistance) {
-            closestMatch = value;
-            closestDistance = distance;
+            // If the current distance is smaller than the closest distance, update the closest match
+            if (distance < closestDistance) {
+                closestMatch = value;
+                closestDistance = distance;
+            }
         }
     }
   
