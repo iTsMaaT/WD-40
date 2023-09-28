@@ -11,17 +11,17 @@ module.exports = {
             where: {
                 AND: {
                     GuildID: "747610874725925026",
-                    UserID: "970784142486827008"
+                    //UserID: "970784142486827008"
                 }
             }
         });
 
         const AllMessagesArray = [];
         messages.forEach(obj => AllMessagesArray.push(obj.Content));
-        const ArrayNoLinks = AllMessagesArray.filter(val => !/https?:\/\/[^\s]+/.test(val));
+        const ArrayNoLinks = AllMessagesArray.filter(val => !/https?:\/\/[^\s]+/.test(val) && /\S/.test(val));
         let MessagesString = "";
         ArrayNoLinks.forEach(val => MessagesString += val + "\n");
-        
+
         const fileName = `./Messages_data.txt`;
         await fs.writeFile(fileName, MessagesString, { encoding: 'utf8' });
     },
