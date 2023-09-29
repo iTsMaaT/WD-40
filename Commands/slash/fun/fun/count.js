@@ -1,5 +1,6 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
+
 module.exports = {
     name: "count",
     description: "Counts the number of time a prompt as been said",

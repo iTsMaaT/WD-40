@@ -1,5 +1,5 @@
 const translate = require("@iamtraction/google-translate");
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
     name: "translate",

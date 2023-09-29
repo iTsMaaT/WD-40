@@ -1,5 +1,6 @@
-const SendErrorEmbed = require('@functions/SendErrorEmbed');
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 const got = require("got");
+
 module.exports = {
     name: "ask",
     description: "Ask a question to PaLM",

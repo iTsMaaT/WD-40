@@ -1,4 +1,4 @@
-const SendErrorEmbed = require("@functions/SendErrorEmbed.js");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
     name: "uwufy",

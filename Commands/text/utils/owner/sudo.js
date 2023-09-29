@@ -1,4 +1,4 @@
-const infoFromMessageLink = require("@functions/InfoFromMessageLink");
+const { infoFromMessageLink } = require("@functions/discordFunctions");
 
 module.exports = {
     name: "sudo",

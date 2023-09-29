@@ -1,4 +1,5 @@
 const akinator = require("discord.js-akinator");
+
 module.exports = {
     name: "guess",
     description: "Guess a character with akinator",

@@ -1,6 +1,4 @@
-const id = require("@functions/id");
-const CreateOrUseWebhook = require("@functions/CreateOrUseWebhook");
-const SendErrorEmbed = require("@functions/SendErrorEmbed.js");
+const { SendErrorEmbed, CreateOrUseWebhook, id } = require("@functions/discordFunctions");
 
 module.exports = {
     name: 'fakemessage',

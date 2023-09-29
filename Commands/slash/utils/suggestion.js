@@ -1,4 +1,5 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
+
 module.exports = {
     name: "suggestion",
     description: "Suggest ideas for the bot",

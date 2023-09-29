@@ -6,7 +6,6 @@ require('module-alias/register');
 
 const Logger = require("./utils/log");
 const fs = require('fs');
-const dns = require('dns');
 
 const cron = require("cron");
 const dotenv = require("dotenv");
@@ -14,7 +13,7 @@ const Discord = require('discord.js');
 
 const getExactDate = require("@functions/getExactDate");
 const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 const RandomMinMax = require("@functions/RandomMinMax");
 const findClosestMatch = require('@functions/findClosestMatch');
 const HourlyRam = [0, 0, 0];
@@ -29,9 +28,7 @@ const client = new Client({
 });
 
 global.prisma = new PrismaClient();
-global.GuildManager = (require("./utils/GuildManager.js"))(prisma);
-global.prefix = '>';
-global.CmdEnabled = 1;
+global.GuildManager = (require("./utils/GuildManager.js"))(global.prisma);
 global.superuser = 0;
 global.debug = 1;
 global.SmartRestartEnabled = 0;
@@ -39,6 +36,15 @@ global.SmartRestartEnabled = 0;
 // Add array.equals()
 Array.prototype.equals = function (otherArray) {
     return this.length === otherArray.length && this.every((value, index) => value === otherArray[index]);
+};
+
+// Add array.shuffle
+Array.prototype.shuffle = function() {
+    for (let i = this.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [this[i], this[j]] = [this[j], this[i]];
+    }
+    return this;
 };
 
 //music
@@ -53,28 +59,17 @@ global.player = new Player(client, {
         }
     },
 });
-player.extractors.loadDefault();
+global.player.extractors.loadDefault();
 
 //Logger system and databases
 global.logger = new Logger({ root: __dirname, client });
 console.logger = console.log;
-console.log = (log) => logger.console(log);
+console.log = (log) => global.logger.console(log);
 global.snowflakeData = [];
 prisma.snowflake.findMany().then(v => {
     const result = v.map(v => [parseInt(v.GuildID), parseInt(v.UserID)]);
     global.snowflakeData = global.snowflakeData.concat(result);
 });
-
-//Error handler
-//Gotta Catch ’Em All!
-process.on("unhandledRejection", (err, promise) => {
-    logger.error("Unhandled Promise Rejection: " + err.stack);
-});
-
-process.on("uncaughtException", (err) => {
-    logger.error("Uncaught Exception: " + err.stack);
-});
-
 
 //Collections creation
 client.commands = new Discord.Collection();
@@ -128,17 +123,21 @@ loadFiles('./Commands/context/', (contextcommand, fileName) => {
         client.contextCommands.set(contextcommand.name, contextcommand);
         discoveredCommands.push(contextcommand);
     } else {
-        logger.error(`[WARNING] The (ctx) command ${fileName} is missing a required "name", "execute", or "type" property.`);
+        global.logger.error(`[WARNING] The (ctx) command ${fileName} is missing a required "name", "execute", or "type" property.`);
     }
 });
 
 //Event handler
 loadFiles('./events/client/', function (event) {
     if (event.once) {
-        client.once(event.name, (...args) => event.execute(client, logger, ...args));
+        client.once(event.name, (...args) => event.execute(client, global.logger, ...args));
     } else {
-        client.on(event.name, (...args) => event.execute(client, logger, ...args));
+        client.on(event.name, (...args) => event.execute(client, global.logger, ...args));
     }
+});
+
+loadFiles('./events/process/', function (event) {
+    process.on(event.name, (...args) => event.execute(client, global.logger, ...args));
 });
 
 process.stdin.setEncoding('utf8');
@@ -152,13 +151,14 @@ process.stdin.on('data', (input) => {
     const command = client.consoleCommands.get(commandName);
     if (!command) return;
 
-    command.execute(client, logger, ...args);
+    command.execute(client, global.logger, ...args);
 });
 
 
 //Bot setup on startup
 client.once(Events.ClientReady, async () => {
 
+    client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send(`Bot starting!`);
     const part3 = RandomMinMax(1, 255);
     const part4 = RandomMinMax(1, 255);
     let port;
@@ -171,7 +171,7 @@ client.once(Events.ClientReady, async () => {
     const ipAddress = `192.168.${part3}.${part4}:${port}`;
     const ip = ipAddress;
 
-    logger.info(`Bot starting on [${process.env.SERVER}]...`);
+    global.logger.info(`Bot starting on [${process.env.SERVER}]...`);
 
     console.log("Guild manager initiation...");
     const guilds = await client.guilds.fetch();
@@ -216,15 +216,15 @@ client.once(Events.ClientReady, async () => {
             console.log(HourlyRam);
             if (HourlyRam[0] > 90 && HourlyRam[1] > 90 && HourlyRam [2] > 90) client.users.cache.get(process.env.OWNER_ID).send("Memory leak detected.");
         } catch(err) {
-            logger.error("Couldn't get the RAM % for MemoryLeakDetector");
-            logger.error(err);
+            global.logger.error("Couldn't get the RAM % for MemoryLeakDetector");
+            global.logger.error(err);
         }
     });
 
     const SmartRestart = new cron.CronJob('* * * * *', async () => {
         if (client.voice.adapters.size == 0 && SmartRestartEnabled) {
-            logger.severe(`Restart requested from discord`);
-            client.channels.cache.get("1037141235451842701").send(`Restart requested from discord for reason : \`Smart restart\``);
+            global.logger.severe(`Restart requested from discord`);
+            client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send(`Restart requested from discord for reason : \`Smart restart\``);
 
             //After 3s, closes the database and then exits the process
             setTimeout(function () {
@@ -255,8 +255,8 @@ client.once(Events.ClientReady, async () => {
     //start confirmation
     const interval = setInterval(() => {
         if (client.ws.ping !== -1) {
-            client.channels.cache.get("1037141235451842701").send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
-            logger.info("Bot started successfully.");
+            client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
+            global.logger.info("Bot started successfully.");
             clearInterval(interval);
         }
     }, 500);
@@ -274,7 +274,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
         const slash = interaction.client.slashcommands.get(interaction.commandName);
 
-        if (!slash) return console.error(`No command matching ${interaction.commandName} was found.`);
+        if (!slash) return global.logger.error(`No command matching ${interaction.commandName} was found.`);
 
         // Check command cooldown
         if (SlashCooldowns.has(interaction.user.id)) {
@@ -295,7 +295,7 @@ client.on(Events.InteractionCreate, async interaction => {
             await slash.execute(logger, interaction, client);
 
             //Logging the command
-            logger.info(`Executing [/${interaction.commandName}]
+            global.logger.info(`Executing [/${interaction.commandName}]
             by    [${interaction.user.tag} (${interaction.user.id})]
             in    [${interaction.channel.name} (${interaction.channel.id})]
             from  [${interaction.guild.name} (${interaction.guild.id})]`
@@ -311,8 +311,8 @@ client.on(Events.InteractionCreate, async interaction => {
                 ephemeral: true,
             });
 
-            logger.error(`Error executing slash command [${interaction.commandName}]`);
-            logger.error(error.stack);
+            global.logger.error(`Error executing slash command [${interaction.commandName}]`);
+            global.logger.error(error.stack);
         }
     } else if (interaction.isContextMenuCommand()) {
         
@@ -323,7 +323,7 @@ client.on(Events.InteractionCreate, async interaction => {
         try {
             await context.execute(logger, interaction, client);
 
-            logger.info(`
+            global.logger.info(`
             Executing [${interaction.commandName} (${context.type === 2 ? "User" : "Message"})]
             by   [${interaction.user.tag} (${interaction.user.id})]
             in   [${interaction.channel.name} (${interaction.channel.id})]
@@ -340,8 +340,8 @@ client.on(Events.InteractionCreate, async interaction => {
                 ephemeral: true,
             });
             
-            logger.error(`Error executing context menu command [${interaction.commandName}]`);
-            logger.error(error);
+            global.logger.error(`Error executing context menu command [${interaction.commandName}]`);
+            global.logger.error(error);
         }
     }
 });
@@ -422,7 +422,7 @@ client.on(Events.MessageCreate, async (message) => {
         TextCooldowns.set(message.author.id, Date.now() + cooldownTime);
 
         // Logging every executed commands
-        logger.info(`
+        global.logger.info(`
         Executing [${message.content}]
         by    [${message.member.user.tag} (${message.author.id})]
         in    [${message.channel.name} (${message.channel.id})]
@@ -432,9 +432,9 @@ client.on(Events.MessageCreate, async (message) => {
         // Execute the command
         try {
             await message.channel.sendTyping();
-            await command.execute(logger, client, message, args);
+            await command.execute(global.logger, client, message, args);
         } catch (error) {
-            logger.error(error.stack);
+            global.logger.error(error.stack);
             return SendErrorEmbed(message, "An error occured while executing the command", "red");
         }
     }

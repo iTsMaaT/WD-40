@@ -1,5 +1,4 @@
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
-const id = require("@functions/id");
+const { SendErrorEmbed, id } = require("@functions/discordFunctions");
 const { PermissionsBitField } = require('discord.js');
 
 module.exports = {

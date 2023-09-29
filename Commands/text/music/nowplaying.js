@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const SendErrorEmbed = require("../../../utils/functions/SendErrorEmbed");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { useQueue, useTimeline } = require('discord-player');
 
 module.exports = {

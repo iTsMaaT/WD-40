@@ -1,5 +1,6 @@
 const { ApplicationCommandType } = require("discord.js");
 const prettyMilliseconds = require("pretty-ms");
+
 module.exports = {
     name: 'ping',
     description: 'Shows bot latency',

@@ -1,4 +1,4 @@
-const SendErrorEmbed = require("@functions/SendErrorEmbed.js");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { createCanvas } = require('canvas');
 const { AttachmentBuilder } = require("discord.js");
 

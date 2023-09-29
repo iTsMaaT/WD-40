@@ -1,4 +1,5 @@
 const got = require("got");
+
 module.exports = {
     name: "joke",
     description: "le funny",

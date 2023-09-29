@@ -1,7 +1,7 @@
 const TimeFormatToMS = function (timeString) {
 
     // Validation
-    if (!timeString || !/^(\d+[dhms])+ms$/.test(timeString) || /(\D)\1/.test(timeString) || timeString.match(/\d+/g).map(Number).map(parseInt).some(Number.isNaN)) return undefined;
+    if (!timeString || !/^(\d+[dhms])+ms$/.test(timeString) || /(\D)\1/.test(timeString) || timeString.match(/\d+/g).map(Number).map(parseInt).some(Number.isNaN)) return null;
 
     const timeUnits = {
         d: 24 * 60 * 60 * 1000, // 1 day = 24 hours * 60 minutes * 60 seconds * 1000 milliseconds

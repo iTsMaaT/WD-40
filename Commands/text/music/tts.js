@@ -1,7 +1,7 @@
 const { useQueue } = require('discord-player');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require('@discordjs/voice');
 const googleTTS = require('google-tts-api');
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
     name: 'tts',

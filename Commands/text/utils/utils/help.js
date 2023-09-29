@@ -1,6 +1,6 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const prettyString = require("@functions/prettyString.js");
-const SendErrorEmbed = require("@functions/SendErrorEmbed.js");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
     name: "help",

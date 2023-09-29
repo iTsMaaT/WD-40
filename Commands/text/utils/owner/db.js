@@ -11,7 +11,7 @@ module.exports = {
         let data;
 
         const tables = Object.keys(global.prisma);
-        const tableList = tables.filter(name => !name.startsWith("_"));
+        const tableList = tables.filter(name => !name.startsWith("_") && !name.startsWith("$"));
 
         if (args[0] === '-t' || !args[0] || !tableList.includes(args[0])) return message.reply(`Tables: ${tableList.join(', ')}`);
 
@@ -40,22 +40,22 @@ module.exports = {
                 const maxLength = Math.max(...columnData.map((value) => value.length));
                 columnLengths[column] = maxLength;
             });
-
+            
             // Create the table header
             const tableHeader = Object.keys(data[0])
                 .map((header) => header.padEnd(columnLengths[header]))
                 .join(' | ');
-
+            
             // Create the separator line
             const separatorLine = '-'.repeat(tableHeader.length);
-
+                
             // Create the table rows
             const tableRows = data.map((row) =>
                 Object.entries(row)
                     .map(([key, value]) => String(value).padEnd(columnLengths[key]))
                     .join(' | ')
             );
-
+            
             // Join the table header, separator line, and rows
             const table = [tableHeader, separatorLine, ...tableRows].join('\n');
 

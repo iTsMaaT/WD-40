@@ -1,4 +1,5 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
+
 module.exports = {
     name: "prefix",
     description: "Changes the prefix to do commands",
@@ -19,10 +20,10 @@ module.exports = {
         const responseEmbed = {
             title: "Prefix Changed",
             color: 0xffffff, 
-            description: `The new prefix is \`${prefix.charAt(0)}\` in \`${message.member.guild.name}\``,
+            description: `The new prefix is \`${prefix.charAt(0)}\` in \`${interaction.member.guild.name}\``,
             timestamp: new Date(),
         };
         interaction.reply({ embeds: [responseEmbed]  });
-        logger.info(`Prefix changed to ${prefix.charAt(0)} in \`${message.member.guild.name}\``);
+        logger.info(`Prefix changed to ${prefix.charAt(0)} in \`${interaction.member.guild.name}\``);
     }
 };

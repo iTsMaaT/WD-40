@@ -1,5 +1,5 @@
 const { ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField } = require("discord.js");
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 const emoteList = require("@root/utils/emojis.json");
 const findClosestMatch = require("@functions/findClosestMatch");
 
@@ -100,7 +100,7 @@ module.exports = {
                     let fieldValue = "";
             
                     for (const entry of entries) {
-                        fieldValue += `String: ${entry.string}\nEmotes: ${entry.emotes.replace(";", "|")}\n\n`;
+                        fieldValue += `String: ${entry.string}\nEmotes: ${entry.emotes.split(";").join("|")}\n\n`;
                     }
             
                     embed.fields.push({ name: channelPrompt, value: fieldValue });
@@ -160,6 +160,7 @@ module.exports = {
                     }, []);
                 }
 
+                if (emotes.length == 0) return SendErrorEmbed(interaction, "No compatible emotes found", "red", true);
                 const embed = {
                     color: 0xffff00,
                     title: "Auto-reactions",
@@ -170,6 +171,7 @@ module.exports = {
                 Is everything accurate?`
                         .replace(/^\s+/gm, ''),
                     timestamp: new Date(),
+                    footer: { text: "Custom emotes are not supported."}
                 };
 
                 const YesRestart = new ButtonBuilder()

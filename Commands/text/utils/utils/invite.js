@@ -1,5 +1,4 @@
 const { ChannelType, PermissionsBitField } = require('discord.js');
-const SendErrorEmbed = require("@functions/SendErrorEmbed.js");
 
 module.exports = {
     name: "invite",

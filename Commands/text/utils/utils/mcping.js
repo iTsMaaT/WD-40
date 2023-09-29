@@ -1,6 +1,5 @@
 const got = require("got");
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
-const { AttachmentBuilder } = require("discord.js");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
     name: 'mcping',

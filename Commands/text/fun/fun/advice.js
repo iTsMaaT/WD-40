@@ -1,4 +1,5 @@
 const got = require("got");
+
 module.exports = {
     name: "advice",
     description: "Get a random advice",

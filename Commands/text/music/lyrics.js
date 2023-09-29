@@ -1,6 +1,7 @@
 const { useQueue } = require('discord-player');
 const { lyricsExtractor } = require('@discord-player/extractor');
 const { EmbedBuilder } = require("discord.js");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
     name: "lyrics",

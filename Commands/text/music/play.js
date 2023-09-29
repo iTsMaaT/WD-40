@@ -1,4 +1,4 @@
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { QueryType } = require('discord-player');
 const { SoundCloudExtractor } = require("@discord-player/extractor");
 

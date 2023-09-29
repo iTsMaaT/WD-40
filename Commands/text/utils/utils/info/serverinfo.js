@@ -27,7 +27,7 @@ module.exports = {
                     value: 
 `**User count**: ${message.guild.members.cache.filter((m) => !m.user.bot).size}
 **Bot count**: ${message.guild.members.cache.filter((m) => m.user.bot).size}
-**Total**: ${message.guild.memberCount} ${message.guild.memberCount === 69 ? "(Nice)" : ""}${message.guild.memberCount === 42 ? " This is the answer to life!" : ""}`,
+**Total**: ${message.guild.memberCount} ${message.guild.memberCount === 69 ? "(Nice)" : ""}`,
                 },
             ],
             timestamp: new Date(),
