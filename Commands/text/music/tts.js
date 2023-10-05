@@ -2,19 +2,22 @@ const { useQueue } = require('discord-player');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require('@discordjs/voice');
 const googleTTS = require('google-tts-api');
 const { SendErrorEmbed } = require("@functions/discordFunctions");
+const { PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
     name: 'tts',
     description: 'Play a text-to-speech message in the voice channel',
     usage: '< [Text]: text to say >',
     category: 'music',
+    examples: ["i love eating baguettes"],
+    permissions: [PermissionFlagsBits.Connect],
     async execute(logger, client, message, args) {
         const queue = useQueue(message.guild.id);
         let connection;
 
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
         if (!args[0]) return SendErrorEmbed(message, "You must provide a prompt.", "yellow");
-        if (queue || queue?.tracks || queue?.currentTrack) return SendErrorEmbed(message, "You must stop the music before playing TTS.", "yellow");
+        if (queue || queue?.tracks || queue?.currentTrack) return SendErrorEmbed(message, "You must stop the music before playing a TTS.", "yellow");
 
         if (args.filter(word => word.length > 200).length) return SendErrorEmbed(message, "The prompt contains a word longer than 200 characters", "yellow");
 

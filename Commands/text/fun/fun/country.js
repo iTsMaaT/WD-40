@@ -5,6 +5,7 @@ module.exports = {
     description: "See information about a country",
     usage: "< [Country name] >",
     category: "fun",
+    examples: ["Canada"],
     execute(logger, client, message, args) {
         if (!args[0]) return message.channel.send("No country provided");
         

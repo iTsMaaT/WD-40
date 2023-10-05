@@ -5,6 +5,7 @@ module.exports = {
     description: "UwUfies a prompt",
     usage: "< [Prompt] >",
     category: "fun",
+    examples: ["Hello, World!"],
     execute(logger, client, message, args) {
         
         if (!args[0]) SendErrorEmbed(message, "You need a prompt", "yellow");

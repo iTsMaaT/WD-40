@@ -5,6 +5,7 @@ module.exports = {
     description: "Reverts a prompt ʌǝɹʇᴉɔɐllʎ and yllatnoziroh",
     category: "text manipulation",
     usage: "< String >",
+    examples: ["Hello, World!"],
     aliases: ['ud'],
     async execute(logger, client, message, args) {
         if (!args[0]) return SendErrorEmbed(message, "You need to provide a prompt.", "yellow");

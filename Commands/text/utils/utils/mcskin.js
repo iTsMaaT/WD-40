@@ -5,6 +5,7 @@ module.exports = {
     description: 'Gives the Minecraft skin of a user',
     usage: "< [Username, UUID]: Name or UUID of the user >",
     category: "utils",
+    examples: ["Notch"],
     async execute(logger, client, message, args) {
         const name = args[0] ?? "mhf_steve";
     

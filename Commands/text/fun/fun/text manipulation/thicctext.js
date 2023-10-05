@@ -5,6 +5,7 @@ module.exports = {
     description: "Makes a text 丅卄工匚匚",
     category: "text manipulation",
     usage: "< String >",
+    examples: ["Hello, World!"],
     aliases: ['tt'],
     async execute(logger, client, message, args) {
         if (!args[0]) return SendErrorEmbed(message, "You need to provide a prompt.", "yellow");

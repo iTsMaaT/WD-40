@@ -5,6 +5,7 @@ module.exports = {
     description: "Translates a string to alphuck",
     category: "text manipulation",
     usage: "< String >",
+    examples: ["Hello, World!"],
     async execute(logger, client, message, args) {
         if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");
 

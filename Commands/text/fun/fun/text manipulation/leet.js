@@ -5,6 +5,7 @@ module.exports = {
     description: "Converts a text to leet speech",
     category: "text manipulation",
     usage: "< String >",
+    examples: ["Hello, World!"],
     aliases: ['1337'],
     async execute(logger, client, message, args) {
         if (!args[0]) return SendErrorEmbed(message, "You need to provide a prompt.", "yellow");

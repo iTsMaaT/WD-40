@@ -1,6 +1,7 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { QueryType } = require('discord-player');
 const { SoundCloudExtractor } = require("@discord-player/extractor");
+const { PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
     name: "play",
@@ -8,6 +9,8 @@ module.exports = {
     aliases: ["p"],
     usage: "< [Song]: song link or query >",
     category: "music",
+    examples: ["never gonna give you up"],
+    permissions: [PermissionFlagsBits.Connect],
     async execute(logger, client, message, args) {
         let res, research;
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");

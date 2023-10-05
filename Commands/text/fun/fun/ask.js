@@ -6,6 +6,7 @@ module.exports = {
     description: "Ask a question to PaLM",
     usage: "< prompt >",
     category: "fun",
+    examples: ["what are you used for?"],
     cooldown: 5000,
     execute: async (logger, client, message, args) => {
         try {

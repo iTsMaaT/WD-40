@@ -1,4 +1,5 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
+const { PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
     name: "muteall",
@@ -6,6 +7,7 @@ module.exports = {
     category: "admin",
     usage: "< -mute / -unmute >",
     admin: true,
+    permissions: [PermissionFlagsBits.MuteMembers],
     aliases: ['ma'],
     execute(logger, client, message, args) {
   

@@ -6,6 +6,7 @@ module.exports = {
     category: "text manipulation",
     usage: "< String >",
     aliases: ['bf'],
+    examples: ["Hello, World!"],
     async execute(logger, client, message, args) {    
         if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");
 

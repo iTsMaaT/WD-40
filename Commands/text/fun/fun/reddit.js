@@ -6,6 +6,7 @@ module.exports = {
     description: "Finds an image or post from *any* subreddit",
     usage: "< -p [...]: post, -u [...]: user>",
     category: "fun",
+    examples: ["-p aww", "-u spez"],
     execute: async (logger, client, message, args) => {
         let sent = "";
         

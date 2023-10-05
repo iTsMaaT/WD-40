@@ -1,5 +1,6 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { ChannelType } = require("discord.js");
+const { PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
     name: "moveall",
@@ -7,6 +8,7 @@ module.exports = {
     category: "admin",
     usage: "< channelID >",
     admin: true,
+    permissions: [PermissionFlagsBits.MoveMembers],
     aliases: ['mova'],
     execute(logger, client, message, args) {
   

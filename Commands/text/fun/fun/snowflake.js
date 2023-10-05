@@ -10,7 +10,7 @@ module.exports = {
             if (args.length == 1) {
                 //Transforms a ping into the ID
                 let rawid = args[0].replace("@", "");
-                rawdid = rawid.replace("<", "");
+                let rawdid = rawid.replace("<", "");
                 const strid = rawdid.replace(">", "");
                 rawid = parseInt(rawdid.replace(">", ""));
                 //Uses the database to add or remove the person from the list

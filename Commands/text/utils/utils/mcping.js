@@ -6,6 +6,7 @@ module.exports = {
     description: 'Ping a Minecraft server',
     usage: "< [IP]: mc server ip, [Port]: the port of the server (optional) >",
     category: "utils",
+    examples: ["Hypixel.net"],
     async execute(logger, client, message, args) {
 
         if (args[1]) var port = ":" + parseInt(args[1]);

@@ -1,11 +1,13 @@
 const { createCanvas, loadImage } = require('canvas');
 const { SendErrorEmbed } = require("@functions/discordFunctions");
+const { PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
     name: 'emote',
     description: 'Makes the attachment into a server emote/sticker',
     category: 'utils',
     usage: "< -e/-s: Emote or sticker, [Name]: name of the e/s >",
+    permissions: [PermissionFlagsBits.Administrator],
     async execute(logger, client, message, args) {
         if ( !message.member.permissions.has("Administrator") || !message.author.id == process.env.OWNER_ID) SendErrorEmbed(message, "You need to be administrator to execute this command", "yellow");
         

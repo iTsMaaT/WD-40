@@ -5,6 +5,7 @@ module.exports = {
     description: "search something on the urban dictionary",
     usage: "< [Prompt] >",
     category: "fun",
+    examples: ["amogus"],
     async execute(logger, client, message, args) {
 
         await got(`https://api.urbandictionary.com/v0/define?term=${encodeURIComponent(args.slice(0).join(" "))}`)

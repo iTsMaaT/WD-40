@@ -7,6 +7,7 @@ module.exports = {
     description: "Removes a given track",
     usage: "< [Track]: track to remove >",
     category: "music",
+    examples: ["3"],
     execute(logger, client, message, args) {
         const queue = useQueue(message.guild.id);
 

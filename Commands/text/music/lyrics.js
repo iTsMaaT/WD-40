@@ -6,7 +6,6 @@ const { SendErrorEmbed } = require("@functions/discordFunctions");
 module.exports = {
     name: "lyrics",
     description: "Gives lyrics for the currently playing song",
-    usage: "< [Track]: track to remove >",
     category: "music",
     async execute(logger, client, message, args) {
         const queue = useQueue(message.guild.id);

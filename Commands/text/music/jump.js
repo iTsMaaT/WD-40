@@ -6,6 +6,7 @@ module.exports = {
     description: "Skips to a precise song",
     usage: "< [Song]: number of the song to skip to >",
     category: "music",
+    examples: ["3"],
     inVoiceChannel: true,
     execute: async (logger, client, message, args) => {
         const queue = useQueue(message.guild.id);

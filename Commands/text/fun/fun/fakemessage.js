@@ -1,10 +1,13 @@
 const { SendErrorEmbed, CreateOrUseWebhook, id } = require("@functions/discordFunctions");
+const { PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
     name: 'fakemessage',
     description: 'Create a fake message using webhooks',
     usage: '< [Prompt] >',
     category: 'fun',
+    examples: ["1081004946872352958 You are weird looking"],
+    permission: [PermissionFlagsBits.ManageWebhooks],
     aliases: ['fmsg'],
     async execute(logger, client, message, args) {
         let UserID;

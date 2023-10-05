@@ -5,6 +5,7 @@ module.exports = {
     description: "Translates a string to malbolge, the hardest programming language",
     category: "text manipulation",
     usage: "< String >",
+    examples: ["Hello, World!"],
     aliases: ['mb'],
     async execute(logger, client, message, args) {    
         if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");

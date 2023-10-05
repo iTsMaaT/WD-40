@@ -5,6 +5,7 @@ module.exports = {
     description: "Mᴀᴋᴇs ʟᴏᴡᴇʀᴄᴀsᴇ ʟᴇᴛᴛᴇʀs ɪɴᴛᴏ sᴍᴀʟʟ ᴄᴀᴘs",
     category: "text manipulation",
     usage: "< String >",
+    examples: ["Hello, World!"],
     aliases: ['sc'],
     async execute(logger, client, message, args) {
         if (!args[0]) return SendErrorEmbed(message, "You need to provide a prompt.", "yellow");

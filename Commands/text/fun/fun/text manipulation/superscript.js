@@ -5,6 +5,7 @@ module.exports = {
     description: "Changes a text's characters to ˢᵁᴾᴱᴿˢᶜᴿᴵᴾᵀ",
     category: "text manipulation",
     usage: "< String >",
+    examples: ["Hello, World!"],
     async execute(logger, client, message, args) {
         if (!args[0]) return SendErrorEmbed(message, "You need to provide a prompt.", "yellow");
         if (args.join(" ").length > 1000) return SendErrorEmbed(message, "The result is too long (>1000)", "yellow");

@@ -5,6 +5,7 @@ module.exports = {
     description: "Transform a string into emotes",
     usage: "< [Prompt] >",
     category: "text manipulation",
+    examples: ["Hello, World!"],
     execute(logger, client, message, args) {
 
         //Map of all characters to emotes

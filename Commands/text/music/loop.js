@@ -7,6 +7,7 @@ module.exports = {
     description: "Loop a desired song or queue",
     usage: "< [loop type] : Off, Song, Queue or Autoplay >",
     category: "music",
+    examples: ["track"],
     execute(logger, client, message, args) {
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
 

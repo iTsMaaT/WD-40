@@ -1,12 +1,16 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { createCanvas } = require('canvas');
 const { AttachmentBuilder } = require("discord.js");
+const { PermissionFlagsBits }= require("discord.js");
+
 
 module.exports = {
     name: "imagefuck",
     description: "Transform a string into imagefuck",
     usage: "< [Prompt] >",
     category: "text manipulation",
+    examples: ["Hello, World!"],
+    permission: [PermissionFlagsBits.AttachFiles],
     async execute(logger, client, message, args) {
         if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");
 
