@@ -13,7 +13,7 @@ module.exports = {
     category: "fun",
     private: true,
     async execute(logger, client, message, args) {
-        const array = [1,2,3,4,5,6,7,8,9];
+        const array = [1, 2, 3, 4, 5, 6, 7, 8, 9];
         StringReact(client, message.channel.id, message.id, "sex");
         const ptero = await GetPterodactylInfo();
         message.channel.send(
@@ -31,8 +31,8 @@ module.exports = {
             + "\n" +
             ptero.main.name
             + "\n" +
-            GetUniqueValues(["a", "a", "s", "r", "r", "e", "x", "v", "v"])
+            GetUniqueValues(["a", "a", "s", "r", "r", "e", "x", "v", "v"]),
             
         );
-    }
+    },
 };

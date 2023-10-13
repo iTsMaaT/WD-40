@@ -1,4 +1,4 @@
-const { useQueue } = require('discord-player');
+const { useQueue } = require("discord-player");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { EmbedBuilder } = require("discord.js");
 
@@ -16,14 +16,14 @@ module.exports = {
         const remove = parseInt(args[0]);
         const trackResolvable = queue.tracks.at(remove);
 
-        if (isNaN(remove) || !trackResolvable) return SendErrorEmbed(message, `Couldn't find song to skip to.`, "red");
+        if (isNaN(remove) || !trackResolvable) return SendErrorEmbed(message, "Couldn't find song to skip to.", "red");
 
         queue.node.remove(trackResolvable);
 
         const embed = new EmbedBuilder()
-            .setColor('#ffffff')
+            .setColor("#ffffff")
             .setDescription(`Removed: ${trackResolvable.title}`)
             .setTimestamp();
         message.reply({ embeds: [embed] });
-    }
+    },
 };

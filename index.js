@@ -1,21 +1,21 @@
 const { PrismaClient } = require("@prisma/client");
-const { Client, GatewayIntentBits, Events, Partials, ActivityType  } = require("discord.js");
+const { Client, GatewayIntentBits, Events, Partials, ActivityType, PermissionFlagsBits } = require("discord.js");
 const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState, AutoCommandMatch } = require("./utils/config.json");
 
-require('module-alias/register');
+require("module-alias/register");
 
 const Logger = require("./utils/log");
-const fs = require('fs');
+const fs = require("fs");
 
 const cron = require("cron");
 const dotenv = require("dotenv");
-const Discord = require('discord.js');
+const Discord = require("discord.js");
 
 const getExactDate = require("@functions/getExactDate");
 const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const RandomMinMax = require("@functions/RandomMinMax");
-const findClosestMatch = require('@functions/findClosestMatch');
+const findClosestMatch = require("@functions/findClosestMatch");
 const HourlyRam = [0, 0, 0];
 
 dotenv.config();
@@ -24,7 +24,7 @@ const client = new Client({
     intents: Object.keys(GatewayIntentBits), // all intents
     partials: Object.keys(Partials),
     shards: "auto",
-    allowedMentions: { repliedUser: false }
+    allowedMentions: { repliedUser: false },
 });
 
 global.prisma = new PrismaClient();
@@ -34,7 +34,7 @@ global.debug = 1;
 global.SmartRestartEnabled = 0;
 
 // Add array.equals()
-Array.prototype.equals = function (otherArray) {
+Array.prototype.equals = function(otherArray) {
     return this.length === otherArray.length && this.every((value, index) => value === otherArray[index]);
 };
 
@@ -47,31 +47,31 @@ Array.prototype.shuffle = function() {
     return this;
 };
 
-//music
-const { Player } = require('discord-player');
+// music
+const { Player } = require("discord-player");
 global.player = new Player(client, {
     ytdlOptions: {
         requestOptions: {
             headers: {
                 cookie: process.env.YOUTUBE_COOKIE,
-                "x-youtube-identity-token": process.env.YOUTUBE_TOKEN
-            }
-        }
+                "x-youtube-identity-token": process.env.YOUTUBE_TOKEN,
+            },
+        },
     },
 });
 global.player.extractors.loadDefault();
 
-//Logger system and databases
+// Logger system and databases
 global.logger = new Logger({ root: __dirname, client });
 console.logger = console.log;
 console.log = (log) => global.logger.console(log);
 global.snowflakeData = [];
-prisma.snowflake.findMany().then(v => {
-    const result = v.map(v => [parseInt(v.GuildID), parseInt(v.UserID)]);
+prisma.snowflake.findMany().then(val => {
+    const result = val.map(v => [parseInt(v.GuildID), parseInt(v.UserID)]);
     global.snowflakeData = global.snowflakeData.concat(result);
 });
 
-//Collections creation
+// Collections creation
 client.commands = new Discord.Collection();
 client.slashcommands = new Discord.Collection();
 client.contextCommands = new Discord.Collection();
@@ -79,26 +79,26 @@ client.consoleCommands = new Discord.Collection();
 const TextCooldowns = new Map();
 const SlashCooldowns = new Map();
 
-//File finder/loader
+// File finder/loader
 function loadFiles(folder, callback) {
     const commandFiles = fs.readdirSync(folder);
     while (commandFiles.length > 0) {
         const file = commandFiles.shift();
-        if (file.endsWith('.js')) {
+        if (file.endsWith(".js")) {
             const loaded = require(`${folder}${file}`);
             loaded.filePath = folder + file;
             callback(loaded, file);
         } else {
             const newFiles = fs.readdirSync(folder + file);
-            newFiles.forEach(f => commandFiles.push(file + '/' + f));
+            newFiles.forEach(f => commandFiles.push(file + "/" + f));
         }
     }
 }
 
-//Slash command handler
+// Slash command handler
 const discoveredCommands = [];
-loadFiles('./Commands/slash/', (slashcommand, fileName) => {
-    if ('name' in slashcommand && 'execute' in slashcommand && 'description' in slashcommand) {
+loadFiles("./Commands/slash/", (slashcommand, fileName) => {
+    if ("name" in slashcommand && "execute" in slashcommand && "description" in slashcommand) {
         client.slashcommands.set(slashcommand.name, slashcommand);
         discoveredCommands.push(slashcommand);
     } else {
@@ -106,8 +106,8 @@ loadFiles('./Commands/slash/', (slashcommand, fileName) => {
     }
 });
 
-//Text command handler
-loadFiles('./Commands/text/', function (command) {
+// Text command handler
+loadFiles("./Commands/text/", function(command) {
     client.commands.set(command.name, command);
 
     if (command.aliases && Array.isArray(command.aliases)) {
@@ -118,8 +118,8 @@ loadFiles('./Commands/text/', function (command) {
 });
 
 // Context menu command handler
-loadFiles('./Commands/context/', (contextcommand, fileName) => {
-    if ('name' in contextcommand && 'execute' in contextcommand && 'type' in contextcommand) {
+loadFiles("./Commands/context/", (contextcommand, fileName) => {
+    if ("name" in contextcommand && "execute" in contextcommand && "type" in contextcommand) {
         client.contextCommands.set(contextcommand.name, contextcommand);
         discoveredCommands.push(contextcommand);
     } else {
@@ -127,25 +127,34 @@ loadFiles('./Commands/context/', (contextcommand, fileName) => {
     }
 });
 
-//Event handler
-loadFiles('./events/client/', function (event) {
+// Event handler
+loadFiles("./events/client/", function(event) {
     if (event.once) {
-        client.once(event.name, (...args) => event.execute(client, global.logger, ...args));
+        client.once(event.name, (...args) => {
+            if (event.log) global.logger.event(`Event: [${event.name}] fired.`);
+            event.execute(client, global.logger, ...args);
+        });
     } else {
-        client.on(event.name, (...args) => event.execute(client, global.logger, ...args));
+        client.on(event.name, (...args) => {
+            if (event.log) global.logger.event(`Event: [${event.name}] fired.`);
+            event.execute(client, global.logger, ...args);
+        });
     }
 });
 
-loadFiles('./events/process/', function (event) {
-    process.on(event.name, (...args) => event.execute(client, global.logger, ...args));
+loadFiles("./events/process/", function(event) {
+    process.on(event.name, (...args) => {
+        event.execute(client, global.logger, ...args);
+        if (event.log) global.logger.event(`Event: [${event.name}] fired.`);
+    });
 });
 
-process.stdin.setEncoding('utf8');
-loadFiles('./events/console/', function (event) {
+process.stdin.setEncoding("utf8");
+loadFiles("./events/console/", function(event) {
     client.consoleCommands.set(event.name, event);
 });
 
-process.stdin.on('data', (input) => {
+process.stdin.on("data", (input) => {
     const args = input.split(/ +/);
     const commandName = args.shift().toLowerCase().trim();
     const command = client.consoleCommands.get(commandName);
@@ -155,10 +164,10 @@ process.stdin.on('data', (input) => {
 });
 
 
-//Bot setup on startup
+// Bot setup on startup
 client.once(Events.ClientReady, async () => {
 
-    client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send(`Bot starting!`);
+    client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");
     const part3 = RandomMinMax(1, 255);
     const part4 = RandomMinMax(1, 255);
     let port;
@@ -195,55 +204,53 @@ client.once(Events.ClientReady, async () => {
     console.log("Activity status setup done.");
 
     console.log("Creating the cron jobs...");
-    //- - - New Day - - -
-    const scheduledMessage = new cron.CronJob('30 59 02 * * *', () => {
+    // - - - New Day - - -
+    const scheduledMessage = new cron.CronJob("30 59 02 * * *", () => {
         // This runs every day at 02:59:30
         client.channels.cache.get("1069811223950016572").send("- - - - - New Day - - - - -");
     });
 
-    const DailyActivity = new cron.CronJob('00 00 04 * * *', () => {
-        client.user.setActivity(activities[Math.floor(Math.random() * activities.length)], {type: ActivityType.Custom});
+    const DailyActivity = new cron.CronJob("00 00 04 * * *", () => {
+        client.user.setActivity(activities[Math.floor(Math.random() * activities.length)], { type: ActivityType.Custom });
     });
 
-    const RamLeakDetector = new cron.CronJob('0 * * * *', async () => {
+    const RamLeakDetector = new cron.CronJob("0 * * * *", async () => {
         try {
             const PterodactylInfo = await GetPterodactylInfo();
             let RamLeakPourcentage = parseInt(PterodactylInfo.ram.pourcentage.raw).toFixed(0);
             if (RamLeakPourcentage > 100) RamLeakPourcentage = 100;
-            console.log(`Current RAM usage: ${RamLeakPourcentage}%`);
             HourlyRam.push(RamLeakPourcentage);
             HourlyRam.shift();
-            console.log(HourlyRam);
             if (HourlyRam[0] > 90 && HourlyRam[1] > 90 && HourlyRam [2] > 90) client.users.cache.get(process.env.OWNER_ID).send("Memory leak detected.");
-        } catch(err) {
+        } catch (err) {
             global.logger.error("Couldn't get the RAM % for MemoryLeakDetector");
             global.logger.error(err);
         }
     });
 
-    const SmartRestart = new cron.CronJob('* * * * *', async () => {
+    const SmartRestart = new cron.CronJob("* * * * *", async () => {
         if (client.voice.adapters.size == 0 && SmartRestartEnabled) {
-            global.logger.severe(`Restart requested from discord`);
-            client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send(`Restart requested from discord for reason : \`Smart restart\``);
+            global.logger.severe("Restart requested from discord");
+            client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Restart requested from discord for reason : `Smart restart`");
 
-            //After 3s, closes the database and then exits the process
-            setTimeout(function () {
-                /****************/
+            // After 3s, closes the database and then exits the process
+            setTimeout(function() {
+                /* ------------- */
                 global.prisma.$disconnect();
                 process.exit(1);
-                /****************/
+                /* ------------- */
             }, 1000 * 3);
         }
     });
 
     console.log("Starting the cron jobs...");
-    //sarting the daily sending
+    // sarting the daily sending
     scheduledMessage.start();
     DailyActivity.start();
     RamLeakDetector.start();
     SmartRestart.start();
     console.log("Cron job setup done.");
-    console.log("Discord.js version: " + require('discord.js').version);
+    console.log("Discord.js version: " + require("discord.js").version);
     console.log(`There is ${client.options.shardCount} shard${client.options.shardCount > 1 ? "s" : ""} spawned`);
     whitelist.push(process.env.OWNER_ID);
     global.debug = DefaultDebugState;
@@ -252,7 +259,7 @@ client.once(Events.ClientReady, async () => {
     console.log(`Debug is ${debug ? "en" : "dis"}abled\nSuperuser is ${superuser ? "en" : "dis"}abled`);
 
     console.log("Waiting for websocket to successfully connect.");
-    //start confirmation
+    // start confirmation
     const interval = setInterval(() => {
         if (client.ws.ping !== -1) {
             client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
@@ -260,15 +267,15 @@ client.once(Events.ClientReady, async () => {
             clearInterval(interval);
         }
     }, 500);
-    client.user.setActivity(activities[Math.floor(Math.random() * activities.length)], {type: ActivityType.Custom});
+    client.user.setActivity(activities[Math.floor(Math.random() * activities.length)], { type: ActivityType.Custom });
 });
 
-//Debug event
+// Debug event
 client.on(Events.Debug, debug => {
     if (global.debug) console.log(debug);
 });
 
-//Slash command executing
+// Slash command executing
 client.on(Events.InteractionCreate, async interaction => {
     if (interaction.isChatInputCommand()) {
 
@@ -291,15 +298,15 @@ client.on(Events.InteractionCreate, async interaction => {
         SlashCooldowns.set(interaction.user.id, Date.now() + cooldownTime);
 
         try {
-        //execute the slash command
+        // execute the slash command
             await slash.execute(logger, interaction, client);
 
-            //Logging the command
+            // Logging the command
             global.logger.info(`Executing [/${interaction.commandName}]
             by    [${interaction.user.tag} (${interaction.user.id})]
             in    [${interaction.channel.name} (${interaction.channel.id})]
             from  [${interaction.guild.name} (${interaction.guild.id})]`
-                .replace(/^\s+/gm, ''));
+                .replace(/^\s+/gm, ""));
 
         } catch (error) {
             interaction.reply({
@@ -328,7 +335,7 @@ client.on(Events.InteractionCreate, async interaction => {
             by   [${interaction.user.tag} (${interaction.user.id})]
             in   [${interaction.channel.name} (${interaction.channel.id})]
             from [${interaction.guild.name} (${interaction.guild.id})]`
-                .replace(/^\s+/gm, ''));
+                .replace(/^\s+/gm, ""));
 
         } catch (error) {
             interaction.reply({
@@ -346,7 +353,7 @@ client.on(Events.InteractionCreate, async interaction => {
     }
 });
 
-//Text command executing
+// Text command executing
 client.on(Events.MessageCreate, async (message) => {
     if (message.author.bot) return;
     if (superuser && !whitelist.includes(message.author.id)) return;
@@ -363,16 +370,16 @@ client.on(Events.MessageCreate, async (message) => {
                 ChannelName: message.channel.name,
                 GuildID: message.guild.id,
                 GuildName: message.guild.name,
-                //Timestamp: new Date(new Date(message.createdTimestamp).toLocaleString("en-US", {timeZone: "America/Toronto"})),
+                // Timestamp: new Date(new Date(message.createdTimestamp).toLocaleString("en-US", {timeZone: "America/Toronto"})),
                 Content: message.content,
-            }
+            },
         });
     } catch (ex) {
         console.log(`[${getExactDate()} - SEVERE] Unable to write to database`);
         console.log(ex);
     }
 
-    //Text command executing
+    // Text command executing
     const prefix = global.GuildManager.GetPrefix(message.guild);
     if (message.content.startsWith(prefix) || message.content.startsWith(`<@${client.user.id}>`)) {
         let args, commandName;
@@ -385,27 +392,34 @@ client.on(Events.MessageCreate, async (message) => {
             commandName = args.shift().toLowerCase();
         }
 
-        // Check if the command or alias exists
-        const command = client.commands.get(commandName);
+        // Command auto-correction
+        let command = client.commands.get(commandName);
         if (!command && AutoCommandMatch) {
-            const commandSet = new Set(client.commands.filter(command => !command.private).map(command => command.name));
+            const commandSet = new Set(client.commands.filter(cmd => !cmd.private).map(cmd => cmd.name));
             const commandArray = Array.from(commandSet);
             const closeMatch = findClosestMatch(commandName, commandArray);
             if (closeMatch.distance <= 3) {
-                //command = client.commands.get(closeMatch.closestMatch);
+                // command = client.commands.get(closeMatch.closestMatch);
                 await message.reply(`Did you mean ${prefix}${closeMatch.closestMatch}?`);
+                const filter = (m) => m.author.id === message.author.id;
+                await message.channel.awaitMessages({ filter, max: 1, time: 5000, errors: ["time"] })
+                    .then((collected) => {
+                        const responseMessage = collected.first();
+                        if (responseMessage.content.toLowerCase().startsWith("yes")) command = client.commands.get(closeMatch.closestMatch);
+                    }).catch(() => null);
             }
         }
 
-        if(!command) return;
+        if (!command) return;
+        // Admin commands checking
         if (command.admin && !message.member.permissions.has("Administrator") || !message.author.id == process.env.OWNER_ID) return SendErrorEmbed(message, "You are not administrator", "red");
 
-        const blacklist = await GuildManager.GetBlacklist(message.guild.id);
-        const blCategory = !blacklist.CheckPermission(message.author.id, command.category);
-        const blCommand = !blacklist.CheckPermission(message.author.id, command.name);
-        if(blCategory || blCommand){
+        const userBlacklist = await GuildManager.GetBlacklist(message.guild.id);
+        const blCategory = !userBlacklist.CheckPermission(message.author.id, command.category);
+        const blCommand = !userBlacklist.CheckPermission(message.author.id, command.name);
+        if (blCategory || blCommand) 
             return SendErrorEmbed(message, `You are blacklisted from executing ${!blCategory ? `commands in the **${command.category}** category` : `the **${command.name}** command`}.`, "red");
-        }
+        
 
         // Check command cooldown
         if (TextCooldowns.has(message.author.id)) {
@@ -427,11 +441,22 @@ client.on(Events.MessageCreate, async (message) => {
         by    [${message.member.user.tag} (${message.author.id})]
         in    [${message.channel.name} (${message.channel.id})]
         from  [${message.guild.name} (${message.guild.id})]`
-            .replace(/^\s+/gm, ''));
+            .replace(/^\s+/gm, ""));
         
         // Execute the command
         try {
             await message.channel.sendTyping();
+
+            // Check if the bot has the required permissions
+            const botPermissions = message.guild.members.cache.get(client.user.id)?.permissions?.bitfield;
+            const requiredPermissions = command.permission || [];
+            requiredPermissions.push(PermissionFlagsBits.SendMessages);
+
+            if (requiredPermissions.length > 0) {
+                const missingPermissions = requiredPermissions.filter(permission => !(botPermissions & BigInt(permission)));
+                if (missingPermissions.length > 0) return SendErrorEmbed(message, `The bot is missing the following permissions: ${missingPermissions.join(", ")}`, "red");
+            }
+
             await command.execute(global.logger, client, message, args);
         } catch (error) {
             global.logger.error(error.stack);
@@ -439,5 +464,5 @@ client.on(Events.MessageCreate, async (message) => {
         }
     }
 });
-//Logins with the token
+// Logins with the token
 client.login(process.env.TOKEN);

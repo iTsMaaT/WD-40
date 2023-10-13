@@ -12,13 +12,13 @@ module.exports = {
             const json = await JSON.parse(req.body);
             const id = Object.keys(json.query.pages)[0];
             const image = json.query.pages[id].imageinfo[0].url;
-        } catch(err) {
+        } catch (err) {
             return SendErrorEmbed(message, "Coulsn't fetch the image", "red");
         }
 
         const Embed = {
             color: 0xffffff,
-            title: `Random Wikihow image`,
+            title: "Random Wikihow image",
             image: {
                 url: image,
             },
@@ -26,5 +26,5 @@ module.exports = {
         };
 
         message.reply({ embeds: [Embed] });
-    }
+    },
 };

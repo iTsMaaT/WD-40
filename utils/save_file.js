@@ -1,28 +1,28 @@
-const path = require('node:path');
-const fs = require('node:fs');
+const path = require("node:path");
+const fs = require("node:fs");
 
-function checkIfFolderExists(path) {
-    try{
-        fs.readdirSync(path);
-    } catch(e ){
-        fs.mkdirSync(path);
+function checkIfFolderExists(filePath) {
+    try {
+        fs.readdirSync(filePath);
+    } catch (e) {
+        fs.mkdirSync(filePath);
     }
 }
 
-function readData(fileName){
+function readData(fileName) {
     let data = {};
-    try{
-        const fd = fs.readFileSync(fileName, {encoding: 'utf8'});
+    try {
+        const fd = fs.readFileSync(fileName, { encoding: "utf8" });
         data = JSON.parse(fd);
-    } catch (e){
+    } catch (e) {
         fs.writeFileSync(fileName, "{}", (err) => {console.log(err);});
     }
     
     return data;
 }
 
-function writeData(fileName, data){
-    fs.writeFileSync(fileName, JSON.stringify(data, null, 4), {encoding: 'utf8'});
+function writeData(fileName, data) {
+    fs.writeFileSync(fileName, JSON.stringify(data, null, 4), { encoding: "utf8" });
 }
 
 class SaveFile {
@@ -31,7 +31,7 @@ class SaveFile {
     fileName = "";
 
     constructor(options) {
-        const p = path.join(options.root, 'saves');
+        const p = path.join(options.root, "saves");
         this.fileName = path.join(p, options.fileName);
         checkIfFolderExists(p);
         this.data = readData(this.fileName);
@@ -50,7 +50,7 @@ class SaveFile {
         writeData(this.fileName, this.data);
     }
 
-    setValue(key, value){
+    setValue(key, value) {
         this.data[key] = value;
         writeData(this.fileName, this.data);
     }

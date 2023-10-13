@@ -1,7 +1,7 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { createCanvas } = require('canvas');
+const { createCanvas } = require("canvas");
 const { AttachmentBuilder } = require("discord.js");
-const { PermissionFlagsBits }= require("discord.js");
+const { PermissionFlagsBits } = require("discord.js");
 
 
 module.exports = {
@@ -17,24 +17,24 @@ module.exports = {
         const prompt = args.join(" ");
 
         const colourToBf = {
-            '255,0,0': '>',
-            '0,255,0': '.',
-            '0,0,255': '<',
-            '255,255,0': '+',
-            '0,255,255': '-',
-            '255,0,188': '[',
-            '255,128,0': ']',
-            '102,0,204': ','
+            "255,0,0": ">",
+            "0,255,0": ".",
+            "0,0,255": "<",
+            "255,255,0": "+",
+            "0,255,255": "-",
+            "255,0,188": "[",
+            "255,128,0": "]",
+            "102,0,204": ",",
         };
 
         const buffer = await createImage(stringToBF(prompt), 10);
-        var img = new AttachmentBuilder(buffer, 'img.png');
+        const img = new AttachmentBuilder(buffer, "img.png");
 
         const embed = {
-            title: `ImageFuck code`,
+            title: "ImageFuck code",
             color: 0xffffff,
             image: {
-                url: 'attachment://file.jpg',
+                url: "attachment://file.jpg",
             },
             timestamp: new Date(),
         };
@@ -43,47 +43,47 @@ module.exports = {
 
         function charToBF(char) {
             let buffer = "[-]>[-]<";
-            for (let i = 0; i < Math.floor(char.charCodeAt(0) / 10); i++) {
+            for (let i = 0; i < Math.floor(char.charCodeAt(0) / 10); i++) 
                 buffer += "+";
-            }
+            
             buffer += "[>++++++++++<-]>";
-            for (let i = 0; i < char.charCodeAt(0) % 10; i++) {
+            for (let i = 0; i < char.charCodeAt(0) % 10; i++) 
                 buffer += "+";
-            }
+            
             buffer += ".<";
             return buffer;
         }
 
-        //Converts a delta to brainfuck
+        // Converts a delta to brainfuck
         function deltaToBF(delta) {
             let buffer = "";
-            for (let i = 0; i < Math.floor(Math.abs(delta) / 10); i++) {
+            for (let i = 0; i < Math.floor(Math.abs(delta) / 10); i++) 
                 buffer += "+";
-            }
+            
           
-            if (delta > 0) {
+            if (delta > 0) 
                 buffer += "[>++++++++++<-]>";
-            } else {
+            else 
                 buffer += "[>----------<-]>";
-            }
+            
           
             for (let i = 0; i < Math.abs(delta) % 10; i++) {
-                if (delta > 0) {
+                if (delta > 0) 
                     buffer += "+";
-                } else {
+                else 
                     buffer += "-";
-                }
+                
             }
             buffer += ".<";
             return buffer;
         }
         
-        //Takes a string and translates it to brainfuck
+        // Takes a string and translates it to brainfuck
         function stringToBF(string, commented) {
             let buffer = "";
-            if (string === null || string === undefined) {
+            if (string === null || string === undefined) 
                 return buffer;
-            }
+            
             for (let i = 0; i < string.length; i++) {
                 if (i === 0) {
                     buffer += charToBF(string[i]);
@@ -91,31 +91,31 @@ module.exports = {
                     const delta = string.charCodeAt(i) - string.charCodeAt(i - 1);
                     buffer += deltaToBF(delta);
                 }
-                if (commented) {
+                if (commented) 
                     buffer += " " + string[i].replace(/[+-<>[],.]/g, "") + "\n";
-                }
+                
             }
             return buffer;
         }
 
         async function createImage(source, pixelSize) {
             const bfToColour = {};
-            for (const key in colourToBf) {
+            for (const key in colourToBf) 
                 bfToColour[colourToBf[key]] = key;
-            }
+            
         
             const colours = [];
             for (const char of source) {
-                if (bfToColour[char]) {
-                    colours.push(bfToColour[char].split(',').map(Number));
-                }
+                if (bfToColour[char]) 
+                    colours.push(bfToColour[char].split(",").map(Number));
+                
             }
         
             const pixelsPerRow = Math.ceil(Math.sqrt(colours.length));
             const canvasSize = pixelsPerRow * pixelSize; // Calculate the canvas size based on pixelSize
         
             const canvas = createCanvas(canvasSize, canvasSize);
-            const context = canvas.getContext('2d');
+            const context = canvas.getContext("2d");
         
             for (let i = 0; i < colours.length; i++) {
                 const [r, g, b] = colours[i];

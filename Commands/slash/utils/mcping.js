@@ -2,8 +2,8 @@ const { ApplicationCommandType, ApplicationCommandOptionType, SlashCommandBuilde
 const got = require("got");
 
 module.exports = {
-    name: 'mcping',
-    description: 'Ping a minecraft server',
+    name: "mcping",
+    description: "Ping a minecraft server",
     type :ApplicationCommandType.ChatInput,
     options: [
         {
@@ -23,24 +23,26 @@ module.exports = {
         interaction.deferReply();
         const server_ip = interaction.options.get("ip").value;
         const server_port_string = interaction.options.get("port")?.value;
-        if (server_port_string) { var port = ":" + parseInt(server_port_string); }
+        let port;
+        if (server_port_string) port = ":" + parseInt(server_port_string); 
         got(`https://api.mcstatus.io/v2/status/java/${server_ip}${port ?? ""}`)
             .then(async response => {
                 const server = JSON.parse(response.body);
     
-                if (!server.online) await interaction.editReply({ embeds: [{title: `${server.eula_blocked ? "The server is banned by Mojang." : "Server offline or nonexistent."}`, color: 0xff0000, timestamp: new Date()}] });
+                if (!server.online) await interaction.editReply({ embeds: [{ title: `${server.eula_blocked ? "The server is banned by Mojang." : "Server offline or nonexistent."}`, color: 0xff0000, timestamp: new Date() }] });
    
+                let imgfile;
                 if (server.icon) {
-                    const data = server.icon.split(',')[1];
-                    const buf = Buffer.from(data, 'base64');
-                    var imgfile = new AttachmentBuilder(buf, 'img.png');
+                    const data = server.icon.split(",")[1];
+                    const buf = Buffer.from(data, "base64");
+                    imgfile = new AttachmentBuilder(buf, "img.png");
                 }
     
                 const serverStatusEmbed = {
                     title: `Server Status for ${server.host} (Port: ${server.port})`,
                     color: 0xffffff,
                     thumbnail: {
-                        url: 'attachment://file.jpg' || "",
+                        url: "attachment://file.jpg" || "",
                     },
                     fields: [
                         { name: "Server Version", value: server.version.name_clean },
@@ -53,13 +55,13 @@ module.exports = {
                 if (server.players.list[0] && server.players.list.length < 10) {
                     const playerNames = [];
     
-                    for (const player of server.players.list) {
+                    for (const player of server.players.list) 
                         playerNames.push(player.name_clean);
-                    }
+                    
                     serverStatusEmbed.fields.push({ name: "Player list", value: playerNames.join(", ") });
                 }
     
                 interaction.editReply({ embeds: [serverStatusEmbed], files: [imgfile]  });
             });
-    }
+    },
 };

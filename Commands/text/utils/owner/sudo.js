@@ -8,29 +8,29 @@ module.exports = {
     execute: async (logger, client, message, args) => {
         const owner = await message.guild.fetchOwner();
 
-        //Only server owner and iTsMaaT are allowed to execute this command
+        // Only server owner and iTsMaaT are allowed to execute this command
         if ((message.author.id == process.env.OWNER_ID || message.author.id == owner.id)) {
-            //Sends a message in a given channel
+            // Sends a message in a given channel
             const sudoprefix = args.shift();
             if (sudoprefix == "-s") {
                 const SudoID = args.shift();
-                client.channels.cache.get(SudoID).send(args.join(' '));
+                client.channels.cache.get(SudoID).send(args.join(" "));
                 message.reply({ content: "Sudo successful.", allowedMentions: { repliedUser: false } });
                 logger.info(`Sudo -s used by ${message.author.tag} (${message.author.id}) in <#${SudoID}>, Message content : ${args.join(" ")}`);
             }
-            //Replies to a given message in a given channel
+            // Replies to a given message in a given channel
             else if (sudoprefix == "-r") {
                 const LinkArray = infoFromMessageLink(args.shift());
                 const ChannelID = LinkArray[1];
                 const MsgID = LinkArray[2];
                 client.channels.cache.get(ChannelID).messages.fetch({ cache: false, message: MsgID })
                     .then(m => {
-                        m.reply(args.join(' '));
+                        m.reply(args.join(" "));
                         message.reply({ content: "Sudo successful.", allowedMentions: { repliedUser: false } });
                         logger.info(`Sudo -r used by ${message.author.tag} (${message.author.id}) in <#${ChannelID}>, Message content : ${args.join(" ")}`);
                     }).catch(() => message.reply("Unable to find message."));
             }
-            //Reacts to a given message in a given channel
+            // Reacts to a given message in a given channel
             else if (sudoprefix == "-e") {
                 if (args[1]) {
                     const LinkArray = infoFromMessageLink(args.shift());
@@ -59,11 +59,11 @@ module.exports = {
                     message.reply({ content: "Emotes cleared.", allowedMentions: { repliedUser: false } });
                 }
             }
-            //DMs a given user
+            // DMs a given user
             else if (sudoprefix == "-dm") {
                 try {
                     const UserID = args.shift();
-                    client.users.send(UserID, args.join(' '));
+                    client.users.send(UserID, args.join(" "));
                     message.reply({ content: `DM sent to <@${UserID}>`, allowedMentions: { repliedUser: false } });
                     logger.info(`Sudo -dm used by ${message.author.tag} (${message.author.id}) to <@${UserID}>`);
                 } catch (err) {
@@ -71,7 +71,7 @@ module.exports = {
                 }
             } 
             else if (sudoprefix == "-help") {
-                //Help for the sudo
+                // Help for the sudo
                 message.reply({ content:
                 `
 **-s** : Sends a message in a channel (\`>sudo -s <Channel ID> <Message>\`)
@@ -86,10 +86,10 @@ module.exports = {
 
             }
             else {
-                //Unknown parameter error
-                message.reply(`Unknown parameter (use \`>sudo -help\` for help)`);
+                // Unknown parameter error
+                message.reply("Unknown parameter (use `>sudo -help` for help)");
             }
             
         }
-    }
+    },
 };

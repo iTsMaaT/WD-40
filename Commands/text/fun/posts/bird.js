@@ -1,18 +1,18 @@
-const got = require('got');
+const got = require("got");
 
 module.exports = {
-    name: 'bird',
-    description: 'birb pics!',
+    name: "bird",
+    description: "birb pics!",
     category: "posts",
     async execute(logger, client, message, args) {
 
         await got("http://shibe.online/api/birds")
             .then(response => {
-                var url = JSON.parse(response.body)[0];
+                const url = JSON.parse(response.body)[0];
 
                 const embed = {
                     color: 0xffffff,
-                    title: `Enjoy!`,
+                    title: "Enjoy!",
                     image: {
                         url: url,
                     },
@@ -21,5 +21,5 @@ module.exports = {
 
                 message.reply({ embeds: [embed] });
             });
-    }
+    },
 };

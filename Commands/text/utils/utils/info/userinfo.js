@@ -6,7 +6,7 @@ module.exports = {
     description: "Gives info of a user",
     usage: "< [User]: the user to get info from (optional) >",
     category: "info",
-    aliases: ['uinfo'],
+    aliases: ["uinfo"],
     execute: async (logger, client, message, args) => {
         let id;
         let target;
@@ -16,9 +16,9 @@ module.exports = {
             id = message.author.id;
         } else {
             const rawId = args[0].replace(/[<!@>]/g, "");
-            if (!rawId.match(/^\d+$/)) {
+            if (!rawId.match(/^\d+$/)) 
                 return SendErrorEmbed(message, "Invalid user ID.");
-            }
+            
             id = rawId;
         }
 
@@ -40,10 +40,11 @@ module.exports = {
             }
         }
 
+        let custom_status, activity_name, activity_details;
         try {
-            var custom_status = status?.activities[0]?.state ?? "`No status`";
-            var activity_name = status?.activities[1]?.name ?? "`No activity name`";
-            var activity_details = status?.activities[1]?.details ?? "`No activity details`";
+            custom_status = status?.activities[0]?.state ?? "`No status`";
+            activity_name = status?.activities[1]?.name ?? "`No activity name`";
+            activity_details = status?.activities[1]?.details ?? "`No activity details`";
         } catch {
             custom_status = "-";
             activity_name = "-";
@@ -54,9 +55,9 @@ module.exports = {
             const FullClientStatus = target?.presence?.clientStatus;
             let ClientSatus = "";
             for (const key in FullClientStatus) {
-                if (Object.prototype.hasOwnProperty.call(FullClientStatus, key)) {
+                if (Object.prototype.hasOwnProperty.call(FullClientStatus, key)) 
                     ClientSatus += `${prettyString(key, "first", false)}: \`${prettyString(FullClientStatus[key], "first", false)}\n\``;
-                }
+                
             }
             const userInfoEmbed = {
                 title: target.displayName,
@@ -66,9 +67,9 @@ module.exports = {
                 },
                 fields: [
                     { name: "User ID", value: target.id || "-" },
-                    { name: "Status", value: ClientSatus || "Offline"},
+                    { name: "Status", value: ClientSatus || "Offline" },
                     { name: "Account Age", value: `${target?.user?.createdTimestamp ? `<t:${parseInt(target?.user?.createdTimestamp / 1000)}:R>` : "-"}` },
-                    { name: "Member Since", value: `${target.joinedTimestamp ? `<t:${parseInt(target?.joinedTimestamp / 1000)}:R>` : `-`}` },
+                    { name: "Member Since", value: `${target.joinedTimestamp ? `<t:${parseInt(target?.joinedTimestamp / 1000)}:R>` : "-"}` },
                     { name: "Custom Status", value: custom_status || "-" },
                     { name: "Activity Title", value: activity_name || "-" },
                     { name: "Activity Details", value: activity_details || "-" },

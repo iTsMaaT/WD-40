@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { QueueRepeatMode, useQueue } = require('discord-player');
+const { QueueRepeatMode, useQueue } = require("discord-player");
 
 module.exports = {
     name: "loop",
@@ -15,17 +15,17 @@ module.exports = {
 
         if (!queue || !queue.tracks) return SendErrorEmbed(message, "There is nothing playing.", "yellow");
         switch (args[0]?.toLowerCase() ?? "queue") {
-            case 'off':
+            case "off":
                 queue.setRepeatMode(QueueRepeatMode.OFF);
                 break;
-            case 'song':
-            case 'track':
+            case "song":
+            case "track":
                 queue.setRepeatMode(QueueRepeatMode.TRACK);
                 break;
-            case 'queue':
+            case "queue":
                 queue.setRepeatMode(QueueRepeatMode.QUEUE);
                 break;
-            case 'autoplay':
+            case "autoplay":
                 queue.setRepeatMode(QueueRepeatMode.AUTOPLAY);
                 break;
             default:
@@ -37,5 +37,5 @@ module.exports = {
             .setDescription(`Set repeat mode to \`${args[0] ?? "Queue"}\``)
             .setTimestamp();
         message.reply({ embeds: [repeat_mode_embed]  });
-    }
+    },
 }; 

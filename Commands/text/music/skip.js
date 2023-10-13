@@ -1,12 +1,12 @@
 const { EmbedBuilder } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { useQueue } = require('discord-player');
+const { useQueue } = require("discord-player");
 
 module.exports = {
     name: "skip",
     description: "Skip a currently playing song",
     category: "music",
-    aliases: ['next'],
+    aliases: ["next"],
     execute(logger, client, message, args) {
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
 
@@ -17,12 +17,12 @@ module.exports = {
             queue.node.skip();
             const skipped_embed = new EmbedBuilder()
                 .setColor("#ffffff")
-                .setDescription(`Skipped!`)
+                .setDescription("Skipped!")
                 .setTimestamp();
             message.reply({ embeds: [skipped_embed] });
         } catch (e) {
             logger.error(e);
             SendErrorEmbed(message, "An error occurred.", "red");
         }
-    }
+    },
 }; 

@@ -1,8 +1,8 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { useQueue } = require('discord-player');
+const { useQueue } = require("discord-player");
 
 module.exports = {
-    name: 'jump',
+    name: "jump",
     description: "Skips to a precise song",
     usage: "< [Song]: number of the song to skip to >",
     category: "music",
@@ -13,15 +13,15 @@ module.exports = {
         const track = parseInt(args[0]);
         const jump = queue?.tracks.at(track);
         const position = queue?.node.getTrackPosition(jump);
-        const tracks = queue?.tracks.map((track, id) => ({
-            name: track.title,
-            value: ++id
+        const tracks = queue?.tracks.map((song, id) => ({
+            name: song.title,
+            value: ++id,
         }));
 
         if (jump?.title && !tracks.some((t) => t.name === jump.title)) {
             tracks.unshift({
                 name: jump.title,
-                value: position
+                value: position,
             });
         }
 
@@ -31,10 +31,10 @@ module.exports = {
 
         const trackResolvable = queue.tracks.at(jump);
 
-        if (isNaN(track) || !trackResolvable) return SendErrorEmbed(message, `Couldn't find song to skip to.`, "red");
+        if (isNaN(track) || !trackResolvable) return SendErrorEmbed(message, "Couldn't find song to skip to.", "red");
 
         queue.node.jump(trackResolvable);
         return SendErrorEmbed(message, `Skiped to ${trackResolvable.title}`);
 
-    }
+    },
 };

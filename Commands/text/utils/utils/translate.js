@@ -14,9 +14,9 @@ module.exports = {
         const reference = await message.channel.messages.fetch(message.reference.messageId);
         const text = reference.content;
 
-        try{
+        try {
             const [enTr, localeTr] = await Promise.all([
-                translate(text, { to: 'en' }),
+                translate(text, { to: "en" }),
                 translate(text, { to: LanguageCode }),
             ]);
 
@@ -29,29 +29,29 @@ module.exports = {
                     { name: "**Original: **", value: text },
                     { name: "**English: **", value: limitString(enTr.text, 1000) },
                 ],
-                footer: { text: ""},
+                footer: { text: "" },
                 timestamp: new Date(),        
             };
 
             try {
-                if(LanguageCode !== "en") embed.fields.push({ name:"**Server language: **", value: limitString(localeTr.text, 1000) });
+                if (LanguageCode !== "en") embed.fields.push({ name:"**Server language: **", value: limitString(localeTr.text, 1000) });
             } catch (err) {
                 logger.error(err);
             }
         
             message.reply({ embeds: [embed] });
                 
-        } catch(err) {
+        } catch (err) {
             logger.error(err.stack);
-            message.reply({ embeds: [{title: "An error occured.", color: 0xff0000, timestamp: new Date()}] });
+            message.reply({ embeds: [{ title: "An error occured.", color: 0xff0000, timestamp: new Date() }] });
         } 
 
         function limitString(string, limit) {
-            if (string.length <= limit) {
+            if (string.length <= limit) 
                 return string;
-            } else {
+            else 
                 return string.substring(0, limit - 3) + "...";
-            }
+            
         }
     },
 };

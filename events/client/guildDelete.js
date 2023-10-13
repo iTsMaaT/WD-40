@@ -1,8 +1,9 @@
-const { Events } = require('discord.js');
+const { Events } = require("discord.js");
 
 module.exports = {
     name: Events.GuildDelete,
     once: false,
+    log: true,
     async execute(client, logger, guild) {
         await global.GuildManager.SetActiveOrCreate(guild, false);
         logger.info(`The bot has been removed from \`${guild.name}\``);

@@ -10,11 +10,11 @@ module.exports = {
         if (message.channel.nsfw) {
             await got("https://nekos.life/api/neko")
                 .then(response => {
-                    var url = JSON.parse(response.body);
+                    const url = JSON.parse(response.body);
 
                     NekoEmbed = {
                         color: 0xffffff,
-                        title: `Enjoy!`,
+                        title: "Enjoy!",
                         image: {
                             url: url.neko,
                         },
@@ -26,5 +26,5 @@ module.exports = {
         } else {
             return SendErrorEmbed(message, "The channel you are in isn't NSFW", "yellow");
         }
-    }
+    },
 };

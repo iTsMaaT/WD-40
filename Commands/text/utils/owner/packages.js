@@ -1,6 +1,6 @@
-const { version: discordjsVersion } = require('discord.js');
-const { dependencies, name } = require('@root/package.json');
-const changelog = require('@root/changelogs.json');
+const { version: discordjsVersion } = require("discord.js");
+const { dependencies, name } = require("@root/package.json");
+const changelog = require("@root/changelogs.json");
 
 module.exports = {
     name: "packages",
@@ -8,27 +8,27 @@ module.exports = {
     category: "fun",
     private: true,
     async execute(logger, client, message, args) {
-        const WDVersion = changelog.slice(-1).map(({version}) => { return version; }).join();
+        const WDVersion = changelog.slice(-1).map(({ version }) => { return version; }).join();
     
         const embed = {
-            title: 'Installed Packages',
+            title: "Installed Packages",
             color: 0xffffff,
-            description: 'The following packages are installed:',
+            description: "The following packages are installed:",
             fields: [
                 { name: name.toUpperCase(), value: WDVersion, inline: false },
-                { name: 'discord.js', value: "^" + discordjsVersion, inline: true },
-            ]
+                { name: "discord.js", value: "^" + discordjsVersion, inline: true },
+            ],
         };
 
         const fields = [];
-        for (const [packageName, packageVersion] of Object.entries(dependencies)) {
+        for (const [packageName, packageVersion] of Object.entries(dependencies)) 
             if (packageName != "discord.js") fields.push({ name: packageName, value: packageVersion, inline: true });
-        }
+        
         
         embed.fields.push(...fields);
         embed.timestamp = new Date();
         embed.footer = { text: `[Server: ${process.env.SERVER}]` };
 
-        message.reply({ embeds: [embed], allowedMentions: {RepliedUser: false} });
-    }
+        message.reply({ embeds: [embed], allowedMentions: { RepliedUser: false } });
+    },
 };

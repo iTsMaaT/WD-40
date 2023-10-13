@@ -1,7 +1,7 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { useQueue } = require('discord-player');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require('@discordjs/voice');
-const googleTTS = require('google-tts-api');
+const { useQueue } = require("discord-player");
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("@discordjs/voice");
+const googleTTS = require("google-tts-api");
 const got = require("got");
 const { PermissionFlagsBits } = require("discord.js");
 
@@ -36,14 +36,14 @@ module.exports = {
             const prompt = `When responding to the following prompt, try to condense your response. Make sure it is under 1000 characters. This prompt is gonna be played inside a Voice Chat, so please do not use markdown. Prompt: ${args.join(" ")}`;
             const result = await got(`${process.env.PALM_API_PROXY_URL}?api_key=${process.env.PALM_API_KEY}&prompt=${encodeURIComponent(prompt)}`, {
                 timeout: {
-                    request: 10000
-                }
+                    request: 10000,
+                },
             });
             
             response = limitString(JSON.parse(result.body).response, 1000);
 
-        } catch(err) {
-            if (err.name == 'TimeoutError') return SendErrorEmbed(message, "I do not wish to answer that question. (Request timed out)", "yellow");
+        } catch (err) {
+            if (err.name == "TimeoutError") return SendErrorEmbed(message, "I do not wish to answer that question. (Request timed out)", "yellow");
             SendErrorEmbed(message, "An error occurred.", "red");
         }
 
@@ -57,16 +57,16 @@ module.exports = {
                 guildId: message.guild.id,
                 adapterCreator: message.guild.voiceAdapterCreator,
             });
-        } catch(err) {
+        } catch (err) {
             logger.error(err);
             return SendErrorEmbed(message, "Connection to the voice channel failed", "red");
         }
 
         const audioUrls = googleTTS.getAllAudioUrls(response, {
-            lang: 'fr',
+            lang: "fr",
             slow: true,
-            host: 'https://translate.google.com',
-            splitPunct: '-',
+            host: "https://translate.google.com",
+            splitPunct: "-",
         });
 
         try {
@@ -105,11 +105,11 @@ module.exports = {
         }
 
         function limitString(string, limit) {
-            if (string.length <= limit) {
+            if (string.length <= limit) 
                 return string;
-            } else {
+            else 
                 return string.substring(0, limit - 3) + "...";
-            }
+            
         }
-    }
+    },
 };

@@ -4,7 +4,7 @@ module.exports = {
     category: "utils",
     private: true,
     execute(logger, client, message, args) {
-        //Superuser command (Only iTsMaaT can execute commands)
+        // Superuser command (Only iTsMaaT can execute commands)
         const server = process.env.SERVER;
         if (args[0] == server) {
             if (message.author.id == process.env.OWNER_ID && !superuser) {
@@ -14,8 +14,8 @@ module.exports = {
                 superuser = 0;
                 message.reply("Everyone can execute commands on [" + server + "].");
             } else if (!message.author.id == process.env.OWNER_ID) {
-                message.reply(`You are not allowed to execute that command`);
+                message.reply("You are not allowed to execute that command");
             }
         }
-    }
+    },
 };

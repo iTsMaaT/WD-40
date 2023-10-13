@@ -8,25 +8,25 @@ module.exports = {
     usage: "< -deafen / -undeafen >",
     admin: true,
     permissions: [PermissionFlagsBits.DeafenMembers],
-    aliases: ['deafa'],
+    aliases: ["deafa"],
     execute(logger, client, message, args) {
       
         // Check if the user is in a voice channel
-        if (!message.member.voice.channel) {
-            return SendErrorEmbed(message, 'You need to be in a voice channel to use this command.', "yellow");
-        }
+        if (!message.member.voice.channel) 
+            return SendErrorEmbed(message, "You need to be in a voice channel to use this command.", "yellow");
+        
       
         const voiceChannel = message.member.voice.channel;
 
         const embed = {
             color: 0xffffff,
-            title: '',
+            title: "",
             timestamp: new Date(),
         };
       
         // Check the argument to determine if deafening or undeafening
-        const action = args[0]?.toLowerCase() ?? '-deafen';
-        if (action === '-deafen') {
+        const action = args[0]?.toLowerCase() ?? "-deafen";
+        if (action === "-deafen") {
             // Deafen all members except the executor
             voiceChannel.members.forEach(async (member) => {
                 if (!member.user.bot && member.id !== message.author.id) {
@@ -38,8 +38,8 @@ module.exports = {
                 }
             });
       
-            embed.title = 'Successfully deafened all members except yourself.';
-        } else if (action === '-undeafen') {
+            embed.title = "Successfully deafened all members except yourself.";
+        } else if (action === "-undeafen") {
             // Undeafen all members
             voiceChannel.members.forEach(async (member) => {
                 try {
@@ -49,10 +49,10 @@ module.exports = {
                 }
             });
             
-            embed.title = 'Successfully undeafened all members.';
+            embed.title = "Successfully undeafened all members.";
             message.reply({ embeds: [embed] });
         } else {
-            SendErrorEmbed(message, 'Invalid argument. Please specify either "deafen" or "undeafen".', "yellow");
+            SendErrorEmbed(message, "Invalid argument. Please specify either \"deafen\" or \"undeafen\".", "yellow");
         }
     },
 };

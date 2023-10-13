@@ -4,12 +4,12 @@ const emoteList = require("@root/utils/emojis.json");
 const findClosestMatch = require("@functions/findClosestMatch");
 
 module.exports = {
-    name: 'autoreaction',
-    description: 'Adds reactions to chosen messages in chosen channels',
+    name: "autoreaction",
+    description: "Adds reactions to chosen messages in chosen channels",
     type: ApplicationCommandType.ChatInput,
     options: [
         {
-            name: 'add',
+            name: "add",
             description: "Add a auto-reaction",
             type: ApplicationCommandOptionType.Subcommand,
             options: [
@@ -18,23 +18,23 @@ module.exports = {
                     description: "The prompt that needs to be contained in the channel name",
                     type: ApplicationCommandOptionType.String,
                     required: true,
-                    max_length: 100
-                },{
+                    max_length: 100,
+                }, {
                     name: "string",
                     description: "The string in messages that enables a reaction (you can use <link>, <attachment> or <media>)",
                     type: ApplicationCommandOptionType.String,
                     required: true,
-                    max_length: 100
-                },{
+                    max_length: 100,
+                }, {
                     name: "emotes",
                     description: "The reactions (unicode emotes are preferred)",
                     type: ApplicationCommandOptionType.String,
                     required: true,
                 },
-            ]
+            ],
         },
         {
-            name: 'remove',
+            name: "remove",
             description: "Remove a auto-reaction",
             type: ApplicationCommandOptionType.Subcommand,
             options: [
@@ -43,18 +43,18 @@ module.exports = {
                     description: "The prompt that needs to be contained in the channel name",
                     type: ApplicationCommandOptionType.String,
                     required: true,
-                    max_length: 100
-                },{
+                    max_length: 100,
+                }, {
                     name: "string",
                     description: "The string in messages that enables a reaction (You can do <media>, <links>, <attachments>and <all>)",
                     type: ApplicationCommandOptionType.String,
                     required: true,
-                    max_length: 100
+                    max_length: 100,
                 },
-            ]
+            ],
         },
         {
-            name: 'removeall',
+            name: "removeall",
             description: "Removes all auto-reactions for a channel prompt",
             type: ApplicationCommandOptionType.Subcommand,
             options: [
@@ -63,12 +63,12 @@ module.exports = {
                     description: "The prompt that needs to be contained in the channel name",
                     type: ApplicationCommandOptionType.String,
                     required: true,
-                    max_length: 100
+                    max_length: 100,
                 },
-            ]
+            ],
         },
         {
-            name: 'list',
+            name: "list",
             description: "Lists the auto-reactions for this guild",
             type: ApplicationCommandOptionType.Subcommand,
         },
@@ -99,9 +99,9 @@ module.exports = {
                     const entries = reactions[channelPrompt];
                     let fieldValue = "";
             
-                    for (const entry of entries) {
+                    for (const entry of entries) 
                         fieldValue += `String: ${entry.string}\nEmotes: ${entry.emotes.split(";").join("|")}\n\n`;
-                    }
+                    
             
                     embed.fields.push({ name: channelPrompt, value: fieldValue });
                 }
@@ -111,7 +111,7 @@ module.exports = {
             }
             
             case "remove": {
-                if(!reactions[ChannelPromptInput]) return SendErrorEmbed(interaction, "There is no entry for that channel prompt", "yellow", true);
+                if (!reactions[ChannelPromptInput]) return SendErrorEmbed(interaction, "There is no entry for that channel prompt", "yellow", true);
 
                 autoreactions.removeReaction(ChannelPromptInput, StringInput);
                 const embed = {
@@ -124,7 +124,7 @@ module.exports = {
                 break;
             }
             case "removeall": {
-                if(!reactions[ChannelPromptInput]) return SendErrorEmbed(interaction, "There is no entry for that channel prompt", "yellow", true);
+                if (!reactions[ChannelPromptInput]) return SendErrorEmbed(interaction, "There is no entry for that channel prompt", "yellow", true);
 
                 autoreactions.removeReaction(ChannelPromptInput);
                 const embed = {
@@ -138,7 +138,7 @@ module.exports = {
             }
             case "add": {
 
-                if(Object.keys(reactions).length >= 20) return SendErrorEmbed(interaction, "You cannot have more than 20 auto-reactions", "yellow", true);
+                if (Object.keys(reactions).length >= 20) return SendErrorEmbed(interaction, "You cannot have more than 20 auto-reactions", "yellow", true);
 
                 if (reactions[ChannelPromptInput]) {
                     const existingEntry = reactions[ChannelPromptInput].find(entry => entry.string === StringInput);
@@ -148,14 +148,14 @@ module.exports = {
                 let emotes = [];
     
                 if (/^[a-z:0-9_]+$/.test(EmotesInput)) {
-                    const emoteNames = EmotesInput.replace(" ","").trim(":").split("::");
+                    const emoteNames = EmotesInput.replace(" ", "").trim(":").split("::");
                     emoteNames.forEach(emote => {
                         const closestMatch = findClosestMatch(emote, emoteList);
                         if (closestMatch.closestDistance <= 5) emotes.push(emoteList[closestMatch.closestMatch]);
                     });
                 } else {
-                    emotes = [...EmotesInput.replace(" ","")].reduce((acc, val) => {
-                        if(Object.values(emoteList).includes(val)) acc.push(val);
+                    emotes = [...EmotesInput.replace(" ", "")].reduce((acc, val) => {
+                        if (Object.values(emoteList).includes(val)) acc.push(val);
                         return acc;
                     }, []);
                 }
@@ -169,19 +169,19 @@ module.exports = {
                 Entered string: **${StringInput}**
                 Closest found emotes: ${emotes.join("|")}
                 Is everything accurate?`
-                        .replace(/^\s+/gm, ''),
+                        .replace(/^\s+/gm, ""),
                     timestamp: new Date(),
-                    footer: { text: "Custom emotes are not supported."}
+                    footer: { text: "Custom emotes are not supported." },
                 };
 
                 const YesRestart = new ButtonBuilder()
-                    .setCustomId('yes')
-                    .setLabel('Yes')
+                    .setCustomId("yes")
+                    .setLabel("Yes")
                     .setStyle(ButtonStyle.Success);
     
                 const NoRestart = new ButtonBuilder()
-                    .setCustomId('no')
-                    .setLabel('No')
+                    .setCustomId("no")
+                    .setLabel("No")
                     .setStyle(ButtonStyle.Danger);
     
                 const row = new ActionRowBuilder()
@@ -202,8 +202,8 @@ module.exports = {
                     max: 1, // The maximum number of interactions to collect.
                 });
 
-                collector.on('collect', async(interaction) => {
-                    if (interaction.customId === 'yes') {
+                collector.on("collect", async (collectorInteraction) => {
+                    if (collectorInteraction.customId === "yes") {
 
                         autoreactions.addReaction(ChannelPromptInput, StringInput, emotes.join(";"));
 
@@ -212,12 +212,12 @@ module.exports = {
                     Channel match prompt: **${ChannelPromptInput}**
                     String match: **${StringInput}**
                     Reaction emotes: ${emotes.join("|")}`
-                            .replace(/^\s+/gm, '');
+                            .replace(/^\s+/gm, "");
                         embed.color = 0xffffff;
             
-                    } else if (interaction.customId === 'no') {
+                    } else if (collectorInteraction.customId === "no") {
                     
-                        embed.description = `Cancelled`;
+                        embed.description = "Cancelled";
                         embed.color = 0xff0000;
 
                     }
@@ -225,12 +225,12 @@ module.exports = {
                     row.components.forEach((component) => component.setDisabled(true));
                     await ConfirmationMessage.edit({ embeds: [embed], components: [row] });
                     
-                    await interaction.update({
+                    await collectorInteraction.update({
                         components: [row],
                     });
                 });
               
-                collector.on('end', async () => {
+                collector.on("end", async () => {
                     row.components.forEach((component) => component.setDisabled(true));
                     await ConfirmationMessage.edit({ components: [row], embeds: [embed] });
                 });

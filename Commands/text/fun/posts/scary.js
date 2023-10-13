@@ -2,15 +2,15 @@ const got = require("got");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
-    name: 'scary',
-    description: 'Good luck',
+    name: "scary",
+    description: "Good luck",
     category: "posts",
     aliases: ["twosentencehorror"],
     async execute(logger, client, message, args) {
         let RedditDesc, RedditTitle, tries;
 
         while (!RedditDesc) {
-            const response = await got(`https://www.reddit.com/r/2sentence2horror/random/.json`);
+            const response = await got("https://www.reddit.com/r/2sentence2horror/random/.json");
             const content = JSON.parse(response.body);
             RedditTitle = content[0].data.children[0].data.title || "";
             RedditDesc = content[0].data.children[0].data.selftext || "";
@@ -26,5 +26,5 @@ module.exports = {
         };
 
         message.reply({ embeds: [embed] });
-    }
+    },
 };

@@ -2,7 +2,7 @@ module.exports = {
     name: "serverinfo",
     description: "Gives info of a server",
     category: "info",
-    aliases: ['sinfo'],
+    aliases: ["sinfo"],
     execute: async (logger, client, message, args) => {
         const owner = await message.guild.fetchOwner();
   

@@ -13,8 +13,8 @@ module.exports = {
         },
     ],
     async execute(logger, interaction, client) {
-        //set or deletes the prefix, if a custom one was already applied
-        const prefix = interaction.options.get("prefix").value.replace(/\s/g, '');
+        // set or deletes the prefix, if a custom one was already applied
+        const prefix = interaction.options.get("prefix").value.replace(/\s/g, "");
         // Set or delete the prefix if a custom one was already applied
         await global.GuildManager.TogglePrefix(interaction.guild, prefix.charAt(0));
         const responseEmbed = {
@@ -25,5 +25,5 @@ module.exports = {
         };
         interaction.reply({ embeds: [responseEmbed]  });
         logger.info(`Prefix changed to ${prefix.charAt(0)} in \`${interaction.member.guild.name}\``);
-    }
+    },
 };

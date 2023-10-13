@@ -1,8 +1,8 @@
 const ToEngineerNotation = require("./ToEngineerNotation");
-const prettyMilliseconds = require('pretty-ms');
+const prettyMilliseconds = require("pretty-ms");
 const got = require("got");
 
-const GetPterodactylInfo = async function () {
+const GetPterodactylInfo = async function() {
     let serverName = "";
     let RAMlimit = "";
     let CPUlimit = "";
@@ -60,61 +60,61 @@ const GetPterodactylInfo = async function () {
         ram: {
             limit: {
                 raw: parseInt(RAMlimit) * 1024 * 1024,
-                clean: `${ToEngineerNotation(parseInt(RAMlimit) * 1024 * 1024)}b`
+                clean: `${ToEngineerNotation(parseInt(RAMlimit) * 1024 * 1024)}b`,
             },
             usage: {
                 raw: parseInt(RAMusage),
-                clean: `${ToEngineerNotation(parseInt(RAMusage))}b`
+                clean: `${ToEngineerNotation(parseInt(RAMusage))}b`,
             },
             pourcentage: {
                 raw: parseInt(RAMusage) / (parseInt(RAMlimit) * 1024 * 1024) * 100,
-                clean: (parseInt(RAMusage) / (parseInt(RAMlimit) * 1024 * 1024) * 100).toFixed(2) + "%"
-            }
+                clean: (parseInt(RAMusage) / (parseInt(RAMlimit) * 1024 * 1024) * 100).toFixed(2) + "%",
+            },
         },
         disk: {
             limit: {
                 raw: parseInt(DISKlimit) * 1024 * 1024,
-                clean: `${ToEngineerNotation(parseInt(DISKlimit) * 1024 * 1024)}b`
+                clean: `${ToEngineerNotation(parseInt(DISKlimit) * 1024 * 1024)}b`,
             },
             usage: {
                 raw: parseInt(DISKusage),
-                clean: `${ToEngineerNotation(parseInt(DISKusage))}b`
+                clean: `${ToEngineerNotation(parseInt(DISKusage))}b`,
             },
             pourcentage: {
                 raw: parseInt(DISKusage) / (parseInt(DISKlimit) * 1024 * 1024) * 100,
-                clean: (parseInt(DISKusage) / (parseInt(DISKlimit) * 1024 * 1024) * 100).toFixed(2) + "%"
-            }
+                clean: (parseInt(DISKusage) / (parseInt(DISKlimit) * 1024 * 1024) * 100).toFixed(2) + "%",
+            },
         },
         cpu: {
             limit: CPUlimit,
             usage: CPUusage,
             pourcentage: {
                 raw: parseInt(CPUusage) / (parseInt(CPUlimit)) * 100,
-                clean: (parseInt(CPUusage) / (parseInt(CPUlimit)) * 100).toFixed(2) + "%"
+                clean: (parseInt(CPUusage) / (parseInt(CPUlimit)) * 100).toFixed(2) + "%",
             },
-            cores: (CPUusage / 100).toFixed(2)
+            cores: (CPUusage / 100).toFixed(2),
         },
         network: {
             download: {
                 raw: NETWORKin,
-                clean: `${ToEngineerNotation(parseInt(NETWORKin))}b`
+                clean: `${ToEngineerNotation(parseInt(NETWORKin))}b`,
             },
             upload: {
                 raw: NETWORKout,
-                clean: `${ToEngineerNotation(parseInt(NETWORKout))}b`
+                clean: `${ToEngineerNotation(parseInt(NETWORKout))}b`,
             },
         },
         uptime: {
             raw: parseInt(BOTuptime),
-            clean: prettyMilliseconds(parseInt(BOTuptime))
+            clean: prettyMilliseconds(parseInt(BOTuptime)),
         },
         main: {
             name: serverName,
             ip: IPalias,
-            port: IPport
-        }
+            port: IPport,
+        },
     };
-    //console.log(info)
+    // console.log(info)
     return info;
 };
 module.exports = GetPterodactylInfo;

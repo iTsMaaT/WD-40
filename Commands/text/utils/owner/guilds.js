@@ -1,7 +1,7 @@
 module.exports = {
-    name: 'guilds',
-    category: 'utils',
-    description: 'Makes a list of the guilds the bot is in',
+    name: "guilds",
+    category: "utils",
+    description: "Makes a list of the guilds the bot is in",
     private: true,
     execute(logger, client, message, args) {
         if (message.author.id === process.env.OWNER_ID) {
@@ -12,13 +12,13 @@ module.exports = {
   
             // Create the embed
             const embed = {
-                title: 'Guilds List',
+                title: "Guilds List",
                 color: 0xffffff,
-                description: '',
+                description: "",
                 fields: [],
                 footer: {
-                    text: ''
-                }
+                    text: "",
+                },
             };
             const userCountArray = [];
             const botCountArray = [];
@@ -34,15 +34,15 @@ module.exports = {
                 const userCount = guild.memberCount - botCount;
                 const totalCount = guild.memberCount;
 
-                const userPadding = ' '.repeat(Math.max(userCountArray).toString().length - userCount.toString().length);
-                const botPadding = ' '.repeat(Math.max(botCountArray).toString().length - botCount.toString().length);
+                const userPadding = " ".repeat(Math.max(userCountArray).toString().length - userCount.toString().length);
+                const botPadding = " ".repeat(Math.max(botCountArray).toString().length - botCount.toString().length);
   
                 totalUsers += userCount;
                 totalBots += botCount;
   
                 const field = {
                     name: `${guild.name} (${guild.id})`,
-                    value: `\`Users: ${userCount}${userPadding} | Bots: ${botCount}${botPadding} | Total: ${totalCount}\``
+                    value: `\`Users: ${userCount}${userPadding} | Bots: ${botCount}${botPadding} | Total: ${totalCount}\``,
                 };
   
                 embed.fields.push(field);
@@ -54,9 +54,8 @@ module.exports = {
             // Send the embed
             message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
         }
-    }
+    },
 };
-  
   
 
 /* Antoine stupide (it works ig)

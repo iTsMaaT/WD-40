@@ -1,6 +1,6 @@
-const prettyMilliseconds = require('pretty-ms');
-const os = require('os');
-const changelog = require('@root/changelogs.json');
+const prettyMilliseconds = require("pretty-ms");
+const os = require("os");
+const changelog = require("@root/changelogs.json");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
@@ -10,7 +10,7 @@ module.exports = {
     execute: async (logger, client, message, args) => {
 
         const addedCommands = new Set();
-        client.commands.each((val) => {if (!val.private && !addedCommands.has(val.name)) { addedCommands.add(val.name); }});
+        client.commands.each((val) => {if (!val.private && !addedCommands.has(val.name))  addedCommands.add(val.name); });
         
         const PteroInfo = await GetPterodactylInfo();
         const RamUsageFormatted = `${PteroInfo.ram.usage.clean} / ${PteroInfo.ram.limit.clean} (${PteroInfo.ram.pourcentage.clean})`;
@@ -18,7 +18,7 @@ module.exports = {
         let lastCommandTimeSinceNow = "";
         let lastExecutedCommand = "";
         let lastCommandLink = "";
-        const WDVersion = changelog.slice(-1).map(({version}) => { return version; }).join();
+        const WDVersion = changelog.slice(-1).map(({ version }) => { return version; }).join();
         const Shards = client.options.shardCount ?? 1;
         const nodeVersion = process.version;
         const amountTextCommands = addedCommands.size;
@@ -30,21 +30,21 @@ module.exports = {
         const uptime = prettyMilliseconds(client.uptime);
         const ping = client.ws.ping + "ms";
         const botAge = prettyMilliseconds(Date.now() - client.user.createdAt);
-        const totalExecutedCommands = await global.prisma.logs.count({ where: { Value: { contains: "Executing [", } } });
+        const totalExecutedCommands = await global.prisma.logs.count({ where: { Value: { contains: "Executing [" } } });
         const VoicesPlaying = client.voice.adapters.size;
       
         const lastExecutedCommands = (await global.prisma.message.findMany({
             where: {
                 AND: [
-                    { Content: { startsWith: prefix, } },
+                    { Content: { startsWith: prefix } },
                     { NOT: { MessageID: message.id } },
-                    { GuildID: message.guild.id }
-                ]
+                    { GuildID: message.guild.id },
+                ],
             },
             take: 10,
             orderBy: {
-                ID: 'desc'
-            }
+                ID: "desc",
+            },
         }));
         const TextCommands = client.commands.map(command => command.name);
         if (lastExecutedCommands) {
@@ -60,39 +60,39 @@ module.exports = {
         const lastCommandContent = lastExecutedCommand?.Content;
         if (lastExecutedCommand) {
             lastCommandLink = `https://discord.com/channels/${lastExecutedCommand.GuildID}/${lastExecutedCommand.ChannelID}/${lastExecutedCommand.MessageID}`;
-            lastCommandTimeSinceNow = prettyMilliseconds(Date.now() - (await client.channels.cache.get(lastExecutedCommand.ChannelID).messages.fetch(lastExecutedCommand.MessageID).then(message => message.createdTimestamp)));
+            lastCommandTimeSinceNow = prettyMilliseconds(Date.now() - (await client.channels.cache.get(lastExecutedCommand.ChannelID).messages.fetch(lastExecutedCommand.MessageID).then(msg => msg.createdTimestamp)));
         }
 
         const embed = {
             title: `Stats for ${client.user.username} (v${WDVersion})`,
             color: 0xffffff,
-            description: ``,
+            description: "",
             fields: [
                 {
                     name: "Commands count",
-                    value: `Text commands: **${amountTextCommands}**\nSlash commands: **${amountSlashCommands}**`
+                    value: `Text commands: **${amountTextCommands}**\nSlash commands: **${amountSlashCommands}**`,
                 }, {
                     name: "Server count",
-                    value: `Guilds: **${totalGuilds}**\nUsers: **${totalUsers}** (Here: **${userHere}**)\nChannels: **${totalChannels}**`
+                    value: `Guilds: **${totalGuilds}**\nUsers: **${totalUsers}** (Here: **${userHere}**)\nChannels: **${totalChannels}**`,
                 }, {
                     name: "Connection info",
-                    value: `Ping: **${ping}**\nUptime: **${uptime}**`
+                    value: `Ping: **${ping}**\nUptime: **${uptime}**`,
                 }, {
                     name: "Commands stats",
-                    value: `Total executed commands (since 08-05-23): **${totalExecutedCommands}**\nLast executed command (in \`${message.guild.name}\`):\n\`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow ?? "Never"} ago) ${lastCommandLink ? `\nLink: ${lastCommandLink}` : ""}`
+                    value: `Total executed commands (since 08-05-23): **${totalExecutedCommands}**\nLast executed command (in \`${message.guild.name}\`):\n\`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow ?? "Never"} ago) ${lastCommandLink ? `\nLink: ${lastCommandLink}` : ""}`,
                 }, {
                     name: "Hosting",
-                    value: `Host: **${os.platform()} ${os.release()}**\nShard count: **${Shards}**\nNodeJS version: **${nodeVersion}**\nRam usage: **${RamUsageFormatted}**`
+                    value: `Host: **${os.platform()} ${os.release()}**\nShard count: **${Shards}**\nNodeJS version: **${nodeVersion}**\nRam usage: **${RamUsageFormatted}**`,
                 }, {
                     name: "Voice",
-                    value: `Playing in **${VoicesPlaying} / ${totalGuilds}** VCs`
-                }
+                    value: `Playing in **${VoicesPlaying} / ${totalGuilds}** VCs`,
+                },
             ],
             footer: {
-                text: `The bot is ${botAge} old | Created by @itsmaat`
+                text: `The bot is ${botAge} old | Created by @itsmaat`,
             },
             timestamp: new Date(),
         };
         message.reply({ embeds: [embed] });
-    }
+    },
 };

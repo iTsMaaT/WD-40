@@ -6,11 +6,11 @@ module.exports = {
     category: "utils",
     private: true,
     execute(logger, client, message, args) {
-        //Changes the presence of the bot
+        // Changes the presence of the bot
 
         if (message.author.id != process.env.OWNER_ID) return;
 
-        switch(args[0]) {
+        switch (args[0]) {
             case "donotdisturb":
             case "dnd": 
             case "red":
@@ -36,5 +36,5 @@ module.exports = {
             }
         }
         message.reply("Status changed to: " + args[0] ?? "Online");
-    }
+    },
 };

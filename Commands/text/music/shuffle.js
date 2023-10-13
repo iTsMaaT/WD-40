@@ -1,8 +1,8 @@
-const { useQueue } = require('discord-player');
+const { useQueue } = require("discord-player");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
-    name: 'shuffle',
+    name: "shuffle",
     description: "Shuffles the playlist",
     category: "music",
     inVoiceChannel: true,
@@ -14,11 +14,11 @@ module.exports = {
 
         const shuffle_embed = {
             color: 0xffffff,
-            title: `Queue shuffled`,
+            title: "Queue shuffled",
             description: `Shuffled ${queue.tracks.size} songs.`,
             timestamp: new Date(),
         };
 
         message.reply({ embeds: [shuffle_embed] });
-    }
+    },
 };

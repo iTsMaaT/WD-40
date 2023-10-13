@@ -7,12 +7,12 @@ module.exports = {
     category: "utils",
     private: true,
     execute(logger, client, message, args) {
-        //Changes the activity or gives a list of all presets
+        // Changes the activity or gives a list of all presets
 
         if (message.author.id != process.env.OWNER_ID) return;
         if (!args[0]) {
-            client.user.setActivity(activities[Math.floor(Math.random() * activities.length)], {type: ActivityType.Custom});
-            message.reply({ content: `Activity randomised` });
+            client.user.setActivity(activities[Math.floor(Math.random() * activities.length)], { type: ActivityType.Custom });
+            message.reply({ content: "Activity randomised" });
             return;
         }
         switch (args[0]) {
@@ -27,12 +27,12 @@ module.exports = {
                 break;
             }
             case "-p":
-                client.user.setActivity(activities[args[1]], {type: ActivityType.Custom});
+                client.user.setActivity(activities[args[1]], { type: ActivityType.Custom });
                 message.reply({ content: `Activity changed to : \`${activities[args[1]]}\``  });
                 break;
             default:
-                client.user.setActivity(args.join(' '), {type: ActivityType.Custom});
-                message.reply({ content: `Activity updated`  });
+                client.user.setActivity(args.join(" "), { type: ActivityType.Custom });
+                message.reply({ content: "Activity updated"  });
         }
-    }
+    },
 };

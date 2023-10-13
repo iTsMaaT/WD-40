@@ -2,12 +2,12 @@ const { ApplicationCommandType } = require("discord.js");
 const prettyMilliseconds = require("pretty-ms");
 
 module.exports = {
-    name: 'ping',
-    description: 'Shows bot latency',
+    name: "ping",
+    description: "Shows bot latency",
     type: ApplicationCommandType.ChatInput,
     async execute(logger, interaction, client) {
         await interaction.deferReply();
-        const sent = await interaction.editReply({ content: 'Pinging...', fetchReply: true , allowedMentions: {RepliedUser: false}});
+        const sent = await interaction.editReply({ content: "Pinging...", fetchReply: true, allowedMentions: { RepliedUser: false } });
 
         const pingEmbed = {
             title: "Ping Information",

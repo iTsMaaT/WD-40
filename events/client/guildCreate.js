@@ -1,9 +1,10 @@
-const { Events } = require('discord.js');
-const { guildblacklist } = require('@root/utils/config.json');
+const { Events } = require("discord.js");
+const { guildblacklist } = require("@root/utils/config.json");
 
 module.exports = {
     name: Events.GuildCreate,
     once: false,
+    log: true,
     async execute(client, logger, guild) {
         await global.GuildManager.SetActiveOrCreate(guild);
         logger.info(`The bot has been added to \`${guild.name}\``);

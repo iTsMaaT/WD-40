@@ -1,4 +1,4 @@
-const { createCanvas } = require('canvas');
+const { createCanvas } = require("canvas");
 const ConsoleGraph = function(dataPoints, console) {
     // Data points (x, y)
 //    const dataPoints = [
@@ -7,7 +7,7 @@ const ConsoleGraph = function(dataPoints, console) {
 //    { x: 25, y: 6 },
 //    { x: 37, y: 8 },
 //    { x: 49, y: 12 },
-//];
+// ];
 
     if (console) {
     // Find the minimum and maximum x and y values
@@ -23,51 +23,51 @@ const ConsoleGraph = function(dataPoints, console) {
         // Create an empty graph
         const graph = [];
   
-        for (let row = 0; row < graphHeight; row++) {
-            graph[row] = Array(graphWidth).fill(' ');
-        }
+        for (let row = 0; row < graphHeight; row++) 
+            graph[row] = Array(graphWidth).fill(" ");
+        
   
         // Plot the data points on the graph
         dataPoints.forEach(({ x, y }) => {
             const xPos = x - minX;
             const yPos = graphHeight - (y - minY + 1);
-            graph[yPos][xPos] = '*';
+            graph[yPos][xPos] = "*";
         });
   
         // Prepare the graph display
-        let graphDisplay = '';
+        let graphDisplay = "";
   
-        graphDisplay += ' '.repeat(maxY.toString().length) + 'Y\n';
-        graphDisplay += ' '.repeat(maxY.toString().length) + '^\n';
+        graphDisplay += " ".repeat(maxY.toString().length) + "Y\n";
+        graphDisplay += " ".repeat(maxY.toString().length) + "^\n";
   
         for (let row = graphHeight - 1; row >= 0; row--) {
-            let line = '';
-            if (row === 0 || row === graphHeight - 1) {
-                line += (minY + row).toString().padStart(2) + '|';
-            } else {
-                line += '  |';
-            }
+            let line = "";
+            if (row === 0 || row === graphHeight - 1) 
+                line += (minY + row).toString().padStart(2) + "|";
+            else 
+                line += "  |";
+            
   
-            for (let col = 0; col < graphWidth; col++) {
+            for (let col = 0; col < graphWidth; col++) 
                 line += graph[row][col];
-            }
+            
   
-            graphDisplay += line + '\n';
+            graphDisplay += line + "\n";
         }
   
-        graphDisplay += ' '.repeat(2) + '-'.repeat(graphWidth + 1) + "->X\n";
+        graphDisplay += " ".repeat(2) + "-".repeat(graphWidth + 1) + "->X\n";
   
         // Display the x-axis labels
-        let xLabelsLine = ' '.repeat(4);
+        let xLabelsLine = " ".repeat(4);
         for (let i = minX; i <= maxX; i++) {
-            if (i === minX || i === maxX) {
+            if (i === minX || i === maxX) 
                 xLabelsLine += i.toString();
-            } else {
-                xLabelsLine += ' ';
-            }
+            else 
+                xLabelsLine += " ";
+            
         }
   
-        graphDisplay += xLabelsLine + '\n';
+        graphDisplay += xLabelsLine + "\n";
   
         // Output the graph display
         console.log(graphDisplay);
@@ -91,23 +91,23 @@ const ConsoleGraph = function(dataPoints, console) {
     
         // Create a canvas
         const canvas = createCanvas(canvasWidth, canvasHeight);
-        const context = canvas.getContext('2d');
+        const context = canvas.getContext("2d");
     
         // Set line color to white
-        context.strokeStyle = 'white';
+        context.strokeStyle = "white";
     
         // Draw the graph
         context.beginPath();
         context.moveTo((dataPoints[0].x - minX) * scaleX, canvasHeight - ((dataPoints[0].y - minY) * scaleY));
     
-        for (let i = 1; i < dataPoints.length; i++) {
+        for (let i = 1; i < dataPoints.length; i++) 
             context.lineTo((dataPoints[i].x - minX) * scaleX, canvasHeight - ((dataPoints[i].y - minY) * scaleY));
-        }
+        
     
         context.stroke();
     
         // Convert canvas to an image
-        return canvas.toDataURL('image/png');
+        return canvas.toDataURL("image/png");
     }
 };
 module.exports = ConsoleGraph;

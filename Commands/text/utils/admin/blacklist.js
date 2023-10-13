@@ -1,11 +1,11 @@
 const { SendErrorEmbed, id } = require("@functions/discordFunctions");
-const { PermissionsBitField } = require('discord.js');
+const { PermissionsBitField } = require("discord.js");
 
 module.exports = {
-    name: 'blacklist',
-    description: 'Blacklist a user from using commands',
+    name: "blacklist",
+    description: "Blacklist a user from using commands",
     usage: "< ID: ID of the user to blacklist, Permission: command or category to blacklist the user from >",
-    category: 'admin',
+    category: "admin",
     examples: ["1081004946872352958 moveall"],
     async execute(logger, client, message, args) {
         if (!args[0]) return SendErrorEmbed(message, "You did not provide a user.", "yellow");
@@ -25,7 +25,7 @@ module.exports = {
         try {
             target = await message.guild.members.fetch(id(args[0]));
             owner = await message.guild.fetchOwner();
-        } catch(err) {
+        } catch (err) {
             return SendErrorEmbed(message, "Couldn't find the specified user", "yellow");
         }
         if (!commandArray.includes(permission) && permission) return SendErrorEmbed(message, "Invalid permission, must be a category or command name.", "yellow");
@@ -37,7 +37,7 @@ module.exports = {
         
         const embed = {
             color: 0xffffff,
-            title: `Blacklist`,
+            title: "Blacklist",
             fields: [],
             timestamp: new Date(),
         };
@@ -47,17 +47,17 @@ module.exports = {
             const BlacklistedCommandsArray = [];
             const BlacklistedCategoriesArray = [];
             const PermissionsBlacklist = blacklist.GetPermissions(target.id);
-            if (!PermissionsBlacklist) embed.description = `This user is not blacklisted`;
+            if (!PermissionsBlacklist) {embed.description = "This user is not blacklisted";}
             else {
                 for (entry of PermissionsBlacklist) {
                     if (commandSet.has(entry.trim())) BlacklistedCommandsArray.push(entry.trim());
                     if (commandCategorySet.has(entry.trim())) BlacklistedCategoriesArray.push(entry.trim());
                 }
-                if (BlacklistedCategoriesArray[0]) embed.fields.push({ name: "Blacklisted categories", value: BlacklistedCategoriesArray.join(", ")});
-                if (BlacklistedCommandsArray[0]) embed.fields.push({ name: "Blacklisted commands", value: BlacklistedCommandsArray.join(", ")});
+                if (BlacklistedCategoriesArray[0]) embed.fields.push({ name: "Blacklisted categories", value: BlacklistedCategoriesArray.join(", ") });
+                if (BlacklistedCommandsArray[0]) embed.fields.push({ name: "Blacklisted commands", value: BlacklistedCommandsArray.join(", ") });
             }
             embed.title = "Blacklist for " + target.user.username;
-            return message.reply({ embeds: [embed]});
+            return message.reply({ embeds: [embed] });
         }
 
         if (blacklist.CheckPermission(target.id, permission)) {
@@ -69,6 +69,6 @@ module.exports = {
             const blCategory = !blacklist.CheckPermission(message.author.id, permission);
             embed.description = `You granted permission for <@${target.id}> (${target.id}) to execute ${!blCategory ? `commands in the **${permission}** category` : `the **${permission}** command`}.`;
         }
-        message.reply({ embeds: [embed]});
-    }
+        message.reply({ embeds: [embed] });
+    },
 };

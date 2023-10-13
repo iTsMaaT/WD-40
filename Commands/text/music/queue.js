@@ -1,19 +1,19 @@
 const { EmbedBuilder } = require("discord.js");
-const { useQueue } = require('discord-player');
+const { useQueue } = require("discord-player");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
     name: "queue",
     description: "Shows the current queue for songs",
     category: "music",
-    aliases: ['q'],
+    aliases: ["q"],
     execute(logger, client, message, args) {
         let queue;
-        if (message.author.id == process.env.OWNER_ID && args[0]) {
+        if (message.author.id == process.env.OWNER_ID && args[0]) 
             queue = useQueue(parseInt(args[0]));
-        } else {
+        else 
             queue = useQueue(message.guild.id);
-        }
+        
         if (!queue || !queue.tracks || !queue.currentTrack) return SendErrorEmbed(message, "There is nothing in the queue / currently playing.", "yellow");
 
         const songs = queue.tracks.size;
@@ -22,10 +22,10 @@ module.exports = {
 
 
         const embed = new EmbedBuilder()
-            .setColor('#ffffff')
-            .setAuthor({name: `Server queue - ${message.guild.name}`})
-            .setDescription(`**Current:** ${queue.currentTrack.title}\n\n${tracks.slice(0, 10).join('\n')}\n\n${nextSongs}`)
+            .setColor("#ffffff")
+            .setAuthor({ name: `Server queue - ${message.guild.name}` })
+            .setDescription(`**Current:** ${queue.currentTrack.title}\n\n${tracks.slice(0, 10).join("\n")}\n\n${nextSongs}`)
             .setTimestamp();
         message.reply({ embeds: [embed] });
-    }
+    },
 };

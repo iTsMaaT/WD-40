@@ -1,14 +1,14 @@
-const got = require('got');
-const cheerio = require('cheerio');
-const https = require('https');
+const got = require("got");
+const cheerio = require("cheerio");
+const https = require("https");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
-    name: 'linkinfo',
-    description: 'Gives info about a link',
-    usage: '< [URL] >',
-    aliases: ['linfo'],
-    category: 'info',
+    name: "linkinfo",
+    description: "Gives info about a link",
+    usage: "< [URL] >",
+    aliases: ["linfo"],
+    category: "info",
     cooldown: 10000,
     async execute(logger, client, message, args) {
 
@@ -23,42 +23,42 @@ module.exports = {
 
             const embed = {
                 color: 0xffffff,
-                title: 'Link Analysis',
+                title: "Link Analysis",
                 fields: [
-                    { name: 'Unshortened URL', value: truncateText(result.unshortenedURL, MAX_FIELD_LENGTH) ?? '-' },
-                    { name: 'Response Status', value: truncateText(result.responseStatus, MAX_FIELD_LENGTH) },
-                    { name: 'IP Address', value: truncateText(result.ip, MAX_FIELD_LENGTH) ?? '-' },
-                    { name: 'Type', value: truncateText(result.type, MAX_FIELD_LENGTH) },
-                    { name: 'SSL Certificate', value: truncateText(result.sslCertificate, MAX_FIELD_LENGTH) ?? '-' },
-                    { name: 'Redirect Chain', value: truncateText(result.redirectChain?.join(' -> '), MAX_FIELD_LENGTH) || '-' },
-                    { name: 'Page Title', value: truncateText(result.pageTitle, MAX_FIELD_LENGTH) || '-' },
+                    { name: "Unshortened URL", value: truncateText(result.unshortenedURL, MAX_FIELD_LENGTH) ?? "-" },
+                    { name: "Response Status", value: truncateText(result.responseStatus, MAX_FIELD_LENGTH) },
+                    { name: "IP Address", value: truncateText(result.ip, MAX_FIELD_LENGTH) ?? "-" },
+                    { name: "Type", value: truncateText(result.type, MAX_FIELD_LENGTH) },
+                    { name: "SSL Certificate", value: truncateText(result.sslCertificate, MAX_FIELD_LENGTH) ?? "-" },
+                    { name: "Redirect Chain", value: truncateText(result.redirectChain?.join(" -> "), MAX_FIELD_LENGTH) || "-" },
+                    { name: "Page Title", value: truncateText(result.pageTitle, MAX_FIELD_LENGTH) || "-" },
                     {
-                        name: 'VirusTotal Analysis (Note that this only works on known links by VirusTotal)',
+                        name: "VirusTotal Analysis (Note that this only works on known links by VirusTotal)",
                         value: truncateText(getVirusTotalAnalysisText(result.scanResults), MAX_FIELD_LENGTH),
                     },
-                    { name: 'Metadata', value: truncateText(getMetadataText(result.metadata), MAX_FIELD_LENGTH) },
+                    { name: "Metadata", value: truncateText(getMetadataText(result.metadata), MAX_FIELD_LENGTH) },
                 ],
             };
 
             message.reply({ embeds: [embed] });
         } catch (error) {
             logger.error(error.stack);
-            const responseStatus = error.response?.statusCode || '-';
-            const statusDescription = error.response?.statusMessage || 'Unknown Error';
+            const responseStatus = error.response?.statusCode || "-";
+            const statusDescription = error.response?.statusMessage || "Unknown Error";
           
             const embed = {
                 color: 0xffffff,
-                title: 'Link Analysis',
+                title: "Link Analysis",
                 fields: [
-                    { name: 'Unshortened URL', value: link },
-                    { name: 'Response Status', value: `${responseStatus} (${statusDescription})` },
-                    { name: 'IP Address', value: '-' },
-                    { name: 'Type', value: '-' },
-                    { name: 'SSL Certificate', value: '-' },
-                    { name: 'Redirect Chain', value: '-' },
-                    { name: 'Page Title', value: '-' },
-                    { name: 'VirusTotal Analysis', value: '-' },
-                    { name: 'Metadata', value: '-' },
+                    { name: "Unshortened URL", value: link },
+                    { name: "Response Status", value: `${responseStatus} (${statusDescription})` },
+                    { name: "IP Address", value: "-" },
+                    { name: "Type", value: "-" },
+                    { name: "SSL Certificate", value: "-" },
+                    { name: "Redirect Chain", value: "-" },
+                    { name: "Page Title", value: "-" },
+                    { name: "VirusTotal Analysis", value: "-" },
+                    { name: "Metadata", value: "-" },
                 ],
             };
           
@@ -89,10 +89,10 @@ module.exports = {
           
             return {
                 unshortenedURL,
-                ip: ip !== '-' ? ip : undefined,
+                ip: ip !== "-" ? ip : undefined,
                 type,
                 responseStatus,
-                sslCertificate: sslCertificate !== '-' ? sslCertificate : undefined,
+                sslCertificate: sslCertificate !== "-" ? sslCertificate : undefined,
                 redirectChain: redirectChain.length > 0 ? redirectChain : undefined,
                 pageTitle: pageTitle !== null ? pageTitle : undefined,
                 metadata,
@@ -122,30 +122,30 @@ module.exports = {
         async function getDestinationIP(url) {
             try {
                 const response = await got.head(url, { followRedirect: false, agent: { https: agent } });
-                if (response.ip) {
+                if (response.ip) 
                     return response.ip;
-                }
+                
             } catch (error) {
                 // Handle the error
             }
-            return '-';
+            return "-";
         }
           
         async function getDestinationType(url) {
             try {
                 const response = await got.head(url, { agent: { https: agent } });
-                const contentType = response.headers['content-type'];
+                const contentType = response.headers["content-type"];
           
-                if (contentType && contentType.startsWith('text/html')) {
-                    return 'Website';
-                } else if (contentType && contentType.startsWith('application')) {
-                    return 'App';
-                } else {
-                    return 'File';
-                }
+                if (contentType && contentType.startsWith("text/html")) 
+                    return "Website";
+                else if (contentType && contentType.startsWith("application")) 
+                    return "App";
+                else 
+                    return "File";
+                
             } catch (error) {
                 // Handle the error
-                return '-';
+                return "-";
             }
         }
           
@@ -158,7 +158,7 @@ module.exports = {
           
         async function getSSLCertificate(url) {
             try {
-                if (url.startsWith('https')) {
+                if (url.startsWith("https")) {
                     const response = await got(url, { agent: { https: agent } });
                     if (response.socket) {
                         const sslCertificate = response.socket.getPeerCertificate();
@@ -167,9 +167,9 @@ module.exports = {
                 }
             } catch (error) {
                 // Handle the error
-                return '-';
+                return "-";
             }
-            return '-';
+            return "-";
         }
           
         async function getRedirectChain(url) {
@@ -187,7 +187,7 @@ module.exports = {
             try {
                 const response = await got(url, { agent: { https: agent } });
                 const $ = cheerio.load(response.body);
-                const title = $('title').text();
+                const title = $("title").text();
                 return title || null;
             } catch (error) {
                 // Handle the error
@@ -197,29 +197,29 @@ module.exports = {
           
         async function getMetadata(url) {
             try {
-                if (metadataCache[url]) {
+                if (metadataCache[url]) 
                     return metadataCache[url];
-                }
+                
           
                 const response = await got(url, { agent: { https: agent } });
                 const $ = cheerio.load(response.body);
           
-                const description = $('meta[name="description"]').attr('content');
-                const keywords = $('meta[name="keywords"]').attr('content');
-                const ogTitle = $('meta[property="og:title"]').attr('content');
-                const ogDescription = $('meta[property="og:description"]').attr('content');
-                const author = $('meta[name="author"]').attr('content');
-                const publisher = $('meta[property="article:publisher"]').attr('content');
-                const creator = $('meta[name="creator"]').attr('content');
+                const description = $("meta[name=\"description\"]").attr("content");
+                const keywords = $("meta[name=\"keywords\"]").attr("content");
+                const ogTitle = $("meta[property=\"og:title\"]").attr("content");
+                const ogDescription = $("meta[property=\"og:description\"]").attr("content");
+                const author = $("meta[name=\"author\"]").attr("content");
+                const publisher = $("meta[property=\"article:publisher\"]").attr("content");
+                const creator = $("meta[name=\"creator\"]").attr("content");
           
                 const metadata = {
-                    description: description || '-',
-                    keywords: keywords || '-',
-                    ogTitle: ogTitle || '-',
-                    ogDescription: ogDescription || '-',
-                    author: author || '-',
-                    publisher: publisher || '-',
-                    creator: creator || '-',
+                    description: description || "-",
+                    keywords: keywords || "-",
+                    ogTitle: ogTitle || "-",
+                    ogDescription: ogDescription || "-",
+                    author: author || "-",
+                    publisher: publisher || "-",
+                    creator: creator || "-",
                 };
           
                 metadataCache[url] = metadata;
@@ -227,13 +227,13 @@ module.exports = {
             } catch (error) {
                 // Handle the error
                 return {
-                    description: '-',
-                    keywords: '-',
-                    ogTitle: '-',
-                    ogDescription: '-',
-                    author: '-',
-                    publisher: '-',
-                    creator: '-',
+                    description: "-",
+                    keywords: "-",
+                    ogTitle: "-",
+                    ogDescription: "-",
+                    author: "-",
+                    publisher: "-",
+                    creator: "-",
                 };
             }
         }
@@ -241,12 +241,12 @@ module.exports = {
           
         async function getVirusTotalAnalysis(url) {
             try {
-                const id = Buffer.from(url).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+                const id = Buffer.from(url).toString("base64").replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
                 const response = await got(`https://www.virustotal.com/api/v3/urls/${id}`, {
                     headers: {
-                        'x-apikey': process.env.VIRUS_TOTAL_API_KEY,
+                        "x-apikey": process.env.VIRUS_TOTAL_API_KEY,
                     },
-                    responseType: 'json',
+                    responseType: "json",
                     agent: { https: agent },
                 });
           
@@ -254,21 +254,21 @@ module.exports = {
                 return scanResults || { isRateLimited: false, harmless: 0, suspicious: 0, malicious: 0 };
             } catch (error) {
                 logger.error(error);
-                return { isRateLimited: false, harmless: '-', suspicious: '-', malicious: '-' };
+                return { isRateLimited: false, harmless: "-", suspicious: "-", malicious: "-" };
             }
         }
 
         function truncateText(text, maxLength) {
-            if (text && text.length > maxLength) {
-                return text.substring(0, maxLength - 3) + '...';
-            }
+            if (text && text.length > maxLength) 
+                return text.substring(0, maxLength - 3) + "...";
+            
             return text;
         }
         
         function getVirusTotalAnalysisText(scanResults) {
-            if (scanResults.isRateLimited) {
-                return 'VirusTotal API rate limit exceeded. Please try again later.';
-            }
+            if (scanResults.isRateLimited) 
+                return "VirusTotal API rate limit exceeded. Please try again later.";
+            
             const harmless = truncateText(scanResults.harmless, MAX_FIELD_LENGTH);
             const suspicious = truncateText(scanResults.suspicious, MAX_FIELD_LENGTH);
             const malicious = truncateText(scanResults.malicious, MAX_FIELD_LENGTH);

@@ -2,14 +2,15 @@ const got = require("got");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
-    name: 'mcping',
-    description: 'Ping a Minecraft server',
+    name: "mcping",
+    description: "Ping a Minecraft server",
     usage: "< [IP]: mc server ip, [Port]: the port of the server (optional) >",
     category: "utils",
     examples: ["Hypixel.net"],
     async execute(logger, client, message, args) {
 
-        if (args[1]) var port = ":" + parseInt(args[1]);
+        let port = "";
+        if (args[1]) port = ":" + parseInt(args[1]);
         got(`https://api.mcstatus.io/v2/status/java/${args[0]}${port ?? ""}`)
             .then(async response => {
                 const server = JSON.parse(response.body);
@@ -33,9 +34,9 @@ module.exports = {
                 if (server.players.list[0] && server.players.list.length < 10) {
                     const playerNames = [];
 
-                    for (const player of server.players.list) {
+                    for (const player of server.players.list) 
                         playerNames.push(player.name_clean);
-                    }
+                    
                     serverStatusEmbed.fields.push({ name: "Player list", value: playerNames.join(", ") });
                 }
                 

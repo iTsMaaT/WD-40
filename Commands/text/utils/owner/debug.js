@@ -1,7 +1,7 @@
 module.exports = {
-    name: 'debug',
-    description: 'Blacklist a user from using commands',
-    category: 'utils',
+    name: "debug",
+    description: "Blacklist a user from using commands",
+    category: "utils",
     private: true,
     execute(logger, client, message, args) {
         if (message.author.id == process.env.OWNER_ID && !debug) {
@@ -11,5 +11,5 @@ module.exports = {
             debug = 0;
             message.reply("Debug disabled.");
         }
-    }
+    },
 };

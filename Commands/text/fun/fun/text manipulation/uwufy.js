@@ -17,7 +17,7 @@ module.exports = {
             color: 0xffffff,
             title: "UwUfied text",
             description: UwUprompt,
-            timestamp: new Date()
+            timestamp: new Date(),
         };
 
         message.reply({ embeds: [embed] });
@@ -25,18 +25,18 @@ module.exports = {
 
         function uwufyText(text) {
             // Replace 'r' or 'l' followed by a vowel with 'w'
-            text = text.replace(/(?:r|l)([aeiou])/gi, 'w$1');
+            text = text.replace(/(?:r|l)([aeiou])/gi, "w$1");
             
             // Replace 'n' or 'N' followed by 'a', 'e', 'i', 'o', or 'u' with 'ny'
-            text = text.replace(/n([aeiou])/gi, 'ny$1');
+            text = text.replace(/n([aeiou])/gi, "ny$1");
             
             // Replace 'ove' with 'uv'
-            text = text.replace(/ove/gi, 'uv');
+            text = text.replace(/ove/gi, "uv");
             
             // Add 'uwu' at the end
-            text += ' uwu';
+            text += " uwu";
           
             return text;
         }
-    }
+    },
 };

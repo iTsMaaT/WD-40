@@ -1,24 +1,24 @@
 const prettyString = require("./prettyString");
 const CreateOrUseWebhook = async function(message, name) {
     const webhooks = await message.channel.fetchWebhooks();
-    let webhook = webhooks.filter(webhook => webhook.name == name)[0];
+    let webhook = webhooks.filter(wh => wh.name == name)[0];
 
     if (!webhook) {
         webhook = await message.channel.createWebhook({
-            name: name
+            name: name,
         });
     }
     return webhook;
 };
 
 const id = function(mention) {
-    const id = mention.replace(/[<!@>]/g, "");
-    if (!id.match(/^\d+$/)) return null;
-    return id;
+    const cleanId = mention.replace(/[<!@>]/g, "");
+    if (!cleanId.match(/^\d+$/)) return null;
+    return cleanId;
 };
 
 const SendErrorEmbed = async function(message, string, color, isSlash) {
-    var embed = {
+    const embed = {
         title: prettyString(string.toString(), false, true),
         timestamp: new Date(),
         color: 0xffffff,
@@ -26,9 +26,9 @@ const SendErrorEmbed = async function(message, string, color, isSlash) {
     if (color == "red") embed.color = 0xff0000;
     else if (color == "yellow") embed.color = 0xffff00;
     if (isSlash) {
-        try{
+        try {
             await message.reply({ embeds: [embed] });
-        } catch(err) {
+        } catch (err) {
             await message.editReply({ embeds: [embed] });
         }
     } else {
@@ -39,7 +39,7 @@ const SendErrorEmbed = async function(message, string, color, isSlash) {
 /**
  * Reacts the provided string to a message
  */
-const StringReact = function (client, ChannelID, MessageID, string) {
+const StringReact = function(client, ChannelID, MessageID, string) {
     const letters = string.toUpperCase().toString();
 
     for (i = 0; i < letters.length; i++) {

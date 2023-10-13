@@ -34,7 +34,7 @@ module.exports = {
                         { name: "Capital", value: country.capital[0], inline: true },
                         { name: "Continent", value: country.continents[0], inline: true },
                         { name: "Language(s)", value: languages.join(", ") },
-                        { name: "Flag info", value: country.flags.alt }
+                        { name: "Flag info", value: country.flags.alt },
                     ],
                     timestamp: new Date(),
                 };

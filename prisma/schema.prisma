@@ -44,6 +44,7 @@ enum LogType {
   DEBUG
   MUSIC
   CONSOLE
+  EVENT
 }
 model Logs {
   ID      BigInt    @id @default(autoincrement())

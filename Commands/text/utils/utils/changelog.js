@@ -1,21 +1,21 @@
-const changelog = require('@root/changelogs.json');
+const changelog = require("@root/changelogs.json");
 
 module.exports = {
-    name: 'changelog',
-    description: 'Displays the latest changes to the bot',
-    category: 'utils',
+    name: "changelog",
+    description: "Displays the latest changes to the bot",
+    category: "utils",
     aliases: ["cl"],
     execute(logger, client, message, args) {
         const latestChanges = changelog.slice(-5);
 
         const changelogEmbed = {
-            title: 'Changelogs',
+            title: "Changelogs",
             description: latestChanges
                 .map(({ version, date, changes }) => {
-                    const changeList = changes.map(change => `- ${change}`).join('\n');
+                    const changeList = changes.map(change => `- ${change}`).join("\n");
                     return `**Version: ${version}** (${date}):\n${changeList}\n`;
                 })
-                .join('\n'),
+                .join("\n"),
             color: 0xffffff, 
             timestamp: new Date(),
         };

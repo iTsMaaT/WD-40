@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { useQueue, useTimeline } = require('discord-player');
+const { useQueue, useTimeline } = require("discord-player");
 
 module.exports = {
     name: "pause",
@@ -19,14 +19,14 @@ module.exports = {
 
         const music_resumed_embed = new EmbedBuilder()
             .setColor("#ffffff")
-            .setDescription('Music resumed.')
+            .setDescription("Music resumed.")
             .setTimestamp();
 
         const music_paused_embed = new EmbedBuilder()
             .setColor("#ffffff")
-            .setDescription('Music paused.')
+            .setDescription("Music paused.")
             .setTimestamp();
 
         message.reply({ embeds: [state ? music_paused_embed : music_resumed_embed] });
-    }
+    },
 }; 

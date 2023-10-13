@@ -5,30 +5,30 @@ module.exports = {
     category: "fun",
     admin: true,
     async execute(logger, client, message, args) {
-        //Checks if the person executing the command is iTsMaaT or the server's owner
+        // Checks if the person executing the command is iTsMaaT or the server's owner
         if (message.member.permissions.has("Administrator") || message.author.id == process.env.OWNER_ID) {
             if (args.length == 1) {
-                //Transforms a ping into the ID
+                // Transforms a ping into the ID
                 let rawid = args[0].replace("@", "");
-                let rawdid = rawid.replace("<", "");
+                const rawdid = rawid.replace("<", "");
                 const strid = rawdid.replace(">", "");
                 rawid = parseInt(rawdid.replace(">", ""));
-                //Uses the database to add or remove the person from the list
+                // Uses the database to add or remove the person from the list
                 const guildId = parseInt(message.guildId);
-                const enabled = (await prisma.snowflake.findFirst({where:{GuildID:guildId,UserID:rawid}})) != null;
-                if(!enabled){
-                    global.snowflakeData.push([guildId,rawid]);
-                    await prisma.snowflake.create({data:{GuildID:guildId,UserID:rawid}});
+                const enabled = (await prisma.snowflake.findFirst({ where:{ GuildID:guildId, UserID:rawid } })) != null;
+                if (!enabled) {
+                    global.snowflakeData.push([guildId, rawid]);
+                    await prisma.snowflake.create({ data:{ GuildID:guildId, UserID:rawid } });
                     message.reply({ content: `<@${strid}> is a snowflake` });
                 } else {
                     global.snowflakeData = snowflakeData.filter(v => !v.equals([guildId, rawid]));
-                    await prisma.snowflake.delete({where:{GuildID_UserID: {GuildID:guildId,UserID:rawid}}});
+                    await prisma.snowflake.delete({ where:{ GuildID_UserID: { GuildID:guildId, UserID:rawid } } });
                     message.reply({ content: `<@${strid}> is no longer a snowflake (good for him)` });
                 }
             }
         }
         else {
-            message.channel.send(`You are not allowed to execute that command`);
+            message.channel.send("You are not allowed to execute that command");
         }
-    }
+    },
 };

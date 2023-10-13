@@ -5,10 +5,10 @@ module.exports = {
     category: "utils",
     execute(logger, client, message, args) {
         
-        //Sends the suggestion and other info in a channel
-        client.channels.cache.get("1040076894932062229").send(`**Suggestion by ${message.author} (${message.member.user.tag}) received: **` + args.join(' '));
-        client.channels.cache.get("1040076894932062229").send(`- - - - - - - - - - -`);
-        message.reply(`Suggestion received.`);
-        logger.info(`Suggestion received`);
-    }
+        // Sends the suggestion and other info in a channel
+        client.channels.cache.get("1040076894932062229").send(`**Suggestion by ${message.author} (${message.member.user.tag}) received: **` + args.join(" "));
+        client.channels.cache.get("1040076894932062229").send("- - - - - - - - - - -");
+        message.reply("Suggestion received.");
+        logger.info("Suggestion received");
+    },
 };

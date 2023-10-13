@@ -12,8 +12,8 @@ module.exports = {
             type: ApplicationCommandOptionType.String,
             required: true,
             choices: [
-                { name: "Lookup a user's post", value: "user", },
-                { name: "Fetch a post from a subreddit", value: "sub", },
+                { name: "Lookup a user's post", value: "user" },
+                { name: "Fetch a post from a subreddit", value: "sub" },
             ],
         },
         {
@@ -28,14 +28,14 @@ module.exports = {
         const optiondata = interaction.options.get("data").value;
         await interaction.deferReply();
         switch (option) {
-            case "sub":
-                var sent = "";
-                //Gore subreddits blacklist
+            case "sub": {
+                let sent = "";
+                // Gore subreddits blacklist
                 if (optiondata != "eyeblech" && optiondata != "gore" && optiondata != "guro") {
                     let RedditImage = "";
-                    var RedditTries = 1;
+                    let RedditTries = 1;
                     sent = await interaction.editReply({ content: `Attempt ${RedditTries}/10`, fetchreply: true });
-                    //Tries to fetch a post 10 times
+                    // Tries to fetch a post 10 times
                     for (let i = 0; i <= 10; i++) {
                         try {
                             const response = await got(`https://www.reddit.com/r/${optiondata}/random/.json`);
@@ -46,10 +46,10 @@ module.exports = {
                             const PostNsfw = content[0].data.children[0].data.over_18;
                             RedditImage = content[0].data.children[0].data.url;
                             RedditTries += 1;
-                            //Updates the counter
-                            if (RedditTries % 2 == 0 && RedditTries <= 10) {
+                            // Updates the counter
+                            if (RedditTries % 2 == 0 && RedditTries <= 10) 
                                 sent.edit({ content: `Attempt ${RedditTries}/10`, fetchreply: true });
-                            }
+                            
                             if (RedditImage.endsWith(".jpg") || RedditImage.endsWith(".png") || RedditImage.endsWith(".gif")) {
                                 if (!PostNsfw || (PostNsfw && message.channel.nsfw)) {
 
@@ -70,11 +70,11 @@ module.exports = {
                                     logger.info(RedditImage);
                                     return;
                                 } else {
-                                    return sent.edit(`The post is NSFW but the channel isn't`);
+                                    return sent.edit("The post is NSFW but the channel isn't");
                                 }
                             }
                         } catch (err) {
-                        //Catches the error, probably a non-existent or banned subreddit
+                        // Catches the error, probably a non-existent or banned subreddit
                             sent.edit(`Non-existent Subreddit\n\`${err}\``);
                             logger.error(`Non-existent Subreddit\n\`${err.stack}\``);
                             return;
@@ -83,7 +83,7 @@ module.exports = {
                     sent.edit("Could not find post containing a picture or compatible gif link (10 tries)");
                 }
                 break;
-      
+            }
             case "user": {
                 const url = `https://www.reddit.com/user/${optiondata}/submitted.json`;
                 let response;
@@ -91,22 +91,22 @@ module.exports = {
                     response = await got(url);
                 } catch (error) {
                     console.error(error);
-                    return interaction.reply({ content: 'an error occurred while fetching posts from the Reddit API.', ephemeral: true });
+                    return interaction.reply({ content: "an error occurred while fetching posts from the Reddit API.", ephemeral: true });
                 }
 
                 // Parse the JSON response
                 const data = JSON.parse(response.body);
 
                 // Filter the posts to only include image posts
-                const imagePosts = data.data.children.filter((post) => post.data.post_hint === 'image');
+                const imagePosts = data.data.children.filter((post) => post.data.post_hint === "image");
 
                 // Select a random post from the image posts
                 const randomPost = imagePosts[Math.floor(Math.random() * imagePosts.length)];
 
                 // If no image posts were found, return an error message
-                if (!randomPost) {
+                if (!randomPost) 
                     return interaction.editReply({ content: `no image posts found for user "${data}".`, ephemeral: true });
-                }
+                
 
                 // Send the post as an embed in the channel
                 const embed = {
@@ -122,5 +122,5 @@ module.exports = {
                 interaction.editReply({ embeds: [embed]  });
             }
         } 
-    }
+    },
 };

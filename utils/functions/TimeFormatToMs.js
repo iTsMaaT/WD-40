@@ -1,4 +1,4 @@
-const TimeFormatToMS = function (timeString) {
+const TimeFormatToMS = function(timeString) {
 
     // Validation
     if (!timeString || !/^(\d+[dhms])+ms$/.test(timeString) || /(\D)\1/.test(timeString) || timeString.match(/\d+/g).map(Number).map(parseInt).some(Number.isNaN)) return null;
@@ -8,7 +8,7 @@ const TimeFormatToMS = function (timeString) {
         h: 60 * 60 * 1000,      // 1 hour = 60 minutes * 60 seconds * 1000 milliseconds
         m: 60 * 1000,           // 1 minute = 60 seconds * 1000 milliseconds
         s: 1000,                // 1 second = 1000 milliseconds
-        ms: 1                   // 1 millisecond
+        ms: 1,                  // 1 millisecond
     };
       
     const units = timeString.match(/[dhms]/g) || [];

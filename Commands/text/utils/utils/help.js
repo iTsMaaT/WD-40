@@ -15,30 +15,35 @@ module.exports = {
             const CommandName = client.commands.get(args[0]);
             if (!CommandName || CommandName.private) return SendErrorEmbed(message, "This command doesn't exist.", "red");
 
-            var CommandEmbed = {
+            const CommandEmbed = {
                 title: `**${prefix}${CommandName.name}** ${CommandName.usage ?? ""}`,
                 color: 0xffffff,
                 fields: [{ name: "Description", value: CommandName.description }],
                 timestamp: new Date(),
             };
 
-            if(CommandName.aliases[0]) CommandEmbed.fields.push({ name: "aliases", value: CommandName.aliases.join(", ") });
-            if(CommandName.cooldown) CommandEmbed.fields.push({ name: "cooldown", value: parseInt(CommandName.cooldown) / 1000 + "s" });
+            if (CommandName.aliases) CommandEmbed.fields.push({ name: "Aliases", value: CommandName.aliases.join(", ") });
+            if (CommandName.cooldown) CommandEmbed.fields.push({ name: "Cooldown", value: parseInt(CommandName.cooldown) / 1000 + "s" });
+            if (CommandName.examples) {
+                const formattedExamples = [];
+                CommandName.examples.forEach(ex => {formattedExamples.push(`${prefix}${CommandName.name} ${ex}`);});
+                CommandEmbed.fields.push({ name: "Examples", value: formattedExamples.join("\n") });
+            }
 
             return message.reply({ embeds: [CommandEmbed]  });
         }
-        //Finds all command files and separate them from categories, then use page to list the commands per category
+        // Finds all command files and separate them from categories, then use page to list the commands per category
 
         let counter = 0;
         const categorymapper = {};
         const addedCommands = new Set(); // Keep track of added commands
         client.commands.each((val) => {
             if (!val.private && !addedCommands.has(val.name)) {
-                if (categorymapper[val.category]) {
+                if (categorymapper[val.category]) 
                     categorymapper[val.category][`**${val.name}${val.aliases ? ` [${(val.aliases).join(", ")}]` : ""}: **`] = (prettyString(val.description, "first", true));
-                } else {
+                else 
                     categorymapper[val.category] = {};
-                }
+                
                 addedCommands.add(val.name);
             }
         });
@@ -60,27 +65,27 @@ module.exports = {
         const categories = Object.keys(groupedObject);
 
         const FisrtPage = new ButtonBuilder()
-            .setCustomId('first')
-            .setLabel('◀◀')
+            .setCustomId("first")
+            .setLabel("◀◀")
             .setStyle(ButtonStyle.Success);
 
         const LastPage = new ButtonBuilder()
-            .setCustomId('last')
-            .setLabel('▶▶')
+            .setCustomId("last")
+            .setLabel("▶▶")
             .setStyle(ButtonStyle.Success);
 
         const NextPage = new ButtonBuilder()
-            .setCustomId('next')
-            .setLabel('▶')
+            .setCustomId("next")
+            .setLabel("▶")
             .setStyle(ButtonStyle.Primary);
 
         const PreviousPage = new ButtonBuilder()
-            .setCustomId('previous')
-            .setLabel('◀')
+            .setCustomId("previous")
+            .setLabel("◀")
             .setStyle(ButtonStyle.Primary);
 
         const PageNumber = new ButtonBuilder()
-            .setCustomId('page')
+            .setCustomId("page")
             .setLabel(`${counter} / ${categories.length}`)
             .setStyle(ButtonStyle.Secondary)
             .setDisabled(true);
@@ -91,18 +96,17 @@ module.exports = {
         const pages = [];
         categories.map((category, index) => {
             const categoryName = category.split(" ")[0]; // Get the category name
-            if (index === 0 || categoryName !== categories[index - 1].split(" ")[0]) {
+            if (index === 0 || categoryName !== categories[index - 1].split(" ")[0]) 
                 pages.push(`**Page ${index + 1}:** ${categoryName.toUpperCase()}`);
-            }
+            
         });
 
         const categoryEmbed = {
             title: "Command categories",
             description: `**The prefix is:** \`${prefix}\`\n\nTotal commands: ${addedCommands.size}\n${pages.join("\n")}`,
             color: 0xffffff,
-            footer: { text: `Buttons expire after 2 minutes.` }
+            footer: { text: "Buttons expire after 2 minutes." },
         };
-              
               
 
         row.components[0].setDisabled(true);
@@ -121,20 +125,20 @@ module.exports = {
         const collector = helpMessage.createMessageComponentCollector({
             filter,
             time: 120000,
-            dispose: true
+            dispose: true,
         });
         
         collector.on("collect", async (interaction) => {
 
-            if (interaction.customId === 'next') {
+            if (interaction.customId === "next") 
                 counter++;
-            } else if (interaction.customId === 'previous') {
+            else if (interaction.customId === "previous") 
                 counter--;
-            } else if (interaction.customId === 'first') {
+            else if (interaction.customId === "first") 
                 counter = 0;
-            } else if (interaction.customId === 'last') {
+            else if (interaction.customId === "last") 
                 counter = categories.length;
-            }
+            
             if (counter < 0) counter = 0;
             if (counter >= categories.length) counter = categories.length;
 
@@ -182,8 +186,8 @@ module.exports = {
             await helpMessage.edit({
                 embeds: [embed],
                 components: [row],
-                allowedMentions: { repliedUser: false }
+                allowedMentions: { repliedUser: false },
             });
         });
-    }
+    },
 };
