@@ -4,14 +4,6 @@ module.exports = {
     name: "suggestion",
     description: "Suggest ideas for the bot",
     type: ApplicationCommandType.ChatInput,
-    options: [
-        {
-            name: "suggestion",
-            description: "The user to check the info from.",
-            type: ApplicationCommandOptionType.String,
-            required: true,
-        },
-    ],
     execute(logger, interaction, client) {
         // Sends the suggestion and other info in a channel
         const suggestion = interaction.options.get("suggestion").value;

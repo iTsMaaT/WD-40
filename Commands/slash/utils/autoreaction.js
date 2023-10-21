@@ -46,7 +46,7 @@ module.exports = {
                     max_length: 100,
                 }, {
                     name: "string",
-                    description: "The string in messages that enables a reaction (You can do <media>, <links>, <attachments>and <all>)",
+                    description: "The string in messages that enables a reaction (You can do <media>, <links>, <attachments> and <all>)",
                     type: ApplicationCommandOptionType.String,
                     required: true,
                     max_length: 100,

@@ -87,6 +87,7 @@ function loadFiles(folder, callback) {
         if (file.endsWith(".js")) {
             const loaded = require(`${folder}${file}`);
             loaded.filePath = folder + file;
+            loaded.lastExecutionTime = 1000;
             callback(loaded, file);
         } else {
             const newFiles = fs.readdirSync(folder + file);
@@ -167,18 +168,33 @@ process.stdin.on("data", (input) => {
 // Bot setup on startup
 client.once(Events.ClientReady, async () => {
 
-    client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");
-    const part3 = RandomMinMax(1, 255);
-    const part4 = RandomMinMax(1, 255);
-    let port;
-    if (Math.random() < 0.5)
-        port = 25565;
-    else 
-        RandomMinMax(24500, 26000);
-
+    const updateActivities = () => {
+        const part3 = RandomMinMax(1, 255);
+        const part4 = RandomMinMax(1, 255);
+        let port;
+        if (Math.random() < 0.5)
+            port = 25565;
+        else 
+            port = RandomMinMax(24500, 26000);
+    
     // Combine the parts into a valid IPv4 address
     const ipAddress = `192.168.${part3}.${part4}:${port}`;
     const ip = ipAddress;
+    
+    for (let i = 0; i < activities.length; i++) {
+        activities[i].name = activities[i].name.replace("Placeholder01", (100 / activities.length).toFixed(2));
+        activities[i].name = activities[i].name.replace("Placeholder02", activities.length - 1);
+        activities[i].name = activities[i].name.replace("Placeholder03", ip);
+        activities[i].name = activities[i].name.replace("Placeholder04", client.guilds.cache.size);
+        
+        // Set the activity with type and name
+    }
+    const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+    client.user.setActivity(randomActivity.name, { type: randomActivity.type });
+    };
+    
+    
+    client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");
 
     global.logger.info(`Bot starting on [${process.env.SERVER}]...`);
 
@@ -195,12 +211,7 @@ client.once(Events.ClientReady, async () => {
     console.log("commands setup done.");
 
     console.log(`Setting up activity status... (${activities.length} statuses)`);
-    for (let i = 0; i < activities.length; i++) {
-        activities[i] = activities[i].replace("Placeholder01", (100 / activities.length).toFixed(2));
-        activities[i] = activities[i].replace("Placeholder02", activities.length - 1);
-        activities[i] = activities[i].replace("Placeholder03", ip);
-        activities[i] = activities[i].replace("Placeholder04", client.guilds.cache.size);
-    }
+    updateActivities();
     console.log("Activity status setup done.");
 
     console.log("Creating the cron jobs...");
@@ -211,7 +222,7 @@ client.once(Events.ClientReady, async () => {
     });
 
     const DailyActivity = new cron.CronJob("00 00 04 * * *", () => {
-        client.user.setActivity(activities[Math.floor(Math.random() * activities.length)], { type: ActivityType.Custom });
+        updateActivities();
     });
 
     const RamLeakDetector = new cron.CronJob("0 * * * *", async () => {
@@ -259,6 +270,52 @@ client.once(Events.ClientReady, async () => {
     console.log(`Debug is ${debug ? "en" : "dis"}abled\nSuperuser is ${superuser ? "en" : "dis"}abled`);
 
     console.log("Waiting for websocket to successfully connect.");
+    console.logger(`
+                                                                                  
+                                 ██████████████                                 
+                           ██████████████████████████                           
+                       ██████████████████████████████████                       
+                    ████████████████████████████████████████                    
+                 ██████████████                  ██████████████                 
+               ███████████                            ███████████               
+             ██████████                                  ██████████             
+           █████████                                        █████████           
+          █████████             █               █             ████████          
+         ████████              █                 █             █████████        
+       ████████              ██                   ██             ████████       
+      ████████               █                     █              ████████      
+      ███████               ██                     ██              ████████     
+     ███████                ██                     ██               ███████     
+    ███████                 ██                    ███                ███████    
+    ██████                  ███    ██████████     ███                 ███████   
+   ███████                  █████████████████████████                 ███████   
+   ██████                 ██████████         ██████████                ██████   
+   ██████             ████████████████     ████████████████            ███████  
+  ███████           ████      █████████████████████     █████          ███████  
+  ███████          ██         ███  ███     ███  ███         ██         ███████  
+  ███████         █           ███   █       █   ███          ██        ███████  
+  ███████        █            ████   ███████   ████            █       ███████  
+   ██████        █             ████   █████   ████             █       ███████  
+   ██████                       █████ █████ █████                      ██████   
+   ███████                        █████████████                       ███████   
+    ██████                           ███████                          ███████   
+    ███████                          ███████                         ███████    
+    ████████                        █████████                       ███████     
+      ███████        ██           ████     █████           ██      ████████     
+      ████████         █████████████         ██████████████       ████████      
+       ████████                                                  ████████       
+         ████████                                               ████████        
+          █████████                                           ████████          
+           █████████                                        █████████           
+             ██████████                                  ██████████             
+               ███████████                            ███████████               
+                 ██████████████                  ██████████████                 
+                    ████████████████████████████████████████                    
+                       ██████████████████████████████████                       
+                           ██████████████████████████                           
+                                 ██████████████                                 
+        
+    `);
     // start confirmation
     const interval = setInterval(() => {
         if (client.ws.ping !== -1) {
@@ -445,7 +502,10 @@ client.on(Events.MessageCreate, async (message) => {
         
         // Execute the command
         try {
-            await message.channel.sendTyping();
+
+            const startTime = Date.now();
+
+            if (command.lastExecutionTime > 1000) await message.channel.sendTyping();
 
             // Check if the bot has the required permissions
             const botPermissions = message.guild.members.cache.get(client.user.id)?.permissions?.bitfield;
@@ -458,6 +518,8 @@ client.on(Events.MessageCreate, async (message) => {
             }
 
             await command.execute(global.logger, client, message, args);
+            command.lastExecutionTime = Date.now() - startTime;
+
         } catch (error) {
             global.logger.error(error.stack);
             return SendErrorEmbed(message, "An error occured while executing the command", "red");

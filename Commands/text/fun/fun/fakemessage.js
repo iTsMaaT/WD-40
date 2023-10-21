@@ -19,10 +19,12 @@ module.exports = {
         else 
             UserID = message.author.id;
         
-
-        const User = await message.guild.members.fetch(UserID).catch(err => {
+            let User;
+        try {
+            User = await message.guild.members.fetch(UserID)
+        } catch(err) {
             return SendErrorEmbed(message, "Couldn't fetch the user", "red");
-        });
+        }
 
         // Create a webhook in the target channel
         const webhook = await CreateOrUseWebhook(message, "FakeMessage");

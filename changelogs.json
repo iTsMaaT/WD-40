@@ -226,9 +226,25 @@
         "version": "4.11.0",
         "date": "2023-09-21",
         "changes": [
-            "/autoreaction: You can now configure auto-reactions to certin messages in certain channels",
+            "/autoreaction: You can now configure auto-reactions to certain messages in certain channels",
             "Even more improvements to >help",
             "some fixes to the stupid music plugin",
+            "Lots of fixes"
+        ]
+    },
+    {
+        "version": "5.0.0",
+        "date": "2023-09-21",
+        "changes": [
+            "Massive refactoring",
+            "Combined functions, better event handler, console commands",
+            "Removed `WD-40 is typing ...` for fast command (now is dynamic depending on the command execution time)",
+            "After being auto-corrected by the bot for a typo, saying yes will execute the command",
+            "Some activity statuses are now dynamically updated everyday",
+            "Added <all> parameter for auto-reactions",
+            "Fixed duplicate emotes for auto-reactions",
+            "New support server! | https://discord.gg/pqKE2QZrFM",
+            "Activity status now look like a actual status (no `Playing ...`)",
             "Lots of fixes"
         ]
     }
