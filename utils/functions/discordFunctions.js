@@ -1,4 +1,4 @@
-const prettyString = require("./prettyString");
+const { prettyString } = require("@functions/formattingFunctions");
 const CreateOrUseWebhook = async function(message, name) {
     const webhooks = await message.channel.fetchWebhooks();
     let webhook = webhooks.filter(wh => wh.name == name)[0];
@@ -62,4 +62,26 @@ const InfoFromMessageLink = function(link) {
     */
 };
 
-module.exports = { CreateOrUseWebhook, id, SendErrorEmbed, StringReact, InfoFromMessageLink };
+const editOrSend = async (messageOptions, add) => {
+    const channel = this;
+    if (!channel.id) throw new Error("Invalid channel");
+
+    try {
+        const message = await message.channel.messages.fetch({ limit: 1 }).first();
+        if (add) 
+            message.edit(message.content + messageOptions?.content ?? messageOptions);
+        else 
+            message.edit(messageOptions);
+    } catch (err) {
+        channel.send(messageOptions);
+    }
+};
+
+module.exports = { 
+    CreateOrUseWebhook,
+    id,
+    SendErrorEmbed,
+    StringReact,
+    InfoFromMessageLink,
+    editOrSend, 
+};

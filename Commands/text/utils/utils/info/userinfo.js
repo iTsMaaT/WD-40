@@ -1,5 +1,5 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const prettyString = require("@functions/prettyString.js");
+const { prettyString } = require("@functions/formattingFunctions");
 
 module.exports = {
     name: "userinfo",

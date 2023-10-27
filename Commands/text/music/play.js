@@ -59,7 +59,7 @@ module.exports = {
                     volume: 75,
                 },
             });
-            logger.music(`Playing [${res.track.title}]`); 
+            logger.music(`Playing [${res.track.title}] in [${message.member.voice.channel.name}]`); 
 
             embed = {
                 color: 0xffffff,

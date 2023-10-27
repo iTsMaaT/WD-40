@@ -1,9 +1,8 @@
 const CreateUniqueSeed = require("@functions/CreateUniqueSeed.js");
 const RandomMinMax = require("@functions/RandomMinMax.js");
 const getExactDate = require("@functions/getExactDate.js");
-const prettyString = require("@functions/prettyString.js");
+const { prettyString } = require("@functions/formattingFunctions");
 const { StringReact } = require("@functions/discordFunctions.js");
-const ShuffleArray = require("@functions/ShuffleArray.js");
 const GetPterodactylInfo = require("@functions/GetPterodactylInfo.js");
 const GetUniqueValues = require("@functions/GetUniqueValues.js");
 
@@ -27,7 +26,7 @@ module.exports = {
             + "\n" +
             CreateUniqueSeed()
             + "\n" +
-            ShuffleArray(array).join(", ")
+            array.shuffle().join(", ")
             + "\n" +
             ptero.main.name
             + "\n" +

@@ -1,6 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const { Client, GatewayIntentBits, Events, Partials, ActivityType, PermissionFlagsBits } = require("discord.js");
 const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState, AutoCommandMatch } = require("./utils/config.json");
+const { memoryUsage } = require("node:process");
 
 require("module-alias/register");
 
@@ -90,6 +91,7 @@ function loadFiles(folder, callback) {
             loaded.lastExecutionTime = 1000;
             callback(loaded, file);
         } else {
+            if (file.endsWith(".txt")) continue;
             const newFiles = fs.readdirSync(folder + file);
             newFiles.forEach(f => commandFiles.push(file + "/" + f));
         }
@@ -155,13 +157,19 @@ loadFiles("./events/console/", function(event) {
     client.consoleCommands.set(event.name, event);
 });
 
-process.stdin.on("data", (input) => {
+process.stdin.on("data", async (input) => {
     const args = input.split(/ +/);
     const commandName = args.shift().toLowerCase().trim();
     const command = client.consoleCommands.get(commandName);
     if (!command) return;
 
-    command.execute(client, global.logger, ...args);
+    console.logger(`
+    Executing [${commandName}]
+    by        [CONSOLE]
+    ---------------------------`
+        .replace(/^\s+/gm, ""));
+
+    await command.execute(client, global.logger, ...args);
 });
 
 
@@ -177,24 +185,24 @@ client.once(Events.ClientReady, async () => {
         else 
             port = RandomMinMax(24500, 26000);
     
-    // Combine the parts into a valid IPv4 address
-    const ipAddress = `192.168.${part3}.${part4}:${port}`;
-    const ip = ipAddress;
+        // Combine the parts into a valid IPv4 address
+        const ipAddress = `192.168.${part3}.${part4}:${port}`;
+        const ip = ipAddress;
     
-    for (let i = 0; i < activities.length; i++) {
-        activities[i].name = activities[i].name.replace("Placeholder01", (100 / activities.length).toFixed(2));
-        activities[i].name = activities[i].name.replace("Placeholder02", activities.length - 1);
-        activities[i].name = activities[i].name.replace("Placeholder03", ip);
-        activities[i].name = activities[i].name.replace("Placeholder04", client.guilds.cache.size);
+        for (let i = 0; i < activities.length; i++) {
+            activities[i].name = activities[i].name.replace("Placeholder01", (100 / activities.length).toFixed(2));
+            activities[i].name = activities[i].name.replace("Placeholder02", activities.length - 1);
+            activities[i].name = activities[i].name.replace("Placeholder03", ip);
+            activities[i].name = activities[i].name.replace("Placeholder04", client.guilds.cache.size);
         
         // Set the activity with type and name
-    }
-    const randomActivity = activities[Math.floor(Math.random() * activities.length)];
-    client.user.setActivity(randomActivity.name, { type: randomActivity.type });
+        }
+        const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+        client.user.setActivity(randomActivity.name, { type: randomActivity.type });
     };
     
     
-    client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");
+    if (process.env.SERVER != "dev") client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");
 
     global.logger.info(`Bot starting on [${process.env.SERVER}]...`);
 
@@ -319,7 +327,7 @@ client.once(Events.ClientReady, async () => {
     // start confirmation
     const interval = setInterval(() => {
         if (client.ws.ping !== -1) {
-            client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
+            if (process.env.SERVER != "dev") client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
             global.logger.info("Bot started successfully.");
             clearInterval(interval);
         }
@@ -518,7 +526,7 @@ client.on(Events.MessageCreate, async (message) => {
             }
 
             await command.execute(global.logger, client, message, args);
-            command.lastExecutionTime = Date.now() - startTime;
+            command.lastExecutionTime = parseInt(Date.now() - startTime);
 
         } catch (error) {
             global.logger.error(error.stack);

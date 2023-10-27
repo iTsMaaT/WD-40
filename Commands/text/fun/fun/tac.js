@@ -1,4 +1,4 @@
-const prettyString = require("@functions/prettyString.js");
+const { prettyString } = require("@functions/formattingFunctions");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {

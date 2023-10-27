@@ -5,12 +5,14 @@ module.exports = {
     execute(client, logger) {
         const uptime = formatUptime(process.uptime());
         const WDVersion = changelog.slice(-1).map(({ version }) => { return version; }).join();
-        console.log("Bot Information:");
-        console.log("- Version: " + WDVersion);
-        console.log("- Ping: " + client.ws.ping + "ms");
-        console.log("- Uptime: " + uptime);
-        console.log("- Server Count: " + client.guilds.cache.size);
-        console.log("- User Count: " + client.users.cache.size);
+        console.logger(`
+        Bot Information:
+        - Version: ${WDVersion}
+        - Ping: ${client.ws.ping + "ms"}
+        - Uptime: ${uptime}
+        - Server Count: ${client.guilds.cache.size}
+        - User Count: ${client.users.cache.size}`
+            .replace(/^\s+/gm, ""));
 
         function formatUptime(seconds) {
             const hours = Math.floor(seconds / 3600);

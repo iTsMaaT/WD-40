@@ -1,3 +1,4 @@
+const util = require("util");
 /* function checkIfFolderExists(path) {
     try{
         fs.readdirSync(path);
@@ -26,7 +27,7 @@ function getDateTime() {
     return getDate() + " " + time;
 }
 
-async function writeLogToFile(log, client, type) {
+async function writeLogToFile(header, message, client, type) {
     
     // Set the color based on the log type
     let color;
@@ -50,16 +51,18 @@ async function writeLogToFile(log, client, type) {
             color = "\x1b[0m"; // Reset color
             break;
     }
-    
-    console.logger(`${color}${log}\x1b[0m`);
+
+    const formattedLog = util.inspect(message, { depth: null, colors: true }).slice(1, -1);
+    // Adds color depending on log type, then the log header, then the log and finally a newline
+    process.stdout.write(`${color}${header} ${formattedLog}\x1b[0m\n`);
     
     if (type == "CONSOLE" || type == "EVENT") return;
-    client?.channels?.cache?.get("1069811223950016572")?.send(`\`\`\`${log}\`\`\``);
+    client?.channels?.cache?.get("1069811223950016572")?.send(`\`\`\`${formattedLog}\`\`\``);
     
     try {
         await global.prisma.logs.create({
             data: {
-                Value: log,
+                Value: formattedLog,
                 Type: type,
             },
         });
@@ -77,35 +80,35 @@ class Logger {
     }
 
     error(message) {
-        writeLogToFile(`[${getDateTime()} -   ERROR] ${message}`, this.options.client, "ERROR");
+        writeLogToFile(`[${getDateTime()} -   ERROR]`, message, this.options.client, "ERROR");
     }
 
     debug(message) {
-        writeLogToFile(`[${getDateTime()} -   DEBUG] ${message}`, this.options.client, "DEBUG");
+        writeLogToFile(`[${getDateTime()} -   DEBUG]`, message, this.options.client, "DEBUG");
     }
 
     info(message) {
-        writeLogToFile(`[${getDateTime()} -    INFO] ${message}`, this.options.client, "INFO");
+        writeLogToFile(`[${getDateTime()} -    INFO]`, message, this.options.client, "INFO");
     }
 
     console(message) {
-        writeLogToFile(`[${getDateTime()} - CONSOLE] ${message}`, this.options.client, "CONSOLE");
+        writeLogToFile(`[${getDateTime()} - CONSOLE]`, message, this.options.client, "CONSOLE");
     }
 
     warning(message) {
-        writeLogToFile(`[${getDateTime()} - WARNING] ${message}`, this.options.client, "WARNING");
+        writeLogToFile(`[${getDateTime()} - WARNING]`, message, this.options.client, "WARNING");
     }
 
     severe(message) {
-        writeLogToFile(`[${getDateTime()} -  SEVERE] ${message}`, this.options.client, "SEVERE");
+        writeLogToFile(`[${getDateTime()} -  SEVERE]`, message, this.options.client, "SEVERE");
     }
 
     music(message) {
-        writeLogToFile(`[${getDateTime()} -   MUSIC] ${message}`, this.options.client, "MUSIC");
+        writeLogToFile(`[${getDateTime()} -   MUSIC]`, message, this.options.client, "MUSIC");
     }
 
     event(message) {
-        writeLogToFile(`[${getDateTime()} -   EVENT] ${message}`, this.options.client, "EVENT");
+        writeLogToFile(`[${getDateTime()} -   EVENT]`, message, this.options.client, "EVENT");
     }
 }
 

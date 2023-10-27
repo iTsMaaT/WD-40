@@ -1,4 +1,4 @@
-const ToEngineerNotation = require("./ToEngineerNotation");
+const { ToEngineerNotation } = require("@functions/discordFunctions");
 const prettyMilliseconds = require("pretty-ms");
 const got = require("got");
 

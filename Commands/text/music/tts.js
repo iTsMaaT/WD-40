@@ -76,3 +76,57 @@ module.exports = {
         message.reply({ embeds: [{ title: "Playing the TTS", timestamp: new Date(), color: 0xffffff }] });
     },
 };
+
+
+const voices = [
+    "Adult Female #1, American English (TruVoice)",
+    "Adult Female #2, American English (TruVoice)",
+    "Adult Male #1, American English (TruVoice)",
+    "Adult Male #2, American English (TruVoice)",
+    "Adult Male #3, American English (TruVoice)",
+    "Adult Male #4, American English (TruVoice)",
+    "Adult Male #5, American English (TruVoice)",
+    "Adult Male #6, American English (TruVoice)",
+    "Adult Male #7, American English (TruVoice)",
+    "Adult Male #8, American English (TruVoice)",
+    "Female Whisper",
+    "Mary",
+    "Mary (for Telephone)",
+    "Mary in Hall",
+    "Mary in Space",
+    "Mary in Stadium",
+    "Mike",
+    "Mike (for Telephone)",
+    "Mike in Hall",
+    "Mike in Space",
+    "Mike in Stadium",
+    "RoboSoft Five",
+    "RoboSoft Four",
+    "RoboSoft One",
+    "RoboSoft Six",
+    "RoboSoft Three",
+    "RoboSoft Two",
+    "Bonzi",
+    "Sam",
+];
+
+const SayTTS = async function(voice, text, pitch, speed)
+{
+    pitch = parseInt(pitch);
+    speed = parseInt(speed);
+
+    const url = "https://www.tetyys.com/SAPI4?text=" + encodeURIComponent(text) + "&voice=" + encodeURIComponent(voice) + "&pitch=" + pitch + "&speed=" + speed;
+
+    if (url.length > 4088) {
+        alert("Text too long");
+        return;
+    }
+
+    const wav = await got(url);
+    if (wav.status != 200) {
+        alert(await wav.text());
+        return;
+    }
+    const blobUrl = URL.createObjectURL(await wav.blob());
+    return blobUrl;
+};

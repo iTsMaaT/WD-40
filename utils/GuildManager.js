@@ -92,15 +92,16 @@ module.exports = (function(prisma) {
                     GuildID: guildId,
                 },
             });
+
             if (data.length > 0) {
-                for (const i in data) {
-                    const value = data[i];
-                    if (value.UserID === undefined) continue;
-                    bl[value.UserID] = new String(value.Permission).toLowerCase().split(";");
-                }
+                data.forEach((value) => {
+                    if (value.UserID) 
+                        bl[value.UserID] = new String(value.Permission).toLowerCase().split(";");
+                
+                });
             }
         } catch (e) {
-            global.logger.error("Silently failing blacklist init for guild " + guildId + ", " + e.stack);
+            global.logger.error("Error while initializing blacklist for guild " + guildId + ": " + e.stack);
         }
 
         function GrantPermission(userId, permission) {
@@ -155,7 +156,7 @@ module.exports = (function(prisma) {
 
     async function GetBlacklist(guildId) {
         if (!blacklist[guildId]) 
-            blacklist[guildId] = await blacklistFn(prisma, guildId);
+            blacklist[guildId] = blacklistFn(guildId);
         
         return blacklist[guildId];
     }
@@ -310,6 +311,159 @@ module.exports = (function(prisma) {
         
         return reactions[guildId];
     }
+
+    // eefefef
+
+    async function autoResponseFn(guildId) {
+        const cache = {};
+    
+        try {
+            const data = await prisma.Responses.findMany({
+                where: {
+                    GuildID: guildId,
+                },
+            });
+    
+            if (data.length > 0) {
+                for (const i in data) {
+                    if (data[i].ChannelString === undefined) continue;
+                    const value = data[i];
+                    if (!cache[value.ChannelString]) 
+                        cache[value.ChannelString] = [];
+                    
+                    cache[value.ChannelString].push({
+                        "string": value.String,
+                        "response": value.Response,
+                    });
+                }
+            }
+        } catch (e) {
+            global.logger.error("Silently failing auto reaction init for guild " + guildId + ", " + e.stack);
+        }
+    
+        async function addResponse(ChannelPrompt, string, response) {
+            if (!cache[ChannelPrompt]) 
+                cache[ChannelPrompt] = [];
+            
+            cache[ChannelPrompt].push({
+                "string": string,
+                "response": response,
+            });
+            await updateResponseDB(ChannelPrompt, string);
+        }
+    
+        async function removeResponse(ChannelPrompt, string = null) {
+            if (!string) delete cache[ChannelPrompt];
+            if (cache[ChannelPrompt]) {
+                // Remove the entry with the matching string
+                cache[ChannelPrompt] = cache[ChannelPrompt].filter(entry => entry.string !== string);
+                if (cache[ChannelPrompt].length == 0) delete cache[ChannelPrompt];
+            }
+            await updateResponseDB(ChannelPrompt, string);
+        }
+    
+        async function matchResponses(ChannelPrompt, String, hasAttachment = false) {
+            const matchedResponses = [];
+            
+            if (cache) {
+                for (const channelPrompt of Object.keys(cache)) {
+                    if (!ChannelPrompt.includes(channelPrompt)) continue;
+                    for (const entry of cache[channelPrompt]) {
+                        const { string, response } = entry;
+        
+                        // Check if the string matches <media> or <link> for URLs
+                        if ((/(https?:\/\/[^\s]+)/.test(String) || hasAttachment) && string === "<media>") 
+                            matchedResponses.push(...response.split(";"));
+                        
+        
+                        if (/(https?:\/\/[^\s]+)/.test(String) && string === "<link>") 
+                            matchedResponses.push(...response.split(";"));
+                        
+        
+                        // Check if the string matches <attachment> for attachments
+                        if (hasAttachment && string === "<attachment>") 
+                            matchedResponses.push(...response.split(";"));
+                        
+        
+                        // Check for other matches anywhere in the strings
+                        if (String.includes(string)) 
+                            matchedResponses.push(...response.split(";"));
+                        
+
+                        if (string === "<all>") 
+                            matchedResponses.push(...response.split(";"));
+                        
+                    }
+                }
+            }
+        
+            // if (!matchedResponses[0]) return null;
+            return matchedResponses;
+        }
+        
+    
+        async function getResponses() {
+            return cache;
+        }
+    
+        async function updateResponseDB(ChannelPrompt, String) {
+            if (cache[ChannelPrompt]) {
+                const ResponseTable = bl[ChannelPrompt].filter(val => val.string === String);
+                if (ResponseTable.length > 0) {
+                    const Responses = ResponseTable[0].response;
+    
+                    // Update or create entries for each string and Responses pair
+                    await prisma.Reactions.upsert({
+                        where: {
+                            GuildID_ChannelString_String: {
+                                GuildID: guildId,
+                                ChannelString: ChannelPrompt,
+                                String,
+                            },
+                        },
+                        update: {
+                            Responses,
+                        },
+                        create: {
+                            GuildID: guildId,
+                            ChannelString: ChannelPrompt,
+                            String,
+                            Responses,
+                        },
+                    });
+                } else {
+                    await prisma.Reactions.delete({
+                        where: {
+                            GuildID_ChannelString_String: {
+                                GuildID: guildId,
+                                ChannelString: ChannelPrompt,
+                                String,
+                            },
+                        },
+                    });
+                }
+            } else {
+                // Delete all entries for this channel prompt
+                await prisma.Reactions.deleteMany({
+                    where: {
+                        GuildID: guildId,
+                        ChannelString: ChannelPrompt,
+                    },
+                });
+            }
+        }
+    
+        return { addResponse, removeResponse, matchResponses, getResponses };
+    }
+    
+    const autoResponses = {};
+    
+    async function getAutoResponses(guildId) {
+        if (!autoResponses[guildId]) 
+            autoResponses[guildId] = await autoResponseFn(guildId);
+        
+        return autoResponses[guildId];
+    }
     
 
     return {
@@ -326,5 +480,6 @@ module.exports = (function(prisma) {
         GetPersonality,
         GetBlacklist,
         getAutoReactions,
+        getAutoResponses,
     };
 });

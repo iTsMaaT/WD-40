@@ -81,4 +81,13 @@ model Reactions {
   String          String
   Emotes          String 
   @@unique([GuildID, ChannelString, String])
+}
+
+model Responses {
+  ID              BigInt  @id @default(autoincrement())
+  GuildID         String
+  ChannelString   String
+  String          String
+  Response        String 
+  @@unique([GuildID, ChannelString, Response])
   }

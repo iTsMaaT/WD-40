@@ -1,5 +1,5 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const prettyString = require("@functions/prettyString.js");
+const { prettyString } = require("@functions/formattingFunctions");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
