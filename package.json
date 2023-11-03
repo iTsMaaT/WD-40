@@ -49,6 +49,7 @@
     "ytdl-core": "^4.10.0"
   },
   "devDependencies": {
+    "eslint": "^8.52.0",
     "prisma": "^5.3.1"
   },
   "_moduleAliases": {

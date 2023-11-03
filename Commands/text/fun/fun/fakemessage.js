@@ -13,19 +13,21 @@ module.exports = {
         let UserID;
 
         if (!args[0]) return SendErrorEmbed(message, "You must provide a prompt", "yellow");
-
+        
         if (id(args[0])) 
             UserID = id(args.shift());
         else 
             UserID = message.author.id;
-        
-            let User;
+
+        let User;
         try {
-            User = await message.guild.members.fetch(UserID)
-        } catch(err) {
+            User = await message.guild.members.fetch(UserID);
+        } catch (err) {
             return SendErrorEmbed(message, "Couldn't fetch the user", "red");
         }
 
+        message.delete();
+        
         // Create a webhook in the target channel
         const webhook = await CreateOrUseWebhook(message, "FakeMessage");
 
@@ -37,7 +39,5 @@ module.exports = {
         });
 
         // Delete the webhook after sending the fake message
-        message.delete();
-
     },
 };

@@ -163,7 +163,8 @@ process.stdin.on("data", async (input) => {
     const command = client.consoleCommands.get(commandName);
     if (!command) return;
 
-    console.logger(`
+    process.stdout.write("\u001b[1A\u001b[2K");
+    await console.logger(`
     Executing [${commandName}]
     by        [CONSOLE]
     ---------------------------`
@@ -175,6 +176,7 @@ process.stdin.on("data", async (input) => {
 
 // Bot setup on startup
 client.once(Events.ClientReady, async () => {
+    console.log(global.player.scanDeps());
 
     const updateActivities = () => {
         const part3 = RandomMinMax(1, 255);
