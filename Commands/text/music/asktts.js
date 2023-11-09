@@ -3,7 +3,6 @@ const { useQueue } = require("discord-player");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("@discordjs/voice");
 const googleTTS = require("google-tts-api");
 const got = require("got");
-const { PermissionFlagsBits } = require("discord.js");
 
 
 module.exports = {
@@ -12,7 +11,7 @@ module.exports = {
     usage: "< prompt >",
     category: "music",
     examples: ["what is the skull emoji used for"],
-    permissions: [PermissionFlagsBits.Connect],
+    permissions: ["Connect"],
     cooldown: 10000,
     execute: async (logger, client, message, args) => {
         let response, connection, sent;

@@ -1,5 +1,4 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
     name: "deafenall",
@@ -7,7 +6,7 @@ module.exports = {
     category: "admin",
     usage: "< -deafen / -undeafen >",
     admin: true,
-    permissions: [PermissionFlagsBits.DeafenMembers],
+    permissions: ["DeafenMembers"],
     aliases: ["deafa"],
     execute(logger, client, message, args) {
       
