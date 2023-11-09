@@ -29,7 +29,7 @@ module.exports = {
 
             
             if (!queue) {
-                message.guild.me.voice?.setChannel(null).catch(() => null);
+                message.guild.me?.voice?.setChannel(null).catch(() => null);
                 const connection = joinVoiceChannel({
                     channelId: message.member.voice.channel.id,
                     guildId: message.guild.id,
