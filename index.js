@@ -1,7 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const { Client, GatewayIntentBits, Events, Partials, ActivityType, PermissionFlagsBits } = require("discord.js");
 const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState, AutoCommandMatch } = require("./utils/config.json");
-const { memoryUsage } = require("node:process");
 
 require("module-alias/register");
 
@@ -237,12 +236,15 @@ client.once(Events.ClientReady, async () => {
         updateActivities();
     });
 
+    const PterodactylInfo = await GetPterodactylInfo();
+    const totalRam = PterodactylInfo.ram.limit.raw;
+    console.log(memoryUsage());
+    console.log(totalRam);
+
     const RamLeakDetector = new cron.CronJob("0 * * * *", async () => {
         try {
-            const PterodactylInfo = await GetPterodactylInfo();
-            let RamLeakPourcentage = parseInt(PterodactylInfo.ram.pourcentage.raw).toFixed(0);
-            if (RamLeakPourcentage > 100) RamLeakPourcentage = 100;
-            HourlyRam.push(RamLeakPourcentage);
+            const memoryUsage = process.memoryUsage();
+            HourlyRam.push((memoryUsage.heapUsed / memoryUsage.heapTotal) * 100);
             HourlyRam.shift();
             if (HourlyRam[0] > 90 && HourlyRam[1] > 90 && HourlyRam [2] > 90) client.users.cache.get(process.env.OWNER_ID).send("Memory leak detected.");
         } catch (err) {
