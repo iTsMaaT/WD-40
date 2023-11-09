@@ -513,7 +513,7 @@ client.on(Events.MessageCreate, async (message) => {
 
             const startTime = Date.now();
 
-            if (command.lastExecutionTime > 1000) await message.channel.sendTyping();
+            if (command.lastExecutionTime >= 1000) await message.channel.sendTyping();
 
             // Check if the bot has the required permissions
             const botPermissions = message.guild.members.cache.get(client.user.id)?.permissions?.bitfield;
