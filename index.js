@@ -236,11 +236,6 @@ client.once(Events.ClientReady, async () => {
         updateActivities();
     });
 
-    const PterodactylInfo = await GetPterodactylInfo();
-    const totalRam = PterodactylInfo.ram.limit.raw;
-    console.log(memoryUsage());
-    console.log(totalRam);
-
     const RamLeakDetector = new cron.CronJob("0 * * * *", async () => {
         try {
             const memoryUsage = process.memoryUsage();
