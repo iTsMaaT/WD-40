@@ -1,6 +1,6 @@
 const got = require("got");
 
-const FetchReddit = async function (ChannelNSFW, ...subreddits) {
+const FetchReddit = async function(ChannelNSFW, ...subreddits) {
     try {
         const subreddit = subreddits[Math.floor(Math.random() * subreddits.length)];
         let PostImage = "";

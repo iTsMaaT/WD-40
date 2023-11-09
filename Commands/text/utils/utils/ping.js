@@ -1,11 +1,11 @@
-const prettyMilliseconds = require('pretty-ms');
+const prettyMilliseconds = require("pretty-ms");
 
 module.exports = {
     name: "ping",
     description: "Gives ping and uptime",
     category: "utils",
     async execute(logger, client, message, args) {
-        const sent = await message.reply({ content: 'Pinging...', fetchReply: true , allowedMentions: {RepliedUser: false}});
+        const sent = await message.reply({ content: "Pinging...", fetchReply: true, allowedMentions: { RepliedUser: false } });
 
         const pingEmbed = {
             title: "Ping Information",

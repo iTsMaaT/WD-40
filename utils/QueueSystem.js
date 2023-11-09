@@ -27,19 +27,19 @@ const processQueue = async (queueName) => {
 // Function to add an operation to a specific queue
 const addToQueue = (queueName, operation) => {
     // Check if the specified queue exists, if not create it
-    if (!queues[queueName]) {
+    if (!queues[queueName]) 
         queues[queueName] = [];
-    }
+    
 
     // Push the operation to the end of the specified queue
     queues[queueName].push(operation);
 
     // If the specified queue was empty, start processing the operations
-    if (queues[queueName].length === 1) {
+    if (queues[queueName].length === 1) 
         processQueue(queueName);
-    }
+    
 };
 
 module.exports = {
-    addToQueue
+    addToQueue,
 };

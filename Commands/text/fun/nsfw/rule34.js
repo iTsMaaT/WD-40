@@ -1,5 +1,5 @@
-const got = require('got');
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const got = require("got");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
     name: "rule34",
@@ -10,7 +10,7 @@ module.exports = {
 
         if (message.channel.nsfw) {
             try {
-                const url = 'http://rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=' + args.join('+');
+                const url = "http://rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=" + args.join("+");
                 const response = await got(url);
 
                 const data = JSON.parse(response.body);
@@ -28,7 +28,7 @@ module.exports = {
             } catch (err) {
                 const RuleEmbed = {
                     color: 0xff0000,
-                    title: `An error occured, probably a invalid tag`,
+                    title: "An error occured, probably a invalid tag",
                     timestamp: new Date(),
                 };
                 message.reply({ embeds: [RuleEmbed] });

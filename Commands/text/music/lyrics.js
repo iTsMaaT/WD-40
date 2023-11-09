@@ -1,11 +1,11 @@
-const { useQueue } = require('discord-player');
-const { lyricsExtractor } = require('@discord-player/extractor');
+const { useQueue } = require("discord-player");
+const { lyricsExtractor } = require("@discord-player/extractor");
 const { EmbedBuilder } = require("discord.js");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
     name: "lyrics",
     description: "Gives lyrics for the currently playing song",
-    usage: "< [Track]: track to remove >",
     category: "music",
     async execute(logger, client, message, args) {
         const queue = useQueue(message.guild.id);
@@ -13,7 +13,7 @@ module.exports = {
 
         if (!queue || !queue.tracks || !queue.currentTrack) return SendErrorEmbed(message, "There is nothing in the queue / currently playing.", "yellow");
 
-        const track =(queue?.currentTrack?.title);
+        const track = (queue?.currentTrack?.title);
         const lyrics = await genius.search(track).catch(() => null);
 
         if (!lyrics) return SendErrorEmbed(message, "Couldn't find lyrics.", "red");
@@ -26,5 +26,5 @@ module.exports = {
             .setDescription(trimmedLyrics.length === 1997 ? `${trimmedLyrics}...` : trimmedLyrics)
             .setColor(0xffffff);
         message.reply({ embeds: [embed] });
-    }
+    },
 };

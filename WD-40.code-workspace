@@ -7,7 +7,7 @@
     "settings": {
         "[javascript]": {
             "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-            "editor.formatOnSave": true
+            "editor.formatOnSave": true,
         },
         "eslint.format.enable": true,
         "editor.codeActionsOnSave": {

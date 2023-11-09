@@ -1,4 +1,5 @@
 const got = require("got");
+
 module.exports = {
     name: "advice",
     description: "Get a random advice",
@@ -10,10 +11,10 @@ module.exports = {
 
                 FactEmbed = {
                     color: 0xffffff,
-                    title: `Random advice`,
+                    title: "Random advice",
                     description: advice.slip.advice,
                     timestamp: new Date(),
-                    footer: { text: `ID : ${advice.slip.id}` }
+                    footer: { text: `ID : ${advice.slip.id}` },
                 };
 
                 message.reply({ embeds: [FactEmbed] });
@@ -21,12 +22,12 @@ module.exports = {
             .catch((err) => {
                 ErrEmbed = {
                     color: 0xff0000,
-                    title: `An error occured`,
+                    title: "An error occured",
                     description: err,
                     timestamp: new Date(),
                 };
                 message.reply({ embeds: [ErrEmbed] });
                 logger.error(err);
             });
-    }
+    },
 };

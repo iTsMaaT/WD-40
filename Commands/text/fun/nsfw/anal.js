@@ -1,20 +1,20 @@
 const got = require("got");
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
-    name: 'anal',
-    description: 'why',
+    name: "anal",
+    description: "why",
     category: "NSFW",
     async execute(logger, client, message, args) {
 
         if (message.channel.nsfw) {
             await got("https://nekobot.xyz/api/image?type=anal")
                 .then(response => {
-                    var url = JSON.parse(response.body);
+                    const url = JSON.parse(response.body);
 
                     Embed = {
                         color: 0xffffff,
-                        title: `Enjoy!`,
+                        title: "Enjoy!",
                         image: {
                             url: url.message,
                         },
@@ -26,5 +26,5 @@ module.exports = {
         } else {
             return SendErrorEmbed(message, "The channel you are in isn't NSFW", "yellow");
         }
-    }
+    },
 };

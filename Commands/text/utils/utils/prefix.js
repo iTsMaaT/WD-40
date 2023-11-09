@@ -1,4 +1,4 @@
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
     name: "prefix",
@@ -6,6 +6,7 @@ module.exports = {
     usage: "< [Prefix]: new prefix for the guild >",
     category: "utils",
     admin: true,
+    examples: ["!"],
     async execute(logger, client, message, args) {
         if (args.length === 1) {
         // Set or delete the prefix if a custom one was already applied

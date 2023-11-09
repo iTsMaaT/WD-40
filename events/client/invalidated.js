@@ -1,12 +1,13 @@
-const { Events } = require('discord.js');
+const { Events } = require("discord.js");
 
 module.exports = {
     name: Events.Invalidated,
     once: false,
+    log: true,
     execute(client, logger) {
         logger.severe("The client was invalidated, restarting the bot...");
-        client.channels.cache.get("1037141235451842701").send(`Restarting the bot : Invalidated. <@411996978583699456>`);
-        setTimeout(function () {
+        client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Restarting the bot : Invalidated.");
+        setTimeout(function() {
             global.prisma.$disconnect();
             process.exit(1);
         }, 1000 * 3);   

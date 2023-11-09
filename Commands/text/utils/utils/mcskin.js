@@ -1,10 +1,11 @@
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
-    name: 'mcskin',
-    description: 'Gives the Minecraft skin of a user',
+    name: "mcskin",
+    description: "Gives the Minecraft skin of a user",
     usage: "< [Username, UUID]: Name or UUID of the user >",
     category: "utils",
+    examples: ["Notch"],
     async execute(logger, client, message, args) {
         const name = args[0] ?? "mhf_steve";
     
@@ -19,12 +20,12 @@ module.exports = {
                     url: `https://mc-heads.net/skin/${name}`,
                 }, url: `https://mc-heads.net/user/${name}`,
                 timestamp: new Date(),
-                footer: { text: `Defaults to Steve if no arguments are provided` }
+                footer: { text: "Defaults to Steve if no arguments are provided" },
             };
-            message.reply({ embeds: [MCSkinEmbed, {image: { url: `https://mc-heads.net/body/${name}` }, url: `https://mc-heads.net/user/${name}`}] });
-        } catch(err) {
+            message.reply({ embeds: [MCSkinEmbed, { image: { url: `https://mc-heads.net/body/${name}` }, url: `https://mc-heads.net/user/${name}` }] });
+        } catch (err) {
             SendErrorEmbed(message, "An unknown error occured", "red");
             logger.error(err);
         }
-    }
+    },
 };

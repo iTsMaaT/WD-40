@@ -1,10 +1,11 @@
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
     name: "sarcasm",
     description: "MaKeS a StRiNg LoOk SaRcAsTiC",
     category: "text manipulation",
     usage: "< String >",
+    examples: ["Hello, World!"],
     async execute(logger, client, message, args) {
         if (!args[0]) return SendErrorEmbed(message, "You need to provide a prompt.", "yellow");
         if (args.join(" ").length > 1000) return SendErrorEmbed(message, "The result is too long (>1000)", "yellow");
@@ -15,13 +16,13 @@ module.exports = {
 
         for (word of prompt) {
             for (let i = 0; i < word.length; i++) {
-                //Alternates between lower and upper case for each chars
+                // Alternates between lower and upper case for each chars
                 index++;
-                if (index % 2 == 0) {
+                if (index % 2 == 0) 
                     sarcasm += word[i].toLowerCase();
-                } else {
+                else 
                     sarcasm += word[i].toUpperCase();
-                }
+                
             }
             sarcasm += " ";
         }

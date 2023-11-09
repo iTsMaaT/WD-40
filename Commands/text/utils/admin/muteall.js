@@ -1,4 +1,5 @@
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
+const { PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
     name: "muteall",
@@ -6,25 +7,26 @@ module.exports = {
     category: "admin",
     usage: "< -mute / -unmute >",
     admin: true,
-    aliases: ['ma'],
+    permissions: [PermissionFlagsBits.MuteMembers],
+    aliases: ["ma"],
     execute(logger, client, message, args) {
   
         // Check if the user is in a voice channel
-        if (!message.member.voice.channel) {
-            return SendErrorEmbed(message, 'You need to be in a voice channel to use this command.', "yellow");
-        }
+        if (!message.member.voice.channel) 
+            return SendErrorEmbed(message, "You need to be in a voice channel to use this command.", "yellow");
+        
   
         const voiceChannel = message.member.voice.channel;
 
         const embed = {
             color: 0xffffff,
-            title: '',
+            title: "",
             timestamp: new Date(),
         };
   
         // Check the argument to determine if muting or unmuting
-        const action = args[0]?.toLowerCase() ?? '-mute';
-        if (action === '-mute') {
+        const action = args[0]?.toLowerCase() ?? "-mute";
+        if (action === "-mute") {
         // Mute all members except the executor
             voiceChannel.members.forEach(async (member) => {
                 if (!member.user.bot && member.id !== message.author.id) {
@@ -36,8 +38,8 @@ module.exports = {
                 }
             });
   
-            embed.title = 'Successfully muted all members except yourself.';
-        } else if (action === '-unmute') {
+            embed.title = "Successfully muted all members except yourself.";
+        } else if (action === "-unmute") {
         // Unmute all members
             voiceChannel.members.forEach(async (member) => {
                 try {
@@ -47,10 +49,10 @@ module.exports = {
                 }
             });
   
-            embed.title = 'Successfully unmuted all members.';
+            embed.title = "Successfully unmuted all members.";
             message.reply({ embeds: [embed] });
         } else {
-            SendErrorEmbed(message, 'Invalid argument. Please specify either "mute" or "unmute".', "yellow");
+            SendErrorEmbed(message, "Invalid argument. Please specify either \"mute\" or \"unmute\".", "yellow");
         }
-    }
+    },
 };

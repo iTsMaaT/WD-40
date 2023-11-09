@@ -1,4 +1,4 @@
-const prettyMilliseconds = require('pretty-ms');
+const prettyMilliseconds = require("pretty-ms");
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 
 module.exports = {
@@ -11,13 +11,13 @@ module.exports = {
 
         if (message.author.id == process.env.OWNER_ID) {
             const YesRestart = new ButtonBuilder()
-                .setCustomId('yes')
-                .setLabel('Yes')
+                .setCustomId("yes")
+                .setLabel("Yes")
                 .setStyle(ButtonStyle.Success);
 
             const NoRestart = new ButtonBuilder()
-                .setCustomId('no')
-                .setLabel('No')
+                .setCustomId("no")
+                .setLabel("No")
                 .setStyle(ButtonStyle.Danger);
 
             const row = new ActionRowBuilder()
@@ -44,8 +44,8 @@ module.exports = {
                 max: 1, // The maximum number of interactions to collect.
             });
           
-            collector.on('collect', (interaction) => {
-                if (interaction.customId === 'yes') {
+            collector.on("collect", (interaction) => {
+                if (interaction.customId === "yes") {
                     embed.description = `**Shutting down the bot...**\n**Uptime**: \`${prettyMilliseconds(client.uptime)}\``;
                     embed.color = 0xff0000;
                     ConfirmationMessage.edit({ embeds: [embed], components: [row] }).then(() => {
@@ -53,18 +53,18 @@ module.exports = {
                         logger.severe("Shutdown requested from discord...");
                         client.channels.cache.get("1037141235451842701").send(`Shutdown requested from discord for reason : \`${args?.join(" ") || "No reasons provided."}\``);
 
-                        //After 3s, closes the database and then exits the process
-                        setTimeout(function () {
-                            /****************/
+                        // After 3s, closes the database and then exits the process
+                        setTimeout(function() {
+                            /** **************/
                             client.destroy();
                             global.prisma.$disconnect();
                             process.exit(0);
-                            /****************/
+                            /** **************/
                         }, 1000 * 3);
                         return;
                     });
-                } else if (interaction.customId === 'no') {
-                    embed.description = `Shutdown cancelled`;
+                } else if (interaction.customId === "no") {
+                    embed.description = "Shutdown cancelled";
                     embed.color = 0xffffff;
                     ConfirmationMessage.edit({ embeds: [embed], components: [row] }).then(() => {
                         row.components.forEach((component) => component.setDisabled(true));
@@ -77,10 +77,10 @@ module.exports = {
                 });
             });
           
-            collector.on('end', async () => {
+            collector.on("end", async () => {
                 row.components.forEach((component) => component.setDisabled(true));
                 await ConfirmationMessage.edit({ components: [row], embeds: [embed] });
             });
         }
-    }
+    },
 };

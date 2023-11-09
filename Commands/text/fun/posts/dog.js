@@ -1,18 +1,18 @@
-const got = require('got');
+const got = require("got");
 
 module.exports = {
-    name: 'dog',
-    description: 'Not cats!',
+    name: "dog",
+    description: "Not cats!",
     category: "posts",
     async execute(logger, client, message, args) {
 
         await got("https://dog.ceo/api/breeds/image/random")
             .then(response => {
-                var url = JSON.parse(response.body);
+                const url = JSON.parse(response.body);
 
                 const embed = {
                     color: 0xffffff,
-                    title: `Enjoy!`,
+                    title: "Enjoy!",
                     image: {
                         url: url.message,
                     },
@@ -22,5 +22,5 @@ module.exports = {
                 message.reply({ embeds: [embed] });
             });
 
-    }
+    },
 };

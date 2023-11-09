@@ -44,6 +44,7 @@ enum LogType {
   DEBUG
   MUSIC
   CONSOLE
+  EVENT
 }
 model Logs {
   ID      BigInt    @id @default(autoincrement())
@@ -79,5 +80,14 @@ model Reactions {
   ChannelString   String
   String          String
   Emotes          String 
+  @@unique([GuildID, ChannelString, String])
+}
+
+model Responses {
+  ID              BigInt  @id @default(autoincrement())
+  GuildID         String
+  ChannelString   String
+  String          String
+  Response        String 
   @@unique([GuildID, ChannelString, String])
   }

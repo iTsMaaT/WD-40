@@ -1,8 +1,8 @@
 module.exports = {
-    name: 'messagespersecond',
-    description: 'Gives the mps according to the last 100 messages',
+    name: "messagespersecond",
+    description: "Gives the mps according to the last 100 messages",
     category: "utils",
-    aliases: ['mps'],
+    aliases: ["mps"],
     async execute(logger, client, message, args) {
 
         const messages = await message.channel.messages.fetch({ limit: 100 });

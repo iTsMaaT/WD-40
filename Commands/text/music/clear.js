@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require("discord.js");
-const SendErrorEmbed = require("@functions/SendErrorEmbed");
-const { useQueue } = require('discord-player');
+const { SendErrorEmbed } = require("@functions/discordFunctions");
+const { useQueue } = require("discord-player");
 
 module.exports = {
     name: "clear",
@@ -16,5 +16,5 @@ module.exports = {
             .setDescription("Cleared!")
             .setTimestamp();
         message.reply({ embeds: [stoppped_music_embed] });
-    }
+    },
 };
