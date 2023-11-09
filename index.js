@@ -518,7 +518,6 @@ client.on(Events.MessageCreate, async (message) => {
             // Check if the bot has the required permissions
             const botPermissions = message.guild.members.cache.get(client.user.id)?.permissions?.toArray();
             const requiredPermissions = command.permission || [];
-            console.log(botPermissions);
 
             if (requiredPermissions.length > 0 && !botPermissions.includes("Administrator")) {
                 const missingPermissions = requiredPermissions.filter(permission => !botPermissions.includes(permission));
