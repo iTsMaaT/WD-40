@@ -1,5 +1,4 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { PermissionFlagsBits } = require("discord.js");
 const { Readable } = require("stream");
 const { useQueue } = require("discord-player");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("@discordjs/voice");
@@ -11,7 +10,7 @@ module.exports = {
     description: "Do not",
     category: "music",
     private: true,
-    permissions: [PermissionFlagsBits.Connect],
+    permissions: ["Connect"],
     async execute(logger, client, message, args) {
         const queue = useQueue(message.guild.id);
 
@@ -30,6 +29,7 @@ module.exports = {
 
             
             if (!queue) {
+                message.guild.me.voice.setChannel(null).catch(() => null);
                 const connection = joinVoiceChannel({
                     channelId: message.member.voice.channel.id,
                     guildId: message.guild.id,

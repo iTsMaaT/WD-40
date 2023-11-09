@@ -2,7 +2,6 @@ const { useQueue } = require("discord-player");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("@discordjs/voice");
 const googleTTS = require("google-tts-api");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
     name: "tts",
@@ -10,7 +9,7 @@ module.exports = {
     usage: "< [Text]: text to say >",
     category: "music",
     examples: ["i love eating baguettes"],
-    permissions: [PermissionFlagsBits.Connect],
+    permissions: ["Connect"],
     async execute(logger, client, message, args) {
         const queue = useQueue(message.guild.id);
         let connection;

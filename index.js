@@ -516,14 +516,17 @@ client.on(Events.MessageCreate, async (message) => {
             if (command.lastExecutionTime >= 1000) await message.channel.sendTyping();
 
             // Check if the bot has the required permissions
-            const botPermissions = message.guild.members.cache.get(client.user.id)?.permissions?.bitfield;
+            const botPermissions = message.guild.members.cache.get(client.user.id)?.permissions?.toArray();
             const requiredPermissions = command.permission || [];
-            requiredPermissions.push(PermissionFlagsBits.SendMessages);
+            console.log(botPermissions);
 
-            if (requiredPermissions.length > 0) {
-                const missingPermissions = requiredPermissions.filter(permission => !(botPermissions & BigInt(permission)));
-                if (missingPermissions.length > 0) return SendErrorEmbed(message, `The bot is missing the following permissions: ${missingPermissions.join(", ")}`, "red");
+            if (requiredPermissions.length > 0 && !botPermissions.includes("Administrator")) {
+                const missingPermissions = requiredPermissions.filter(permission => !botPermissions.includes(permission));
+                if (missingPermissions.length > 0) 
+                    return SendErrorEmbed(message, `The bot is missing the following permissions: ${missingPermissions.join(", ")}`, "red");
+    
             }
+
 
             await command.execute(global.logger, client, message, args);
             command.lastExecutionTime = parseInt(Date.now() - startTime);

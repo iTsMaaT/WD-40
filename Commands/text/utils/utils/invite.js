@@ -1,5 +1,4 @@
 const { ChannelType, PermissionsBitField } = require("discord.js");
-const { PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
     name: "invite",
@@ -7,7 +6,7 @@ module.exports = {
     description: "Creates a invite to the rules or announcements channel",
     private: false,
     admin: true,
-    permissions: [PermissionFlagsBits.CreateInstantInvite],
+    permissions: ["CreateInstantInvite"],
     async execute(logger, client, message, args) {
 
         const guild = message.guild;
