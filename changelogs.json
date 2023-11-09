@@ -234,7 +234,7 @@
     },
     {
         "version": "5.0.0",
-        "date": "2023-09-21",
+        "date": "2023-11-08",
         "changes": [
             "Massive refactoring",
             "Combined functions, better event handler, console commands",

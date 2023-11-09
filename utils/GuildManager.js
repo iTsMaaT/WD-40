@@ -338,7 +338,7 @@ module.exports = (function(prisma) {
                 }
             }
         } catch (e) {
-            global.logger.error("Silently failing auto reaction init for guild " + guildId + ", " + e.stack);
+            global.logger.error("Silently failing auto response init for guild " + guildId + ", " + e.stack);
         }
     
         async function addResponse(ChannelPrompt, string, response) {
