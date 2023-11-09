@@ -91,7 +91,7 @@ function loadFiles(folder, callback) {
             loaded.lastExecutionTime = 1000;
             callback(loaded, file);
         } else {
-            if (file.endsWith(".txt")) continue;
+            if (!fs.lstatSync(folder + file).isDirectory()) continue;
             const newFiles = fs.readdirSync(folder + file);
             newFiles.forEach(f => commandFiles.push(file + "/" + f));
         }
@@ -181,7 +181,7 @@ client.once(Events.ClientReady, async () => {
     const updateActivities = () => {
         const part3 = RandomMinMax(1, 255);
         const part4 = RandomMinMax(1, 255);
-        let port;
+        let port = 0;
         if (Math.random() < 0.5)
             port = 25565;
         else 
@@ -189,12 +189,11 @@ client.once(Events.ClientReady, async () => {
     
         // Combine the parts into a valid IPv4 address
         const ipAddress = `192.168.${part3}.${part4}:${port}`;
-        const ip = ipAddress;
     
         for (let i = 0; i < activities.length; i++) {
             activities[i].name = activities[i].name.replace("Placeholder01", (100 / activities.length).toFixed(2));
             activities[i].name = activities[i].name.replace("Placeholder02", activities.length - 1);
-            activities[i].name = activities[i].name.replace("Placeholder03", ip);
+            activities[i].name = activities[i].name.replace("Placeholder03", ipAddress);
             activities[i].name = activities[i].name.replace("Placeholder04", client.guilds.cache.size);
         
         // Set the activity with type and name
@@ -221,7 +220,10 @@ client.once(Events.ClientReady, async () => {
     console.log("commands setup done.");
 
     console.log(`Setting up activity status... (${activities.length} statuses)`);
-    updateActivities();
+    if (process.env.SERVER == "prod")
+        updateActivities();
+    else
+        client.user.setActivity("Under maintenace...", { type: ActivityType.Custom });
     console.log("Activity status setup done.");
 
     console.log("Creating the cron jobs...");
@@ -334,7 +336,6 @@ client.once(Events.ClientReady, async () => {
             clearInterval(interval);
         }
     }, 500);
-    client.user.setActivity(activities[Math.floor(Math.random() * activities.length)], { type: ActivityType.Custom });
 });
 
 // Debug event

@@ -238,6 +238,7 @@
         "changes": [
             "Massive refactoring",
             "Combined functions, better event handler, console commands",
+            "Added /autoresponse: same as /autoreaction, but replies instead of reacting",
             "Removed `WD-40 is typing ...` for fast command (now is dynamic depending on the command execution time)",
             "After being auto-corrected by the bot for a typo, saying yes will execute the command",
             "Some activity statuses are now dynamically updated everyday",
@@ -245,6 +246,8 @@
             "Fixed duplicate emotes for auto-reactions",
             "New support server! | https://discord.gg/pqKE2QZrFM",
             "Activity status now look like a actual status (no `Playing ...`)",
+            "gamer",
+            "Music player now supports Soundgasm (why did you make me do this)",
             "Lots of fixes"
         ]
     }

@@ -408,12 +408,12 @@ module.exports = (function(prisma) {
     
         async function updateResponseDB(ChannelPrompt, String) {
             if (cache[ChannelPrompt]) {
-                const ResponseTable = bl[ChannelPrompt].filter(val => val.string === String);
+                const ResponseTable = cache[ChannelPrompt].filter(val => val.string === String);
                 if (ResponseTable.length > 0) {
-                    const Responses = ResponseTable[0].response;
+                    const Response = ResponseTable[0].response;
     
                     // Update or create entries for each string and Responses pair
-                    await prisma.Reactions.upsert({
+                    await prisma.Responses.upsert({
                         where: {
                             GuildID_ChannelString_String: {
                                 GuildID: guildId,
@@ -422,17 +422,17 @@ module.exports = (function(prisma) {
                             },
                         },
                         update: {
-                            Responses,
+                            Response,
                         },
                         create: {
                             GuildID: guildId,
                             ChannelString: ChannelPrompt,
                             String,
-                            Responses,
+                            Response,
                         },
                     });
                 } else {
-                    await prisma.Reactions.delete({
+                    await prisma.Responses.delete({
                         where: {
                             GuildID_ChannelString_String: {
                                 GuildID: guildId,
@@ -444,7 +444,7 @@ module.exports = (function(prisma) {
                 }
             } else {
                 // Delete all entries for this channel prompt
-                await prisma.Reactions.deleteMany({
+                await prisma.Responses.deleteMany({
                     where: {
                         GuildID: guildId,
                         ChannelString: ChannelPrompt,

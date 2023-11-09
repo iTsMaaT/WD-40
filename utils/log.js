@@ -52,12 +52,12 @@ async function writeLogToFile(header, message, client, type) {
             break;
     }
 
-    const formattedLog = util.inspect(message, { depth: null, colors: true }).slice(1, -1);
+    const formattedLog = util.format(message);
     // Adds color depending on log type, then the log header, then the log and finally a newline
     process.stdout.write(`${color}${header} ${formattedLog}\x1b[0m\n`);
     
     if (type == "CONSOLE" || type == "EVENT") return;
-    client?.channels?.cache?.get("1069811223950016572")?.send(`\`\`\`${formattedLog}\`\`\``);
+    client?.channels?.cache?.get("1069811223950016572")?.send(`\`\`\`${header} ${formattedLog}\`\`\``);
     
     try {
         await global.prisma.logs.create({

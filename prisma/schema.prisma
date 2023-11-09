@@ -89,5 +89,5 @@ model Responses {
   ChannelString   String
   String          String
   Response        String 
-  @@unique([GuildID, ChannelString, Response])
+  @@unique([GuildID, ChannelString, String])
   }

@@ -39,6 +39,15 @@ module.exports = {
                 await message.react(reaction).catch(() => null);
             });
         }
+
+        const autoresponses = await global.GuildManager.getAutoResponses(message.guild.id);
+        const responses = await autoresponses.matchResponses(message.channel.name, message.content, message.attachments.size > 0);
+        if (responses) {
+            responses.forEach(async (res) => {
+                await message.reply(res).catch(() => null);
+            });
+        }
+
         // Auto-responses
         if (global.GuildManager.GetResponses(message.guild)) {
 
