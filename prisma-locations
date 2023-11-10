@@ -1,0 +1,41 @@
+--- Command ---
+Commands/slash/fun/fun/count.js:50:        const count = await global.prisma.message.count({
+Commands/slash/fun/fun/count.js:53:        const last = (await global.prisma.message.findMany({
+Commands/text/fun/fun/snowflake.js:18:                const enabled = (await prisma.snowflake.findFirst({ where:{ GuildID:guildId, UserID:rawid } })) != null;
+Commands/text/fun/fun/snowflake.js:21:                    await prisma.snowflake.create({ data:{ GuildID:guildId, UserID:rawid } });     
+Commands/text/fun/fun/snowflake.js:25:                    await prisma.snowflake.delete({ where:{ GuildID_UserID: { GuildID:guildId, UserID:rawid } } });
+Commands/text/utils/owner/db.js:13:        const tables = Object.keys(global.prisma);
+Commands/text/utils/owner/db.js:22:            const columnFinder = await global.prisma[tableName].findMany({
+Commands/text/utils/owner/db.js:28:            data = await global.prisma[tableName].findMany({
+Commands/text/utils/owner/restart.js:64:                            global.prisma.$disconnect();
+Commands/text/utils/owner/shutdown.js:60:                            global.prisma.$disconnect();
+Commands/text/utils/utils/stats.js:33:        const totalExecutedCommands = await global.prisma.logs.count({ where: { Value: { contains: "Executing [" } } });
+Commands/text/utils/utils/stats.js:36:        const lastExecutedCommands = (await global.prisma.message.findMany({
+
+--- Events ---
+events/client/invalidated.js:11:            global.prisma.$disconnect();
+
+--- Endpoint ---
+index.js:1:const { PrismaClient } = require("@prisma/client");
+index.js:30:global.prisma = new PrismaClient();
+index.js:31:global.GuildManager = (require("./utils/GuildManager.js"))(global.prisma);
+index.js:69:prisma.snowflake.findMany().then(val => {
+index.js:259:                global.prisma.$disconnect();
+index.js:429:        await global.prisma.message.create({
+
+--- Util Classes ---
+utils/GuildManager.js:1:module.exports = (function(prisma) {
+utils/GuildManager.js:32:        await prisma.GuildSettings.create({
+utils/GuildManager.js:43:        return await prisma.GuildSettings.findUnique({
+utils/GuildManager.js:51:        await prisma.GuildSettings.update({
+utils/GuildManager.js:90:            const data = await prisma.Blacklist.findMany({
+utils/GuildManager.js:126:            await prisma.Blacklist.upsert({
+utils/GuildManager.js:168:            const data = await prisma.Reactions.findMany({
+utils/GuildManager.js:263:                    await prisma.Reactions.upsert({
+utils/GuildManager.js:282:                    await prisma.Reactions.delete({
+utils/GuildManager.js:294:                await prisma.Reactions.deleteMany({
+utils/GuildManager.js:321:            const data = await prisma.Responses.findMany({
+utils/GuildManager.js:416:                    await prisma.Responses.upsert({
+utils/GuildManager.js:435:                    await prisma.Responses.delete({
+utils/GuildManager.js:447:                await prisma.Responses.deleteMany({
+utils/log.js:63:        await global.prisma.logs.create(

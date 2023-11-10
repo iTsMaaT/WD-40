@@ -47,9 +47,12 @@
     "os": "^0.1.2",
     "pretty-ms": "^7.0.1",
     "sodium": "^3.0.2",
-    "youtube-ext": "^1.1.16"
+    "youtube-ext": "^1.1.16",
+    "drizzle-orm": "^0.29.0",
+    "mysql2": "^3.6.3"
   },
   "devDependencies": {
+    "drizzle-kit": "^0.20.1",
     "eslint": "^8.52.0",
     "prisma": "^5.3.1"
   },
