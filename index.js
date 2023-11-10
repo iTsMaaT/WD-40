@@ -169,7 +169,7 @@ process.stdin.on("data", async (input) => {
     ---------------------------`
         .replace(/^\s+/gm, ""));
 
-    await command.execute(client, global.logger, ...args);
+    await command.execute(client, global.logger, args);
 });
 
 
@@ -241,6 +241,7 @@ client.once(Events.ClientReady, async () => {
             const memoryUsage = process.memoryUsage();
             HourlyRam.push((memoryUsage.heapUsed / memoryUsage.heapTotal) * 100);
             HourlyRam.shift();
+            console.log(HourlyRam);
             if (HourlyRam[0] > 90 && HourlyRam[1] > 90 && HourlyRam [2] > 90) client.users.cache.get(process.env.OWNER_ID).send("Memory leak detected.");
         } catch (err) {
             global.logger.error("Couldn't get the RAM % for MemoryLeakDetector");
