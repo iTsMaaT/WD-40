@@ -1,7 +1,7 @@
-import { mysqlTable, primaryKey, varchar, datetime, text, unique, int, bigint, tinyint, mysqlEnum } from "drizzle-orm/mysql-core";
-import { sql } from "drizzle-orm";
+const { mysqlTable, primaryKey, varchar, datetime, text, unique, int, bigint, tinyint, mysqlEnum } = require("drizzle-orm/mysql-core");
+const { sql } = require("drizzle-orm");
 
-export const blacklist = mysqlTable("blacklist", {
+const blacklist = mysqlTable("blacklist", {
     id: bigint("ID", { mode: "number" }).autoincrement().notNull(),
     guildId: varchar("GuildID", { length: 25 }).notNull(),
     userId: varchar("UserID", { length: 25 }).notNull(),
@@ -14,7 +14,7 @@ export const blacklist = mysqlTable("blacklist", {
     };
 });
 
-export const guildsettings = mysqlTable("guildsettings", {
+const guildsettings = mysqlTable("guildsettings", {
     guildId: varchar("GuildID", { length: 25 }).notNull(),
     prefix: varchar("Prefix", { length: 3 }).default(">").notNull(),
     guildName: varchar("GuildName", { length: 255 }).notNull(),
@@ -28,7 +28,7 @@ export const guildsettings = mysqlTable("guildsettings", {
     };
 });
 
-export const logs = mysqlTable("logs", {
+const logs = mysqlTable("logs", {
     date: datetime("Date", { mode: "string", fsp: 3 }).default(sql`CURRENT_TIMESTAMP(3)`).notNull(),
     value: text("Value").notNull(),
     type: mysqlEnum("Type", ["ERROR", "SEVERE", "WARNING", "INFO", "DEBUG", "MUSIC", "CONSOLE", "EVENT"]).default("INFO").notNull(),
@@ -40,7 +40,7 @@ export const logs = mysqlTable("logs", {
     };
 });
 
-export const message = mysqlTable("message", {
+const message = mysqlTable("message", {
     id: bigint("ID", { mode: "number" }).autoincrement().notNull(),
     messageId: varchar("MessageID", { length: 191 }).notNull(),
     userId: varchar("UserID", { length: 191 }).notNull(),
@@ -58,7 +58,7 @@ export const message = mysqlTable("message", {
     };
 });
 
-export const reactions = mysqlTable("reactions", {
+const reactions = mysqlTable("reactions", {
     id: bigint("ID", { mode: "number" }).autoincrement().notNull(),
     guildId: varchar("GuildID", { length: 25 }).notNull(),
     channelString: varchar("ChannelString", { length: 25 }).notNull(),
@@ -72,7 +72,7 @@ export const reactions = mysqlTable("reactions", {
     };
 });
 
-export const responses = mysqlTable("responses", {
+const responses = mysqlTable("responses", {
     id: bigint("ID", { mode: "number" }).autoincrement().notNull(),
     guildId: varchar("GuildID", { length: 25 }).notNull(),
     channelString: varchar("ChannelString", { length: 25 }).notNull(),
@@ -86,7 +86,7 @@ export const responses = mysqlTable("responses", {
     };
 });
 
-export const snowflake = mysqlTable("snowflake", {
+const snowflake = mysqlTable("snowflake", {
     guildId: varchar("GuildID", { length: 25 }).notNull(),
     userId: varchar("UserID", { length: 25 }).notNull(),
 },
@@ -96,3 +96,13 @@ export const snowflake = mysqlTable("snowflake", {
         snowflakeGuildIdUserIdKey: unique("Snowflake_GuildID_UserID_key").on(table.guildId, table.userId),
     };
 });
+
+module.exports = {
+    blacklist,
+    guildsettings,
+    logs,
+    message,
+    reactions,
+    responses,
+    snowflake,
+};
