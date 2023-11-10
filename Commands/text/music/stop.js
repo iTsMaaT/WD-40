@@ -7,7 +7,7 @@ module.exports = {
     category: "music",
     execute(logger, client, message, args) {
         const queue = useQueue(message.guild.id);
-        if (!queue) return message.guild.me.voice.setChannel(null).catch(() => null);
+        if (!queue) return message.guild?.me?.voice?.setChannel(null).catch(() => null);
 
         queue.delete();
         const stoppped_music_embed = new EmbedBuilder()
