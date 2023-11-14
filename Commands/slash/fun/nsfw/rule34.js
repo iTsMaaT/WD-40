@@ -1,4 +1,3 @@
-const got = require("got");
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
 
 module.exports = {
@@ -19,9 +18,9 @@ module.exports = {
         if (interaction.channel.nsfw) {
             try {
                 const url = "http://rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=" + tags;
-                const response = await got(url);
+                const response = await fetch(url);
 
-                const data = JSON.parse(response.body);
+                const data = await response.json();
                 const post = data[Math.floor(Math.random() * data.length)];
 
                 const RuleEmbed = {
@@ -32,14 +31,14 @@ module.exports = {
                     },
                     timestamp: new Date(),
                 };
-                interaction.reply({ embeds: [RuleEmbed] });
+                await interaction.editReply({ embeds: [RuleEmbed] });
             } catch (err) {
                 const RuleEmbed = {
                     color: 0xff0000,
                     title: "An error occured, probably a invalid tag",
                     timestamp: new Date(),
                 };
-                interaction.reply({ embeds: [RuleEmbed] });
+                await interaction.editReply({ embeds: [RuleEmbed] });
                 logger.error(err);
             }
         } else {

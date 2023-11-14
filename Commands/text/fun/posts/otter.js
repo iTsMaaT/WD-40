@@ -1,25 +1,27 @@
-const got = require("got");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
+const { AttachmentBuilder } = require("discord.js");
 
 module.exports = {
-    name: "bird",
+    name: "otter",
     description: "birb pics!",
     category: "posts",
     async execute(logger, client, message, args) {
+        try {
+            const blob = await (await fetch("https://otter.bruhmomentlol.repl.co/random")).blob();
+            const file = new AttachmentBuilder(Buffer.from(await blob.arrayBuffer()), { name: "otter.jpg" });
+            const embed = {
+                color: 0xffffff,
+                title: "Enjoy!",
+                image: {
+                    url: "attachment://otter.jpg",
+                },
+                timestamp: new Date(),
+            };
 
-        await got("https://otter.bruhmomentlol.repl.co/random")
-            .then(response => {
-                const url = JSON.parse(response.body)[0];
-
-                const embed = {
-                    color: 0xffffff,
-                    title: "Enjoy!",
-                    image: {
-                        url: url,
-                    },
-                    timestamp: new Date(),
-                };
-
-                message.reply({ embeds: [embed] });
-            });
+            message.reply({ embeds: [embed], files: [file] });
+        } catch (err) {
+            console.logger(err);
+            return SendErrorEmbed(message, "Error fetching the image", "red");
+        }
     },
 };

@@ -1,25 +1,24 @@
-const got = require("got");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
     name: "bird",
     description: "birb pics!",
     category: "posts",
     async execute(logger, client, message, args) {
+        try {
+            const url = await (await fetch("http://shibe.online/api/birds")).json();
+            const embed = {
+                color: 0xffffff,
+                title: "Enjoy!",
+                image: {
+                    url: url[0],
+                },
+                timestamp: new Date(),
+            };
 
-        await got("http://shibe.online/api/birds")
-            .then(response => {
-                const url = JSON.parse(response.body)[0];
-
-                const embed = {
-                    color: 0xffffff,
-                    title: "Enjoy!",
-                    image: {
-                        url: url,
-                    },
-                    timestamp: new Date(),
-                };
-
-                message.reply({ embeds: [embed] });
-            });
+            message.reply({ embeds: [embed] });
+        } catch (err) {
+            return SendErrorEmbed(message, "Error fetching the image", "red");
+        }
     },
 };

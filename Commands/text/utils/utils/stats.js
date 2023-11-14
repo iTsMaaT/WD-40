@@ -2,6 +2,7 @@ const prettyMilliseconds = require("pretty-ms");
 const os = require("os");
 const changelog = require("@root/changelogs.json");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
+const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
 
 module.exports = {
     name: "stats",

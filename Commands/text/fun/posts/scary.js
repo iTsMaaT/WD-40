@@ -1,4 +1,3 @@
-const got = require("got");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
@@ -10,8 +9,8 @@ module.exports = {
         let RedditDesc, RedditTitle, tries;
 
         while (!RedditDesc) {
-            const response = await got("https://www.reddit.com/r/2sentence2horror/random/.json");
-            const content = JSON.parse(response.body);
+            const response = await fetch("https://www.reddit.com/r/2sentence2horror/random/.json");
+            const content = await response.json();
             RedditTitle = content[0].data.children[0].data.title || "";
             RedditDesc = content[0].data.children[0].data.selftext || "";
             tries++;

@@ -57,7 +57,7 @@ module.exports = {
                 ID: "desc",
             },
         }))[0];
-        if (!last || !count) return await SendErrorEmbed(interaction, "None found.", "red");
+        if (!last || !count) return await SendErrorEmbed(interaction, "None found.", "red", true);
 
         if (last) link = `https://discord.com/channels/${last.GuildID}/${last.ChannelID}/${last.MessageID}`;
 

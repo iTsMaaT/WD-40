@@ -1,4 +1,3 @@
-const got = require("got");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
@@ -11,9 +10,9 @@ module.exports = {
 
         let port = "";
         if (args[1]) port = ":" + parseInt(args[1]);
-        got(`https://api.mcstatus.io/v2/status/java/${args[0]}${port ?? ""}`)
+        fetch(`https://api.mcstatus.io/v2/status/java/${args[0]}${port ?? ""}`)
             .then(async response => {
-                const server = JSON.parse(response.body);
+                const server = await response.json();
 
                 if (!server.online) return SendErrorEmbed(message, `${server.eula_blocked ? "The server is banned by Mojang." : "Server offline or nonexistant."}`, "red");
 

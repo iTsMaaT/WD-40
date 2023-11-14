@@ -2,7 +2,6 @@ const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { QueryType } = require("discord-player");
 const { SoundCloudExtractor } = require("@discord-player/extractor");
 const cheerio = require("cheerio");
-const got = require("got");
 
 module.exports = {
     name: "play",
@@ -26,13 +25,13 @@ module.exports = {
             color: 0xffffff,
             description: "Request received, fetching...",
             timestamp: new Date(),
+            footer: { text: "Age restricted videos might not work." },
         };
 
         const msg = await message.reply({ embeds: [play_embed] });
 
         try {
             const soundgasm = await getSoundgasmLink(args.join(" "));
-            console.log(soundgasm);
             if (soundgasm) string = soundgasm;
 
             research = await player.search(string, {
@@ -76,67 +75,6 @@ module.exports = {
 
         } catch (err) {
             logger.error(err.stack);
-
-            if (err.toString().includes("Error: Status code: 410")) {
-
-                try {
-
-                    embed = {
-                        color: 0xffffff,
-                        description: "Failed to get stream from Youtube, attempting SoundCloud",
-                        timestamp: new Date(),
-                        footer: { text: "This is due to the video being age restricted (this is a temporary fix)" },
-                    };
-
-                    await msg.edit({ embeds: [embed] });
-
-                    research = await player.search(research._data.tracks[0].title, {
-                        requestedBy: message.member,
-                        searchEngine: `ext:${SoundCloudExtractor.identifier}`,
-                    });
-
-                    res = await player.play(message.member.voice.channel.id, research, {
-                        nodeOptions: {
-                            metadata: {
-                                channel: message.channel,
-                                requestedBy: message.author,
-                            },
-                            leaveOnEmptyCooldown: 300000,
-                            leaveOnEmpty: true,
-                            leaveOnEnd: true,
-                            leaveOnEndCooldown: 300000,
-                            bufferingTimeout: 0,
-                            volume: 75,
-                        },
-                    });
-                    logger.music(`Playing [${res.track.title}]`); 
-    
-                    embed = {
-                        color: 0xffffff,
-                        description: `Successfully enqueued${res.track.playlist ? ` **track(s)** from: **${res.track.playlist.title}**` : `: **${res.track.title}**`}`,
-                        timestamp: new Date(),
-                        footer: { text: "Attempted to use SoundCloud instead of Youtube due to age restriction" },
-                    };
-
-                    await msg.edit({ embeds: [embed] });
-
-                    return;
-                } catch (err) {
-
-                    logger.error(err.stack);
-
-                    embed = {
-                        color: 0xff0000,
-                        description: "Failed to fetch / play the reqested track",
-                        timestamp: new Date(),
-                        footer: { text: "" },
-                    };
-
-                    await msg.edit({ embeds: [embed] });
-                }
-            }
-
-
             embed = {
                 color: 0xff0000,
                 description: "Failed to fetch / play the reqested track",
@@ -152,8 +90,8 @@ const getSoundgasmLink = async (link) => {
     const regex = /^https:\/\/soundgasm\.net\/.*/;
     if (!regex.test(link)) return null;
 
-    const response = await got(link); // Replace with the URL you want to fetch
-    const html = response.body;
+    const response = await fetch(link); // Replace with the URL you want to fetch
+    const html = await response.json();
 
     const $ = cheerio.load(html);
     const scriptContent = $("script").last().html(); // Get the content of the last script tag

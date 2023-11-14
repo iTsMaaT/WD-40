@@ -58,6 +58,7 @@ global.player = new Player(client, {
             },
         },
     },
+    skipFFmpeg: false,
 });
 global.player.extractors.loadDefault();
 
@@ -236,19 +237,6 @@ client.once(Events.ClientReady, async () => {
         updateActivities();
     });
 
-    const RamLeakDetector = new cron.CronJob("0 * * * *", async () => {
-        try {
-            const memoryUsage = process.memoryUsage();
-            HourlyRam.push((memoryUsage.heapUsed / memoryUsage.heapTotal) * 100);
-            HourlyRam.shift();
-            console.log(HourlyRam);
-            if (HourlyRam[0] > 90 && HourlyRam[1] > 90 && HourlyRam [2] > 90) client.users.cache.get(process.env.OWNER_ID).send("Memory leak detected.");
-        } catch (err) {
-            global.logger.error("Couldn't get the RAM % for MemoryLeakDetector");
-            global.logger.error(err);
-        }
-    });
-
     const SmartRestart = new cron.CronJob("* * * * *", async () => {
         if (client.voice.adapters.size == 0 && SmartRestartEnabled) {
             global.logger.severe("Restart requested from discord");
@@ -268,7 +256,6 @@ client.once(Events.ClientReady, async () => {
     // sarting the daily sending
     scheduledMessage.start();
     DailyActivity.start();
-    RamLeakDetector.start();
     SmartRestart.start();
     console.log("Cron job setup done.");
     console.log("Discord.js version: " + require("discord.js").version);
@@ -375,14 +362,25 @@ client.on(Events.InteractionCreate, async interaction => {
                 .replace(/^\s+/gm, ""));
 
         } catch (error) {
-            interaction.reply({
-                embeds: [{
-                    title: "An error occured while executing the command",
-                    color: 0xff0000,
-                    timestamp: new Date(),
-                }],
-                ephemeral: true,
-            });
+            try {
+                await interaction.reply({
+                    embeds: [{
+                        title: "An error occured while executing the command",
+                        color: 0xff0000,
+                        timestamp: new Date(),
+                    }],
+                    ephemeral: true,
+                });
+            } catch (err) {
+                await interaction.editReply({
+                    embeds: [{
+                        title: "An error occured while executing the command",
+                        color: 0xff0000,
+                        timestamp: new Date(),
+                    }],
+                    ephemeral: true,
+                });
+            }
 
             global.logger.error(`Error executing slash command [${interaction.commandName}]`);
             global.logger.error(error.stack);

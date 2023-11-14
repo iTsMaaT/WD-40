@@ -1,33 +1,28 @@
-const got = require("got");
-
 module.exports = {
     name: "advice",
     description: "Get a random advice",
     category: "fun",
-    execute(logger, client, message, args) {
-        got("https://api.adviceslip.com/advice")
-            .then(response => {
-                const advice = JSON.parse(response.body);
+    async execute(logger, client, message, args) {
+        const advice = await (await fetch("https://api.adviceslip.com/advice")).json();
+        try {
+            FactEmbed = {
+                color: 0xffffff,
+                title: "Random advice",
+                description: advice.slip.advice,
+                timestamp: new Date(),
+                footer: { text: `ID : ${advice.slip.id}` },
+            };
 
-                FactEmbed = {
-                    color: 0xffffff,
-                    title: "Random advice",
-                    description: advice.slip.advice,
-                    timestamp: new Date(),
-                    footer: { text: `ID : ${advice.slip.id}` },
-                };
-
-                message.reply({ embeds: [FactEmbed] });
-            })
-            .catch((err) => {
-                ErrEmbed = {
-                    color: 0xff0000,
-                    title: "An error occured",
-                    description: err,
-                    timestamp: new Date(),
-                };
-                message.reply({ embeds: [ErrEmbed] });
-                logger.error(err);
-            });
+            message.reply({ embeds: [FactEmbed] });
+        } catch (err) {
+            ErrEmbed = {
+                color: 0xff0000,
+                title: "An error occured",
+                description: err,
+                timestamp: new Date(),
+            };
+            message.reply({ embeds: [ErrEmbed] });
+            logger.error(err);
+        }
     },
 };
