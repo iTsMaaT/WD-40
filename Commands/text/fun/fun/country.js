@@ -1,4 +1,4 @@
-const got = require("got");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
     name: "country",
@@ -9,11 +9,11 @@ module.exports = {
     execute(logger, client, message, args) {
         if (!args[0]) return message.channel.send("No country provided");
         
-        got(`https://restcountries.com/v3.1/name/${encodeURIComponent(args.slice(0).join(" "))}?fullText=true`)
-            .then(response => {
-                const json = JSON.parse(response.body);
+        fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(args.slice(0).join(" "))}?fullText=true`)
+            .then(async response => {
+                const json = await response.json();
 
-                if (json.status === "404") return message.channel.reply({ content: "Couldn't find the specified country."  });
+                if (json.status === "404") return SendErrorEmbed(message, "Couldn't find the specified country.", "red");
 
                 const country = json[0];
                 const currencies = Object.values(country.currencies).map(currency => `${currency.name} (${currency.symbol})`);
@@ -49,7 +49,7 @@ module.exports = {
             })
             .catch(error => {
                 console.error("Error retrieving country information:", error);
-                message.channel.send("An error occurred while retrieving country information. Please try again later.");
+                return SendErrorEmbed(message, "Couldn't fetch country infomations", "red");
             });
     },
 };

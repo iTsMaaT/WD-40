@@ -1,5 +1,4 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
-const got = require("got");
 
 module.exports = {
     name: "reddit",
@@ -38,8 +37,8 @@ module.exports = {
                     // Tries to fetch a post 10 times
                     for (let i = 0; i <= 10; i++) {
                         try {
-                            const response = await got(`https://www.reddit.com/r/${optiondata}/random/.json`);
-                            const content = JSON.parse(response.body);
+                            const response = await fetch(`https://www.reddit.com/r/${optiondata}/random/.json`);
+                            const content = await response.json();
                             const permalink = content[0].data.children[0].data.permalink;
                             const RedditURL = `https://reddit.com${permalink}`;
                             const RedditTitle = content[0].data.children[0].data.title;
@@ -88,14 +87,14 @@ module.exports = {
                 const url = `https://www.reddit.com/user/${optiondata}/submitted.json`;
                 let response;
                 try {
-                    response = await got(url);
+                    response = await fetch(url);
                 } catch (error) {
                     console.error(error);
                     return interaction.reply({ content: "an error occurred while fetching posts from the Reddit API.", ephemeral: true });
                 }
 
                 // Parse the JSON response
-                const data = JSON.parse(response.body);
+                const data = await response.json();
 
                 // Filter the posts to only include image posts
                 const imagePosts = data.data.children.filter((post) => post.data.post_hint === "image");

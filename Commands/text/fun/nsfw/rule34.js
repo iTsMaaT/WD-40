@@ -1,4 +1,3 @@
-const got = require("got");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
@@ -11,9 +10,9 @@ module.exports = {
         if (message.channel.nsfw) {
             try {
                 const url = "http://rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=" + args.join("+");
-                const response = await got(url);
+                const response = await fetch(url);
 
-                const data = JSON.parse(response.body);
+                const data = await response.json();
                 const post = data[Math.floor(Math.random() * data.length)];
 
                 const RuleEmbed = {

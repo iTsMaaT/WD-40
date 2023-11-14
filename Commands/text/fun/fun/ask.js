@@ -1,5 +1,4 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const got = require("got");
 
 module.exports = {
     name: "ask",
@@ -11,13 +10,11 @@ module.exports = {
     execute: async (logger, client, message, args) => {
         try {
             const prompt = `When responding to the following prompt, try to condense your response. Make sure it is under 2000 characters. Prompt: ${args.join(" ")}`;
-            const result = await got(`${process.env.PALM_API_PROXY_URL}?api_key=${process.env.PALM_API_KEY}&prompt=${encodeURIComponent(prompt)}`, {
-                timeout: {
-                    request: 10000,
-                },
+            const result = await fetch(`${process.env.PALM_API_PROXY_URL}?api_key=${process.env.PALM_API_KEY}&prompt=${encodeURIComponent(prompt)}`, {
+                signal: AbortSignal.timeout(10000),
             });
             
-            const response = JSON.parse(result.body).response;
+            const response = (await result.json()).response;
             message.reply(limitString(response, 2000));
 
         } catch (err) {

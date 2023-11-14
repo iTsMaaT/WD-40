@@ -1,6 +1,5 @@
 const { ToEngineerNotation } = require("@functions/formattingFunctions");
 const prettyMilliseconds = require("pretty-ms");
-const got = require("got");
 
 const GetPterodactylInfo = async function() {
     let serverName = "";
@@ -18,7 +17,7 @@ const GetPterodactylInfo = async function() {
 
     try {
         const [serverResponse, resourcesResponse] = await Promise.all([
-            got("https://dash.kpotatto.net/api/client/servers/adc0f433", {
+            fetch("https://dash.kpotatto.net/api/client/servers/adc0f433", {
                 method: "GET",
                 headers: {
                     "Accept": "application/json",
@@ -26,7 +25,7 @@ const GetPterodactylInfo = async function() {
                     "Authorization": `Bearer ${process.env.PTERODACTYL_API_KEY}`,
                 },
             }),
-            got("https://dash.kpotatto.net/api/client/servers/adc0f433/resources", {
+            fetch("https://dash.kpotatto.net/api/client/servers/adc0f433/resources", {
                 method: "GET",
                 headers: {
                     "Accept": "application/json",
@@ -36,7 +35,7 @@ const GetPterodactylInfo = async function() {
             }),
         ]);
 
-        const serverJson = JSON.parse(serverResponse.body);
+        const serverJson = await serverResponse.json();
         serverName = serverJson.attributes.name;
         RAMlimit = serverJson.attributes.limits.memory;
         CPUlimit = serverJson.attributes.limits.cpu;
@@ -44,7 +43,7 @@ const GetPterodactylInfo = async function() {
         IPalias = serverJson.attributes.relationships.allocations.data[0].attributes.ip_alias;
         IPport = serverJson.attributes.relationships.allocations.data[0].attributes.port;
 
-        const resourcesJson = JSON.parse(resourcesResponse.body);
+        const resourcesJson = await resourcesResponse.json();
         RAMusage = resourcesJson.attributes.resources.memory_bytes;
         CPUusage = resourcesJson.attributes.resources.cpu_absolute;
         DISKusage = resourcesJson.attributes.resources.disk_bytes;
@@ -53,7 +52,7 @@ const GetPterodactylInfo = async function() {
         BOTuptime = resourcesJson.attributes.resources.uptime;
     } catch (err) {
         logger.error(err.stack);
-        return undefined;
+        return null;
     }
 
     const info = {

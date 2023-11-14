@@ -36,7 +36,5 @@ module.exports = {
             avatarURL: User.displayAvatarURL({ format: "png" }),
             content: args.join(" "),
         });
-
-        // Delete the webhook after sending the fake message
     },
 };

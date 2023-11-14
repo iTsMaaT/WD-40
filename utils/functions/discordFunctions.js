@@ -26,11 +26,11 @@ const SendErrorEmbed = async function(message, string, color, isSlash) {
     if (color == "red") embed.color = 0xff0000;
     else if (color == "yellow") embed.color = 0xffff00;
     if (isSlash) {
-        try {
+        if (!message.deferred) 
             await message.reply({ embeds: [embed] });
-        } catch (err) {
+        else 
             await message.editReply({ embeds: [embed] });
-        }
+    
     } else {
         await message.reply({ embeds: [embed] });
     }

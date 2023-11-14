@@ -59,7 +59,6 @@ module.exports = {
                     { name: "Invite", value: formatObject(inviteInfo) },
                 ],
                 timestamp: new Date(),
-                footer: { text: `${invite.guild.available ? "" : "The server is unavailable"}` },
             };
   
             await message.reply({ embeds: [embed] });

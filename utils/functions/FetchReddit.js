@@ -1,5 +1,3 @@
-const got = require("got");
-
 const FetchReddit = async function(ChannelNSFW, ...subreddits) {
     try {
         const subreddit = subreddits[Math.floor(Math.random() * subreddits.length)];
@@ -7,8 +5,8 @@ const FetchReddit = async function(ChannelNSFW, ...subreddits) {
         let embed;
 
         while (!/\.(jpg|png|gif)$/.test(PostImage)) {
-            const response = await got(`https://www.reddit.com/r/${subreddit}/random/.json`, { agent: false });
-            const content = JSON.parse(response.body);
+            const response = await fetch(`https://www.reddit.com/r/${subreddit}/random/.json`, { agent: false });
+            const content = await response.json();
             const permalink = content[0].data.children[0].data.permalink;
             const PostURL = `https://reddit.com${permalink}`;
             const PostTitle = content[0].data.children[0].data.title;

@@ -1,5 +1,4 @@
-const { ApplicationCommandType, ApplicationCommandOptionType, SlashCommandBuilder } = require("discord.js");
-const got = require("got");
+const { ApplicationCommandType, ApplicationCommandOptionType, AttachmentBuilder } = require("discord.js");
 
 module.exports = {
     name: "mcping",
@@ -19,15 +18,15 @@ module.exports = {
             required: false,
         },
     ],
-    execute(logger, interaction, client) {
-        interaction.deferReply();
+    async execute(logger, interaction, client) {
+        await interaction.deferReply();
         const server_ip = interaction.options.get("ip").value;
         const server_port_string = interaction.options.get("port")?.value;
         let port;
         if (server_port_string) port = ":" + parseInt(server_port_string); 
-        got(`https://api.mcstatus.io/v2/status/java/${server_ip}${port ?? ""}`)
+        fetch(`https://api.mcstatus.io/v2/status/java/${server_ip}${port ?? ""}`)
             .then(async response => {
-                const server = JSON.parse(response.body);
+                const server = await response.json();
     
                 if (!server.online) await interaction.editReply({ embeds: [{ title: `${server.eula_blocked ? "The server is banned by Mojang." : "Server offline or nonexistent."}`, color: 0xff0000, timestamp: new Date() }] });
    
@@ -61,7 +60,7 @@ module.exports = {
                     serverStatusEmbed.fields.push({ name: "Player list", value: playerNames.join(", ") });
                 }
     
-                interaction.editReply({ embeds: [serverStatusEmbed], files: [imgfile]  });
+                await interaction.editReply({ embeds: [serverStatusEmbed], files: [imgfile]  });
             });
     },
 };
