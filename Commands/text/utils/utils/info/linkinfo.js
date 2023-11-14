@@ -1,5 +1,4 @@
 const https = require("https");
-const fetch = require("node-fetch");
 const cheerio = require("cheerio");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const dns = require("dns/promises");
