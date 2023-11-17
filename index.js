@@ -12,11 +12,9 @@ const dotenv = require("dotenv");
 const Discord = require("discord.js");
 
 const getExactDate = require("@functions/getExactDate");
-const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const RandomMinMax = require("@functions/RandomMinMax");
 const findClosestMatch = require("@functions/findClosestMatch");
-const HourlyRam = [0, 0, 0];
 
 dotenv.config();
 
@@ -32,13 +30,14 @@ global.GuildManager = (require("./utils/GuildManager.js"))(global.prisma);
 global.superuser = 0;
 global.debug = 1;
 global.SmartRestartEnabled = 0;
+global.wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Add array.equals()
 Array.prototype.equals = function(otherArray) {
     return this.length === otherArray.length && this.every((value, index) => value === otherArray[index]);
 };
 
-// Add array.shuffle
+// Add array.shuffle()
 Array.prototype.shuffle = function() {
     for (let i = this.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
