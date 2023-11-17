@@ -52,15 +52,18 @@ module.exports = {
             res = await player.play(message.member.voice.channel.id, Attachment ?? research, {
                 nodeOptions: {
                     metadata: {
-                        channel: message.channel,
-                        requestedBy: message.author,
+                        channel: interaction.channel,
+                        client: interaction.guild.members.me,
+                        requestedBy: interaction.user,
                     },
-                    leaveOnEmptyCooldown: 300000,
-                    leaveOnEmpty: true,
+                    bufferingTimeout: 15000,
+                    leaveOnStop: true,
+                    leaveOnStopCooldown: 5000,
                     leaveOnEnd: true,
-                    leaveOnEndCooldown: 300000,
-                    bufferingTimeout: 0,
-                    volume: 75,
+                    leaveOnEndCooldown: 15000,
+                    leaveOnEmpty: true,
+                    leaveOnEmptyCooldown: 300000,
+                    skipOnNoStream: true,
                 },
             });
             logger.music(`Playing [${res.track.title}] in [${message.member.voice.channel.name}]`); 
