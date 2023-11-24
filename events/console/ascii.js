@@ -7,7 +7,6 @@ module.exports = {
         let result = "";
 
         for (word of string) {
-            console.log(word);
             for (char of word) {
                 const asciiCode = char.charCodeAt(0);
                 // Convert ASCII code to binary

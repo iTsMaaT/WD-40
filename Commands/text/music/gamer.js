@@ -12,7 +12,7 @@ module.exports = {
     private: true,
     permissions: ["Connect"],
     async execute(logger, client, message, args) {
-        const queue = useQueue(message.guild.id);
+        let queue = useQueue(message.guild.id);
 
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
         
@@ -26,34 +26,38 @@ module.exports = {
             stream._read = () => {/**/};
             stream.push(buffer);
             stream.push(null);
-
-            
+        
             if (!queue) {
-                message.guild.me?.voice?.setChannel(null).catch(() => null);
-                const connection = joinVoiceChannel({
-                    channelId: message.member.voice.channel.id,
-                    guildId: message.guild.id,
-                    adapterCreator: message.guild.voiceAdapterCreator,
+                queue = await player.nodes.create(message.guild, {
+                    nodeOptions: {
+                        metadata: {
+                            channel: interaction.channel,
+                            client: interaction.guild.members.me,
+                            requestedBy: interaction.user,
+                        },
+                        bufferingTimeout: 15000,
+                        leaveOnStop: true,
+                        leaveOnStopCooldown: 5000,
+                        leaveOnEnd: true,
+                        leaveOnEndCooldown: 15000,
+                        leaveOnEmpty: true,
+                        leaveOnEmptyCooldown: 300000,
+                        skipOnNoStream: true,
+                    },
                 });
-                
-                const player = createAudioPlayer();
-                connection.subscribe(player);
-                player.play(createAudioResource(stream));
-                
-                player.on(AudioPlayerStatus.Idle, () => {
-                    player.stop();
-                    connection.destroy(); // No more audio elements, destroy the connection     
-                });
-            } else {
-                const track = queue.voiceReceiver.createRawTrack(stream, {
-                    title: "gamer",
-                    requestedBy: message.author,
-                    author: "me",
-                });
-                
-                queue.insertTrack(track, 0);
-                queue.node.skip();
+                if (!queue.connection) await queue.connect(message.member.voice.channel);
             }
+
+            if (queue.node.isPaused()) await queue.node.setPaused(0);
+             
+            const track = queue.voiceReceiver.createRawTrack(stream, {
+                title: "gamer",
+                requestedBy: message.author,
+                author: "me",
+            });
+                
+            queue.insertTrack(track, 0);
+            queue.node.skip();
         } catch (err) {
             logger.error(err);
             return SendErrorEmbed(message, "Error while gaming", "red");

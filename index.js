@@ -132,22 +132,22 @@ loadFiles("./Commands/context/", (contextcommand, fileName) => {
 // Event handler
 loadFiles("./events/client/", function(event) {
     if (event.once) {
-        client.once(event.name, (...args) => {
+        client.once(event.name, async (...args) => {
             if (event.log) global.logger.event(`Event: [${event.name}] fired.`);
-            event.execute(client, global.logger, ...args);
+            await event.execute(client, global.logger, ...args);
         });
     } else {
-        client.on(event.name, (...args) => {
+        client.on(event.name, async (...args) => {
             if (event.log) global.logger.event(`Event: [${event.name}] fired.`);
-            event.execute(client, global.logger, ...args);
+            await event.execute(client, global.logger, ...args);
         });
     }
 });
 
 loadFiles("./events/process/", function(event) {
-    process.on(event.name, (...args) => {
-        event.execute(client, global.logger, ...args);
+    process.on(event.name, async (...args) => {
         if (event.log) global.logger.event(`Event: [${event.name}] fired.`);
+        await event.execute(client, global.logger, ...args);
     });
 });
 
@@ -361,7 +361,7 @@ client.on(Events.InteractionCreate, async interaction => {
                 .replace(/^\s+/gm, ""));
 
         } catch (error) {
-            try {
+            if (!interaction.deferred) {
                 await interaction.reply({
                     embeds: [{
                         title: "An error occured while executing the command",
@@ -370,7 +370,7 @@ client.on(Events.InteractionCreate, async interaction => {
                     }],
                     ephemeral: true,
                 });
-            } catch (err) {
+            } else {
                 await interaction.editReply({
                     embeds: [{
                         title: "An error occured while executing the command",
@@ -463,7 +463,7 @@ client.on(Events.MessageCreate, async (message) => {
             const closeMatch = findClosestMatch(commandName, commandArray);
             if (closeMatch.distance <= 3) {
                 // command = client.commands.get(closeMatch.closestMatch);
-                await message.reply(`Did you mean ${prefix}${closeMatch.closestMatch}?`);
+                await message.reply(`Did you mean \`${prefix}${closeMatch.closestMatch}\`?`);
                 const filter = (m) => m.author.id === message.author.id;
                 await message.channel.awaitMessages({ filter, max: 1, time: 5000, errors: ["time"] })
                     .then((collected) => {
@@ -481,7 +481,7 @@ client.on(Events.MessageCreate, async (message) => {
         const blCategory = !userBlacklist.CheckPermission(message.author.id, command.category);
         const blCommand = !userBlacklist.CheckPermission(message.author.id, command.name);
         if (blCategory || blCommand) 
-            return SendErrorEmbed(message, `You are blacklisted from executing ${!blCategory ? `commands in the **${command.category}** category` : `the **${command.name}** command`}.`, "red");
+            return SendErrorEmbed(message, `You are blacklisted from executing ${blCategory ? `commands in the **${command.category}** category` : `the **${command.name}** command`}.`, "red");
         
 
         // Check command cooldown
