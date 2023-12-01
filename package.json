@@ -10,7 +10,8 @@
     "prisma:deploy": "npx prisma migrate deploy",
     "prisma:push": "npx prisma db push",
     "prisma:rollback": "npx prisma migrate resolve --version $npm_config_version",
-    "code": "git pull && npm i && code WD-40.code-workspace && eslint --no-fix ."
+    "code": "git pull && npm i && code WD-40.code-workspace && eslint --no-fix .",
+    "c": "npm run code"
   },
   "repository": {
     "type": "git",
