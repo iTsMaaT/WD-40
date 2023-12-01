@@ -21,8 +21,8 @@ module.exports = {
 
         const formattedGames = steamInfo.threeRecentGames.games.map((game, index) => `
         Game${index + 1}: **${game.name}**
-        Total playtime: ${prettyMilliseconds(game.playtime_forever * 1000)}
-        Playtime last 2 weeks: ${prettyMilliseconds(game.playtime_2weeks * 1000)}
+        Total playtime: ${prettyMilliseconds(game.playtime_forever * 1000 * 60)}
+        Playtime last 2 weeks: ${prettyMilliseconds(game.playtime_2weeks * 1000 * 60)}
         -
             `.replace(/^\s+/gm, "")).join("\n");
 
