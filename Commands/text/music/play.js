@@ -1,7 +1,10 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { QueryType } = require("discord-player");
 const { SoundCloudExtractor } = require("@discord-player/extractor");
+const fs = require("fs/promises");
 const cheerio = require("cheerio");
+const util = require("util");
+
 
 module.exports = {
     name: "play",
@@ -13,7 +16,7 @@ module.exports = {
     permissions: ["Connect"],
     async execute(logger, client, message, args) {
         let res, research;
-        if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
+        // if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
 
         const Attachment = message.attachments.first()?.attachment;
 
@@ -28,25 +31,81 @@ module.exports = {
             footer: { text: "Age restricted videos might not work." },
         };
 
+        research = await player.search(string, {
+            requestedBy: message.member,
+            searchEngine: QueryType.AUTO_SEARCH,
+        });
+
+        if (string) {
+            console.log(research.extractor);
+            return;
+        }
+        
         const msg = await message.reply({ embeds: [play_embed] });
-
+        
         try {
-            const soundgasm = await getSoundgasmLink(args.join(" "));
-            if (soundgasm) string = soundgasm;
+            const linkRegex = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])/igm;
+            const spotifyRegex = /^(?:https:\/\/open\.spotify\.com\/(?:intl-[a-zA-Z]{0,3}\/)?(?:user\/[A-Za-z0-9]+\/)?|spotify:)(?:track\/)([A-Za-z0-9]+).*$/;
+            if (spotifyRegex.test(string) || !linkRegex.test(string)) {
+                
+                if (spotifyRegex.test(string)) {
+                    research = await player.search(string, {
+                        requestedBy: message.member,
+                        searchEngine: QueryType.SPOTIFY_SONG,
+                    });
+                }
 
-            research = await player.search(string, {
-                requestedBy: message.member,
-                // searchEngine: /https?:\/\/(www\.)?youtube\.com\/playlist\?list=([a-zA-Z0-9_-]+)/.test(string) ? QueryType.YOUTUBE_PLAYLIST : QueryType.AUTO
-            });
+                let newResearch = "";
+                if (research && research.hasTracks()) newResearch = `${research.tracks[0].title} - ${research.tracks[0].author}`;
+                else if (!linkRegex.test(string)) newResearch = string;
 
-            if (!research.hasTracks()) {
-                embed = {
-                    color: 0xff0000,
-                    description: "No results found",
+                research = await player.search(newResearch, {
+                    requestedBy: message.member,
+                    searchEngine: QueryType.YOUTUBE_SEARCH,
+                });
+
+                const embed = {
+                    color: 0xffffff,
+                    title: "Type in chat the number you want to play",
+                    fields: [],
                     timestamp: new Date(),
                 };
-    
+
+                research.tracks.slice(10).map((track, index) => {
+                    embed.fields.push({ name: `${index + 1} - ${track.title}`, value: `By ${track.author}` });
+                });
+
                 await msg.edit({ embeds: [embed] });
+
+                const filter = (m) => m.author.id === message.author.id;
+                await message.channel.awaitMessages({ filter, max: 1, time: 10000, errors: ["time"] })
+                    .then((collected) => {
+                        const responseMessage = collected.first();
+                        research = research.tracks[parseInt(responseMessage.content) - 1];
+                    })
+                    .catch(() => research = research.tracks[0]);
+                    
+                console.log(research);
+                if (research) return;
+            } else {
+
+                const soundgasm = await getSoundgasmLink(args.join(" "));
+                if (soundgasm) string = soundgasm;
+
+                research = await player.search(string, {
+                    requestedBy: message.member,
+                    searchEngine: QueryType.AUTO,
+                });
+
+                if (!research.hasTracks()) {
+                    embed = {
+                        color: 0xff0000,
+                        description: "No results found",
+                        timestamp: new Date(),
+                    };
+    
+                    await msg.edit({ embeds: [embed] });
+                }
             }
 
             res = await player.play(message.member.voice.channel.id, Attachment ?? research, {

@@ -48,7 +48,7 @@ module.exports = {
                 if (!queue.connection) await queue.connect(message.member.voice.channel);
             }
 
-            if (queue.node.isPaused()) await queue.node.setPaused(0);
+            if (queue.node.isPaused()) queue.node.setPaused(0);
              
             const track = queue.voiceReceiver.createRawTrack(stream, {
                 title: "gamer",
