@@ -35,11 +35,6 @@ module.exports = {
             requestedBy: message.member,
             searchEngine: QueryType.AUTO_SEARCH,
         });
-
-        if (string) {
-            console.log(research.extractor);
-            return;
-        }
         
         const msg = await message.reply({ embeds: [play_embed] });
         
@@ -81,21 +76,23 @@ module.exports = {
                 await message.channel.awaitMessages({ filter, max: 1, time: 10000, errors: ["time"] })
                     .then((collected) => {
                         const responseMessage = collected.first();
-                        research = research.tracks[parseInt(responseMessage.content) - 1];
+                        console.log(research.tracks);
+                        research = research.tracks.slice(10)[parseInt(responseMessage.content) - 1];
                     })
                     .catch(() => research = research.tracks[0]);
                     
                 console.log(research);
-                if (research) return;
             } else {
 
                 const soundgasm = await getSoundgasmLink(args.join(" "));
                 if (soundgasm) string = soundgasm;
 
-                research = await player.search(string, {
-                    requestedBy: message.member,
-                    searchEngine: QueryType.AUTO,
-                });
+                if (!research) {
+                    research = await player.search(string, {
+                        requestedBy: message.member,
+                        searchEngine: QueryType.AUTO,
+                    });}
+                
 
                 if (!research.hasTracks()) {
                     embed = {
@@ -111,9 +108,9 @@ module.exports = {
             res = await player.play(message.member.voice.channel.id, Attachment ?? research, {
                 nodeOptions: {
                     metadata: {
-                        channel: interaction.channel,
-                        client: interaction.guild.members.me,
-                        requestedBy: interaction.user,
+                        channel: message.channel,
+                        client: message.guild.members.me,
+                        requestedBy: message.user,
                     },
                     bufferingTimeout: 15000,
                     leaveOnStop: true,
