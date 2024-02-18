@@ -35,11 +35,6 @@ module.exports = {
             requestedBy: message.member,
             searchEngine: QueryType.AUTO_SEARCH,
         });
-
-        if (string) {
-            console.log(research.extractor);
-            return;
-        }
         
         const msg = await message.reply({ embeds: [play_embed] });
         
