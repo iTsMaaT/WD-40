@@ -77,7 +77,7 @@ module.exports = {
                     .then((collected) => {
                         const responseMessage = collected.first();
                         console.log(research.tracks);
-                        research = research.tracks.slice(10)[parseInt(responseMessage.content) - 1];
+                        research = research.tracks.slice(10)[parseInt(responseMessage.content) - ];
                     })
                     .catch(() => research = research.tracks[0]);
                     
@@ -87,11 +87,10 @@ module.exports = {
                 const soundgasm = await getSoundgasmLink(args.join(" "));
                 if (soundgasm) string = soundgasm;
 
-                if (!research) {
                     research = await player.search(string, {
                         requestedBy: message.member,
                         searchEngine: QueryType.AUTO,
-                    });}
+                    });
                 
 
                 if (!research.hasTracks()) {
