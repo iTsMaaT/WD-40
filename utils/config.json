@@ -38,7 +38,8 @@
         { "type": 4, "name": "fr fr ong no cap" },
         { "type": 4, "name": "You fucking bitch" },
         { "type": 0, "name": "Minecraft, the best game ever." },
-        { "type": 0, "name": "Cookie Clicker" }
+        { "type": 0, "name": "Cookie Clicker" },
+        { "type": 4, "name": "The byte of 1010111" }
     ],
     
     "guildblacklist": [],

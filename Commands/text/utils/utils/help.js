@@ -103,7 +103,7 @@ module.exports = {
 
         const categoryEmbed = {
             title: "Command categories",
-            description: `**The prefix is:** \`${prefix}\`\n\nTotal commands: ${addedCommands.size}\n${pages.join("\n")}`,
+            description: `**The prefix is:** \`${prefix}\`\nSupport server: https://discord.gg/pqKE2QZrFM\n\nTotal commands: ${addedCommands.size}\n${pages.join("\n")}`,
             color: 0xffffff,
             footer: { text: "Buttons expire after 2 minutes." },
         };

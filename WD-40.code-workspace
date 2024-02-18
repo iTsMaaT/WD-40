@@ -11,7 +11,7 @@
         },
         "eslint.format.enable": true,
         "editor.codeActionsOnSave": {
-            "source.fixAll": true
+            "source.fixAll": "explicit"
         },
         "eslint.options": {
             "overrideConfigFile": ".eslintrc"

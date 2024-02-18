@@ -21,7 +21,7 @@ module.exports = {
         const trackPages = [];
         const fields = [];
         tracks.map(track => {
-            fields.push({ name: `${track.title} - ${track.author}`, value: `requested by : ${track.requestedBy.displayName}` });
+            fields.push({ name: `${track.title} - ${track.author}`, value: `requested by : ${track.requestedBy?.displayName ?? "N/A"}` });
         });
 
         for (let i = 0; i < fields.length; i += 10) {

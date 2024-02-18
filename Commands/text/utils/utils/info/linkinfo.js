@@ -1,7 +1,11 @@
 const https = require("https");
-const cheerio = require("cheerio");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
 const dns = require("dns/promises");
+const fs = require("fs/promises");
+const puppeteer = require("puppeteer");
+const cheerio = require("cheerio");
+const path = require("path");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
+const { AttachmentBuilder } = require("discord.js");
 
 module.exports = {
     name: "linkinfo",
@@ -19,12 +23,15 @@ module.exports = {
         try {
             if (!await validateURL(link)) return SendErrorEmbed(message, "Invalid URL", "yellow");
             const result = await analyzeLink(link);
+            let file;
+            if (result.screenshotPath) file = new AttachmentBuilder(result.screenshotPath, { name: "screenshot.png" });
 
             const embed = {
                 color: 0xffffff,
                 title: "Link Analysis",
                 fields: [
                     { name: "Unshortened URL", value: truncateText(result.unshortenedURL, MAX_FIELD_LENGTH) ?? "-" },
+                    { name: "Redirects (without search params)", value: result.redirects.length !== 1 ? truncateText(result.redirects.join(" ➤\n")) : "None" ?? "-" },
                     { name: "Response Status", value: truncateText(result.responseStatus, MAX_FIELD_LENGTH) ?? "-" },
                     { name: "IP Address", value: truncateText(result.ip, MAX_FIELD_LENGTH) ?? "-" },
                     { name: "Type", value: truncateText(result.type, MAX_FIELD_LENGTH) },
@@ -36,9 +43,17 @@ module.exports = {
                     },
                     { name: "Metadata", value: truncateText(getMetadataText(result.metadata), MAX_FIELD_LENGTH) },
                 ],
+                image: {
+                    url: "attachment://screenshot.png",
+                },
             };
 
-            message.reply({ embeds: [embed] });
+            if (args[1] == "-f") 
+                await message.reply({ embeds: [embed, ...await generateIPInfoEmbeds(result.ip.split(", "))], files: [file] });
+            else
+                await message.reply({ embeds: [embed], files: [file] });
+            if (result.screenshotPath) await fs.unlink(result.screenshotPath);
+
         } catch (error) {
             logger.error(error.stack);
             const responseStatus = error.response?.status || "-";
@@ -73,6 +88,8 @@ module.exports = {
                 pageTitle,
                 metadata,
                 scanResults,
+                screenshotPath,
+                redirects,
             ] = await Promise.all([
                 getDestinationIP(unshortenedURL),
                 getDestinationType(unshortenedURL),
@@ -81,6 +98,8 @@ module.exports = {
                 getPageTitle(unshortenedURL),
                 getMetadata(unshortenedURL),
                 getVirusTotalAnalysis(unshortenedURL),
+                getWebsiteScreenshot(unshortenedURL),
+                followRedirect(url, true),
             ]);
 
             return {
@@ -92,6 +111,8 @@ module.exports = {
                 pageTitle,
                 metadata,
                 scanResults,
+                screenshotPath,
+                redirects,
             };
         }
 
@@ -278,5 +299,80 @@ module.exports = {
             const creator = truncateText(metadata.creator, MAX_FIELD_LENGTH);
             return `Description: ${description}\nKeywords: ${keywords}\nog:title: ${ogTitle}\nog:description: ${ogDescription}\nAuthor: ${author}\nPublisher: ${publisher}\nCreator: ${creator}`;
         }
+
+        async function getWebsiteScreenshot(url) {
+            try {
+
+                const rootDir = path.resolve(__dirname, "../../../../..");
+                const tempFolderPath = path.join(rootDir, "utils", "temp");
+                const screenshotPath = path.join(tempFolderPath, `${Date.now()} - screenshot.png`);
+
+                const browser = await puppeteer.launch({ headless: "new" });
+                const page = await browser.newPage();
+                await page.goto(url);
+                await page.screenshot({ path: screenshotPath });
+                await browser.close();
+                return screenshotPath;
+            } catch (err) {
+                logger.error(err);
+                return null;
+            }
+        }
+
+        async function followRedirect(url, removeSearchParams = false) {
+            const redirects = [];
+            
+            const redirectFollower = async (innerURL) => {
+                if (!removeSearchParams) {
+                    redirects.push(innerURL); 
+                } else {
+                    const info = new URL(innerURL);
+                    redirects.push(info.origin + info.pathname);
+                }
+          
+                const res = await fetch(innerURL, { method: "HEAD", redirect: "manual" });
+          
+                if (res.status >= 300 && res.status < 400) {
+                    const locationHeader = res.headers.get("location") || "";
+                    return await redirectFollower(locationHeader);
+                }
+          
+            };
+            
+            await redirectFollower(url);
+            return redirects;
+        }
     },
+};
+
+const generateIPInfoEmbeds = async (IPArray) => {
+    try {
+        const response = await (await fetch("http://ip-api.com/batch?fields=258043", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(IPArray) })).json();
+        const IPEmbeds = [];
+        for (const query of response) {
+            const embed = {
+                color: 0xffffff,
+                title: `Information for: ${query.query}`,
+                fields: [
+                    { name: "Country", value: query.country ? `${query.country} (${query.countryCode})` : "-" },
+                    { name: "Region", value: query.city ? `${query.city} (${query.regionName})` : "-" },
+                    { name: "Zip code", value: query.zip ?? "-" },
+                    { name: "Location", value: query.lat ? `(${query.lat}, ${query.lon})` : "-" },
+                    { name: "Timezone", value: query.timezone ?? "-" },
+                    { name: "ISP", value: query.isp ? `${query.isp} (${query.org})` : "-" },
+                    { name: "Cellular connection", value: query.mobile ?? "-" },
+                    { name: "Proxy connection", value: query.proxy ?? "-" },
+                ],
+            };
+            IPEmbeds.push(embed);
+        }
+        return IPEmbeds;
+    } catch {
+        return null;
+    }
 };
