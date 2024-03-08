@@ -31,4 +31,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ghcr.io/itsmaat/Discord_bot:nodejs_20
+            ghcr.io/itsmaat/discord_bot:nodejs_20
