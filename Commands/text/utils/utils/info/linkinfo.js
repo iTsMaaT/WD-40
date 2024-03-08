@@ -307,7 +307,7 @@ module.exports = {
                 const tempFolderPath = path.join(rootDir, "utils", "temp");
                 const screenshotPath = path.join(tempFolderPath, `${Date.now()} - screenshot.png`);
 
-                const browser = await puppeteer.launch({ headless: "new", product: "firefox" });
+                const browser = await puppeteer.launch({ headless: "new" });
                 const page = await browser.newPage();
                 await page.goto(url);
                 await page.screenshot({ path: screenshotPath });
