@@ -26,7 +26,7 @@ jobs:
           password: ${{ secrets.REGISTRY_TOKEN }}
       - uses: docker/build-push-action@v5
         with:
-          context: ./nodejs
+          context: ./Docker
           file: ./Docker/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
