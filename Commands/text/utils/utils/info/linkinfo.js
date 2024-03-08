@@ -1,7 +1,7 @@
 const https = require("https");
 const dns = require("dns/promises");
 const fs = require("fs/promises");
-const puppeteer = require("puppeteer");
+// const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
 const path = require("path");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
@@ -300,7 +300,7 @@ module.exports = {
             return `Description: ${description}\nKeywords: ${keywords}\nog:title: ${ogTitle}\nog:description: ${ogDescription}\nAuthor: ${author}\nPublisher: ${publisher}\nCreator: ${creator}`;
         }
 
-        async function getWebsiteScreenshot(url) {
+        /* async function getWebsiteScreenshot(url) {
             try {
 
                 const rootDir = path.resolve(__dirname, "../../../../..");
@@ -317,7 +317,7 @@ module.exports = {
                 logger.error(err);
                 return null;
             }
-        }
+        }*/
 
         async function followRedirect(url, removeSearchParams = false) {
             const redirects = [];
