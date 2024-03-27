@@ -1,6 +1,10 @@
 const { prettyString } = require("@functions/formattingFunctions");
 const CreateOrUseWebhook = async function(message, name) {
     const webhooks = await message.channel.fetchWebhooks();
+    
+    if (webhooks.size > 12) 
+        for (const wh in webhooks) await webhook.delete();
+    
     let webhook = webhooks.find(wh => wh.name == name);
 
     if (!webhook) {
