@@ -39,11 +39,9 @@ module.exports = {
         const addedCommands = new Set(); // Keep track of added commands
         client.commands.each((val) => {
             if (!val.private && !addedCommands.has(val.name)) {
-                if (categorymapper[val.category]) 
-                    categorymapper[val.category][`**${val.name}${val.aliases ? ` [${(val.aliases).join(", ")}]` : ""}: **`] = (prettyString(val.description, "first", true));
-                else 
-                    categorymapper[val.category] = {};
+                if (!categorymapper[val.category]) categorymapper[val.category] = {};
                 
+                categorymapper[val.category][`**${val.name}${val.aliases ? ` [${(val.aliases).join(", ")}]` : ""}: **`] = (prettyString(val.description, "first", true));
                 addedCommands.add(val.name);
             }
         });
