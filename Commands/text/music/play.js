@@ -1,22 +1,19 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { QueryType } = require("discord-player");
-const { SoundCloudExtractor } = require("@discord-player/extractor");
-const fs = require("fs/promises");
 const cheerio = require("cheerio");
-const util = require("util");
 
 
 module.exports = {
     name: "play",
-    description: "Play a song",
+    description: "Play a song (works best with YouTube or Soucloud links)",
     aliases: ["p"],
     usage: "< [Song]: song link or query >",
     category: "music",
     examples: ["never gonna give you up"],
     permissions: ["Connect"],
     async execute(logger, client, message, args) {
-        let res, research;
-        // if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
+        let res, research, embed;
+        if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
 
         const Attachment = message.attachments.first()?.attachment;
 
@@ -24,7 +21,7 @@ module.exports = {
         if (!string) string = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
         // return SendErrorEmbed(message, "Please enter a song URL or query to search.", "yellow");
 
-        play_embed = {
+        embed = {
             color: 0xffffff,
             description: "Request received, fetching...",
             timestamp: new Date(),
@@ -36,7 +33,7 @@ module.exports = {
             searchEngine: QueryType.AUTO_SEARCH,
         });
         
-        const msg = await message.reply({ embeds: [play_embed] });
+        const msg = await message.reply({ embeds: [embed] });
         
         try {
             const linkRegex = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])/igm;
@@ -59,9 +56,10 @@ module.exports = {
                     searchEngine: QueryType.YOUTUBE_SEARCH,
                 });
 
-                const embed = {
+                embed = {
                     color: 0xffffff,
                     title: "Type in chat the number you want to play",
+                    description: "Not entering a number will make it play the best match",
                     fields: [],
                     timestamp: new Date(),
                 };
@@ -81,7 +79,6 @@ module.exports = {
                     })
                     .catch(() => research = research.tracks[0]);
                     
-                console.log(research);
             } else {
 
                 const soundgasm = await getSoundgasmLink(args.join(" "));

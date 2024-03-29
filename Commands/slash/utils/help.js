@@ -124,6 +124,7 @@ module.exports = {
             dispose: true,
         });
         
+        let embed = categoryEmbed;
         collector.on("collect", async (collectoriInteraction) => {
 
             if (collectoriInteraction.customId === "next") 

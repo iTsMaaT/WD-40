@@ -126,6 +126,7 @@ module.exports = {
             dispose: true,
         });
         
+        let embed = categoryEmbed;
         collector.on("collect", async (interaction) => {
 
             if (interaction.customId === "next") 
