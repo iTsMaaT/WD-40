@@ -43,9 +43,9 @@ module.exports = {
                     },
                     { name: "Metadata", value: truncateText(getMetadataText(result.metadata), MAX_FIELD_LENGTH) },
                 ],
-                image: {
+                /* image: {
                     url: "attachment://screenshot.png",
-                },
+                },*/
             };
 
             if (args[1] == "-f") 
@@ -98,7 +98,7 @@ module.exports = {
                 getPageTitle(unshortenedURL),
                 getMetadata(unshortenedURL),
                 getVirusTotalAnalysis(unshortenedURL),
-                getWebsiteScreenshot(unshortenedURL),
+                // getWebsiteScreenshot(unshortenedURL),
                 followRedirect(url, true),
             ]);
 
@@ -111,7 +111,7 @@ module.exports = {
                 pageTitle,
                 metadata,
                 scanResults,
-                screenshotPath,
+                // screenshotPath,
                 redirects,
             };
         }
