@@ -23,8 +23,8 @@ module.exports = {
         try {
             if (!await validateURL(link)) return SendErrorEmbed(message, "Invalid URL", "yellow");
             const result = await analyzeLink(link);
-            let file;
-            if (result.screenshotPath) file = new AttachmentBuilder(result.screenshotPath, { name: "screenshot.png" });
+            // let file;
+            // if (result.screenshotPath) file = new AttachmentBuilder(result.screenshotPath, { name: "screenshot.png" });
 
             const embed = {
                 color: 0xffffff,
@@ -43,16 +43,16 @@ module.exports = {
                     },
                     { name: "Metadata", value: truncateText(getMetadataText(result.metadata), MAX_FIELD_LENGTH) },
                 ],
-                image: {
+                /* image: {
                     url: "attachment://screenshot.png",
-                },
+                },*/
             };
 
             if (args[1] == "-f") 
-                await message.reply({ embeds: [embed, ...await generateIPInfoEmbeds(result.ip.split(", "))], files: [file] });
+                await message.reply({ embeds: [embed, (await generateIPInfoEmbeds(result.ip.split(", ")))[0]]/* , files: [file]*/ });
             else
-                await message.reply({ embeds: [embed], files: [file] });
-            if (result.screenshotPath) await fs.unlink(result.screenshotPath);
+                await message.reply({ embeds: [embed]/* , files: [file]*/ });
+            // if (result.screenshotPath) await fs.unlink(result.screenshotPath);
 
         } catch (error) {
             logger.error(error.stack);
@@ -88,7 +88,7 @@ module.exports = {
                 pageTitle,
                 metadata,
                 scanResults,
-                screenshotPath,
+                // screenshotPath,
                 redirects,
             ] = await Promise.all([
                 getDestinationIP(unshortenedURL),
@@ -98,7 +98,7 @@ module.exports = {
                 getPageTitle(unshortenedURL),
                 getMetadata(unshortenedURL),
                 getVirusTotalAnalysis(unshortenedURL),
-                getWebsiteScreenshot(unshortenedURL),
+                // getWebsiteScreenshot(unshortenedURL),
                 followRedirect(url, true),
             ]);
 
@@ -111,7 +111,7 @@ module.exports = {
                 pageTitle,
                 metadata,
                 scanResults,
-                screenshotPath,
+                // screenshotPath,
                 redirects,
             };
         }
