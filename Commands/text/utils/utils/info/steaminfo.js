@@ -2,7 +2,7 @@ const { SendErrorEmbed } = require("@functions/discordFunctions");
 const prettyMilliseconds = require("pretty-ms");
 
 module.exports = {
-    name: "botinfo",
+    name: "steaminfo",
     description: "Gives info about a steam account",
     category: "info",
     aliases: ["sinfo", "steam"],

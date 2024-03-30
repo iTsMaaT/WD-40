@@ -1,4 +1,4 @@
-const { infoFromMessageLink } = require("@functions/discordFunctions");
+const { InfoFromMessageLink } = require("@functions/discordFunctions");
 
 module.exports = {
     name: "sudo",
@@ -20,7 +20,7 @@ module.exports = {
             }
             // Replies to a given message in a given channel
             else if (sudoprefix == "-r") {
-                const LinkArray = infoFromMessageLink(args.shift());
+                const LinkArray = InfoFromMessageLink(args.shift());
                 const ChannelID = LinkArray[1];
                 const MsgID = LinkArray[2];
                 client.channels.cache.get(ChannelID).messages.fetch({ cache: false, message: MsgID })
@@ -33,7 +33,7 @@ module.exports = {
             // Reacts to a given message in a given channel
             else if (sudoprefix == "-e") {
                 if (args[1]) {
-                    const LinkArray = infoFromMessageLink(args.shift());
+                    const LinkArray = InfoFromMessageLink(args.shift());
                     const ChannelID = LinkArray[1];
                     const MsgID = LinkArray[2];
                     const letters = args.shift().toUpperCase();
