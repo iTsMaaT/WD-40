@@ -51,6 +51,16 @@ module.exports = {
         // Auto-responses
         if (global.GuildManager.GetResponses(message.guild)) {
 
+            if (/((?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel)\/([^/?#&]+)).*/g.test(message.content)) {
+                message.reply(`
+**How to download a Instagram media.**
+Step 1 - Copy the post's link
+Step 2 - Go to this URL (https://snapinsta.app/)     
+Step 3 - Paste the link in the "Paste URL Instagram" box
+Step 4 - Click download
+Step 5 - Send the downloaded media to your favorite social media!
+    `);}
+
             // skull reaction to skull emoji
             if (message.content.toLowerCase() == "💀") 
                 message.react("💀");
