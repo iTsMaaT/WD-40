@@ -59,10 +59,12 @@ module.exports = {
 
 const getSteamInfo = async (steamID) => {
     const baseURL = "http://api.steampowered.com/";
+    console.log(await(await fetch(`${baseURL}IPlayerService/GetOwnedGames/v0001/?key=${process.env.STEAM_API_KEY}&steamid=${steamID}&format=json`)).text());
     const [allGames, recentGames, profile] = await Promise.all([
         await (await fetch(`${baseURL}IPlayerService/GetOwnedGames/v0001/?key=${process.env.STEAM_API_KEY}&steamid=${steamID}&format=json`)).json(),
         await (await fetch(`${baseURL}IPlayerService/GetRecentlyPlayedGames/v0001/?key=${process.env.STEAM_API_KEY}&steamid=${steamID}&count=3&format=json`)).json(),
         await (await fetch(`${baseURL}ISteamUser/GetPlayerSummaries/v0002/?key=${process.env.STEAM_API_KEY}&steamids=${steamID}&format=json`)).json(),
+        // http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=C8F93CB635E0B5B50E2908C8698B04D4&steamid=76561197960434622&format=json
     ]);
 
     const gameCount = allGames.response.game_count;
