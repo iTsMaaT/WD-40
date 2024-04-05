@@ -101,6 +101,7 @@ function loadFiles(folder, callback) {
 const discoveredCommands = [];
 loadFiles("./Commands/slash/", (slashcommand, fileName) => {
     if ("name" in slashcommand && "execute" in slashcommand && "description" in slashcommand) {
+        if (client.slashcommands.get(slashcommand.name)) throw new Error(`Slash command or alias [${slashcommand.name}] already exists`);
         client.slashcommands.set(slashcommand.name, slashcommand);
         discoveredCommands.push(slashcommand);
     } else {
@@ -110,6 +111,7 @@ loadFiles("./Commands/slash/", (slashcommand, fileName) => {
 
 // Text command handler
 loadFiles("./Commands/text/", function(command) {
+    if (client.commands.get(command.name)) throw new Error(`Text command or alias [${command.name}] already exists`);
     client.commands.set(command.name, command);
 
     if (command.aliases && Array.isArray(command.aliases)) {
@@ -122,6 +124,7 @@ loadFiles("./Commands/text/", function(command) {
 // Context menu command handler
 loadFiles("./Commands/context/", (contextcommand, fileName) => {
     if ("name" in contextcommand && "execute" in contextcommand && "type" in contextcommand) {
+        if (client.contextCommands.get(contextcommand.name)) throw new Error(`Context command or alias [${contextcommand.name}] already exists`);
         client.contextCommands.set(contextcommand.name, contextcommand);
         discoveredCommands.push(contextcommand);
     } else {
@@ -153,6 +156,7 @@ loadFiles("./events/process/", function(event) {
 
 process.stdin.setEncoding("utf8");
 loadFiles("./events/console/", function(event) {
+    if (client.consoleCommands.get(event.name)) throw new Error(`Command or alias [${event.name}] already exists`);
     client.consoleCommands.set(event.name, event);
 });
 
