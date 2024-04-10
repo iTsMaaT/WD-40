@@ -113,6 +113,7 @@ loadFiles("./Commands/slash/", (slashcommand, fileName) => {
 loadFiles("./Commands/text/", function(command) {
     if (client.commands.get(command.name)) throw new Error(`Text command or alias [${command.name}] already exists`);
     client.commands.set(command.name, command);
+    if (!command.cooldown) command.cooldown = 3000;
 
     if (command.aliases && Array.isArray(command.aliases)) {
         command.aliases.forEach(alias => {

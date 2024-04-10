@@ -26,21 +26,52 @@ module.exports = {
         if (!args[0]) return SendErrorEmbed(message, "You must provide a prompt.", "yellow");
         if (queue || queue?.tracks || queue?.currentTrack) return SendErrorEmbed(message, "You must stop the music before playing TTS.", "yellow");
         
+        embed.title = "Requesting a response from PaLM.";
+
         try {
-            embed.title = "Requesting a response from PaLM.";
-
-            sent = await message.reply({ embeds: [embed] });
-
-            const prompt = `When responding to the following prompt, try to condense your response. Make sure it is under 1000 characters. This prompt is gonna be played inside a Voice Chat, so please do not use markdown. Prompt: ${args.join(" ")}`;
-            const result = await fetch(`${process.env.PALM_API_PROXY_URL}?api_key=${process.env.PALM_API_KEY}&prompt=${encodeURIComponent(prompt)}`, {
-                signal: AbortSignal.timeout(10000),
+            const API_URL = process.env.PALM_API_PROXY_URL; // Replace with your API URL
+            const apiKey = process.env.PALM_API_KEY; // Replace with your API key
+                
+            const prompt = args.join(" ");
+            if (!prompt) return SendErrorEmbed(message, "Please provide a prompt.", "yellow");
+    
+            const queryParams = new URLSearchParams({
+                api_key: apiKey,
+                prompt: `When responding to the following prompt, try to condense your response. Make sure it is under 2000 characters. The response will be heard in a discord voice channel using TTS. You can use markdown. 
+                    The user that asked the prompt is named: ${message.author.username} (display name: ${message.author.displayName}).
+                    The prompt is: ${prompt}`,
+                gemini: true,
             });
-            
-            response = limitString((await result.json()).response, 1000);
-
+    
+            const apiUrl = `${API_URL}?${queryParams.toString()}`;
+    
+            response = await fetch(apiUrl);
+            if (!result.ok) {
+                let errorText;
+                try {
+                    const errorResponse = await result.json();
+                    errorText = JSON.stringify(errorResponse);
+                } catch (error) {
+                    errorText = await result.text();
+                }
+                throw new Error(`API request failed with status ${result.status}. Error message: ${errorText}`);
+            }
+    
+            const jsonResponse = await response.json();
+            if (jsonResponse.response) 
+                response = jsonResponse.response;
+            else 
+                throw new Error("Unexpected JSON response format");
+                
+    
         } catch (err) {
-            if (err.name == "TimeoutError") return SendErrorEmbed(message, "I do not wish to answer that question. (Request timed out)", "yellow");
-            SendErrorEmbed(message, "An error occurred.", "red");
+            logger.error(err.stack);
+    
+            if (err.name === "AbortError") 
+                return SendErrorEmbed(message, "I do not wish to answer that question. (Request timed out)", "yellow");
+            else 
+                SendErrorEmbed(message, "An error occurred.", "red");
+                
         }
 
         try {
@@ -67,7 +98,7 @@ module.exports = {
 
         try {
 
-            embed.title = "Playing the PaLM's response.";
+            embed.title = "Playing Gemini's response.";
 
             await sent.edit({ embeds: [embed] });
 
