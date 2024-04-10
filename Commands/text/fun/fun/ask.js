@@ -1,5 +1,4 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const fetch = require("node-fetch");
 
 module.exports = {
     name: "ask",
