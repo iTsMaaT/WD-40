@@ -7,7 +7,7 @@ module.exports = {
     name: "play",
     description: "Play a song (works best with YouTube or Soucloud links)",
     aliases: ["p"],
-    usage: "< [Song]: song link or query >",
+    usage: "< [Song]: song link or query , [-s]: optional: shuffles before playing>",
     category: "music",
     examples: ["never gonna give you up"],
     permissions: ["Connect"],
@@ -101,6 +101,8 @@ module.exports = {
                 }
             }
 
+            if (args[1] == "-s") await research.tracks.shuffle();
+
             res = await player.play(message.member.voice.channel.id, Attachment ?? research, {
                 nodeOptions: {
                     metadata: {
@@ -132,7 +134,7 @@ module.exports = {
             logger.error(err.stack);
             embed = {
                 color: 0xff0000,
-                description: "Failed to fetch / play the reqested track",
+                description: "Failed to fetch / play the requested track",
                 timestamp: new Date(),
             };
 
