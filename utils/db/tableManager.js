@@ -1,5 +1,5 @@
 const DB = require("./DatabaseManager.js");
-const { blacklist, guildsettings, logs, message, reactions, responses, snowflake } = require("../../schema/schema.js");
+const fullSchema = require("../../schema/schema.js");
 
 /**
  * Generates repository functions for a given table.
@@ -91,4 +91,5 @@ const RepositoryManager = {
     },
 };
 
-module.exports = RepositoryManager;
+const repositories = RepositoryManager.generateRepositories(fullSchema);
+module.exports = { repositories };

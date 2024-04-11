@@ -33,22 +33,25 @@ module.exports = (function(prisma) {
     }
     
     async function CheckIfGuildExists(guild) {
-        const result = await repositories.guildsettings.select().where({ GuildID: guild.id });
+        const result = await repositories.guildsettings.select().where(eq(schema.guildsettings.guildId, guild.id));
         return result != undefined && result != null;
     }
     
     async function AddGuildToDatabase(guild) {
-        await repositories.guildsettings.insert({ GuildID: guild.id, GuildName: guild.name });
+        await repositories.guildsettings.insert(
+            eq(schema.guildsettings.guildId, guildID),
+            eq(schema.guildsettings.GuildName, guild.name),
+        );
         prefixes[guild.id] = ">";
         responses[guild.id] = false;
     }
     
     async function GetGuildSettings(guild) {
-        return await repositories.guildsettings.select().where({ GuildID: guild.id });
+        return await repositories.guildsettings.select().where(eq(schema.guildsettings.guildId, guild.id));
     }
     
     async function UpdateGuild(guild, data) {
-        await repositories.guildsettings.update(data).where({ GuildID: guild.id });
+        await repositories.guildsettings.update(data).where(eq(schema.guildsettings.guildId, guild.id));
     }
 
     async function ToggleResponses(guild, status) {
