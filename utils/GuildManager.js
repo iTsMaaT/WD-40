@@ -4,7 +4,11 @@ const selectBL = require("./db/BlacklistRepository.js").select;
 const insertBL = require("./db/BlacklistRepository.js").insert;
 const updateDB = require("./db/BlacklistRepository.js").update;
 
-module.exports = (function (prisma) {
+const tableManager = require("./db/tableManager.js");
+const schema = require("../schema/schema.js");
+const repositories = tableManager.generateRepositories(schema);
+
+module.exports = (function(prisma) {
 
     const prefixes = {};
     const responses = {};
@@ -26,40 +30,25 @@ module.exports = (function (prisma) {
             await UpdateGuild(guild, { Active: status });
         else
             await AddGuildToDatabase(guild);
-
     }
-
+    
     async function CheckIfGuildExists(guild) {
-        const result = await GetGuildSettings(guild);
+        const result = await repositories.guildsettings.select().where({ GuildID: guild.id });
         return result != undefined && result != null;
     }
-
+    
     async function AddGuildToDatabase(guild) {
-        await prisma.GuildSettings.create({
-            data: {
-                GuildID: guild.id,
-                GuildName: guild.name,
-            },
-        });
+        await repositories.guildsettings.insert({ GuildID: guild.id, GuildName: guild.name });
         prefixes[guild.id] = ">";
         responses[guild.id] = false;
     }
-
+    
     async function GetGuildSettings(guild) {
-        return await prisma.GuildSettings.findUnique({
-            where: {
-                GuildID: guild.id,
-            },
-        });
+        return await repositories.guildsettings.select().where({ GuildID: guild.id });
     }
-
+    
     async function UpdateGuild(guild, data) {
-        await prisma.GuildSettings.update({
-            where: {
-                GuildID: guild.id,
-            },
-            data,
-        });
+        await repositories.guildsettings.update(data).where({ GuildID: guild.id });
     }
 
     async function ToggleResponses(guild, status) {
