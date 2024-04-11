@@ -1,4 +1,3 @@
-const { PrismaClient } = require("@prisma/client");
 const { Client, GatewayIntentBits, Events, Partials, ActivityType, PermissionFlagsBits } = require("discord.js");
 const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState, AutoCommandMatch } = require("./utils/config.json");
 
@@ -25,8 +24,8 @@ const client = new Client({
     allowedMentions: { repliedUser: false },
 });
 
-global.prisma = new PrismaClient();
-global.GuildManager = (require("./utils/GuildManager.js"))(global.prisma);
+const { repositories } = require("./utils/db/tableManager.js");
+const GuildManager = require("./utils/GuildManager.js");
 global.superuser = 0;
 global.debug = 1;
 global.SmartRestartEnabled = 0;
@@ -66,10 +65,11 @@ global.logger = new Logger({ root: __dirname, client });
 console.logger = console.log;
 console.log = (log) => global.logger.console(log);
 global.snowflakeData = [];
-prisma.snowflake.findMany().then(val => {
-    const result = val.map(v => [parseInt(v.GuildID), parseInt(v.UserID)]);
-    global.snowflakeData = global.snowflakeData.concat(result);
-});
+const snowflakeRepository = repositories.snowflake;
+if (snowflakeRepository) {
+    const snowflakeData = await snowflakeRepository.select().columns("GuildID", "UserID");
+    global.snowflakeData = global.snowflakeData.concat(snowflakeData.map(({ GuildID, UserID }) => [parseInt(GuildID), parseInt(UserID)]));
+}
 
 // Collections creation
 client.commands = new Discord.Collection();
@@ -423,25 +423,27 @@ client.on(Events.InteractionCreate, async interaction => {
 
 // Text command executing
 client.on(Events.MessageCreate, async (message) => {
+    console.log(global.GuildManager.GetPrefix(message.guild));
     if (message.author.bot) return;
     if (superuser && !whitelist.includes(message.author.id)) return;
     if (!message.guild) return message.reply("Commands cannot be executed inside DMs.");
     if (blacklist.includes(message.author.id)) return;
 
     try {
-        await global.prisma.message.create({
-            data: {
-                MessageID: message.id,
-                UserID: message.author.id,
-                UserName: message.member.user.tag,
-                ChannelID: message.channel.id,
-                ChannelName: message.channel.name,
-                GuildID: message.guild.id,
-                GuildName: message.guild.name,
-                // Timestamp: new Date(new Date(message.createdTimestamp).toLocaleString("en-US", {timeZone: "America/Toronto"})),
-                Content: message.content,
-            },
-        });
+        const messageRepository = repositories.message;
+
+        if (messageRepository) {
+            await messageRepository.insert({
+                messageId: message.id,
+                userId: message.author.id,
+                userName: message.member.user.tag,
+                channelId: message.channel.id,
+                channelName: message.channel.name,
+                guildId: message.guild.id,
+                guildName: message.guild.name,
+                content: message.content,
+            });
+        }
     } catch (ex) {
         console.log(`[${getExactDate()} - SEVERE] Unable to write to database`);
         console.log(ex);

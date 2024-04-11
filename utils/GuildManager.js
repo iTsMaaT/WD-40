@@ -1,14 +1,9 @@
 const { eq, and } = require("drizzle-orm");
-const blacklistSchema = require("./db/BlacklistRepository.js").default;
-const selectBL = require("./db/BlacklistRepository.js").select;
-const insertBL = require("./db/BlacklistRepository.js").insert;
-const updateDB = require("./db/BlacklistRepository.js").update;
 
-const tableManager = require("./db/tableManager.js");
+const { repositories } = require("./db/tableManager.js");
 const schema = require("../schema/schema.js");
-const repositories = tableManager.generateRepositories(schema);
 
-module.exports = (function(prisma) {
+module.exports = (function() {
 
     const prefixes = {};
     const responses = {};
@@ -19,9 +14,9 @@ module.exports = (function(prisma) {
             const exists = await CheckIfGuildExists(g);
             if (!exists) await AddGuildToDatabase(g);
             const settings = await GetGuildSettings(g);
-            prefixes[g.id] = settings.Prefix;
-            responses[g.id] = settings.Responses;
-            personality[g.id] = settings.Personality;
+            prefixes[g.id] = settings.prefix;
+            responses[g.id] = settings.responses;
+            personality[g.id] = settings.personality;
         });
     }
 
@@ -38,16 +33,16 @@ module.exports = (function(prisma) {
     }
     
     async function AddGuildToDatabase(guild) {
-        await repositories.guildsettings.insert(
-            eq(schema.guildsettings.guildId, guildID),
-            eq(schema.guildsettings.GuildName, guild.name),
-        );
+        await repositories.guildsettings.insert({
+            guildId: guild.id,
+            guildName: guild.name,
+        });
         prefixes[guild.id] = ">";
         responses[guild.id] = false;
     }
     
     async function GetGuildSettings(guild) {
-        return await repositories.guildsettings.select().where(eq(schema.guildsettings.guildId, guild.id));
+        return (await repositories.guildsettings.select().where(eq(schema.guildsettings.guildId, guild.id)).limit(1))[0] ?? {};
     }
     
     async function UpdateGuild(guild, data) {
@@ -55,12 +50,12 @@ module.exports = (function(prisma) {
     }
 
     async function ToggleResponses(guild, status) {
-        await UpdateGuild(guild, { Responses: status });
+        await UpdateGuild(guild, { responses: status });
         responses[guild.id] = status;
     }
 
     async function TogglePrefix(guild, prefix) {
-        await UpdateGuild(guild, { Prefix: prefix });
+        await UpdateGuild(guild, { prefix: prefix });
         prefixes[guild.id] = prefix;
     }
 
@@ -85,7 +80,7 @@ module.exports = (function(prisma) {
         const bl = {};
 
         try {
-            const data = await selectBL().where(eq(blacklistSchema.guildId, guildId));
+            const data = await repositories.blacklist.select().where(eq(blacklistSchema.guildId, guildId));
             if (data.length > 0) {
                 data.forEach((value) => {
                     if (value.userId)
@@ -117,17 +112,17 @@ module.exports = (function(prisma) {
 
         async function UpdateUserInDB(userId) {
             try {
-                const exists = await selectBL().where(and(
-                    eq(blacklistSchema.guildId, guildId),
-                    eq(blacklistSchema.userId, userId),
+                const exists = await repositories.blacklist.select().where(and(
+                    eq(schema.blacklist.guildId, guildId),
+                    eq(schema.blacklist.userId, userId),
                 ));
                 if (exists.length > 0) {
-                    await updateDB({ permission: bl[userId].join(";").toLowerCase() }).where(and(
+                    await repositories.blacklist.update({ permission: bl[userId].join(";").toLowerCase() }).where(and(
                         eq(blacklistSchema.guildId, guildId),
                         eq(blacklistSchema.userId, userId),
                     ));
                 } else {
-                    await insertBL({
+                    await repositories.blacklist.insert({
                         guildId,
                         userId,
                         permission: bl[userId].join(";").toLowerCase(),
@@ -162,23 +157,25 @@ module.exports = (function(prisma) {
         const bl = {};
 
         try {
-            const data = await prisma.Reactions.findMany({
-                where: {
-                    GuildID: guildId,
-                },
-            });
-
-            if (data.length > 0) {
-                for (const i in data) {
-                    if (data[i].ChannelString === undefined) continue;
-                    const value = data[i];
-                    if (!bl[value.ChannelString])
-                        bl[value.ChannelString] = [];
-
-                    bl[value.ChannelString].push({
-                        "string": value.String,
-                        "emotes": value.Emotes,
+            const reactionsRepository = repositories.reactions;
+            if (reactionsRepository) {
+                const data = await reactionsRepository.select()
+                    .where({
+                        guildId: guildId,
                     });
+
+                if (data.length > 0) {
+                    for (const i in data) {
+                        if (data[i].ChannelString === undefined) continue;
+                        const value = data[i];
+                        if (!bl[value.ChannelString])
+                            bl[value.ChannelString] = [];
+
+                        bl[value.ChannelString].push({
+                            "string": value.String,
+                            "emotes": value.Emotes,
+                        });
+                    }
                 }
             }
         } catch (e) {
@@ -251,52 +248,45 @@ module.exports = (function(prisma) {
         }
 
         async function updateReactionDB(ChannelPrompt, String) {
-            if (bl[ChannelPrompt]) {
-                const EmotesTable = bl[ChannelPrompt].filter(val => val.string === String);
-                if (EmotesTable.length > 0) {
-                    const Emotes = EmotesTable[0].emotes;
-
-                    // Update or create entries for each string and emotes pair
-                    await prisma.Reactions.upsert({
-                        where: {
-                            GuildID_ChannelString_String: {
-                                GuildID: guildId,
-                                ChannelString: ChannelPrompt,
-                                String,
-                            },
-                        },
-                        update: {
-                            Emotes,
-                        },
-                        create: {
-                            GuildID: guildId,
-                            ChannelString: ChannelPrompt,
-                            String,
-                            Emotes,
-                        },
+            const reactionsRepository = repositories.reactions;
+        
+            if (reactionsRepository) {
+                const existingRecord = await reactionsRepository.select()
+                    .where({
+                        guildId: guildId,
+                        channelString: ChannelPrompt,
+                        string: String,
                     });
+        
+                if (existingRecord) {
+                    const EmotesTable = bl[ChannelPrompt].filter(val => val.string === String);
+                    if (EmotesTable.length > 0) {
+                        const Emotes = EmotesTable[0].emotes;
+        
+                        await reactionsRepository.update({ emotes: Emotes })
+                            .where({
+                                guildId: guildId,
+                                channelString: ChannelPrompt,
+                                string: String,
+                            });
+                    } else {
+                        await reactionsRepository.remove()
+                            .where({
+                                guildId: guildId,
+                                channelString: ChannelPrompt,
+                                string: String,
+                            });
+                    }
                 } else {
-                    await prisma.Reactions.delete({
-                        where: {
-                            GuildID_ChannelString_String: {
-                                GuildID: guildId,
-                                ChannelString: ChannelPrompt,
-                                String,
-                            },
-                        },
+                    await reactionsRepository.insert({
+                        guildId: guildId,
+                        channelString: ChannelPrompt,
+                        string: String,
+                        emotes: "",
                     });
                 }
-            } else {
-                // Delete all entries for this channel prompt
-                await prisma.Reactions.deleteMany({
-                    where: {
-                        GuildID: guildId,
-                        ChannelString: ChannelPrompt,
-                    },
-                });
             }
         }
-
         return { addReaction, removeReaction, matchReactions, getReactions };
     }
 
@@ -315,23 +305,25 @@ module.exports = (function(prisma) {
         const cache = {};
 
         try {
-            const data = await prisma.Responses.findMany({
-                where: {
-                    GuildID: guildId,
-                },
-            });
-
-            if (data.length > 0) {
-                for (const i in data) {
-                    if (data[i].ChannelString === undefined) continue;
-                    const value = data[i];
-                    if (!cache[value.ChannelString])
-                        cache[value.ChannelString] = [];
-
-                    cache[value.ChannelString].push({
-                        "string": value.String,
-                        "response": value.Response,
+            const responsesRepository = repositories.responses;
+            if (responsesRepository) {
+                const data = await responsesRepository.select()
+                    .where({
+                        guildId: guildId,
                     });
+
+                if (data.length > 0) {
+                    for (const i in data) {
+                        if (data[i].channelString === undefined) continue;
+                        const value = data[i];
+                        if (!cache[value.channelString])
+                            cache[value.channelString] = [];
+
+                        cache[value.channelString].push({
+                            "string": value.string,
+                            "response": value.response,
+                        });
+                    }
                 }
             }
         } catch (e) {
@@ -346,17 +338,17 @@ module.exports = (function(prisma) {
                 "string": string,
                 "response": response,
             });
-            await updateResponseDB(ChannelPrompt, string);
+            await updateResponseDB(guildId, ChannelPrompt, string);
         }
 
         async function removeResponse(ChannelPrompt, string = null) {
             if (!string) delete cache[ChannelPrompt];
             if (cache[ChannelPrompt]) {
-                // Remove the entry with the matching string
+            // Remove the entry with the matching string
                 cache[ChannelPrompt] = cache[ChannelPrompt].filter(entry => entry.string !== string);
                 if (cache[ChannelPrompt].length == 0) delete cache[ChannelPrompt];
             }
-            await updateResponseDB(ChannelPrompt, string);
+            await updateResponseDB(guildId, ChannelPrompt, string);
         }
 
         async function matchResponses(ChannelPrompt, String, hasAttachment = false) {
@@ -404,49 +396,35 @@ module.exports = (function(prisma) {
         }
 
         async function updateResponseDB(ChannelPrompt, String) {
-            if (cache[ChannelPrompt]) {
-                const ResponseTable = cache[ChannelPrompt].filter(val => val.string === String);
-                if (ResponseTable.length > 0) {
-                    const Response = ResponseTable[0].response;
+            const responsesRepository = repositories.responses;
 
-                    // Update or create entries for each string and Responses pair
-                    await prisma.Responses.upsert({
-                        where: {
-                            GuildID_ChannelString_String: {
-                                GuildID: guildId,
-                                ChannelString: ChannelPrompt,
-                                String,
-                            },
-                        },
-                        update: {
-                            Response,
-                        },
-                        create: {
-                            GuildID: guildId,
-                            ChannelString: ChannelPrompt,
-                            String,
-                            Response,
-                        },
-                    });
+            if (responsesRepository) {
+                if (cache[ChannelPrompt]) {
+                    const ResponseTable = cache[ChannelPrompt].filter(val => val.string === String);
+                    if (ResponseTable.length > 0) {
+                        const Response = ResponseTable[0].response;
+
+                        await responsesRepository.update({ response: Response }).where({
+                            guildId: guildId,
+                            channelString: ChannelPrompt,
+                            string: String,
+                        });
+                    } else {
+                        await responsesRepository.remove()
+                            .where({
+                                guildId: guildId,
+                                channelString: ChannelPrompt,
+                                string: String,
+                            });
+                    }
                 } else {
-                    await prisma.Responses.delete({
-                        where: {
-                            GuildID_ChannelString_String: {
-                                GuildID: guildId,
-                                ChannelString: ChannelPrompt,
-                                String,
-                            },
-                        },
-                    });
-                }
-            } else {
                 // Delete all entries for this channel prompt
-                await prisma.Responses.deleteMany({
-                    where: {
-                        GuildID: guildId,
-                        ChannelString: ChannelPrompt,
-                    },
-                });
+                    await responsesRepository.remove()
+                        .where({
+                            guildId: guildId,
+                            channelString: ChannelPrompt,
+                        });
+                }
             }
         }
 

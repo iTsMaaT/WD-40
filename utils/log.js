@@ -1,3 +1,5 @@
+const { repositories } = require("./db/tableManager.js");
+
 const util = require("util");
 /* function checkIfFolderExists(path) {
     try{
@@ -60,11 +62,9 @@ async function writeLogToFile(header, message, client, type) {
     client?.channels?.cache?.get("1069811223950016572")?.send(`\`\`\`${header} ${formattedLog}\`\`\``);
     
     try {
-        await global.prisma.logs.create({
-            data: {
-                Value: formattedLog,
-                Type: type,
-            },
+        await repositories.logs.insert({
+            value: formattedLog,
+            type: type,
         });
     } catch (ex) {
         console.logger(`\x1b[31m[${getDateTime()} - SEVERE] Unable to write to database\x1b[0m`);
