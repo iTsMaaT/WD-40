@@ -47,7 +47,7 @@ Array.prototype.shuffle = function() {
 
 // music
 const { Player } = require("discord-player");
-global.player = new Player(client, {
+const player = new Player(client, {
     ytdlOptions: {
         requestOptions: {
             headers: {
@@ -58,18 +58,12 @@ global.player = new Player(client, {
     },
     skipFFmpeg: false,
 });
-global.player.extractors.loadDefault();
+player.extractors.loadDefault();
 
 // Logger system and databases
 global.logger = new Logger({ root: __dirname, client });
 console.logger = console.log;
 console.log = (log) => global.logger.console(log);
-global.snowflakeData = [];
-const snowflakeRepository = repositories.snowflake;
-if (snowflakeRepository) {
-    const snowflakeData = await snowflakeRepository.select().columns("GuildID", "UserID");
-    global.snowflakeData = global.snowflakeData.concat(snowflakeData.map(({ GuildID, UserID }) => [parseInt(GuildID), parseInt(UserID)]));
-}
 
 // Collections creation
 client.commands = new Discord.Collection();
@@ -249,7 +243,6 @@ client.once(Events.ClientReady, async () => {
             // After 3s, closes the database and then exits the process
             setTimeout(function() {
                 /* ------------- */
-                global.prisma.$disconnect();
                 process.exit(1);
                 /* ------------- */
             }, 1000 * 3);

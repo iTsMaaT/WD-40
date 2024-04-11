@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { useQueue } = require("discord-player");
+const { useQueue, useMainPlayer } = require("discord-player");
 
 module.exports = {
     name: "stop",
