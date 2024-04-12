@@ -1,3 +1,6 @@
+const dotenv = require("dotenv");
+dotenv.config();
+
 const { Client, GatewayIntentBits, Events, Partials, ActivityType, PermissionFlagsBits } = require("discord.js");
 const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState, AutoCommandMatch } = require("./utils/config.json");
 
@@ -7,7 +10,6 @@ const Logger = require("./utils/log");
 const fs = require("fs");
 
 const cron = require("cron");
-const dotenv = require("dotenv");
 const Discord = require("discord.js");
 
 const getExactDate = require("@functions/getExactDate");
@@ -15,7 +17,6 @@ const { SendErrorEmbed } = require("@functions/discordFunctions");
 const RandomMinMax = require("@functions/RandomMinMax");
 const findClosestMatch = require("@functions/findClosestMatch");
 
-dotenv.config();
 
 const client = new Client({
     intents: Object.keys(GatewayIntentBits), // all intents
@@ -61,7 +62,7 @@ const player = new Player(client, {
 player.extractors.loadDefault();
 
 // Logger system and databases
-global.logger = new Logger({ root: __dirname, client });
+global.logger = new Logger({ client });
 console.logger = console.log;
 console.log = (log) => global.logger.console(log);
 
@@ -174,7 +175,7 @@ process.stdin.on("data", async (input) => {
 
 // Bot setup on startup
 client.once(Events.ClientReady, async () => {
-    console.log(global.player.scanDeps());
+    console.log(player.scanDeps());
 
     const updateActivities = () => {
         const part3 = RandomMinMax(1, 255);
@@ -207,7 +208,7 @@ client.once(Events.ClientReady, async () => {
 
     console.log("Guild manager initiation...");
     const guilds = await client.guilds.fetch();
-    await global.GuildManager.init(guilds);
+    await GuildManager.init(guilds);
     console.log("Guild manager initiation done.");
 
     console.log("Setting up commands...");
@@ -416,7 +417,6 @@ client.on(Events.InteractionCreate, async interaction => {
 
 // Text command executing
 client.on(Events.MessageCreate, async (message) => {
-    console.log(global.GuildManager.GetPrefix(message.guild));
     if (message.author.bot) return;
     if (superuser && !whitelist.includes(message.author.id)) return;
     if (!message.guild) return message.reply("Commands cannot be executed inside DMs.");
@@ -443,7 +443,7 @@ client.on(Events.MessageCreate, async (message) => {
     }
 
     // Text command executing
-    const prefix = global.GuildManager.GetPrefix(message.guild);
+    const prefix = GuildManager.GetPrefix(message.guild);
     if (message.content.startsWith(prefix) || message.content.startsWith(`<@${client.user.id}>`)) {
         let args, commandName;
         if (!message.content.startsWith(`<@${client.user.id}> `)) {

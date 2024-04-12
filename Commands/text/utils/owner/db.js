@@ -1,6 +1,6 @@
 const fs = require("fs/promises");
 const prettyMilliseconds = require("pretty-ms");
-const { repositories } = require("./path/to/tableManager");
+const { repositories } = require("@root/utils/db/tableManager");
 
 module.exports = {
     name: "db",

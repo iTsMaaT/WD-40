@@ -37,8 +37,8 @@ function generateRepositoryFunctions(table) {
      * Creates a query builder for deleting records from the table.
      * @returns {Promise<void>} A Promise that resolves when the deletion is complete.
      */
-    async function remove() {
-        return await DB.drizzle.delete(table);
+    async function remove(filter) {
+        return await DB.drizzle.delete(table).where(filter);
     }
 
     /**

@@ -1,8 +1,0 @@
-Commands/text/fun/fun/snowflake.js:18:                const enabled = (await prisma.snowflake.findFirst({ where:{ GuildID:guildId, UserID:rawid } })) != null;
-Commands/text/fun/fun/snowflake.js:21:                    await prisma.snowflake.create({ data:{ GuildID:guildId, UserID:rawid } });     
-Commands/text/fun/fun/snowflake.js:25:                    await prisma.snowflake.delete({ where:{ GuildID_UserID: { GuildID:guildId, UserID:rawid } } });
-Commands/text/utils/utils/stats.js:33:        const totalExecutedCommands = await global.prisma.logs.count({ where: { Value: { contains: "Executing [" } } });
-Commands/text/utils/utils/stats.js:36:        const lastExecutedCommands = (await global.prisma.message.findMany({
-
-    Commands/text/utils/owner/db.js:13:        const tables = Object.keys(global.prisma);
-Commands/text/utils/owner/db.js:22:            const columnFinder = await global.prisma[tableName].findMany({
