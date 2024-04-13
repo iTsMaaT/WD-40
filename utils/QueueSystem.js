@@ -1,46 +1,50 @@
-// Define an object to hold multiple queues
+/**
+ * Object to hold multiple queues.
+ * @type {Object<string, Function[]>}
+ */
 const queues = {};
+
+/**
+ * Array to keep track of currently processing queues.
+ * @type {string[]}
+ */
 let isProcessing = [];
 
-// Function to process the next operation in a specific queue
+/**
+ * Process the next operation in a specific queue.
+ * @param {string} queueName - The name of the queue to process.
+ * @returns {Promise<void>}
+ */
 const processQueue = async (queueName) => {
-    // Check if the specified queue exists and has operations
     if (queues[queueName] && queues[queueName].length > 0 && !isProcessing.includes(queueName)) {
-    // Get the next operation from the specified queue
         const operation = queues[queueName].shift();
         isProcessing.push(queueName);
 
         try {
-            // Execute the operation
             await operation();
             isProcessing = isProcessing.filter(x => x != queueName);
-
-            // Process the next operation in the specified queue
             processQueue(queueName);
         } catch (error) {
             logger.error(`Error processing queue '${queueName}':\n` + error);
-
             isProcessing = isProcessing.filter(x => x != queueName);
-            // Process the next operation in the specified queue even if an error occurs
             processQueue(queueName);
         }
     }
 };
 
-// Function to add an operation to a specific queue
+/**
+ * Add an operation to a specific queue.
+ * @param {string} queueName - The name of the queue to add the operation to.
+ * @param {Function} operation - The operation to add to the queue.
+ */
 const addToQueue = (queueName, operation) => {
-    // Check if the specified queue exists, if not create it
     if (!queues[queueName]) 
         queues[queueName] = [];
     
-
-    // Push the operation to the end of the specified queue
     queues[queueName].push(operation);
-
-    // If the specified queue was empty, start processing the operations
+    
     if (queues[queueName].length === 1) 
         processQueue(queueName);
-    
 };
 
 module.exports = {

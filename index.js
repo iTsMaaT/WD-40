@@ -6,7 +6,7 @@ const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugSta
 
 require("module-alias/register");
 
-const Logger = require("./utils/log");
+const { instanciateLogger, logger } = require("./utils/log");
 const fs = require("fs");
 
 const cron = require("cron");
@@ -62,9 +62,10 @@ const player = new Player(client, {
 player.extractors.loadDefault();
 
 // Logger system and databases
-global.logger = new Logger({ client });
+instanciateLogger(client);
+const logger = logger;
 console.logger = console.log;
-console.log = (log) => global.logger.console(log);
+console.log = (log) => logger.console(log);
 
 // Collections creation
 client.commands = new Discord.Collection();
@@ -100,7 +101,7 @@ loadFiles("./Commands/slash/", (slashcommand, fileName) => {
         client.slashcommands.set(slashcommand.name, slashcommand);
         discoveredCommands.push(slashcommand);
     } else {
-        global.logger.error(`[WARNING] The (/) command ${fileName} is missing a required "name", "execute", or "type" property.`);
+        logger.error(`[WARNING] The (/) command ${fileName} is missing a required "name", "execute", or "type" property.`);
     }
 });
 
@@ -124,7 +125,7 @@ loadFiles("./Commands/context/", (contextcommand, fileName) => {
         client.contextCommands.set(contextcommand.name, contextcommand);
         discoveredCommands.push(contextcommand);
     } else {
-        global.logger.error(`[WARNING] The (ctx) command ${fileName} is missing a required "name", "execute", or "type" property.`);
+        logger.error(`[WARNING] The (ctx) command ${fileName} is missing a required "name", "execute", or "type" property.`);
     }
 });
 
@@ -132,21 +133,21 @@ loadFiles("./Commands/context/", (contextcommand, fileName) => {
 loadFiles("./events/client/", function(event) {
     if (event.once) {
         client.once(event.name, async (...args) => {
-            if (event.log) global.logger.event(`Event: [${event.name}] fired.`);
-            await event.execute(client, global.logger, ...args);
+            if (event.log) logger.event(`Event: [${event.name}] fired.`);
+            await event.execute(client, logger, ...args);
         });
     } else {
         client.on(event.name, async (...args) => {
-            if (event.log) global.logger.event(`Event: [${event.name}] fired.`);
-            await event.execute(client, global.logger, ...args);
+            if (event.log) logger.event(`Event: [${event.name}] fired.`);
+            await event.execute(client, logger, ...args);
         });
     }
 });
 
 loadFiles("./events/process/", function(event) {
     process.on(event.name, async (...args) => {
-        if (event.log) global.logger.event(`Event: [${event.name}] fired.`);
-        await event.execute(client, global.logger, ...args);
+        if (event.log) logger.event(`Event: [${event.name}] fired.`);
+        await event.execute(client, logger, ...args);
     });
 });
 
@@ -169,7 +170,7 @@ process.stdin.on("data", async (input) => {
     ---------------------------`
         .replace(/^\s+/gm, ""));
 
-    await command.execute(client, global.logger, args);
+    await command.execute(client, logger, args);
 });
 
 
@@ -204,7 +205,7 @@ client.once(Events.ClientReady, async () => {
     
     if (process.env.SERVER != "dev") client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");
 
-    global.logger.info(`Bot starting on [${process.env.SERVER}]...`);
+    logger.info(`Bot starting on [${process.env.SERVER}]...`);
 
     console.log("Guild manager initiation...");
     const guilds = await client.guilds.fetch();
@@ -238,7 +239,7 @@ client.once(Events.ClientReady, async () => {
 
     const SmartRestart = new cron.CronJob("* * * * *", async () => {
         if (client.voice.adapters.size == 0 && SmartRestartEnabled) {
-            global.logger.severe("Restart requested from discord");
+            logger.severe("Restart requested from discord");
             client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Restart requested from discord for reason : `Smart restart`");
 
             // After 3s, closes the database and then exits the process
@@ -315,7 +316,7 @@ client.once(Events.ClientReady, async () => {
     const interval = setInterval(() => {
         if (client.ws.ping !== -1) {
             if (process.env.SERVER != "dev") client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
-            global.logger.info("Bot started successfully.");
+            logger.info("Bot started successfully.");
             clearInterval(interval);
         }
     }, 500);
@@ -332,7 +333,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
         const slash = interaction.client.slashcommands.get(interaction.commandName);
 
-        if (!slash) return global.logger.error(`No command matching ${interaction.commandName} was found.`);
+        if (!slash) return logger.error(`No command matching ${interaction.commandName} was found.`);
 
         // Check command cooldown
         if (SlashCooldowns.has(interaction.user.id)) {
@@ -353,7 +354,7 @@ client.on(Events.InteractionCreate, async interaction => {
             await slash.execute(logger, interaction, client);
 
             // Logging the command
-            global.logger.info(`Executing [/${interaction.commandName}]
+            logger.info(`Executing [/${interaction.commandName}]
             by    [${interaction.user.tag} (${interaction.user.id})]
             in    [${interaction.channel.name} (${interaction.channel.id})]
             from  [${interaction.guild.name} (${interaction.guild.id})]`
@@ -380,8 +381,8 @@ client.on(Events.InteractionCreate, async interaction => {
                 });
             }
 
-            global.logger.error(`Error executing slash command [${interaction.commandName}]`);
-            global.logger.error(error.stack);
+            logger.error(`Error executing slash command [${interaction.commandName}]`);
+            logger.error(error.stack);
         }
     } else if (interaction.isContextMenuCommand()) {
         
@@ -392,7 +393,7 @@ client.on(Events.InteractionCreate, async interaction => {
         try {
             await context.execute(logger, interaction, client);
 
-            global.logger.info(`
+            logger.info(`
             Executing [${interaction.commandName} (${context.type === 2 ? "User" : "Message"})]
             by   [${interaction.user.tag} (${interaction.user.id})]
             in   [${interaction.channel.name} (${interaction.channel.id})]
@@ -409,8 +410,8 @@ client.on(Events.InteractionCreate, async interaction => {
                 ephemeral: true,
             });
             
-            global.logger.error(`Error executing context menu command [${interaction.commandName}]`);
-            global.logger.error(error);
+            logger.error(`Error executing context menu command [${interaction.commandName}]`);
+            logger.error(error);
         }
     }
 });
@@ -499,7 +500,7 @@ client.on(Events.MessageCreate, async (message) => {
         TextCooldowns.set(message.author.id, Date.now() + cooldownTime);
 
         // Logging every executed commands
-        global.logger.info(`
+        logger.info(`
         Executing [${message.content}]
         by    [${message.member.user.tag} (${message.author.id})]
         in    [${message.channel.name} (${message.channel.id})]
@@ -525,11 +526,11 @@ client.on(Events.MessageCreate, async (message) => {
             }
 
 
-            await command.execute(global.logger, client, message, args);
+            await command.execute(logger, client, message, args);
             command.lastExecutionTime = parseInt(Date.now() - startTime);
 
         } catch (error) {
-            global.logger.error(error.stack);
+            logger.error(error.stack);
             return SendErrorEmbed(message, "An error occured while executing the command", "red");
         }
     }

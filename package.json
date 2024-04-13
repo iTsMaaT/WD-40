@@ -41,7 +41,6 @@
     "m3u8stream": "^0.8.6",
     "mediaplex": "^0.0.7",
     "module-alias": "^2.2.3",
-    "node-opus": "^0.3.3",
     "openai": "^4.28.4",
     "opusscript": "^0.0.8",
     "os": "^0.1.2",

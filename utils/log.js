@@ -9,6 +9,11 @@ const util = require("util");
     }
 }*/
 
+
+/**
+ * Get the current date in the format DD-MM-YYYY.
+ * @returns {string} The formatted date.
+ */
 function getDate() {
     // Récupère la date
     const today = new Date();
@@ -22,6 +27,11 @@ function getDate() {
     return dd + "-" + mm + "-" + yyyy;
 }
 
+
+/**
+ * Get the current date and time in the format DD-MM-YYYY HH:MM:SS.mmm.
+ * @returns {string} The formatted date and time.
+ */
 function getDateTime() {
     const d = new Date();
     const time = String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") + ":" + String(d.getSeconds()).padStart(2, "0") + "." + String(d.getMilliseconds()).padStart(3, "0");
@@ -29,6 +39,14 @@ function getDateTime() {
     return getDate() + " " + time;
 }
 
+/**
+ * Write log messages to console, Discord, and database.
+ * @param {string} header - The header for the log message.
+ * @param {string} message - The log message.
+ * @param {object} client - The Discord client object.
+ * @param {string} type - The type of log message.
+ * @returns {Promise<void>} A Promise indicating completion.
+ */
 async function writeLogToFile(header, message, client, type) {
     
     // Set the color based on the log type
@@ -75,6 +93,11 @@ async function writeLogToFile(header, message, client, type) {
 
 class Logger {
 
+    /**
+     * Create a Logger.
+     * @param {object} options - The options for the Logger.
+     * @param {object} options.client - The Discord client object.
+     */
     constructor(options) {
         this.options = options;
     }
@@ -112,4 +135,32 @@ class Logger {
     }
 }
 
-module.exports = Logger;
+
+/**
+ * Represents a logger object with various logging methods.
+ * @typedef {Object} Logger
+ * @property {function} error - Log an error message.
+ * @property {function} debug - Log a debug message.
+ * @property {function} info - Log an info message.
+ * @property {function} console - Log a message to console only.
+ * @property {function} warning - Log a warning message.
+ * @property {function} severe - Log a severe message.
+ * @property {function} music - Log a music-related message.
+ * @property {function} event - Log an event-related message.
+ */
+
+/**
+ * The logger object with various logging methods.
+ * @type {Logger}
+ */
+let logger;
+
+/**
+ * Instantiate the Logger with the provided client.
+ * @param {object} client - The Discord client object.
+ * @returns {Promise<void>} A Promise indicating completion.
+ */
+async function instanciateLogger(client) {
+    logger = new Logger({ client });
+}
+module.exports = { instanciateLogger, logger };

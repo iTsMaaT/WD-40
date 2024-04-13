@@ -163,14 +163,14 @@ async function autoReactFn(guildId) {
 
             if (data.length > 0) {
                 for (const i in data) {
-                    if (data[i].ChannelString === undefined) continue;
+                    if (data[i].channelString === undefined) continue;
                     const value = data[i];
-                    if (!cache[value.ChannelString])
-                        cache[value.ChannelString] = [];
+                    if (!cache[value.channelString])
+                        cache[value.channelString] = [];
 
-                    cache[value.ChannelString].push({
-                        "string": value.String,
-                        "emotes": value.Emotes,
+                    cache[value.channelString].push({
+                        "string": value.string,
+                        "emotes": value.emotes,
                     });
                 }
             }
@@ -238,7 +238,6 @@ async function autoReactFn(guildId) {
         // if (!matchedReactions[0]) return null;
         return matchedReactions;
     }
-
 
     async function getReactions() {
         return cache;
