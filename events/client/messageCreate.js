@@ -1,5 +1,6 @@
 const { Events } = require("discord.js");
 const { blacklist, whitelist } = require("@root/utils/config.json");
+const GuildManager = require("@root/utils/GuildManager");
 
 module.exports = {
     name: Events.MessageCreate,
@@ -21,18 +22,7 @@ module.exports = {
         if (superuser && (message.author.id != process.env.OWNER_ID && whitelist.includes(message.author.id))) return;
         if (blacklist.includes(message.author.id)) return;
 
-        // Snowflake reaction
-        if (snowflakeData != []) {
-            const expected = [parseInt(message.guildId), parseInt(message.author.id)];
-            const exists = snowflakeData.filter(v => {
-                return v.equals(expected);
-            }).length >= 1;
-            if (exists) 
-                message.react("❄️");
-            
-        }
-
-        const autoreactions = await global.GuildManager.getAutoReactions(message.guild.id);
+        const autoreactions = await GuildManager.getAutoReactions(message.guild.id);
         const reactions = await autoreactions.matchReactions(message.channel.name, message.content, message.attachments.size > 0);
         if (reactions) {
             reactions.forEach(async (reaction) => {
@@ -40,7 +30,7 @@ module.exports = {
             });
         }
 
-        const autoresponses = await global.GuildManager.getAutoResponses(message.guild.id);
+        const autoresponses = await GuildManager.getAutoResponses(message.guild.id);
         const responses = await autoresponses.matchResponses(message.channel.name, message.content, message.attachments.size > 0);
         if (responses) {
             responses.forEach(async (res) => {
@@ -49,7 +39,7 @@ module.exports = {
         }
 
         // Auto-responses
-        if (global.GuildManager.GetResponses(message.guild)) {
+        if (GuildManager.GetResponses(message.guild)) {
 
             if (/((?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel)\/([^/?#&]+)).*/g.test(message.content)) {
                 message.reply(`

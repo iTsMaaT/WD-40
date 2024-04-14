@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { useHistory } = require("discord-player");
+const { useHistory, useMainPlayer } = require("discord-player");
 
 module.exports = {
     name: "back",

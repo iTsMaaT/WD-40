@@ -1,16 +1,17 @@
 const fs = require("fs/promises");
 const prettyMilliseconds = require("pretty-ms");
+const { repositories } = require("@root/utils/db/tableManager");
 
 module.exports = {
     name: "db",
     description: "Gives db info of a table",
-    category: "fun",
+    category: "owner",
     private: true,
     async execute(logger, client, message, args) {
         if (message.author.id != process.env.OWNER_ID) return;
         let data;
 
-        const tables = Object.keys(global.prisma);
+        const tables = Object.keys(repositories);
         const tableList = tables.filter(name => !name.startsWith("_") && !name.startsWith("$"));
 
         if (args[0] === "-t" || !args[0] || !tableList.includes(args[0])) return message.reply(`Tables: ${tableList.join(", ")}`);
@@ -19,18 +20,11 @@ module.exports = {
         const sent = await message.reply({ content: "Fetching the DB...", fetchReply: true });
 
         try {
-            const columnFinder = await global.prisma[tableName].findMany({
-                take: 1,
-            });
+            const columnFinder = (await repositories[tableName].select().limit(1))[0];
             if (!columnFinder[0]) return sent.edit("This table is empty.");
             const firstColumn = Object.keys(columnFinder[0])[0];
 
-            data = await global.prisma[tableName].findMany({
-                orderBy: {
-                    [firstColumn]: "desc",
-                },
-                take: 2500,
-            });
+            data = await repositories[tableName].select().orderBy(firstColumn, "desc").limit(2500);
 
             // Calculate the maximum length for each column
             const columnLengths = {};

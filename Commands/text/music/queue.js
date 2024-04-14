@@ -1,5 +1,5 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const { useQueue } = require("discord-player");
+const { useQueue, useMainPlayer } = require("discord-player");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {

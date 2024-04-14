@@ -1,6 +1,7 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { prettyString } = require("@functions/formattingFunctions");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
+const GuildManager = require("@root/utils/GuildManager.js");
 
 module.exports = {
     name: "help",
@@ -9,7 +10,7 @@ module.exports = {
     private: false,
     usage: "< [Command name (Optional)] >",
     async execute(logger, client, message, args) {
-        const prefix = global.GuildManager.GetPrefix(message.guild);
+        const prefix = GuildManager.GetPrefix(message.guild);
 
         if (args[0]) {
             const CommandName = client.commands.get(args[0]);

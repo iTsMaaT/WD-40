@@ -1,4 +1,4 @@
-const { useQueue } = require("discord-player");
+const { useQueue, useMainPlayer } = require("discord-player");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("@discordjs/voice");
 const googleTTS = require("google-tts-api");
 const { SendErrorEmbed } = require("@functions/discordFunctions");

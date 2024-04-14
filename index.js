@@ -1,14 +1,15 @@
-const { PrismaClient } = require("@prisma/client");
+const dotenv = require("dotenv");
+dotenv.config();
+
 const { Client, GatewayIntentBits, Events, Partials, ActivityType, PermissionFlagsBits } = require("discord.js");
 const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState, AutoCommandMatch } = require("./utils/config.json");
 
 require("module-alias/register");
 
-const Logger = require("./utils/log");
+
 const fs = require("fs");
 
 const cron = require("cron");
-const dotenv = require("dotenv");
 const Discord = require("discord.js");
 
 const getExactDate = require("@functions/getExactDate");
@@ -16,7 +17,6 @@ const { SendErrorEmbed } = require("@functions/discordFunctions");
 const RandomMinMax = require("@functions/RandomMinMax");
 const findClosestMatch = require("@functions/findClosestMatch");
 
-dotenv.config();
 
 const client = new Client({
     intents: Object.keys(GatewayIntentBits), // all intents
@@ -25,8 +25,10 @@ const client = new Client({
     allowedMentions: { repliedUser: false },
 });
 
-global.prisma = new PrismaClient();
-global.GuildManager = (require("./utils/GuildManager.js"))(global.prisma);
+const logger = (require("./utils/log")(client));
+
+const { repositories } = require("./utils/db/tableManager.js");
+const GuildManager = require("./utils/GuildManager.js");
 global.superuser = 0;
 global.debug = 1;
 global.SmartRestartEnabled = 0;
@@ -48,7 +50,7 @@ Array.prototype.shuffle = function() {
 
 // music
 const { Player } = require("discord-player");
-global.player = new Player(client, {
+const player = new Player(client, {
     ytdlOptions: {
         requestOptions: {
             headers: {
@@ -59,17 +61,14 @@ global.player = new Player(client, {
     },
     skipFFmpeg: false,
 });
-global.player.extractors.loadDefault();
+player.extractors.loadDefault();
+
+console.log("Variables loaded");
 
 // Logger system and databases
-global.logger = new Logger({ root: __dirname, client });
 console.logger = console.log;
-console.log = (log) => global.logger.console(log);
-global.snowflakeData = [];
-prisma.snowflake.findMany().then(val => {
-    const result = val.map(v => [parseInt(v.GuildID), parseInt(v.UserID)]);
-    global.snowflakeData = global.snowflakeData.concat(result);
-});
+console.log = (log) => logger.console(log);
+console.log("Logger instanciated");
 
 // Collections creation
 client.commands = new Discord.Collection();
@@ -105,7 +104,7 @@ loadFiles("./Commands/slash/", (slashcommand, fileName) => {
         client.slashcommands.set(slashcommand.name, slashcommand);
         discoveredCommands.push(slashcommand);
     } else {
-        global.logger.error(`[WARNING] The (/) command ${fileName} is missing a required "name", "execute", or "type" property.`);
+        logger.error(`[WARNING] The (/) command ${fileName} is missing a required "name", "execute", or "type" property.`);
     }
 });
 
@@ -129,7 +128,7 @@ loadFiles("./Commands/context/", (contextcommand, fileName) => {
         client.contextCommands.set(contextcommand.name, contextcommand);
         discoveredCommands.push(contextcommand);
     } else {
-        global.logger.error(`[WARNING] The (ctx) command ${fileName} is missing a required "name", "execute", or "type" property.`);
+        logger.error(`[WARNING] The (ctx) command ${fileName} is missing a required "name", "execute", or "type" property.`);
     }
 });
 
@@ -137,21 +136,21 @@ loadFiles("./Commands/context/", (contextcommand, fileName) => {
 loadFiles("./events/client/", function(event) {
     if (event.once) {
         client.once(event.name, async (...args) => {
-            if (event.log) global.logger.event(`Event: [${event.name}] fired.`);
-            await event.execute(client, global.logger, ...args);
+            if (event.log) logger.event(`Event: [${event.name}] fired.`);
+            await event.execute(client, logger, ...args);
         });
     } else {
         client.on(event.name, async (...args) => {
-            if (event.log) global.logger.event(`Event: [${event.name}] fired.`);
-            await event.execute(client, global.logger, ...args);
+            if (event.log) logger.event(`Event: [${event.name}] fired.`);
+            await event.execute(client, logger, ...args);
         });
     }
 });
 
 loadFiles("./events/process/", function(event) {
     process.on(event.name, async (...args) => {
-        if (event.log) global.logger.event(`Event: [${event.name}] fired.`);
-        await event.execute(client, global.logger, ...args);
+        if (event.log) logger.event(`Event: [${event.name}] fired.`);
+        await event.execute(client, logger, ...args);
     });
 });
 
@@ -174,13 +173,13 @@ process.stdin.on("data", async (input) => {
     ---------------------------`
         .replace(/^\s+/gm, ""));
 
-    await command.execute(client, global.logger, args);
+    await command.execute(client, logger, args);
 });
 
 
 // Bot setup on startup
 client.once(Events.ClientReady, async () => {
-    console.log(global.player.scanDeps());
+    console.log(player.scanDeps());
 
     const updateActivities = () => {
         const part3 = RandomMinMax(1, 255);
@@ -209,11 +208,11 @@ client.once(Events.ClientReady, async () => {
     
     if (process.env.SERVER != "dev") client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");
 
-    global.logger.info(`Bot starting on [${process.env.SERVER}]...`);
+    logger.info(`Bot starting on [${process.env.SERVER}]...`);
 
     console.log("Guild manager initiation...");
     const guilds = await client.guilds.fetch();
-    await global.GuildManager.init(guilds);
+    await GuildManager.init(guilds);
     console.log("Guild manager initiation done.");
 
     console.log("Setting up commands...");
@@ -243,13 +242,12 @@ client.once(Events.ClientReady, async () => {
 
     const SmartRestart = new cron.CronJob("* * * * *", async () => {
         if (client.voice.adapters.size == 0 && SmartRestartEnabled) {
-            global.logger.severe("Restart requested from discord");
+            logger.severe("Restart requested from discord");
             client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Restart requested from discord for reason : `Smart restart`");
 
             // After 3s, closes the database and then exits the process
             setTimeout(function() {
                 /* ------------- */
-                global.prisma.$disconnect();
                 process.exit(1);
                 /* ------------- */
             }, 1000 * 3);
@@ -321,7 +319,7 @@ client.once(Events.ClientReady, async () => {
     const interval = setInterval(() => {
         if (client.ws.ping !== -1) {
             if (process.env.SERVER != "dev") client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
-            global.logger.info("Bot started successfully.");
+            logger.info("Bot started successfully.");
             clearInterval(interval);
         }
     }, 500);
@@ -338,7 +336,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
         const slash = interaction.client.slashcommands.get(interaction.commandName);
 
-        if (!slash) return global.logger.error(`No command matching ${interaction.commandName} was found.`);
+        if (!slash) return logger.error(`No command matching ${interaction.commandName} was found.`);
 
         // Check command cooldown
         if (SlashCooldowns.has(interaction.user.id)) {
@@ -359,7 +357,7 @@ client.on(Events.InteractionCreate, async interaction => {
             await slash.execute(logger, interaction, client);
 
             // Logging the command
-            global.logger.info(`Executing [/${interaction.commandName}]
+            logger.info(`Executing [/${interaction.commandName}]
             by    [${interaction.user.tag} (${interaction.user.id})]
             in    [${interaction.channel.name} (${interaction.channel.id})]
             from  [${interaction.guild.name} (${interaction.guild.id})]`
@@ -386,8 +384,8 @@ client.on(Events.InteractionCreate, async interaction => {
                 });
             }
 
-            global.logger.error(`Error executing slash command [${interaction.commandName}]`);
-            global.logger.error(error.stack);
+            logger.error(`Error executing slash command [${interaction.commandName}]`);
+            logger.error(error.stack);
         }
     } else if (interaction.isContextMenuCommand()) {
         
@@ -398,7 +396,7 @@ client.on(Events.InteractionCreate, async interaction => {
         try {
             await context.execute(logger, interaction, client);
 
-            global.logger.info(`
+            logger.info(`
             Executing [${interaction.commandName} (${context.type === 2 ? "User" : "Message"})]
             by   [${interaction.user.tag} (${interaction.user.id})]
             in   [${interaction.channel.name} (${interaction.channel.id})]
@@ -415,8 +413,8 @@ client.on(Events.InteractionCreate, async interaction => {
                 ephemeral: true,
             });
             
-            global.logger.error(`Error executing context menu command [${interaction.commandName}]`);
-            global.logger.error(error);
+            logger.error(`Error executing context menu command [${interaction.commandName}]`);
+            logger.error(error);
         }
     }
 });
@@ -429,26 +427,27 @@ client.on(Events.MessageCreate, async (message) => {
     if (blacklist.includes(message.author.id)) return;
 
     try {
-        await global.prisma.message.create({
-            data: {
-                MessageID: message.id,
-                UserID: message.author.id,
-                UserName: message.member.user.tag,
-                ChannelID: message.channel.id,
-                ChannelName: message.channel.name,
-                GuildID: message.guild.id,
-                GuildName: message.guild.name,
-                // Timestamp: new Date(new Date(message.createdTimestamp).toLocaleString("en-US", {timeZone: "America/Toronto"})),
-                Content: message.content,
-            },
-        });
+        const messageRepository = repositories.message;
+
+        if (messageRepository) {
+            await messageRepository.insert({
+                messageId: message.id,
+                userId: message.author.id,
+                userName: message.member.user.tag,
+                channelId: message.channel.id,
+                channelName: message.channel.name,
+                guildId: message.guild.id,
+                guildName: message.guild.name,
+                content: message.content,
+            });
+        }
     } catch (ex) {
         console.log(`[${getExactDate()} - SEVERE] Unable to write to database`);
         console.log(ex);
     }
 
     // Text command executing
-    const prefix = global.GuildManager.GetPrefix(message.guild);
+    const prefix = GuildManager.GetPrefix(message.guild);
     if (message.content.startsWith(prefix) || message.content.startsWith(`<@${client.user.id}>`)) {
         let args, commandName;
         if (!message.content.startsWith(`<@${client.user.id}> `)) {
@@ -504,7 +503,7 @@ client.on(Events.MessageCreate, async (message) => {
         TextCooldowns.set(message.author.id, Date.now() + cooldownTime);
 
         // Logging every executed commands
-        global.logger.info(`
+        logger.info(`
         Executing [${message.content}]
         by    [${message.member.user.tag} (${message.author.id})]
         in    [${message.channel.name} (${message.channel.id})]
@@ -530,14 +529,15 @@ client.on(Events.MessageCreate, async (message) => {
             }
 
 
-            await command.execute(global.logger, client, message, args);
+            await command.execute(logger, client, message, args);
             command.lastExecutionTime = parseInt(Date.now() - startTime);
 
         } catch (error) {
-            global.logger.error(error.stack);
+            logger.error(error.stack);
             return SendErrorEmbed(message, "An error occured while executing the command", "red");
         }
     }
 });
 // Logins with the token
+console.log("yes");
 client.login(process.env.TOKEN);

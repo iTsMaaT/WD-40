@@ -1,4 +1,4 @@
-const { useQueue } = require("discord-player");
+const { useQueue, useMainPlayer } = require("discord-player");
 const { lyricsExtractor } = require("@discord-player/extractor");
 const { EmbedBuilder } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
