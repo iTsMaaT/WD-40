@@ -34,10 +34,10 @@ module.exports = {
         const uptime = prettyMilliseconds(client.uptime);
         const ping = client.ws.ping + "ms";
         const botAge = prettyMilliseconds(Date.now() - client.user.createdAt);
-        const totalExecutedCommands = (await DB.drizzle.execute(sql`SELECT COUNT(m.ID) AS count FROM logs m WHERE m.Value LIKE "Executing [%"`))[0][0].count;
+        const totalExecutedCommands = (await DB.drizzle.execute(sql`SELECT COUNT(m.ID) AS count FROM Logs m WHERE m.Value LIKE "Executing [%"`))[0][0].count;
         const VoicesPlaying = client.voice.adapters.size;
       
-        const lastExecutedCommands = (await DB.drizzle.execute(sql`SELECT m.* FROM message m WHERE m.Content LIKE ${prefix + "%"} AND m.MessageID != ${message.id} AND m.GuildID = ${message.guild.id} ORDER BY m.ID DESC LIMIT 10`))[0];
+        const lastExecutedCommands = (await DB.drizzle.execute(sql`SELECT m.* FROM Message m WHERE m.Content LIKE ${prefix + "%"} AND m.MessageID != ${message.id} AND m.GuildID = ${message.guild.id} ORDER BY m.ID DESC LIMIT 10`))[0];
         const TextCommands = client.commands.map(command => command.name);
         if (lastExecutedCommands) {
             for (const command of lastExecutedCommands) {
