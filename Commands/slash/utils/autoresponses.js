@@ -1,5 +1,6 @@
 const { ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
+const GuildManager = require("@root/utils/GuildManager");
 
 module.exports = {
     name: "autoresponse",
@@ -77,7 +78,7 @@ module.exports = {
         const StringInput = interaction.options.get("string")?.value;
         const ResponseInput = interaction.options.get("response")?.value;
         
-        const autoresponses = await global.GuildManager.getAutoResponses(interaction.guild.id);
+        const autoresponses = await GuildManager.getAutoResponses(interaction.guild.id);
         const responses = await autoresponses.getResponses();
 
         if ((subcommand == "add" || subcommand == "remove" || subcommand == "removeall") && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) return SendErrorEmbed(interaction, "You must be a administrator to execute this action", "yellow", true);

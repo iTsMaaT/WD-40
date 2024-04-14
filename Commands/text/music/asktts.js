@@ -1,8 +1,7 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { useQueue } = require("discord-player");
+const { useQueue, useMainPlayer } = require("discord-player");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("@discordjs/voice");
 const googleTTS = require("google-tts-api");
-
 
 module.exports = {
     name: "asktts",
@@ -110,12 +109,12 @@ module.exports = {
                 if (currentIndex < resources.length) {
                     const resource = createAudioResource(resources[currentIndex]);
 
-                    const player = createAudioPlayer();
-                    connection.subscribe(player);
-                    player.play(resource);
+                    const vcPlayer = createAudioPlayer();
+                    connection.subscribe(vcPlayer);
+                    vcPlayer.play(resource);
 
-                    player.on(AudioPlayerStatus.Idle, () => {
-                        player.stop();
+                    vcPlayer.on(AudioPlayerStatus.Idle, () => {
+                        vcPlayer.stop();
 
                         currentIndex++; // Move to the next audio index
                         playNextAudio(); // Play the next audio

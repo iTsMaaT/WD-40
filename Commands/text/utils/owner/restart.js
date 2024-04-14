@@ -61,7 +61,6 @@ module.exports = {
                         // After 3s, closes the database and then exits the process
                         setTimeout(function() {
                             /** **************/
-                            global.prisma.$disconnect();
                             process.exit(1);
                             /** **************/
                         }, 1000 * 3);

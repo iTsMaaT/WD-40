@@ -1,7 +1,8 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { QueryType } = require("discord-player");
+const { QueryType, useMainPlayer } = require("discord-player");
 const cheerio = require("cheerio");
 
+const player = useMainPlayer();
 
 module.exports = {
     name: "play",

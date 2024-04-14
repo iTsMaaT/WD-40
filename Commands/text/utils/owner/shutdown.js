@@ -57,7 +57,6 @@ module.exports = {
                         setTimeout(function() {
                             /** **************/
                             client.destroy();
-                            global.prisma.$disconnect();
                             process.exit(0);
                             /** **************/
                         }, 1000 * 3);

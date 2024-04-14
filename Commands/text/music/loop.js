@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { QueueRepeatMode, useQueue } = require("discord-player");
+const { QueueRepeatMode, useQueue, useMainPlayer } = require("discord-player");
 
 module.exports = {
     name: "loop",

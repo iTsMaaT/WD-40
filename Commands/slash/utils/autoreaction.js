@@ -2,6 +2,7 @@ const { ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, 
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const emoteList = require("@root/utils/emojis.json");
 const findClosestMatch = require("@functions/findClosestMatch");
+const GuildManager = require("@root/utils/GuildManager");
 
 module.exports = {
     name: "autoreaction",
@@ -79,7 +80,7 @@ module.exports = {
         const StringInput = interaction.options.get("string")?.value;
         const EmotesInput = interaction.options.get("emotes")?.value;
         
-        const autoreactions = await global.GuildManager.getAutoReactions(interaction.guild.id);
+        const autoreactions = await GuildManager.getAutoReactions(interaction.guild.id);
         const reactions = await autoreactions.getReactions();
 
         if ((subcommand == "add" || subcommand == "remove" || subcommand == "removeall") && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) return SendErrorEmbed(interaction, "You must be a administrator to execute this action", "yellow", true);

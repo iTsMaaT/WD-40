@@ -127,7 +127,7 @@ module.exports = {
 
         async function unshortenURL(url) {
             try {
-                const response = await fetch(url, { method: "HEAD", redirect: "manual", agent: agent });
+                const response = await fetch(url, { method: "HEAD", redirect: "manual", agent: agent, signal: AbortSignal.timeout(5000) });
                 if (response.headers.get("location")?.startsWith("/")) return url;
                 if (response.headers.get("location")) return response.headers.get("location");
             } catch (error) {
@@ -151,7 +151,7 @@ module.exports = {
 
         async function getDestinationType(url) {
             try {
-                const response = await fetch(url, { method: "HEAD", agent: agent });
+                const response = await fetch(url, { method: "HEAD", agent: agent, signal: AbortSignal.timeout(5000) });
                 const contentType = response.headers.get("content-type");
 
                 if (contentType && contentType.startsWith("text/html")) return "Website";
@@ -165,7 +165,7 @@ module.exports = {
 
         async function getResponseStatus(url) {
             try {
-                const response = await fetch(url, { method: "HEAD", agent: agent });
+                const response = await fetch(url, { method: "HEAD", agent: agent, signal: AbortSignal.timeout(5000) });
                 const statusCode = response.status;
                 const statusDescription = response.statusText;
                 return `${statusCode} (${statusDescription})`;
@@ -211,7 +211,7 @@ module.exports = {
 
         async function getPageTitle(url) {
             try {
-                const response = await fetch(url, { agent: agent });
+                const response = await fetch(url, { agent: agent, signal: AbortSignal.timeout(5000) });
                 const body = await response.text();
                 const $ = cheerio.load(body);
                 const title = $("title").text();
@@ -224,7 +224,7 @@ module.exports = {
 
         async function getMetadata(url) {
             try {
-                const response = await fetch(url, { agent: agent });
+                const response = await fetch(url, { agent: agent, signal: AbortSignal.timeout(5000) });
                 const body = await response.text();
                 const $ = cheerio.load(body);
 
@@ -262,6 +262,7 @@ module.exports = {
                         "x-apikey": process.env.VIRUS_TOTAL_API_KEY,
                     },
                     agent: agent,
+                    signal: AbortSignal.timeout(5000),
                 });
 
                 const body = await response.json();
@@ -330,7 +331,7 @@ module.exports = {
                     redirects.push(info.origin + info.pathname);
                 }
           
-                const res = await fetch(innerURL, { method: "HEAD", redirect: "manual" });
+                const res = await fetch(innerURL, { method: "HEAD", redirect: "manual", signal: AbortSignal.timeout(5000) });
           
                 if (res.status >= 300 && res.status < 400) {
                     const locationHeader = res.headers.get("location") || "";
@@ -352,7 +353,9 @@ const generateIPInfoEmbeds = async (IPArray) => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(IPArray) })).json();
+            body: JSON.stringify(IPArray),
+            signal: AbortSignal.timeout(5000),
+        })).json();
         const IPEmbeds = [];
         for (const query of response) {
             const embed = {

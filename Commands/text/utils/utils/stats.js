@@ -3,6 +3,9 @@ const os = require("os");
 const changelog = require("@root/changelogs.json");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
+const { sql } = require("drizzle-orm");
+const DB = require("@root/utils/db/DatabaseManager");
+const GuildManager = require("@root/utils/GuildManager");
 
 module.exports = {
     name: "stats",
@@ -15,7 +18,7 @@ module.exports = {
         
         const PteroInfo = await GetPterodactylInfo();
         const RamUsageFormatted = `${PteroInfo.ram.usage.clean} / ${PteroInfo.ram.limit.clean} (${PteroInfo.ram.pourcentage.clean})`;
-        const prefix = global.GuildManager.GetPrefix(message.guild);
+        const prefix = GuildManager.GetPrefix(message.guild);
         let lastCommandTimeSinceNow = "";
         let lastExecutedCommand = "";
         let lastCommandLink = "";
@@ -31,26 +34,13 @@ module.exports = {
         const uptime = prettyMilliseconds(client.uptime);
         const ping = client.ws.ping + "ms";
         const botAge = prettyMilliseconds(Date.now() - client.user.createdAt);
-        const totalExecutedCommands = await global.prisma.logs.count({ where: { Value: { contains: "Executing [" } } });
+        const totalExecutedCommands = (await DB.drizzle.execute(sql`SELECT COUNT(m.ID) AS count FROM logs m WHERE m.Value LIKE "Executing [%"`))[0][0].count;
         const VoicesPlaying = client.voice.adapters.size;
       
-        const lastExecutedCommands = (await global.prisma.message.findMany({
-            where: {
-                AND: [
-                    { Content: { startsWith: prefix } },
-                    { NOT: { MessageID: message.id } },
-                    { GuildID: message.guild.id },
-                ],
-            },
-            take: 10,
-            orderBy: {
-                ID: "desc",
-            },
-        }));
+        const lastExecutedCommands = (await DB.drizzle.execute(sql`SELECT m.* FROM message m WHERE m.Content LIKE ${prefix + "%"} AND m.MessageID != ${message.id} AND m.GuildID = ${message.guild.id} ORDER BY m.ID DESC LIMIT 10`))[0];
         const TextCommands = client.commands.map(command => command.name);
         if (lastExecutedCommands) {
-            for (let command in lastExecutedCommands) {
-                command = lastExecutedCommands[command];
+            for (const command of lastExecutedCommands) {
                 if (TextCommands.includes(command.Content?.split(" ")[0]?.replace(prefix, ""))) {
                     lastExecutedCommand = command;
                     break;
