@@ -110,18 +110,19 @@ async function blacklistFn(guildId) {
     }
 
     async function UpdateUserInDB(userId) {
+        const blacklistRepository = await repositories.blacklist;
         try {
-            const exists = await repositories.blacklist.select().where(and(
+            const exists = blacklistRepository.select().where(and(
                 eq(schema.blacklist.guildId, guildId),
                 eq(schema.blacklist.userId, userId),
             ));
             if (exists.length > 0) {
-                await repositories.blacklist.update({ permission: bl[userId].join(";").toLowerCase() }).where(and(
+                await blacklistRepository.update({ permission: bl[userId].join(";").toLowerCase() }).where(and(
                     eq(blacklistSchema.guildId, guildId),
                     eq(blacklistSchema.userId, userId),
                 ));
             } else {
-                await repositories.blacklist.insert({
+                await blacklistRepository.insert({
                     guildId,
                     userId,
                     permission: bl[userId].join(";").toLowerCase(),
@@ -268,7 +269,7 @@ async function autoReactFn(guildId) {
                 }
             } else {
                 // Delete all entries for this channel prompt
-                await reactionsRepository.remove(and(
+                await reactionsRepository.remove().where(and(
                     eq(schema.reactions.guildId, guildId),
                     eq(schema.reactions.channelString, ChannelPrompt),
                 ));
@@ -406,7 +407,7 @@ async function autoResponseFn(guildId) {
                 }
             } else {
                 // Delete all entries for this channel prompt
-                await responsesRepository.remove(and(
+                await responsesRepository.remove().where(and(
                     eq(schema.responses.guildId, guildId),
                     eq(schema.responses.channelString, ChannelPrompt),
                 ));

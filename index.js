@@ -6,7 +6,7 @@ const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugSta
 
 require("module-alias/register");
 
-const { instanciateLogger, logger } = require("./utils/log");
+
 const fs = require("fs");
 
 const cron = require("cron");
@@ -24,6 +24,8 @@ const client = new Client({
     shards: "auto",
     allowedMentions: { repliedUser: false },
 });
+
+const logger = (require("./utils/log")(client));
 
 const { repositories } = require("./utils/db/tableManager.js");
 const GuildManager = require("./utils/GuildManager.js");
@@ -61,11 +63,12 @@ const player = new Player(client, {
 });
 player.extractors.loadDefault();
 
+console.log("Variables loaded");
+
 // Logger system and databases
-instanciateLogger(client);
-const logger = logger;
 console.logger = console.log;
 console.log = (log) => logger.console(log);
+console.log("Logger instanciated");
 
 // Collections creation
 client.commands = new Discord.Collection();
@@ -536,4 +539,5 @@ client.on(Events.MessageCreate, async (message) => {
     }
 });
 // Logins with the token
+console.log("yes");
 client.login(process.env.TOKEN);

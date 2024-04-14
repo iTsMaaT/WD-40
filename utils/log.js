@@ -149,18 +149,17 @@ class Logger {
  * @property {function} event - Log an event-related message.
  */
 
-/**
- * The logger object with various logging methods.
- * @type {Logger}
- */
-let logger;
-
+let instance = null;
 /**
  * Instantiate the Logger with the provided client.
  * @param {object} client - The Discord client object.
  * @returns {Promise<void>} A Promise indicating completion.
  */
-async function instanciateLogger(client) {
-    logger = new Logger({ client });
-}
-module.exports = { instanciateLogger, logger };
+module.exports = (function logger(client) {
+    if (!instance) {
+        if (!client) throw new Error("Logger attempted to be instanciated without the client object");
+        instance = new Logger({ client });
+        Object.freeze(instance);
+    }
+    return instance;
+});
