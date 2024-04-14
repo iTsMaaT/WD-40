@@ -70,7 +70,7 @@ module.exports = {
             
 
         } catch (err) {
-            logger.error(err.stack);
+            logger.error(err);
 
             if (err.name === "TimeoutError") 
                 return SendErrorEmbed(message, "I do not wish to answer that question. (Request timed out)", "yellow");
@@ -88,8 +88,8 @@ module.exports = {
 
         async function handleFollowup(firstReply, requestBody, API_URL) {
             const filter = (m) => m.author.id === message.author.id;
-            const reply = (await message.channel.awaitMessages({ filter, max: 1, time: 10000, errors: ["time"] })).first();
-            if (!reply.reference) return;
+            const reply = (await message.channel.awaitMessages({ filter, max: 1, time: 10000, errors: [] })).first();
+            if (!reply || !reply.reference) return;
 
             const reference = await message.channel.messages.fetch(reply.reference.messageId);
             if (reference.id !== firstReply.id) return;
