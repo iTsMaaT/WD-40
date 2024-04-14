@@ -1,7 +1,7 @@
 const { mysqlTable, primaryKey, varchar, datetime, text, unique, int, bigint, tinyint, mysqlEnum } = require("drizzle-orm/mysql-core");
 const { sql } = require("drizzle-orm");
 
-const blacklist = mysqlTable("blacklist", {
+const blacklist = mysqlTable("Blacklist", {
     id: bigint("ID", { mode: "number" }).autoincrement().notNull(),
     guildId: varchar("GuildID", { length: 25 }).notNull(),
     userId: varchar("UserID", { length: 25 }).notNull(),
@@ -14,7 +14,7 @@ const blacklist = mysqlTable("blacklist", {
     };
 });
 
-const guildsettings = mysqlTable("guildsettings", {
+const guildsettings = mysqlTable("GuildSettings", {
     guildId: varchar("GuildID", { length: 25 }).notNull(),
     prefix: varchar("Prefix", { length: 3 }).default(">").notNull(),
     guildName: varchar("GuildName", { length: 255 }).notNull(),
@@ -28,7 +28,7 @@ const guildsettings = mysqlTable("guildsettings", {
     };
 });
 
-const logs = mysqlTable("logs", {
+const logs = mysqlTable("Logs", {
     date: datetime("Date", { mode: "string", fsp: 3 }).default(sql`CURRENT_TIMESTAMP(3)`).notNull(),
     value: text("Value").notNull(),
     type: mysqlEnum("Type", ["ERROR", "SEVERE", "WARNING", "INFO", "DEBUG", "MUSIC", "CONSOLE", "EVENT"]).default("INFO").notNull(),
@@ -40,7 +40,7 @@ const logs = mysqlTable("logs", {
     };
 });
 
-const message = mysqlTable("message", {
+const message = mysqlTable("Message", {
     id: bigint("ID", { mode: "number" }).autoincrement().notNull(),
     messageId: varchar("MessageID", { length: 191 }).notNull(),
     userId: varchar("UserID", { length: 191 }).notNull(),
@@ -58,7 +58,7 @@ const message = mysqlTable("message", {
     };
 });
 
-const reactions = mysqlTable("reactions", {
+const reactions = mysqlTable("Reactions", {
     id: bigint("ID", { mode: "number" }).autoincrement().notNull(),
     guildId: varchar("GuildID", { length: 25 }).notNull(),
     channelString: varchar("ChannelString", { length: 25 }).notNull(),
@@ -72,7 +72,7 @@ const reactions = mysqlTable("reactions", {
     };
 });
 
-const responses = mysqlTable("responses", {
+const responses = mysqlTable("Responses", {
     id: bigint("ID", { mode: "number" }).autoincrement().notNull(),
     guildId: varchar("GuildID", { length: 25 }).notNull(),
     channelString: varchar("ChannelString", { length: 25 }).notNull(),
@@ -86,7 +86,7 @@ const responses = mysqlTable("responses", {
     };
 });
 
-const snowflake = mysqlTable("snowflake", {
+const snowflake = mysqlTable("Snowflake", {
     guildId: varchar("GuildID", { length: 25 }).notNull(),
     userId: varchar("UserID", { length: 25 }).notNull(),
 },
