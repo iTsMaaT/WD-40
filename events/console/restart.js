@@ -1,7 +1,7 @@
 module.exports = {
     name: "restart",
     execute(client, logger) {
-        console.log("Restarting down");
+        console.log("Restarting");
         process.exit(1);
     },
 };

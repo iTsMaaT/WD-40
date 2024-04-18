@@ -103,7 +103,8 @@ class Logger {
     }
 
     error(message) {
-        writeLogToFile(`[${getDateTime()} -   ERROR]`, message, this.options.client, "ERROR");
+        const stackTrace = new Error("Generated Stacktrace: ").stack;
+        writeLogToFile(`[${getDateTime()} -   ERROR]`, message.stack || message + "\n" + stackTrace, this.options.client, "ERROR");
     }
 
     debug(message) {
@@ -123,7 +124,8 @@ class Logger {
     }
 
     severe(message) {
-        writeLogToFile(`[${getDateTime()} -  SEVERE]`, message, this.options.client, "SEVERE");
+        const stackTrace = new Error("Generated Stacktrace: ").stack;
+        writeLogToFile(`[${getDateTime()} -  SEVERE]`, message.stack || message + "\n" + stackTrace, this.options.client, "SEVERE");
     }
 
     music(message) {
@@ -148,8 +150,8 @@ class Logger {
  * @property {function} music - Log a music-related message.
  * @property {function} event - Log an event-related message.
  */
-
 let instance = null;
+
 /**
  * Instantiate the Logger with the provided client.
  * @param {object} client - The Discord client object.

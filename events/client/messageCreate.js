@@ -9,6 +9,7 @@ module.exports = {
     async execute(client, logger, message) {
         if (message.author.bot) return;
         if (!message.guild) return;
+        const prefix = GuildManager.GetPrefix(message.guild);
 
         if (message.content.trim() == `<@${client.user.id}>`) {
             const embed = {
