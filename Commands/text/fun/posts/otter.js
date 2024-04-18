@@ -5,6 +5,7 @@ module.exports = {
     name: "otter",
     description: "birb pics!",
     category: "posts",
+    private: true,
     async execute(logger, client, message, args) {
         try {
             const blob = await (await fetch("https://otter.bruhmomentlol.repl.co/random")).blob();

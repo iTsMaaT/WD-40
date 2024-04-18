@@ -1,10 +1,14 @@
-const FetchReddit = async function(ChannelNSFW, ...subreddits) {
+const logger = require("@root/index.js");
+
+const FetchReddit = async function(ChannelNSFW, subreddits, limit) {
     try {
         const subreddit = subreddits[Math.floor(Math.random() * subreddits.length)];
+        if (!limit) limit = subreddit.length;
         let PostImage = "";
         let embed;
-
-        while (!/\.(jpg|png|gif)$/.test(PostImage)) {
+        console.log(subreddit);
+        const count = 0;
+        while (!/\.(jpg|png|gif|jpeg)$/.test(PostImage)) {
             const response = await fetch(`https://www.reddit.com/r/${subreddit}/random/.json`, { agent: false });
             const content = await response.json();
             const permalink = content[0].data.children[0].data.permalink;
@@ -33,6 +37,14 @@ const FetchReddit = async function(ChannelNSFW, ...subreddits) {
                     color: 0xffff00,
                     title: "The post is NSFW but the channel isn't.",
                 };
+            }
+            limit += 1;
+            if (count == limit) {
+                embed = {
+                    color: 0xffff00,
+                    title: `Couldn't fetch post after **${limit}** tries`,
+                };
+                return embed;
             }
         }
         

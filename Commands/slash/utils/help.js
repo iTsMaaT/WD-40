@@ -1,4 +1,5 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ApplicationCommandOptionType } = require("discord.js");
+const GuildManager = require("@root/utils/GuildManager.js");
 
 module.exports = {
     name: "help",
@@ -31,17 +32,15 @@ module.exports = {
 
         let counter = 0;
         const chunkSize = 7; // Number of elements in each chunk
-        const prefix = global.GuildManager.GetPrefix(message.guild);
+        const prefix = GuildManager.GetPrefix(message.guild);
         
         const categorymapper = {};
         const addedCommands = new Set(); // Keep track of added commands
         client.commands.each((val) => {
             if (!val.private && !addedCommands.has(val.name)) {
-                if (categorymapper[val.category]) 
-                    categorymapper[val.category][`**${val.name}${val.aliases ? ` [${(val.aliases).join(", ")}]` : ""}: **`] = (prettyString(val.description, "first", true));
-                else 
-                    categorymapper[val.category] = {};
+                if (!categorymapper[val.category]) categorymapper[val.category] = {};
                 
+                categorymapper[val.category][`**${val.name}${val.aliases ? ` [${(val.aliases).join(", ")}]` : ""}: **`] = (prettyString(val.description, "first", true));
                 addedCommands.add(val.name);
             }
         });

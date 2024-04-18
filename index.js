@@ -25,7 +25,7 @@ const client = new Client({
     allowedMentions: { repliedUser: false },
 });
 
-const logger = (require("./utils/log")(client));
+module.exports = logger = (require("./utils/log")(client));
 
 const { repositories } = require("./utils/db/tableManager.js");
 const GuildManager = require("./utils/GuildManager.js");

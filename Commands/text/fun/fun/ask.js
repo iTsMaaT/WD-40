@@ -88,7 +88,7 @@ module.exports = {
 
         async function handleFollowup(firstReply, requestBody, API_URL) {
             const filter = (m) => m.author.id === message.author.id;
-            const reply = (await message.channel.awaitMessages({ filter, max: 1, time: 10000, errors: [] })).first();
+            const reply = (await message.channel.awaitMessages({ filter, max: 1, time: 30000, errors: [] })).first();
             if (!reply || !reply.reference) return;
 
             const reference = await message.channel.messages.fetch(reply.reference.messageId);

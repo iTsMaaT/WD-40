@@ -58,8 +58,8 @@ module.exports = {
             
                     } catch (err) {
                         // Catches the error, probably a non-existent or banned subreddit
-                        sent.edit(`Non-existent Subreddit\n\`${err}\``);
-                        logger.error(`Non-existent Subreddit\n\`${err.stack}\``);
+                        sent.edit("Non-existent Subreddit");
+                        logger.error(`Non-existent Subreddit\n\`${err}\``);
                         return;
                     }
                 }

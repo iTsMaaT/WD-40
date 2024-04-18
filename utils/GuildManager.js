@@ -1,6 +1,6 @@
 /* eslint-disable no-shadow */
 const { eq, and } = require("drizzle-orm");
-
+const logger = require("@root/index.js");
 const { repositories } = require("./db/tableManager.js");
 const schema = require("../schema/schema.js");
 
@@ -88,7 +88,7 @@ async function blacklistFn(guildId) {
             });
         }
     } catch (e) {
-        global.logger.error("Error while initializing blacklist for guild " + guildId + ": " + e.stack);
+        logger.error("Error while initializing blacklist for guild " + guildId + ": " + e.stack);
     }
 
     function GrantPermission(userId, permission) {
@@ -129,7 +129,7 @@ async function blacklistFn(guildId) {
                 });
             }
         } catch (e) {
-            global.logger.error(`Unable to update Blacklist table (U: ${userId} | G: ${guildId} | P: '${bl[userId].join(";")}')\r\n${e.stack}`);
+            logger.error(`Unable to update Blacklist table (U: ${userId} | G: ${guildId} | P: '${bl[userId].join(";")}')\r\n${e.stack}`);
         }
     }
 
@@ -177,7 +177,7 @@ async function autoReactFn(guildId) {
             }
         }
     } catch (e) {
-        global.logger.error("Silently failing auto reaction init for guild " + guildId + ", " + e.stack);
+        logger.error("Silently failing auto reaction init for guild " + guildId + ", " + e.stack);
     }
 
     async function addReaction(ChannelPrompt, string, reactions) {
@@ -314,7 +314,7 @@ async function autoResponseFn(guildId) {
             }
         }
     } catch (e) {
-        global.logger.error("Silently failing auto response init for guild " + guildId + ", " + e.stack);
+        logger.error("Silently failing auto response init for guild " + guildId + ", " + e.stack);
     }
 
     async function addResponse(ChannelPrompt, string, response) {

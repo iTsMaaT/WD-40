@@ -1,3 +1,5 @@
+const logger = require("@root/index.js");
+
 /**
  * Object to hold multiple queues.
  * @type {Object<string, Function[]>}

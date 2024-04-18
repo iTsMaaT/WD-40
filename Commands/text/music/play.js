@@ -65,7 +65,7 @@ module.exports = {
                     timestamp: new Date(),
                 };
 
-                research.tracks.slice(10).map((track, index) => {
+                research.tracks.slice(0, 10).map((track, index) => {
                     embed.fields.push({ name: `${index + 1} - ${track.title}`, value: `By ${track.author}` });
                 });
 
@@ -76,7 +76,7 @@ module.exports = {
                     .then((collected) => {
                         const responseMessage = collected.first();
                         console.log(research.tracks);
-                        research = research.tracks.slice(10)[parseInt(responseMessage.content) - 1];
+                        research = research.tracks.slice(0, 10)[parseInt(responseMessage.content) - 1];
                     })
                     .catch(() => research = research.tracks[0]);
                     
