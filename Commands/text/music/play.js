@@ -65,7 +65,8 @@ module.exports = {
                     timestamp: new Date(),
                 };
 
-                research.tracks.slice(0, 10).map((track, index) => {
+                const choices = research.tracks.slice(0, 10);
+                choices.map((track, index) => {
                     embed.fields.push({ name: `${index + 1} - ${track.title}`, value: `By ${track.author}` });
                 });
 
@@ -76,9 +77,9 @@ module.exports = {
                     .then((collected) => {
                         const responseMessage = collected.first();
                         console.log(research.tracks);
-                        research = research.tracks.slice(0, 10)[parseInt(responseMessage.content) - 1];
+                        research = choices[parseInt(responseMessage.content) - 1];
                     })
-                    .catch(() => research = research.tracks[0]);
+                    .catch(() => research = choices[0]);
                     
             } else {
 
@@ -102,7 +103,7 @@ module.exports = {
                 }
             }
 
-            if (args[1] == "-s") await research.tracks.shuffle();
+            if (args[1] == "-s") await research?.tracks?.shuffle();
 
             res = await player.play(message.member.voice.channel.id, Attachment ?? research, {
                 nodeOptions: {

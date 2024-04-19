@@ -9,13 +9,13 @@ const responses = {};
 const personality = {};
 
 function init(guilds) {
-    guilds.forEach(async (g) => {
-        const exists = await CheckIfGuildExists(g);
-        if (!exists) await AddGuildToDatabase(g);
-        const settings = await GetGuildSettings(g);
-        prefixes[g.id] = settings.prefix;
-        responses[g.id] = settings.responses;
-        personality[g.id] = settings.personality;
+    guilds.forEach(async (guild) => {
+        const exists = await CheckIfGuildExists(guild);
+        if (!exists) await AddGuildToDatabase(guild);
+        const settings = await GetGuildSettings(guild);
+        prefixes[guild.id] = settings.prefix;
+        responses[guild.id] = settings.responses;
+        personality[guild.id] = settings.personality;
     });
 }
 
