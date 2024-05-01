@@ -24,15 +24,14 @@
   },
   "homepage": "https://github.com/iTsMaaT/Discord_bot",
   "dependencies": {
-    "@discord-player/extractor": "^4.4.7",
+    "@discord-player/extractor": "^4.4.4",
     "@discordjs/opus": "^0.9.0",
     "@discordjs/voice": "^0.16.1",
     "@iamtraction/google-translate": "^2.0.1",
-    "@prisma/client": "^4.13.0",
     "canvas": "^2.11.2",
     "cheerio": "^1.0.0-rc.12",
     "cron": "^2.1.0",
-    "discord-player": "^6.6.8",
+    "discord-player": "^6.6.6",
     "discord-tts": "^1.0.3",
     "discord.js": "^14.14.1",
     "discord.js-akinator": "^4.0.6",
@@ -40,7 +39,7 @@
     "drizzle-orm": "^0.29.0",
     "google-tts-api": "^0.0.6",
     "m3u8stream": "^0.8.6",
-    "mediaplex": "^0.0.7",
+    "mediaplex": "^0.0.9",
     "module-alias": "^2.2.3",
     "mysql2": "^3.6.3",
     "openai": "^4.28.4",
@@ -48,7 +47,7 @@
     "os": "^0.1.2",
     "pretty-ms": "^7.0.1",
     "sodium-native": "^4.1.1",
-    "youtube-ext": "^1.1.23"
+    "yt-stream": "^1.4.14"
   },
   "devDependencies": {
     "drizzle-kit": "^0.20.1",
