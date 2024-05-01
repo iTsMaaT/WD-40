@@ -133,7 +133,7 @@ module.exports = {
             await msg.edit({ embeds: [embed] });
 
         } catch (err) {
-            logger.error(err.stack);
+            logger.error(err);
             embed = {
                 color: 0xff0000,
                 description: "Failed to fetch / play the requested track",

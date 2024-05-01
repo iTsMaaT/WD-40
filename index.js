@@ -154,6 +154,13 @@ loadFiles("./events/process/", function(event) {
     });
 });
 
+loadFiles("./events/player/", function(event) {
+    player.events.on(event.name, async (...args) => {
+        if (event.log) logger.event(`Event: [${event.name}] fired.`);
+        await event.execute(client, logger, ...args);
+    });
+});
+
 process.stdin.setEncoding("utf8");
 loadFiles("./events/console/", function(event) {
     if (client.consoleCommands.get(event.name)) throw new Error(`Command or alias [${event.name}] already exists`);
