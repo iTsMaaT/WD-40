@@ -76,7 +76,6 @@ module.exports = {
                 await message.channel.awaitMessages({ filter, max: 1, time: 10000, errors: ["time"] })
                     .then((collected) => {
                         const responseMessage = collected.first();
-                        console.log(research.tracks);
                         research = choices[parseInt(responseMessage.content) - 1];
                     })
                     .catch(() => research = choices[0]);
