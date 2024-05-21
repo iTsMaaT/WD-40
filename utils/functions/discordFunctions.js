@@ -66,20 +66,53 @@ const InfoFromMessageLink = function(link) {
     */
 };
 
-const editOrSend = async (messageOptions, add) => {
-    const channel = this;
+async function editOrSend(channel, messageOptions, add) {
     if (!channel.id) throw new Error("Invalid channel");
 
     try {
-        const message = await message.channel.messages.fetch({ limit: 1 }).first();
-        if (add) 
-            message.edit(message.content + messageOptions?.content ?? messageOptions);
-        else 
-            message.edit(messageOptions);
+        const messages = await channel.messages.fetch();
+        const message = messages.first();
+        let fullNewContent;
+        let newContent = typeof messageOptions == "object" ? messageOptions.content : messageOptions;
+        let oldContent = message.content.trim();
+        const wasCodeBlock = (oldContent.startsWith("```") && oldContent.endsWith("```"));
+        const isCodeBlock = (oldContent.startsWith("```") && oldContent.endsWith("```"));
+        console.log(wasCodeBlock);
+        if (wasCodeBlock) oldContent = oldContent.replaceAll("```", "");
+        if (isCodeBlock) newContent = newContent.replaceAll("```", "");
+        console.log(oldContent);
+
+        console.log(message.content);
+        console.log(isCodeBlock);
+        console.log(wasCodeBlock);
+
+        if (add) {
+            if (wasCodeBlock && isCodeBlock) 
+                fullNewContent = `\`\`\`${oldContent}\n${typeof messageOptions == "object" ? messageOptions.content : messageOptions}`;
+            else
+                fullNewContent = `${wasCodeBlock ? "```\n" : "" }${oldContent}${wasCodeBlock ? "\n```" : "" }${wasCodeBlock && isCodeBlock ? "\n" : "" }${isCodeBlock ? "```\n" : "" }${oldContent}\n${typeof messageOptions == "object" ? messageOptions.content : messageOptions}${isCodeBlock ? "\n```" : "" }`;
+        } else {
+            fullNewContent = `${wasCodeBlock ? "```" : "" }${typeof messageOptions == "object" ? messageOptions.content : messageOptions}${wasCodeBlock ? "```" : "" }`;
+        }
+        console.log(fullNewContent);
+        message.edit(fullNewContent);
+
     } catch (err) {
-        channel.send(messageOptions);
+        console.log(err);
+        await channel.send(typeof messageOptions == "object" ? messageOptions.content : messageOptions);
     }
-};
+}
+
+function multipleImageEmbed(embedOBJ, ...links) {
+    if (!links || links.length == 0) throw new Error("Image links missing");
+    const mainLink = links[0];
+    const embedParts = [];
+    embedOBJ.url = mainLink;
+    for (const link of links) 
+        embedParts.push({ image: { url: link }, url: mainLink });
+
+    return [embedOBJ, ...embedParts];  
+}
 
 module.exports = { 
     CreateOrUseWebhook,
@@ -88,4 +121,5 @@ module.exports = {
     StringReact,
     InfoFromMessageLink,
     editOrSend, 
+    multipleImageEmbed,
 };

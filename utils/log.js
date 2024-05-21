@@ -1,4 +1,5 @@
 const { repositories } = require("./db/tableManager.js");
+const { editOrSend } = require("./functions/discordFunctions.js");
 
 const util = require("util");
 /* function checkIfFolderExists(path) {
@@ -77,7 +78,8 @@ async function writeLogToFile(header, message, client, type) {
     process.stdout.write(`${color}${header} ${formattedLog}\x1b[0m\n`);
     
     if (type == "CONSOLE" || type == "EVENT") return;
-    client?.channels?.cache?.get("1069811223950016572")?.send(`\`\`\`${header} ${formattedLog}\`\`\``);
+    const channel = await client?.channels?.cache?.get("1069811223950016572");
+    if (channel) await editOrSend(channel, `${header} ${formattedLog}`, true);
     
     try {
         await repositories.logs.insert({
