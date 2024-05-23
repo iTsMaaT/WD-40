@@ -1,5 +1,5 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const { useQueue, useMainPlayer } = require("discord-player");
+const { useQueue, useMainPlayer, useHistory } = require("discord-player");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
@@ -9,29 +9,42 @@ module.exports = {
     aliases: ["q"],
     async execute(logger, client, message, args) {
         const queue = useQueue(message.guild.id);
-        
+        const history = useHistory(message.guild.id);
+
         if (!queue || !queue.tracks || !queue.currentTrack) return SendErrorEmbed(message, "There is nothing in the queue / currently playing.", "yellow");
-
-        const firstTrack = queue.currentTrack;
-        const tracks = queue.tracks;
-
-        // Finds all command files and separate them from categories, then use page to list the commands per category
+        const tracks = queue.tracks ? queue.tracks.data : [];
+        const historyTracks = history.tracks?.data?.length > 0 ? history.tracks.data.reverse() : []; // Reverse history if it's not empty
+        const currentTrack = queue.currentTrack;
 
         let counter = 0;
         const trackPages = [];
-        const fields = [];
+        const historyPages = [];
+        const trackFields = [];
+        const historyFields = [];
+
         tracks.map(track => {
-            fields.push({ name: `${track.title} - ${track.author}`, value: `requested by : ${track.requestedBy?.displayName ?? "N/A"}` });
+            trackFields.push({ name: `${track.title} - ${track.author}`, value: `requested by : ${track.requestedBy?.displayName ?? "N/A"}` });
         });
 
-        for (let i = 0; i < fields.length; i += 10) {
-            const chunk = fields.slice(i, i + 10);
+        historyTracks.map(track => {
+            historyFields.push({ name: `${track.title} - ${track.author}`, value: `requested by : ${track.requestedBy?.displayName ?? "N/A"}` });
+        });
+
+        for (let i = 0; i < trackFields.length; i += 10) {
+            const chunk = trackFields.slice(i, i + 10);
             trackPages.push(chunk);
         }
 
-        const FisrtPage = new ButtonBuilder()
+        for (let i = 0; i < historyFields.length; i += 10) {
+            const chunk = historyFields.slice(i, i + 10);
+            historyPages.push(chunk);
+        }
+
+        const alltracks = [...historyPages, ...trackPages];
+
+        const FirstPage = new ButtonBuilder()
             .setCustomId("first")
-            .setLabel("◀◀")
+            .setLabel("Page 0")
             .setStyle(ButtonStyle.Success);
 
         const LastPage = new ButtonBuilder()
@@ -51,35 +64,44 @@ module.exports = {
 
         const PageNumber = new ButtonBuilder()
             .setCustomId("page")
-            .setLabel(`${counter} / ${trackPages.length}`)
+            .setLabel(`${counter - historyPages.length} / ${alltracks.length - historyPages.length - 1}`)
             .setStyle(ButtonStyle.Secondary)
             .setDisabled(true);
 
         const row = new ActionRowBuilder()
-            .addComponents(FisrtPage, PreviousPage, PageNumber, NextPage, LastPage);
+            .addComponents(FirstPage, PreviousPage, PageNumber, NextPage, LastPage);
 
         const setEmbed = (count) => {
             const embed = {
                 title: "Queue for the current guild",
-                description: `Currently playing : **${firstTrack.title}** - ${firstTrack.author}`,
+                description: `Currently playing : **${currentTrack.title}** - ${currentTrack.author}`,
                 color: 0xffffff,
-                fields: trackPages[count],
+                fields: alltracks[count],
             };
+            if ((counter - historyPages.length) < 0) embed.title = "History for the current guild";
 
             return embed;
         };
 
-        row.components[0].setDisabled(true);
-        row.components[1].setDisabled(true);
+        const updateComponents = (count) => {
+            row.components[0].setDisabled(count === historyPages.length);
+            row.components[1].setDisabled(count === 0);
+            row.components[2].setLabel(`${counter - historyPages.length} / ${alltracks.length - historyPages.length - 1}`);
+            row.components[3].setDisabled(count === trackPages.length);
+            row.components[4].setDisabled(count === trackPages.length);
+        };
+
+        counter = historyPages.length;
+        updateComponents(counter);
+
         const helpMessage = await message.reply({
             embeds: [setEmbed(counter)],
             components: [row],
             allowedMentions: { repliedUser: false },
         });
 
-
         const filter = (interaction) => {
-            if (interaction.user.id == message.author.id) return true;
+            if (interaction.user.id === message.author.id) return true;
         };
 
         const collector = helpMessage.createMessageComponentCollector({
@@ -89,28 +111,19 @@ module.exports = {
         });
         
         collector.on("collect", async (interaction) => {
-
             if (interaction.customId === "next") 
                 counter++;
             else if (interaction.customId === "previous") 
                 counter--;
             else if (interaction.customId === "first") 
-                counter = 0;
+                counter = historyPages.length;
             else if (interaction.customId === "last") 
                 counter = trackPages.length;
             
             if (counter < 0) counter = 0;
-            if (counter >= trackPages.length) counter = trackPages.length;
+            if (counter >= trackPages.length + 1) counter = trackPages.length - 1;
 
-            // Update the label to show the current page number
-            row.components[2].setLabel(`${counter} / ${trackPages.length}`);
-
-
-            await row.components[0].setDisabled(counter == 0);
-            await row.components[1].setDisabled(counter == 0);
-            await row.components[3].setDisabled(counter == trackPages.length);
-            await row.components[4].setDisabled(counter == trackPages.length);
-            
+            updateComponents(counter);
 
             helpMessage.edit({
                 embeds: [setEmbed(counter)],
