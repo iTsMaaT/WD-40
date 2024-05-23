@@ -78,8 +78,6 @@ async function writeLogToFile(header, message, client, type) {
     process.stdout.write(`${color}${header} ${formattedLog}\x1b[0m\n`);
     
     if (type == "CONSOLE" || type == "EVENT") return;
-    const channel = await client?.channels?.cache?.get("1069811223950016572");
-    if (channel) await editOrSend(channel, `${header} ${formattedLog}`, true);
     
     try {
         await repositories.logs.insert({
