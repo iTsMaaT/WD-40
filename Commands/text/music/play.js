@@ -1,5 +1,5 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { QueryType, useMainPlayer } = require("discord-player");
+const { QueryType, useMainPlayer, useQueue } = require("discord-player");
 const cheerio = require("cheerio");
 
 const player = useMainPlayer();
@@ -8,13 +8,18 @@ module.exports = {
     name: "play",
     description: "Play a song (works best with YouTube or Soucloud links)",
     aliases: ["p"],
-    usage: "< [Song]: song link or query , [-s]: optional: shuffles before playing>",
+    usage: "< [Song]: song link or query , [-s]: optional: shuffles before playing, [-pn]: optional: puts the song in top of the queue >",
     category: "music",
     examples: ["never gonna give you up"],
     permissions: ["Connect"],
     async execute(logger, client, message, args) {
         let res, research, embed;
+        const queue = useQueue(message.guild.id);
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
+        
+        const parameter = args.filter(a => a.startsWith("-"))[0];
+        args = args.filter(a => !a.startsWith("-"));
+        console.log(parameter);
 
         const Attachment = message.attachments.first()?.attachment;
 
@@ -102,25 +107,30 @@ module.exports = {
                 }
             }
 
-            if (args[1] == "-s") await research?.tracks?.shuffle();
-
-            res = await player.play(message.member.voice.channel.id, Attachment ?? research, {
-                nodeOptions: {
-                    metadata: {
-                        channel: message.channel,
-                        client: message.guild.members.me,
-                        requestedBy: message.user,
+            if (parameter == "-s") await research?.tracks?.shuffle();
+            if (parameter == "-pn" && queue) {
+                queue.insertTrack(research.tracks[0], 0);
+                res = {};
+                res.track = research.tracks[0];
+            } else {
+                res = await player.play(message.member.voice.channel.id, Attachment ?? research, {
+                    nodeOptions: {
+                        metadata: {
+                            channel: message.channel,
+                            client: message.guild.members.me,
+                            requestedBy: message.user,
+                        },
+                        bufferingTimeout: 15000,
+                        leaveOnStop: true,
+                        leaveOnStopCooldown: 5000,
+                        leaveOnEnd: true,
+                        leaveOnEndCooldown: 15000,
+                        leaveOnEmpty: true,
+                        leaveOnEmptyCooldown: 300000,
+                        skipOnNoStream: true,
                     },
-                    bufferingTimeout: 15000,
-                    leaveOnStop: true,
-                    leaveOnStopCooldown: 5000,
-                    leaveOnEnd: true,
-                    leaveOnEndCooldown: 15000,
-                    leaveOnEmpty: true,
-                    leaveOnEmptyCooldown: 300000,
-                    skipOnNoStream: true,
-                },
-            });
+                });
+            }
             logger.music(`Playing [${res.track.title}] in [${message.member.voice.channel.name}]`); 
 
             embed = {
