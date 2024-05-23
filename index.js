@@ -19,7 +19,7 @@ const findClosestMatch = require("@functions/findClosestMatch");
 
 
 const client = new Client({
-    intents: Object.keys(GatewayIntentBits), // all intents
+    intents: Object.keys(GatewayIntentBits),
     partials: Object.keys(Partials),
     shards: "auto",
     allowedMentions: { repliedUser: false },
@@ -546,5 +546,4 @@ client.on(Events.MessageCreate, async (message) => {
     }
 });
 // Logins with the token
-console.log("yes");
 client.login(process.env.TOKEN);
