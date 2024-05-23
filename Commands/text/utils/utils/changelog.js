@@ -1,4 +1,5 @@
 const changelog = require("@root/changelogs.json");
+const GuildManager = require("@root/utils/GuildManager.js");
 
 module.exports = {
     name: "changelog",
@@ -20,7 +21,7 @@ module.exports = {
             timestamp: new Date(),
         };
 
-        const prefix = global.GuildManager.GetPrefix(message.guild);
+        const prefix = GuildManager.GetPrefix(message.guild);
         message.reply({ embeds: [changelogEmbed], content: `For help: ${prefix}help` });
     },
 };

@@ -12,26 +12,15 @@ module.exports = {
     category: "fun",
     private: true,
     async execute(logger, client, message, args) {
-        const array = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-        StringReact(client, message.channel.id, message.id, "sex");
-        const ptero = await GetPterodactylInfo();
-        message.channel.send(
-            prettyString("shut the fuck up", "all", true)
-            + "\n" +
-            RandomMinMax(69, 420)
-            + "\n" +
-            getExactDate()
-            + "\n" +
-            CreateUniqueSeed(message)
-            + "\n" +
-            CreateUniqueSeed()
-            + "\n" +
-            array.shuffle().join(", ")
-            + "\n" +
-            ptero.main.name
-            + "\n" +
-            GetUniqueValues(["a", "a", "s", "r", "r", "e", "x", "v", "v"]),
-            
-        );
+        
+        try {
+            const embed = {
+                title: "testing",
+                description: "yes",
+            };
+            await message.reply({ embeds: multipleImageEmbed(embed, "https://mc-heads.net/skin/mhf_steve", "https://mc-heads.net/body/mhf_steve", "https://mc-heads.net/avatar/mhf_steve") });
+        } catch (err) {
+            logger.error(err);
+        }
     },
 };
