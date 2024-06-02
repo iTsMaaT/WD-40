@@ -28,7 +28,7 @@ async function SetActiveOrCreate(guild, status = true) {
     
 async function CheckIfGuildExists(guild) {
     const result = await repositories.guildsettings.select().where(eq(schema.guildsettings.guildId, guild.id));
-    return result != undefined && result != null;
+    return !result.length == 0;
 }
     
 async function AddGuildToDatabase(guild) {
@@ -252,20 +252,18 @@ async function autoReactFn(guildId) {
                 const reactionsTable = cache[ChannelPrompt].filter(val => val.string === String);
                 if (reactionsTable.length > 0) {
                     const Reaction = reactionsTable[0].emotes;
-
-                    await reactionsRepository.insert({ 
+                    
+                    await reactionsRepository.upsert({
                         guildId: guildId,
                         emotes: Reaction,
                         channelString: ChannelPrompt,
                         string: String,
-                    });
-                } else {
-                    await reactionsRepository.update()
-                        .where(and(
-                            eq(schema.reactions.guildId, guildId),
-                            eq(schema.reactions.channelString, ChannelPrompt),
-                            eq(schema.reactions.string, String),
-                        ));
+                    }, 
+                    and(
+                        eq(schema.reactions.guildId, guildId),
+                        eq(schema.reactions.channelString, ChannelPrompt),
+                        eq(schema.reactions.string, String),
+                    ));
                 }
             } else {
                 // Delete all entries for this channel prompt
@@ -276,7 +274,7 @@ async function autoReactFn(guildId) {
             }
         }
     }
-    return { addReaction, removeReaction, matchReactions, getReactions };
+    return { addReaction, removeReaction, matchReactions, getReactions }; 
 }
 
 const reactions = {};
@@ -391,19 +389,17 @@ async function autoResponseFn(guildId) {
                 if (ResponseTable.length > 0) {
                     const Response = ResponseTable[0].response;
 
-                    await responsesRepository.insert({ 
+                    await responsesRepository.upsert({
                         guildId: guildId,
                         response: Response,
                         channelString: ChannelPrompt,
                         string: String,
-                    });
-                } else {
-                    await responsesRepository.update()
-                        .where(and(
-                            eq(schema.responses.guildId, guildId),
-                            eq(schema.responses.channelString, ChannelPrompt),
-                            eq(schema.responses.string, String),
-                        ));
+                    }, 
+                    and(
+                        eq(schema.responses.guildId, guildId),
+                        eq(schema.responses.channelString, ChannelPrompt),
+                        eq(schema.responses.string, String),
+                    ));
                 }
             } else {
                 // Delete all entries for this channel prompt

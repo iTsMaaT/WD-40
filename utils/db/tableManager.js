@@ -13,7 +13,7 @@ function generateRepositoryFunctions(table) {
      * @returns {Promise<void>} A Promise that resolves when the insertion is complete.
      */
     async function insert(obj) {
-        return await DB.drizzle.insert(table).values(obj);
+        return DB.drizzle.insert(table).values(obj);
     }
 
     /**
@@ -29,15 +29,15 @@ function generateRepositoryFunctions(table) {
      * @param {Object} updated The updated values.
      * @returns {Promise<void>} A Promise that resolves when the update is complete.
      */
-    async function update(updated) {
-        return await DB.drizzle.update(table).set(updated);
+    function update(updated, filter) {
+        return DB.drizzle.update(table).set(updated);
     }
 
     /**
      * Creates a query builder for deleting records from the table.
      * @returns {Promise<void>} A Promise that resolves when the deletion is complete.
      */
-    function remove(filter) {
+    function remove() {
         return DB.drizzle.delete(table);
     }
 
@@ -50,7 +50,7 @@ function generateRepositoryFunctions(table) {
     async function upsert(obj, filter) {
         if (filter) {
             const existingRecord = await select().where(filter);
-            if (existingRecord) 
+            if (existingRecord.length > 0)
                 await update(obj).where(filter);
             else 
                 await insert(obj);

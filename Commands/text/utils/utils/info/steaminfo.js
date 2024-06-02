@@ -5,7 +5,7 @@ module.exports = {
     name: "steaminfo",
     description: "Gives info about a steam account",
     category: "info",
-    aliases: ["sinfo", "steam"],
+    aliases: ["steam"],
     usage: "< [Steam ID]: id of the profile >",
     examples: ["76561198868461949"],
     async execute(logger, client, message, args) {
