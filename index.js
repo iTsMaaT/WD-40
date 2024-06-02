@@ -55,7 +55,6 @@ const player = new Player(client, {
         requestOptions: {
             headers: {
                 cookie: process.env.YOUTUBE_COOKIE,
-                "x-youtube-identity-token": process.env.YOUTUBE_TOKEN,
             },
         },
     },
@@ -110,12 +109,13 @@ loadFiles("./Commands/slash/", (slashcommand, fileName) => {
 
 // Text command handler
 loadFiles("./Commands/text/", function(command) {
-    if (client.commands.get(command.name)) throw new Error(`Text command or alias [${command.name}] already exists`);
+    if (client.commands.get(command.name)) throw new Error(`Text command [${command.name}] already exists\n${command.filePath}`);
     client.commands.set(command.name, command);
     if (!command.cooldown) command.cooldown = 3000;
 
     if (command.aliases && Array.isArray(command.aliases)) {
         command.aliases.forEach(alias => {
+            if (client.commands.get(alias)) throw new Error(`Text command alias [${alias}] already exists\n${command.filePath}`);
             client.commands.set(alias, command);
         });
     }
@@ -189,6 +189,8 @@ client.once(Events.ClientReady, async () => {
     console.log(player.scanDeps());
 
     const updateActivities = () => {
+        const part1 = RandomMinMax(1, 255);
+        const part2 = RandomMinMax(1, 255);
         const part3 = RandomMinMax(1, 255);
         const part4 = RandomMinMax(1, 255);
         let port = 0;
@@ -198,7 +200,7 @@ client.once(Events.ClientReady, async () => {
             port = RandomMinMax(24500, 26000);
     
         // Combine the parts into a valid IPv4 address
-        const ipAddress = `192.168.${part3}.${part4}:${port}`;
+        const ipAddress = `${part1}.${part2}.${part3}.${part4}`;
     
         for (let i = 0; i < activities.length; i++) {
             activities[i].name = activities[i].name.replace("Placeholder01", (100 / activities.length).toFixed(2));
@@ -238,10 +240,6 @@ client.once(Events.ClientReady, async () => {
 
     console.log("Creating the cron jobs...");
     // - - - New Day - - -
-    const scheduledMessage = new cron.CronJob("30 59 02 * * *", () => {
-        // This runs every day at 02:59:30
-        client.channels.cache.get("1069811223950016572").send("- - - - - New Day - - - - -");
-    });
 
     const DailyActivity = new cron.CronJob("00 00 04 * * *", () => {
         updateActivities();
@@ -263,7 +261,6 @@ client.once(Events.ClientReady, async () => {
 
     console.log("Starting the cron jobs...");
     // sarting the daily sending
-    scheduledMessage.start();
     DailyActivity.start();
     SmartRestart.start();
     console.log("Cron job setup done.");
@@ -472,7 +469,7 @@ client.on(Events.MessageCreate, async (message) => {
             const commandSet = new Set(client.commands.filter(cmd => !cmd.private).map(cmd => cmd.name));
             const commandArray = Array.from(commandSet);
             const closeMatch = findClosestMatch(commandName, commandArray);
-            if (closeMatch.distance <= 3) {
+            if (closeMatch.distance <= 2) {
                 // command = client.commands.get(closeMatch.closestMatch);
                 await message.reply(`Did you mean \`${prefix}${closeMatch.closestMatch}\`?`);
                 const filter = (m) => m.author.id === message.author.id;
@@ -486,7 +483,7 @@ client.on(Events.MessageCreate, async (message) => {
 
         if (!command) return;
         // Admin commands checking
-        if (command.admin && !message.member.permissions.has("Administrator") || !message.author.id == process.env.OWNER_ID) return SendErrorEmbed(message, "You are not administrator", "red");
+        if (command.admin && !message.member.permissions.has("Administrator")) return SendErrorEmbed(message, "You are not administrator", "red");
 
         const userBlacklist = await GuildManager.GetBlacklist(message.guild.id);
         const blCategory = !userBlacklist.CheckPermission(message.author.id, command.category);
