@@ -158,16 +158,15 @@ const getSoundgasmLink = async (link) => {
     const regex = /^https:\/\/soundgasm\.net\/.*/;
     if (!regex.test(link)) return null;
 
-    const response = await fetch(link); // Replace with the URL you want to fetch
+    const response = await fetch(link);
     const html = await response.json();
 
     const $ = cheerio.load(html);
-    const scriptContent = $("script").last().html(); // Get the content of the last script tag
+    const scriptContent = $("script").last().html();
 
-    // Extracting the m4a link from the script content using string manipulation
     const startIndex = scriptContent.indexOf("\"https://media.soundgasm.net/sounds/");
-    const endIndex = scriptContent.indexOf(".m4a\"", startIndex) + 4; // Adding 4 to include '.m4a'
+    const endIndex = scriptContent.indexOf(".m4a\"", startIndex) + 4;
 
     const m4aLink = scriptContent.substring(startIndex + 1, endIndex);
-    return m4aLink; // Output the extracted m4a link
+    return m4aLink;
 };
