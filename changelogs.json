@@ -259,5 +259,13 @@
             "Added -s parameter to >play (>play <[link]> -s) to shuffle before starting to play",
             "Fixed >linkinfo"
         ]
+    },
+    {
+        "version": "5.2.0",
+        "date": "2024-04-07",
+        "changes": [
+            "Fixed issues related to DB",
+            "Cat command uses API instead of Reddit"
+        ]
     }
 ]
