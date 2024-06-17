@@ -54,7 +54,7 @@ const player = new Player(client, {
     ytdlOptions: {
         requestOptions: {
             headers: {
-                cookie: process.env.YOUTUBE_COOKIE,
+                cookie: undefined,
             },
         },
     },
