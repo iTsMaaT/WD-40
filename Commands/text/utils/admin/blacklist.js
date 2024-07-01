@@ -4,7 +4,7 @@ const { PermissionsBitField } = require("discord.js");
 module.exports = {
     name: "blacklist",
     description: "Blacklist a user from using commands",
-    usage2: {
+    usage: {
         required: {
             "ID": "ID of the user to blacklist",
             "Permission": "command or category to blacklist the user from",

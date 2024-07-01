@@ -3,8 +3,7 @@ module.exports = {
     description: "search something on the urban dictionary",
     usage: {
         required: {
-            name: "search",
-            description: "The term to search in the urban dictionary",
+            "search": "The term to search in the urban dictionary",
         },
     },
     category: "fun",

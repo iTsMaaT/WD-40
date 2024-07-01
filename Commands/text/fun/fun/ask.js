@@ -6,8 +6,7 @@ module.exports = {
     description: "Ask a question to Gemini",
     usage: {
         required: {
-            name: "question",
-            description: "The question to ask Gemini",
+            "question": "The question to ask Gemini",
         },
     },
     category: "fun",

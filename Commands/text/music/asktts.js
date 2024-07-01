@@ -8,8 +8,7 @@ module.exports = {
     description: "Ask a question to Gemini, then play the response in the VC",
     usage: {
         required: {
-            name: "prompt",
-            description: "The prompt to ask Gemini",
+            "prompt": "The prompt to ask Gemini",
         },
     },
     category: "music",

@@ -5,8 +5,7 @@ module.exports = {
     description: "UwUfies a prompt",
     usage: {
         required: {
-            name: "string",
-            description: "The text that will be manipulated",
+            "string": "The text that will be manipulated",
         },
     },
     category: "fun",

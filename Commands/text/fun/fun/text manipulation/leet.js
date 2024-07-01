@@ -6,8 +6,7 @@ module.exports = {
     category: "text manipulation",
     usage: {
         required: {
-            name: "string",
-            description: "The text that will be manipulated",
+            "string": "The text that will be manipulated",
         },
     },
     examples: ["Hello, World!"],

@@ -10,8 +10,7 @@ module.exports = {
     aliases: ["p"],
     usage: {
         required: {
-            name: "song",
-            description: "song link or query",
+            "song": "song link or query",
         },
         optional: {
             "shuffle|s": {
