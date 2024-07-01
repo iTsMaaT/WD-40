@@ -9,7 +9,7 @@ module.exports = {
     category: "utils",
     private: false,
     usage: "< [Command name (Optional)] >",
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         const prefix = GuildManager.GetPrefix(message.guild);
 
         if (args[0]) {
@@ -17,19 +17,34 @@ module.exports = {
             if (!CommandName || CommandName.private) return SendErrorEmbed(message, "This command doesn't exist.", "red");
 
             const CommandEmbed = {
-                title: `**${prefix}${CommandName.name}** ${CommandName.usage ?? ""}`,
+                title: `**${prefix}${CommandName.name}**`,
                 color: 0xffffff,
                 fields: [{ name: "Description", value: CommandName.description }],
                 timestamp: new Date(),
             };
 
+            if (typeof CommandName.usage === "string") {
+                CommandEmbed.fields.push({ name: "Usage", value: CommandName.description });
+            } else if (typeof CommandName.usage === "object") {
+                let requiredString = "";
+                let optionalString = "";
+                let usageString = "";
+                if (Object.keys(CommandName.usage.required ?? {}).length) 
+                    requiredString += `__Required__:\n${Object.keys(CommandName.usage.required).map(key => `${key}: ${CommandName.usage.required[key]}`).join("\n")}`;
+                if (Object.keys(CommandName.usage.optional ?? {}).length) 
+                    optionalString += `__Optional__:\n${Object.keys(CommandName.usage.optional).map(key => `-${key.split("|")[0]}[${key.split("|").slice(1).join(",")}]${(CommandName.usage.optional[key].hasValue ?? false) ? " <value>" : ""}: ${CommandName.usage.optional[key].description}`).join("\n")}`;
+                usageString = `${requiredString}${requiredString.length > 0 && optionalString.length > 0 ? "\n" : ""}${optionalString}`;
+                CommandEmbed.fields.push({ name: "Usage", value: usageString });
+                CommandEmbed.footer = { text: "Optional options explanation: -parameterName[parameterAliases]: parameterDescription" };
+            }
+
             if (CommandName.aliases) CommandEmbed.fields.push({ name: "Aliases", value: CommandName.aliases.join(", ") });
-            if (CommandName.cooldown) CommandEmbed.fields.push({ name: "Cooldown", value: parseInt(CommandName.cooldown) / 1000 + "s" });
             if (CommandName.examples) {
                 const formattedExamples = [];
                 CommandName.examples.forEach(ex => {formattedExamples.push(`${prefix}${CommandName.name} ${ex}`);});
                 CommandEmbed.fields.push({ name: "Examples", value: formattedExamples.join("\n") });
             }
+            if (CommandName.cooldown) CommandEmbed.fields.push({ name: "Cooldown", value: parseInt(CommandName.cooldown) / 1000 + "s" });
 
             return message.reply({ embeds: [CommandEmbed]  });
         }

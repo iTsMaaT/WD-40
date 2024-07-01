@@ -7,11 +7,16 @@ const { PermissionFlagsBits } = require("discord.js");
 module.exports = {
     name: "imagefuck",
     description: "Transform a string into imagefuck",
-    usage: "< [Prompt] >",
+    usage: {
+        required: {
+            name: "string",
+            description: "The text that will be manipulated",
+        },
+    },
     category: "text manipulation",
     examples: ["Hello, World!"],
     permission: [PermissionFlagsBits.AttachFiles],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");
 
         const prompt = args.join(" ");

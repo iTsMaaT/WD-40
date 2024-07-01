@@ -4,9 +4,14 @@ module.exports = {
     name: "alphuck",
     description: "Translates a string to alphuck",
     category: "text manipulation",
-    usage: "< String >",
+    usage: {
+        required: {
+            name: "string",
+            description: "The text that will be manipulated",
+        },
+    },
     examples: ["Hello, World!"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");
 
         const bf = brainfuckToAlphuck(stringToBF(args.join(" ")));

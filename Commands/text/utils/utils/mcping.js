@@ -3,10 +3,15 @@ const { SendErrorEmbed } = require("@functions/discordFunctions");
 module.exports = {
     name: "mcping",
     description: "Ping a Minecraft server",
-    usage: "< [IP]: mc server ip, [Port]: the port of the server (optional) >",
+    usage: {
+        required: {
+            "ip": "the IP of the server",
+            "port": "the port of the server (optional)",
+        },
+    },
     category: "utils",
     examples: ["Hypixel.net"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
 
         let port = "";
         if (args[1]) port = ":" + parseInt(args[1]);

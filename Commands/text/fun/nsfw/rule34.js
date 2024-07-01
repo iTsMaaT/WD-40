@@ -3,9 +3,14 @@ const { SendErrorEmbed } = require("@functions/discordFunctions");
 module.exports = {
     name: "rule34",
     description: "Fetches a post using the rule34.xxx API, and can accept tags",
-    usage: "< [Any]: tags...>",
+    usage: {
+        required: {
+            name: "tags",
+            description: "The filter tags, sperated by spaces",
+        },
+    },
     category: "NSFW",
-    execute: async (logger, client, message, args) => {
+    execute: async (logger, client, message, args, found) => {
 
         if (message.channel.nsfw) {
             try {

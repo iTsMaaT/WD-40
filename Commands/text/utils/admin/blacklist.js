@@ -4,10 +4,15 @@ const { PermissionsBitField } = require("discord.js");
 module.exports = {
     name: "blacklist",
     description: "Blacklist a user from using commands",
-    usage: "< ID: ID of the user to blacklist, Permission: command or category to blacklist the user from >",
+    usage2: {
+        required: {
+            "ID": "ID of the user to blacklist",
+            "Permission": "command or category to blacklist the user from",
+        },
+    },
     category: "admin",
     examples: ["1081004946872352958 moveall"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         if (!args[0]) return SendErrorEmbed(message, "You did not provide a user.", "yellow");
         let target, owner;
 

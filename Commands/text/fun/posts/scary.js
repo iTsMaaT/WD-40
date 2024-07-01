@@ -5,7 +5,7 @@ module.exports = {
     description: "Good luck",
     category: "posts",
     aliases: ["twosentencehorror"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         let RedditDesc, RedditTitle, tries;
 
         while (!RedditDesc) {

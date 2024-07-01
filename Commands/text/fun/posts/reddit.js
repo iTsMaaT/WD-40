@@ -3,17 +3,30 @@ const { SendErrorEmbed } = require("@functions/discordFunctions");
 module.exports = {
     name: "reddit",
     description: "Finds an image or post from *any* subreddit",
-    usage: "< -p [...]: post, -u [...]: user>",
+    usage: {
+        optional: {
+            "user|u": {
+                hasValue: true,
+                description: "username of the user. Either -u or -s has to be passed",
+            },
+            "subreddit|s": {
+                hasValue: true,
+                description: "subreddit to fetch from. Either -u or -s has to be passed",
+            },
+        },
+    },
     category: "fun",
     examples: ["-p aww", "-u spez"],
     cooldown: 3000,
-    execute: async (logger, client, message, args) => {
+    async execute(logger, client, message, args, found) {
         let sent = "";
-        
-        switch (args[0]) {
-            case "-p": {
-                // Gore subreddits blacklist
-                if (args[1] == "eyeblech" || args[1] == "gore" || args[1] == "guro") return message.reply("No.");
+        const sub = found["subreddit|s"];
+        const user = found["user|u"];
+        console.log([sub, user]);
+        try {
+            if (sub) {
+            // Gore subreddits blacklist
+                if (sub == "eyeblech" || sub == "gore" || sub == "guro") return message.reply("No.");
 
                 let RedditImage = "";
                 let RedditTries = 1;
@@ -21,7 +34,7 @@ module.exports = {
                 // Tries to fetch a post 10 times
                 for (let i = 0; i <= 10; i++) {
                     try {
-                        const response = await fetch(`https://www.reddit.com/r/${args[1]}/random/.json`);
+                        const response = await fetch(`https://www.reddit.com/r/${sub}/random/.json`);
                         const content = await response.json();
                         const permalink = content[0].data.children[0].data.permalink;
                         const RedditURL = `https://reddit.com${permalink}`;
@@ -57,17 +70,15 @@ module.exports = {
                         }
             
                     } catch (err) {
-                        // Catches the error, probably a non-existent or banned subreddit
+                    // Catches the error, probably a non-existent or banned subreddit
                         sent.edit("Non-existent Subreddit");
                         logger.error(`Non-existent Subreddit\n\`${err}\``);
                         return;
                     }
                 }
                 sent.edit("Could not find post containing a picture or compatible gif link (10 tries)");
-                break;
-            }
-            case "-u": {
-                const url = `https://www.reddit.com/user/${args[1]}/submitted.json`;
+            } else if (user) {
+                const url = `https://www.reddit.com/user/${user}/submitted.json`;
                 let response;
                 try {
                     response = await fetch(url);
@@ -87,7 +98,7 @@ module.exports = {
             
                 // If no image posts were found, return an error message
                 if (!randomPost) 
-                    return SendErrorEmbed(message, `no image posts found for user "${args[0]}".`, "yellow");
+                    return SendErrorEmbed(message, `no image posts found for user "${user}".`, "yellow");
                 
             
                 // Send the post as an embed in the channel
@@ -102,10 +113,13 @@ module.exports = {
                     },
                 };
                 message.channel.send({ embeds: [embed] });
-                break;
-            }
-            default: {
+            } else {
                 return SendErrorEmbed(message, "Wrong argument usage, please refer to `>help reddit`", "yellow");
+            }
+        } catch (err) {
+            if (err.startsWith("SyntaxError: Unexpected token")) {
+                logger.error("Reddit API error");
+                return SendErrorEmbed(message, "Reddit API error, please try again later.", "yellow");
             }
         }
     },

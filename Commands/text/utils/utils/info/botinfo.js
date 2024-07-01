@@ -5,7 +5,7 @@ module.exports = {
     description: "Gives info about the Pterodactyl server",
     category: "info",
     aliases: ["binfo"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
 
         const PteroInfo = await GetPterodactylInfo();
         const embed = {

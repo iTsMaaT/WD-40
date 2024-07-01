@@ -267,5 +267,16 @@
             "Fixed issues related to DB",
             "Cat command uses API instead of Reddit"
         ]
+    },
+    {
+        "version": "5.3.0",
+        "date": "2024-07-01",
+        "changes": [
+            "Made dashed paramters usable anywhere",
+            "Made command parameters more explicit in the help command (eg. >help emote)",
+            ">userinfo can now be used with a username",
+            "Bot asks for proper permissions upon joining a server",
+            "Refactoring"
+        ]
     }
 ]

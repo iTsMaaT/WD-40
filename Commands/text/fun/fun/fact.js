@@ -2,7 +2,7 @@ module.exports = {
     name: "fact",
     description: "Get a random fact",
     category: "fun",
-    execute(logger, client, message, args) {
+    execute(logger, client, message, args, found) {
         
         fetch("https://uselessfacts.jsph.pl/random.json?language=en")
             .then(async response => {

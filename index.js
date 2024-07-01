@@ -482,6 +482,7 @@ client.on(Events.MessageCreate, async (message) => {
         }
 
         if (!command) return;
+        if (command.private && message.author.id === !process.env.OWNER_ID) return;
         // Admin commands checking
         if (command.admin && !message.member.permissions.has("Administrator")) return SendErrorEmbed(message, "You are not administrator", "red");
 
@@ -532,8 +533,27 @@ client.on(Events.MessageCreate, async (message) => {
     
             }
 
+            const found = {};
+            if (typeof command.usage === "object") {
+                const usage = command.usage;
+                const optionalKeys = Object.keys(usage.optional ?? {});
 
-            await command.execute(logger, client, message, args);
+                for (let part = args.length - 1; part >= 0; part--) {
+                    for (const k of optionalKeys) {
+                        if (k.toLowerCase().split("|").map(s => "-" + s).includes(args[part]?.toLowerCase())) {
+                            if (usage.optional[k].hasValue) {
+                                found[k] = args[parseInt(part) + 1];
+                                args.splice(part, 2);
+                            } else {
+                                found[k] = true;
+                                args.splice(part, 1);
+                            }
+                        }
+                    }
+                }
+            }
+
+            await command.execute(logger, client, message, args, found);
             command.lastExecutionTime = parseInt(Date.now() - startTime);
 
         } catch (error) {

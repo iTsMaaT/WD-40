@@ -5,10 +5,15 @@ const { QueueRepeatMode, useQueue, useMainPlayer } = require("discord-player");
 module.exports = {
     name: "loop",
     description: "Loop a desired song or queue",
-    usage: "< [loop type] : Off, Song, Queue or Autoplay >",
+    usage: {
+        required: {
+            name: "loop type",
+            description: "The type of loop to set (Off, Song, Queue or Autoplay)",
+        },
+    },
     category: "music",
     examples: ["track"],
-    execute(logger, client, message, args) {
+    execute(logger, client, message, args, found) {
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
 
         const queue = useQueue(message.guild.id);

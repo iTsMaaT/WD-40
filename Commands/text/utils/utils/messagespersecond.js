@@ -3,7 +3,7 @@ module.exports = {
     description: "Gives the mps according to the last 100 messages",
     category: "utils",
     aliases: ["mps"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
 
         const messages = await message.channel.messages.fetch({ limit: 100 });
 

@@ -4,11 +4,15 @@ const GuildManager = require("@root/utils/GuildManager");
 module.exports = {
     name: "prefix",
     description: "Changes the prefix used to do commands",
-    usage: "< [Prefix]: new prefix for the guild >",
+    usage: {
+        required: {
+            "prefix": "the new prefix for the guild",
+        },
+    },
     category: "utils",
     admin: true,
     examples: ["!"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         if (args.length > 3) return SendErrorEmbed(message, "Prefix can't have more than 3 characters", "yellow");
         if (args.length === 0) return SendErrorEmbed(message, "You must enter a prefix.", "yellow");
 

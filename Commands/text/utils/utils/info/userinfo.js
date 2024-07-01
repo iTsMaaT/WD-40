@@ -4,7 +4,11 @@ const { prettyString } = require("@functions/formattingFunctions");
 module.exports = {
     name: "userinfo",
     description: "Gives info of a user",
-    usage: "< [User]: the user to get info from (optional) >",
+    usage: {
+        required: {
+            "user": "the username / ID / mention of the user to get info from (optional)",
+        },
+    },
     category: "info",
     aliases: ["uinfo"],
     execute: async (logger, client, message, args) => {
@@ -16,10 +20,9 @@ module.exports = {
             id = message.author.id;
         } else {
             const rawId = args[0].replace(/[<!@>]/g, "");
-            if (!rawId.match(/^\d+$/)) 
-                return SendErrorEmbed(message, "Invalid user ID.");
-            
             id = rawId;
+            if (!rawId.match(/^\d+$/)) 
+                id = client.users.cache.find(u => u.username.toLowerCase() === args.join(" ").toLowerCase()).id;
         }
 
         try {

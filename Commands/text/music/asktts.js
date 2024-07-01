@@ -5,8 +5,13 @@ const googleTTS = require("google-tts-api");
 
 module.exports = {
     name: "asktts",
-    description: "Ask a question to PaLM, then play the response in the VC",
-    usage: "< prompt >",
+    description: "Ask a question to Gemini, then play the response in the VC",
+    usage: {
+        required: {
+            name: "prompt",
+            description: "The prompt to ask Gemini",
+        },
+    },
     category: "music",
     examples: ["what is the skull emoji used for"],
     permissions: ["Connect"],
@@ -25,7 +30,7 @@ module.exports = {
         if (!args[0]) return SendErrorEmbed(message, "You must provide a prompt.", "yellow");
         if (queue || queue?.tracks || queue?.currentTrack) return SendErrorEmbed(message, "You must stop the music before playing TTS.", "yellow");
         
-        embed.title = "Requesting a response from PaLM.";
+        embed.title = "Requesting a response from Gemini.";
 
         try {
             const API_URL = process.env.PALM_API_PROXY_URL; // Replace with your API URL
@@ -34,17 +39,23 @@ module.exports = {
             const prompt = args.join(" ");
             if (!prompt) return SendErrorEmbed(message, "Please provide a prompt.", "yellow");
     
-            const queryParams = new URLSearchParams({
+            const requestBody = {
                 api_key: apiKey,
                 prompt: `When responding to the following prompt, try to condense your response. Make sure it is under 2000 characters. The response will be heard in a discord voice channel using TTS. You can use markdown. 
                     The user that asked the prompt is named: ${message.author.username} (display name: ${message.author.displayName}).
                     The prompt is: ${prompt}`,
                 gemini: true,
+            };
+    
+    
+            const result = await fetch(API_URL, { 
+                body: JSON.stringify(requestBody),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                method: "POST",
+                signal: AbortSignal.timeout(10000),
             });
-    
-            const apiUrl = `${API_URL}?${queryParams.toString()}`;
-    
-            response = await fetch(apiUrl);
             if (!result.ok) {
                 let errorText;
                 try {
@@ -55,12 +66,14 @@ module.exports = {
                 }
                 throw new Error(`API request failed with status ${result.status}. Error message: ${errorText}`);
             }
-    
-            const jsonResponse = await response.json();
-            if (jsonResponse.response) 
+
+            const jsonResponse = await result.json();
+            if (jsonResponse.response) {
                 response = jsonResponse.response;
-            else 
+                await handleFollowup(firstReply, requestBody, API_URL);
+            } else {
                 throw new Error("Unexpected JSON response format");
+            }
                 
     
         } catch (err) {

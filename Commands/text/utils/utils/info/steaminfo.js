@@ -6,9 +6,13 @@ module.exports = {
     description: "Gives info about a steam account",
     category: "info",
     aliases: ["steam"],
-    usage: "< [Steam ID]: id of the profile >",
+    usage: {
+        required: {
+            "steamID": "the steam ID of the profile",
+        },
+    },
     examples: ["76561198868461949"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         if (!args[0]) return SendErrorEmbed(message, "You must provide a steam ID", "yellow");
         const steamID = args[0];
         let steamInfo;

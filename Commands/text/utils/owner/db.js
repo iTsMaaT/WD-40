@@ -7,8 +7,7 @@ module.exports = {
     description: "Gives db info of a table",
     category: "owner",
     private: true,
-    async execute(logger, client, message, args) {
-        if (message.author.id != process.env.OWNER_ID) return;
+    async execute(logger, client, message, args, found) {
         let data;
 
         const tables = Object.keys(repositories);

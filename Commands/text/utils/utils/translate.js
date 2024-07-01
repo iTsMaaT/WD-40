@@ -4,9 +4,8 @@ const { SendErrorEmbed } = require("@functions/discordFunctions");
 module.exports = {
     name: "translate",
     description: "Translate the replied to message",
-    usage: "< Will translate the message the user replied to >",
     category: "utils",
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         const LanguageCode = message.guild.preferredLocale.split("-")[0].toString().toLowerCase();
 
         if (!message.reference) SendErrorEmbed(message, "You need to reply to a message", "yellow");

@@ -7,7 +7,7 @@ module.exports = {
     description: "See what song is currently playing",
     category: "music",
     aliases: ["np"],
-    execute(logger, client, message, args) {
+    execute(logger, client, message, args, found) {
         const queue = useQueue(message.guild.id);
         const timeline = useTimeline(message.guild.id);
 

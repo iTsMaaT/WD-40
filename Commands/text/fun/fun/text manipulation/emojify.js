@@ -3,10 +3,15 @@ const { SendErrorEmbed } = require("@functions/discordFunctions");
 module.exports = {
     name: "emojify",
     description: "Transform a string into emotes",
-    usage: "< [Prompt] >",
+    usage: {
+        required: {
+            name: "string",
+            description: "The text that will be manipulated",
+        },
+    },
     category: "text manipulation",
     examples: ["Hello, World!"],
-    execute(logger, client, message, args) {
+    execute(logger, client, message, args, found) {
 
         // Map of all characters to emotes
         const emoteMap = {

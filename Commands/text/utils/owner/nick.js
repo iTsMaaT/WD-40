@@ -3,8 +3,8 @@ module.exports = {
     description: "Changes the server nickname",
     category: "utils",
     private: true,
-    execute: async (logger, client, message, args) => {
-        if (message.author.id == process.env.OWNER_ID && args.length >= 1) {
+    execute: async (logger, client, message, args, found) => {
+        if (args.length >= 1) {
             const member = message.guild.members.cache.get(client.user.id);
 
             // Tries to set the server nickname
@@ -14,7 +14,7 @@ module.exports = {
             } catch (err) {
                 message.reply(`Nickname change failed.\n\`${err}\``);
             }
-        } else if (message.author.id == process.env.OWNER_ID && args.length === 0) {
+        } else if (args.length === 0) {
             const member = message.guild.members.cache.get(client.user.id);
 
             // Resets the server nickname to default

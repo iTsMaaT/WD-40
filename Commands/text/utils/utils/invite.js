@@ -7,7 +7,7 @@ module.exports = {
     private: false,
     admin: true,
     permissions: ["CreateInstantInvite"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
 
         const guild = message.guild;
 
@@ -21,7 +21,7 @@ module.exports = {
         
 
         if (!rulesChannel) {
-            message.reply("Couldn't find a rules channel accessible by everyone.");
+            message.reply("Couldn't find a rules / announcements / general channel accessible by everyone.");
             return;
         }
 

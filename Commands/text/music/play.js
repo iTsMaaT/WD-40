@@ -8,19 +8,30 @@ module.exports = {
     name: "play",
     description: "Play a song (works best with YouTube or Soucloud links)",
     aliases: ["p"],
-    usage: "< [Song]: song link or query , [-s]: optional: shuffles before playing, [-pn]: optional: puts the song in top of the queue >",
+    usage: {
+        required: {
+            name: "song",
+            description: "song link or query",
+        },
+        optional: {
+            "shuffle|s": {
+                hasValue: false,
+                description: "shuffles before playing",
+            },
+            "playnext|pn": {
+                hasValue: false,
+                description: "puts the song in top of the queue",
+            },
+        },
+    },
     category: "music",
     examples: ["never gonna give you up"],
     permissions: ["Connect"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         let res, research, embed;
         const queue = useQueue(message.guild.id);
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
         
-        const parameter = args.filter(a => a.startsWith("-"))[0];
-        args = args.filter(a => !a.startsWith("-"));
-        console.log(parameter);
-
         const Attachment = message.attachments.first()?.attachment;
 
         let string = args.join(" ");
@@ -107,8 +118,8 @@ module.exports = {
                 }
             }
 
-            if (parameter == "-s") await research?.tracks?.shuffle();
-            if (parameter == "-pn" && queue) {
+            if (found["shuffle|s"]) await research?.tracks?.shuffle();
+            if (found["playnext|pn"] && queue) {
                 queue.insertTrack(research.tracks[0], 0);
                 res = {};
                 res.track = research.tracks[0];

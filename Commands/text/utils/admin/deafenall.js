@@ -4,11 +4,16 @@ module.exports = {
     name: "deafenall",
     description: "Deafens all user in a channel except self",
     category: "admin",
-    usage: "< -deafen / -undeafen >",
+    usage: {
+        optional: {
+            "deafen|d": "Deafen all users in the channel",
+            "undeafen|und": "Undeafen all users in the channel",
+        },
+    },
     admin: true,
     permissions: ["DeafenMembers"],
     aliases: ["deafa"],
-    execute(logger, client, message, args) {
+    execute(logger, client, message, args, found) {
       
         // Check if the user is in a voice channel
         if (!message.member.voice.channel) 
@@ -24,8 +29,7 @@ module.exports = {
         };
       
         // Check the argument to determine if deafening or undeafening
-        const action = args[0]?.toLowerCase() ?? "-deafen";
-        if (action === "-deafen") {
+        if (found["-deafen|d"] || Object.keys(found).length === 0) {
             // Deafen all members except the executor
             voiceChannel.members.forEach(async (member) => {
                 if (!member.user.bot && member.id !== message.author.id) {
@@ -38,7 +42,7 @@ module.exports = {
             });
       
             embed.title = "Successfully deafened all members except yourself.";
-        } else if (action === "-undeafen") {
+        } else if (found["-undeafen|und"]) {
             // Undeafen all members
             voiceChannel.members.forEach(async (member) => {
                 try {
@@ -51,7 +55,7 @@ module.exports = {
             embed.title = "Successfully undeafened all members.";
             message.reply({ embeds: [embed] });
         } else {
-            SendErrorEmbed(message, "Invalid argument. Please specify either \"deafen\" or \"undeafen\".", "yellow");
+            SendErrorEmbed(message, "Invalid argument. Please specify either \"-deafen\" or \"-undeafen\".", "yellow");
         }
     },
 };

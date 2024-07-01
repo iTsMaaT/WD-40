@@ -4,7 +4,7 @@ module.exports = {
     name: "dog",
     description: "Not cats!",
     category: "posts",
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         try {
             const url = await (await fetch("https://dog.ceo/api/breeds/image/random")).json();
             const embed = {

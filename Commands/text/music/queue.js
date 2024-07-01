@@ -7,7 +7,7 @@ module.exports = {
     description: "Shows the current queue for songs",
     category: "music",
     aliases: ["q"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         const queue = useQueue(message.guild.id);
         const history = useHistory(message.guild.id);
 

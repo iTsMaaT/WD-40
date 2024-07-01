@@ -4,9 +4,14 @@ module.exports = {
     name: "rainbow",
     description: "Makes a text rainbow (Doesn't work on mobile)",
     category: "text manipulation",
-    usage: "< String >",
+    usage: {
+        required: {
+            name: "string",
+            description: "The text that will be manipulated",
+        },
+    },
     examples: ["Hello, World!"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         if (!args[0]) return SendErrorEmbed(message, "You need to provide a prompt.", "yellow");
         if (args.join(" ").length > 250) return SendErrorEmbed(message, "The result is too long (>250)", "yellow");
 

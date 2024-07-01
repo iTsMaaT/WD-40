@@ -3,10 +3,15 @@ const { SendErrorEmbed } = require("@functions/discordFunctions");
 module.exports = {
     name: "uwufy",
     description: "UwUfies a prompt",
-    usage: "< [Prompt] >",
+    usage: {
+        required: {
+            name: "string",
+            description: "The text that will be manipulated",
+        },
+    },
     category: "fun",
     examples: ["Hello, World!"],
-    execute(logger, client, message, args) {
+    execute(logger, client, message, args, found) {
         
         if (!args[0]) SendErrorEmbed(message, "You need a prompt", "yellow");
 
