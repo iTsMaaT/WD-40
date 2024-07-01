@@ -4,11 +4,16 @@ const { useQueue, useMainPlayer } = require("discord-player");
 module.exports = {
     name: "jump",
     description: "Skips to a precise song",
-    usage: "< [Song]: number of the song to skip to >",
+    usage: {
+        required: {
+            name: "song number",
+            description: "the song number in the queue to jump to",
+        },
+    },
     category: "music",
     examples: ["3"],
     inVoiceChannel: true,
-    execute: async (logger, client, message, args) => {
+    execute: async (logger, client, message, args, found) => {
         const queue = useQueue(message.guild.id);
         const track = parseInt(args[0]);
         const jump = queue?.tracks.at(track);

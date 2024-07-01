@@ -1,7 +1,12 @@
 module.exports = {
     name: "urban",
     description: "search something on the urban dictionary",
-    usage: "< [Prompt] >",
+    usage: {
+        required: {
+            name: "search",
+            description: "The term to search in the urban dictionary",
+        },
+    },
     category: "fun",
     examples: ["amogus"],
     async execute(logger, client, message, args) {

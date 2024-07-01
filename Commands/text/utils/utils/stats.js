@@ -11,7 +11,7 @@ module.exports = {
     name: "stats",
     description: "Gives statistics about the bot",
     category: "utils",
-    execute: async (logger, client, message, args) => {
+    execute: async (logger, client, message, args, found) => {
 
         const addedCommands = new Set();
         client.commands.each((val) => {if (!val.private && !addedCommands.has(val.name))  addedCommands.add(val.name); });

@@ -6,7 +6,7 @@ module.exports = {
     description: "Displays the latest changes to the bot",
     category: "utils",
     aliases: ["cl"],
-    execute(logger, client, message, args) {
+    execute(logger, client, message, args, found) {
         const latestChanges = changelog.slice(-5);
 
         const changelogEmbed = {

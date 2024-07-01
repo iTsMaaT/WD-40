@@ -4,7 +4,7 @@ module.exports = {
     name: "cat",
     description: "Cats!",
     category: "posts",
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         try {
             const url = await (await fetch("http://shibe.online/api/cats")).json();
             const embed = {

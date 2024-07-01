@@ -5,20 +5,36 @@ module.exports = {
     name: "emote",
     description: "Makes the attachment into a server emote/sticker",
     category: "utils",
-    usage: "< -e/-s: Emote or sticker, [Name]: name of the e/s >",
-    permissions: ["Administrator"],
-    async execute(logger, client, message, args) {
-        if (!message.member.permissions.has("Administrator") || !message.author.id == process.env.OWNER_ID) SendErrorEmbed(message, "You need to be administrator to execute this command", "yellow");
+    usage: {
+        required: {
+            name: "Name of the sticker/emote",
+        },
+        optional: {
+            "emote|e": {
+                hasValue: false,
+                description: "Generate a emote. Either -e or -s has to be passed",
+            },
+            "sticker|s": {
+                hasValue: false,
+                description: "Generate a sticker. Either -e or -s has to be passed",
+            },
+        },
+    },
+    examples: ["-e sus", "greatStickerName -s"],
+    permissions: ["CreateGuildExpressions"],
+    admin: true,
+    async execute(logger, client, message, args, found) {
+        const emoteArg = found["emote|e"];
+        const stickerArg = found["sticker|s"];
+        if (emoteArg && stickerArg) return SendErrorEmbed(message, "You can't use both -e and -s", "yellow");
+        if (!emoteArg && !stickerArg) return SendErrorEmbed(message, "You have to use either -e or -s", "yellow");
+        if (!args[0]) return SendErrorEmbed(message, "You have to specify a name for the emote/sticker", "yellow");
         
-        if (!args[1] || args[0] !== "-e" && args[0] !== "-s") return SendErrorEmbed(message, "Invalid argument", "yellow");
-
         const tag = ":dotted_line_face:";
-        const name = args[1].toString();
+        const name = args[0].toString();
 
         const imageAttachment = message.attachments.first();
         if (!imageAttachment || !imageAttachment.attachment) return SendErrorEmbed(message, "Invalid attachment", "yellow");
-
-        const type = args[0];
 
         const canvas = createCanvas(128, 128); 
         const ctx = canvas.getContext("2d");
@@ -27,14 +43,16 @@ module.exports = {
 
         const buffer = canvas.toBuffer();
         
-        if (type === "-e") {
+        if (emoteArg) {
             message.guild.emojis.create({ attachment: buffer, name: name })
                 .then(emoji => message.reply({ content: `Emote added: **${emoji.name}**` }))
                 .catch((err) => {
                     SendErrorEmbed(message, "An error occured", "red");
                     logger.error(err.stack);
                 });
-        } else {
+        } 
+        
+        if (stickerArg) {
             message.guild.stickers.create({ file: buffer, name: name, tags: tag })
                 .then(sticker => message.reply({ content: `Sticker added: **${sticker.name}**` }))
                 .catch((err) => {

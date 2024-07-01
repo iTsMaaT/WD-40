@@ -6,10 +6,9 @@ module.exports = {
     description: "Changes the bot's activity status",
     category: "utils",
     private: true,
-    execute(logger, client, message, args) {
+    execute(logger, client, message, args, found) {
         // Changes the activity or gives a list of all presets
 
-        if (message.author.id != process.env.OWNER_ID) return;
         if (!args[0]) {
             client.user.setActivity(activities[Math.floor(Math.random() * activities.length)], { type: ActivityType.Custom });
             message.reply({ content: "Activity randomised" });

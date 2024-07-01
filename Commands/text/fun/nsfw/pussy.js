@@ -4,7 +4,7 @@ module.exports = {
     name: "pussy",
     description: "Cats?",
     category: "NSFW",
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         if (message.channel.nsfw) {
             const url = await (await fetch("https://nekobot.xyz/api/image?type=pussy")).json();
             Embed = {

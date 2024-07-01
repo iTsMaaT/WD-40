@@ -5,7 +5,7 @@ module.exports = {
     description: "Make the bot send a custom message / reply",
     category: "utils",
     private: true,
-    execute: async (logger, client, message, args) => {
+    execute: async (logger, client, message, args, found) => {
         const owner = await message.guild.fetchOwner();
 
         // Only server owner and iTsMaaT are allowed to execute this command

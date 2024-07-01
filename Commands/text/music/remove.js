@@ -8,7 +8,7 @@ module.exports = {
     usage: "< [Track]: track to remove >",
     category: "music",
     examples: ["3"],
-    execute(logger, client, message, args) {
+    execute(logger, client, message, args, found) {
         const queue = useQueue(message.guild.id);
 
         if (!queue || !queue.tracks || !queue.currentTrack) return SendErrorEmbed(message, "There is nothing in the queue / currently playing.", "yellow");

@@ -3,12 +3,17 @@ const { SendErrorEmbed, CreateOrUseWebhook, id } = require("@functions/discordFu
 module.exports = {
     name: "fakemessage",
     description: "Create a fake message using webhooks",
-    usage: "< [Prompt] >",
+    usage: {
+        required: {
+            name: "message",
+            description: "The message the fake user will display",
+        },
+    },
     category: "fun",
     examples: ["1081004946872352958 You are weird looking"],
     permission: ["ManageWebhooks"],
     aliases: ["fmsg"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         let UserID;
 
         if (!args[0]) return SendErrorEmbed(message, "You must provide a prompt", "yellow");

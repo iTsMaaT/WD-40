@@ -5,11 +5,15 @@ module.exports = {
     name: "moveall",
     description: "Moves all user in a channel to another except self",
     category: "admin",
-    usage: "< channelID >",
+    usage: {
+        required: { 
+            "channelID": "ID of the channel to move all users to",
+        },
+    },
     admin: true,
     permissions: ["MoveMembers"],
     aliases: ["mova"],
-    execute(logger, client, message, args) {
+    execute(logger, client, message, args, found) {
   
         // Check if the user is in a voice channel
         if (!message.member.voice.channel) 

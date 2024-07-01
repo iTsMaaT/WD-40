@@ -4,11 +4,16 @@ const GuildManager = require("@root/utils/GuildManager.js");
 module.exports = {
     name: "ask",
     description: "Ask a question to Gemini",
-    usage: "<prompt>",
+    usage: {
+        required: {
+            name: "question",
+            description: "The question to ask Gemini",
+        },
+    },
     category: "fun",
     examples: ["what are you used for?"],
     cooldown: 10000,
-    execute: async (logger, client, message, args) => {
+    execute: async (logger, client, message, args, found) => {
         try {
             const API_URL = process.env.PALM_API_PROXY_URL; // Replace with your API URL
             const apiKey = process.env.PALM_API_KEY; // Replace with your API key

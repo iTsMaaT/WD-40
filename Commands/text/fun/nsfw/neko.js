@@ -4,7 +4,7 @@ module.exports = {
     name: "neko",
     description: "meow mrrrr~~ ฅ(＾・ω・＾ฅ)",
     category: "NSFW",
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         if (message.channel.nsfw) {
             const url = await (await fetch("https://nekos.life/api/neko")).json();
             Embed = {

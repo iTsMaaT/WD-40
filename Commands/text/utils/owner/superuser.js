@@ -3,17 +3,17 @@ module.exports = {
     description: "Makes only iTsMaaT be able to execute commands",
     category: "utils",
     private: true,
-    execute(logger, client, message, args) {
+    execute(logger, client, message, args, found) {
         // Superuser command (Only iTsMaaT can execute commands)
         const server = process.env.SERVER;
         if (args[0] == server) {
-            if (message.author.id == process.env.OWNER_ID && !superuser) {
+            if (!superuser) {
                 superuser = 1;
                 message.reply("Only you can execute commands on [" + server + "].");
-            } else if (message.author.id == process.env.OWNER_ID && superuser) {
+            } else if (superuser) {
                 superuser = 0;
                 message.reply("Everyone can execute commands on [" + server + "].");
-            } else if (!message.author.id == process.env.OWNER_ID) {
+            } else {
                 message.reply("You are not allowed to execute that command");
             }
         }

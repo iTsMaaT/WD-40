@@ -4,7 +4,11 @@ const { prettyString } = require("@functions/formattingFunctions");
 module.exports = {
     name: "userinfo",
     description: "Gives info of a user",
-    usage: "< [User]: the user to get info from (optional) >",
+    usage: {
+        required: {
+            "user": "the user to get info from (optional)",
+        },
+    },
     category: "info",
     aliases: ["uinfo"],
     execute: async (logger, client, message, args) => {

@@ -7,7 +7,7 @@ module.exports = {
     name: "lyrics",
     description: "Gives lyrics for the currently playing song",
     category: "music",
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         const queue = useQueue(message.guild.id);
         const genius = lyricsExtractor();
 

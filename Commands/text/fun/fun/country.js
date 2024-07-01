@@ -3,10 +3,15 @@ const { SendErrorEmbed } = require("@functions/discordFunctions");
 module.exports = {
     name: "country",
     description: "See information about a country",
-    usage: "< [Country name] >",
+    usage: {
+        required: {
+            name: "country",
+            description: "The country to see info of",
+        },
+    },
     category: "fun",
     examples: ["Canada"],
-    execute(logger, client, message, args) {
+    execute(logger, client, message, args, found) {
         if (!args[0]) return message.channel.send("No country provided");
         
         fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(args.slice(0).join(" "))}?fullText=true`)

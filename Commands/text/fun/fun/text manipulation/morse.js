@@ -4,9 +4,14 @@ module.exports = {
     name: "morse",
     description: "Translates a string to morse code",
     category: "text manipulation",
-    usage: "< String >",
+    usage: {
+        required: {
+            name: "string",
+            description: "The text that will be manipulated",
+        },
+    },
     examples: ["Hello, World!"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         if (!args[0]) return SendErrorEmbed(message, "You need to provide a prompt.", "yellow");
 
         // All morse charaters

@@ -18,7 +18,6 @@ module.exports = {
             activity_name = "-";
             activity_details = "-";
         }
-        console.log(target);
 
         try {
             const presenceStatus = target?.presence?.status || "Offline";

@@ -3,10 +3,14 @@ const { SendErrorEmbed } = require("@functions/discordFunctions");
 module.exports = {
     name: "mcskin",
     description: "Gives the Minecraft skin of a user",
-    usage: "< [Username, UUID]: Name or UUID of the user >",
+    usage: {
+        required: {
+            "username / UUID": "the username or UUID of the user",
+        },
+    },
     category: "utils",
     examples: ["Notch"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         const name = args[0] ?? "mhf_steve";
     
         try {

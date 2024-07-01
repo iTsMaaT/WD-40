@@ -6,7 +6,7 @@ module.exports = {
     description: "birb pics!",
     category: "posts",
     private: true,
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         try {
             const blob = await (await fetch("https://otter.bruhmomentlol.repl.co/random")).blob();
             const file = new AttachmentBuilder(Buffer.from(await blob.arrayBuffer()), { name: "otter.jpg" });

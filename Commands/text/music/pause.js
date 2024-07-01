@@ -6,7 +6,7 @@ module.exports = {
     name: "pause",
     description: "Pauses / Resumes currently playing music",
     category: "music",
-    execute(logger, client, message, args) {
+    execute(logger, client, message, args, found) {
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
 
         const queue = useQueue(message.guild.id);

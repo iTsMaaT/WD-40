@@ -5,9 +5,9 @@ const changelog = require("@root/changelogs.json");
 module.exports = {
     name: "packages",
     description: "Lists the packages and versions",
-    category: "fun",
+    category: "utils",
     private: true,
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, optionalArgs) {
         const WDVersion = changelog.slice(-1).map(({ version }) => { return version; }).join();
     
         const embed = {
@@ -30,5 +30,6 @@ module.exports = {
         embed.footer = { text: `[Server: ${process.env.SERVER}]` };
 
         message.reply({ embeds: [embed], allowedMentions: { RepliedUser: false } });
+        // todo page system
     },
 };

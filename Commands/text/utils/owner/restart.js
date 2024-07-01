@@ -5,7 +5,7 @@ module.exports = {
     description: "Restart the bot from discord",
     category: "utils",
     private: true,
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         const server = process.env.SERVER;
 
         if (message.author.id == process.env.OWNER_ID && (args[0] == "-smart")) {

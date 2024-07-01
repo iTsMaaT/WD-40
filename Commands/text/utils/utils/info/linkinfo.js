@@ -5,16 +5,19 @@ const fs = require("fs/promises");
 const cheerio = require("cheerio");
 const path = require("path");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { AttachmentBuilder } = require("discord.js");
 
 module.exports = {
     name: "linkinfo",
     description: "Gives info about a link",
-    usage: "< [URL] >",
+    usage: {
+        required: {
+            "link": "the URL to analyze",
+        },
+    },
     aliases: ["linfo"],
     category: "info",
     cooldown: 10000,
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         const agent = new https.Agent({ keepAlive: true });
         if (!args[0]) return SendErrorEmbed(message, "Please provide a URL", "yellow");
         const link = args[0];

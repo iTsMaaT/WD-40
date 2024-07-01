@@ -6,11 +6,16 @@ const { SendErrorEmbed } = require("@functions/discordFunctions");
 module.exports = {
     name: "tts",
     description: "Play a text-to-speech message in the voice channel",
-    usage: "< [Text]: text to say >",
+    usage: {
+        required: {
+            name: "string",
+            description: "The text that will be speeched",
+        },
+    },
     category: "music",
     examples: ["i love eating baguettes"],
     permissions: ["Connect"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         const queue = useQueue(message.guild.id);
         let connection;
 

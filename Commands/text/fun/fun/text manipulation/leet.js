@@ -4,10 +4,15 @@ module.exports = {
     name: "leet",
     description: "Converts a text to leet speech",
     category: "text manipulation",
-    usage: "< String >",
+    usage: {
+        required: {
+            name: "string",
+            description: "The text that will be manipulated",
+        },
+    },
     examples: ["Hello, World!"],
     aliases: ["1337"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, found) {
         if (!args[0]) return SendErrorEmbed(message, "You need to provide a prompt.", "yellow");
         if (args.join(" ").length > 1000) return SendErrorEmbed(message, "The result is too long (>1000)", "yellow");
 
