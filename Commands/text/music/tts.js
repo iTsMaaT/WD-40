@@ -8,8 +8,7 @@ module.exports = {
     description: "Play a text-to-speech message in the voice channel",
     usage: {
         required: {
-            name: "string",
-            description: "The text that will be speeched",
+            "string": "The text that will be speeched",
         },
     },
     category: "music",

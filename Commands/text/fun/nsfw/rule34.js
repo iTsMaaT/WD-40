@@ -5,8 +5,7 @@ module.exports = {
     description: "Fetches a post using the rule34.xxx API, and can accept tags",
     usage: {
         required: {
-            name: "tags",
-            description: "The filter tags, sperated by spaces",
+            "tags": "The filter tags, sperated by spaces",
         },
     },
     category: "NSFW",

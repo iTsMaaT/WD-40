@@ -5,8 +5,7 @@ module.exports = {
     description: "Create a fake message using webhooks",
     usage: {
         required: {
-            name: "message",
-            description: "The message the fake user will display",
+            "message": "The message the fake user will display",
         },
     },
     category: "fun",

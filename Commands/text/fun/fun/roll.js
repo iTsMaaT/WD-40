@@ -3,8 +3,7 @@ module.exports = {
     description: "Roll between 1 and 50 dices of up to 50 sides. Defaults to rolling 1d6 when no arguments are given.",
     usage: {
         required: {
-            name: "roll",
-            description: "the dice to roll, like 1d6 (<dice amount>d<dice sides>)",
+            "roll": "the dice to roll, like 1d6 (<dice amount>d<dice sides>)",
         },
     },
     category: "fun",

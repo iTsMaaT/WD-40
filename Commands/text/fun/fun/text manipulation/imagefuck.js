@@ -9,8 +9,7 @@ module.exports = {
     description: "Transform a string into imagefuck",
     usage: {
         required: {
-            name: "string",
-            description: "The text that will be manipulated",
+            "string": "The text that will be manipulated",
         },
     },
     category: "text manipulation",

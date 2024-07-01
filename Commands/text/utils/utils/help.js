@@ -8,7 +8,11 @@ module.exports = {
     description: "Lists commands",
     category: "utils",
     private: false,
-    usage: "< [Command name (Optional)] >",
+    usage: {
+        required: {
+            "command name": "The name of the command to get info of (Optional)",
+        },
+    },
     async execute(logger, client, message, args, found) {
         const prefix = GuildManager.GetPrefix(message.guild);
 

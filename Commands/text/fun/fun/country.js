@@ -5,8 +5,7 @@ module.exports = {
     description: "See information about a country",
     usage: {
         required: {
-            name: "country",
-            description: "The country to see info of",
+            "country": "The country to see info of",
         },
     },
     category: "fun",

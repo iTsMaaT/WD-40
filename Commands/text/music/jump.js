@@ -6,8 +6,7 @@ module.exports = {
     description: "Skips to a precise song",
     usage: {
         required: {
-            name: "song number",
-            description: "the song number in the queue to jump to",
+            "song number": "the song number in the queue to jump to",
         },
     },
     category: "music",

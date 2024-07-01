@@ -5,8 +5,7 @@ module.exports = {
     description: "Transform a string into emotes",
     usage: {
         required: {
-            name: "string",
-            description: "The text that will be manipulated",
+            "string": "The text that will be manipulated",
         },
     },
     category: "text manipulation",

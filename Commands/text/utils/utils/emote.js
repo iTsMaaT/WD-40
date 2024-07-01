@@ -7,7 +7,7 @@ module.exports = {
     category: "utils",
     usage: {
         required: {
-            name: "Name of the sticker/emote",
+            "name": "Name of the sticker/emote",
         },
         optional: {
             "emote|e": {
