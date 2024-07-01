@@ -28,17 +28,17 @@ module.exports = {
             };
 
             if (typeof CommandName.usage === "string") {
-                CommandEmbed.fields.push({ name: "Usage", value: CommandName.description });
+                CommandEmbed.fields.push({ name: "Options", value: CommandName.description });
             } else if (typeof CommandName.usage === "object") {
                 let requiredString = "";
                 let optionalString = "";
                 let usageString = "";
                 if (Object.keys(CommandName.usage.required ?? {}).length) 
-                    requiredString += `__Required__:\n${Object.keys(CommandName.usage.required).map(key => `${key}: ${CommandName.usage.required[key]}`).join("\n")}`;
+                    requiredString += `__Required__:\n${Object.keys(CommandName.usage.required).map(key => `${key.toLowerCase()}: ${prettyString(CommandName.usage.required[key], "first", false)}`).join("\n")}`;
                 if (Object.keys(CommandName.usage.optional ?? {}).length) 
-                    optionalString += `__Optional__:\n${Object.keys(CommandName.usage.optional).map(key => `-${key.split("|")[0]}[${key.split("|").slice(1).join(",")}]${(CommandName.usage.optional[key].hasValue ?? false) ? " <value>" : ""}: ${CommandName.usage.optional[key].description}`).join("\n")}`;
+                    optionalString += `__Optional__:\n${Object.keys(CommandName.usage.optional).map(key => `-${key.split("|")[0].toLowerCase()}${key.split("|").slice(1).length > 0 ? `[${key.split("|").slice(1).join(",").toLowerCase()}]` : ""}${(CommandName.usage.optional[key].hasValue ?? false) ? " <value>" : ""}: ${prettyString(CommandName.usage.optional[key].description, "first", false)}`).join("\n")}`;
                 usageString = `${requiredString}${requiredString.length > 0 && optionalString.length > 0 ? "\n" : ""}${optionalString}`;
-                CommandEmbed.fields.push({ name: "Usage", value: usageString });
+                CommandEmbed.fields.push({ name: "Options", value: usageString });
                 CommandEmbed.footer = { text: "Optional options explanation: -parameterName[parameterAliases]: parameterDescription" };
             }
 
