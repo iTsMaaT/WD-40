@@ -21,7 +21,7 @@ module.exports = {
         
 
         if (!rulesChannel) {
-            message.reply("Couldn't find a rules channel accessible by everyone.");
+            message.reply("Couldn't find a rules / announcements / general channel accessible by everyone.");
             return;
         }
 
