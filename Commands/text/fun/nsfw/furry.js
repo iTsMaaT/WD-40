@@ -5,7 +5,7 @@ module.exports = {
     description: "Fetches a random post from one of three furry subreddits UwU",
     category: "NSFW",
     async execute(logger, client, message, args, found) {
-        message.reply({ embeds: [await FetchReddit(message.channel.nsfw, "furrypornsubreddit", "yiff", "furryonhuman")] });
+        message.reply({ embeds: [await FetchReddit(message.channel.nsfw, ["furrypornsubreddit", "yiff", "furryonhuman"], 5)] });
     },
 };
 
