@@ -1,6 +1,6 @@
 const { version: discordjsVersion } = require("discord.js");
 const { dependencies, name } = require("@root/package.json");
-const changelog = require("@root/changelogs.json");
+const changelogs = require("@root/changelogs.json");
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 
 module.exports = {
@@ -9,7 +9,7 @@ module.exports = {
     category: "utils",
     private: true,
     async execute(logger, client, message, args, optionalArgs) {
-        const WDVersion = changelog.slice(-1).map(({ version }) => { return version; }).join();
+        const WDVersion = changelogs[changelogs.length - 1].version;
     
         const embed = {
             title: "Installed Packages",
