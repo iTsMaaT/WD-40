@@ -1,23 +1,46 @@
 const logger = require("@root/index.js");
+const { getRedditToken } = require("../reddit/fetchRedditToken.js");
+const axios = require("axios");
 
-const FetchReddit = async function(ChannelNSFW, subreddits, limit) {
+const FetchReddit = async function(ChannelNSFW, subreddits, limit, type = "sub") {
     try {
         const subreddit = subreddits[Math.floor(Math.random() * subreddits.length)];
         if (!limit) limit = subreddit.length;
         let PostImage = "";
         let embed;
         console.log(subreddit);
-        const count = 0;
+        let count = 0;
+        const { baseUrl, headers } = await getRedditToken();
         while (!/\.(jpg|png|gif|jpeg)$/.test(PostImage)) {
-            const response = await fetch(`https://www.reddit.com/r/${subreddit}/random/.json`, { agent: false });
-            const content = await response.json();
-            const permalink = content[0].data.children[0].data.permalink;
+            let content;
+            if (type == "sub") 
+                content = await makeRequest(`${baseUrl}/r/${subreddit}/random/.json`, headers);
+            else if (type == "user") 
+                content = [await makeRequest(`${baseUrl}/user/${subreddit}/submitted.json`, headers)];
+            else  
+                logger.error("Wrong type");
+            
+            console.log(content);
+            const post = content[0].data.children.filter((p) => p.data.post_hint === "image" && /\.(jpg|png|gif|jpeg)$/.test(p.data.url))[0];
+            if (post == undefined || post.length == 0) {
+                count += 1;
+                if (count == limit) {
+                    embed = {
+                        color: 0xffff00,
+                        title: `Couldn't fetch post after **${limit}** tries`,
+                    };
+                    return embed;
+                }
+                continue;
+            }
+            console.log(post);
+            const permalink = post.data.permalink;
             const PostURL = `https://reddit.com${permalink}`;
-            const PostTitle = content[0].data.children[0].data.title;
-            PostImage = content[0].data.children[0].data.url;
-            const PostAuthor = content[0].data.children[0].data.author;
-            const PostRSlash = content[0].data.children[0].data.subreddit_name_prefixed;
-            const PostNsfw = content[0].data.children[0].data.over_18;
+            const PostTitle = post.data.title;
+            PostImage = post.data.url;
+            const PostAuthor = post.data.author;
+            const PostRSlash = post.data.subreddit_name_prefixed;
+            const PostNsfw = post.data.over_18;
 
             if (!PostNsfw || (PostNsfw && ChannelNSFW)) {
                 embed = {
@@ -38,14 +61,6 @@ const FetchReddit = async function(ChannelNSFW, subreddits, limit) {
                     title: "The post is NSFW but the channel isn't.",
                 };
             }
-            limit += 1;
-            if (count == limit) {
-                embed = {
-                    color: 0xffff00,
-                    title: `Couldn't fetch post after **${limit}** tries`,
-                };
-                return embed;
-            }
         }
         
         return embed;
@@ -54,9 +69,33 @@ const FetchReddit = async function(ChannelNSFW, subreddits, limit) {
             color: 0xff0000,
             title: "Error while fetching the post",
         };
-        logger.error("Error while fetching a post: " + err);
+        logger.error("Error while fetching a post: " + err.stack);
+        logger.info(err.response);
         return embed;
     }
 };
 
 module.exports = FetchReddit;
+
+
+async function makeRequest(url, headers, attempt = 0) {
+    const response = await axios.request({
+        method: "GET",
+        url,
+        headers: headers,
+        maxBodyLength: Infinity,
+        maxRedirects: 0,
+        validateStatus: (code) => (code >= 200 && code < 300) || code == 302,
+    });
+    if (response.status == 302) {
+        if (attempt > 3) 
+            throw new Error("Too many redirect");
+        
+        const newUrl = response.headers.location.split("/");
+        newUrl[newUrl.length - 2] = encodeURIComponent(newUrl[newUrl.length - 2]);
+        const newHeaders = Object.keys(headers).filter(n => n.toLowerCase() != "authorization").reduce((prev, curr) => prev[curr] = headers[curr], {});
+        return await makeRequest(newUrl.join("/"), newHeaders, attempt + 1);
+    }
+    
+    return response.data;
+}
