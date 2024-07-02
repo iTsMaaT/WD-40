@@ -16,6 +16,7 @@ const getExactDate = require("@functions/getExactDate");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const RandomMinMax = require("@functions/RandomMinMax");
 const findClosestMatch = require("@functions/findClosestMatch");
+const { initConfFile } = require("@root/utils/reddit/fetchRedditToken");
 
 
 const client = new Client({
@@ -218,6 +219,10 @@ client.once(Events.ClientReady, async () => {
     if (process.env.SERVER != "dev") client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");
 
     logger.info(`Bot starting on [${process.env.SERVER}]...`);
+
+    console.log("Initializing Reddit conf file...");
+    await initConfFile();
+    console.log("Reddit conf file initialized.");
 
     console.log("Guild manager initiation...");
     const guilds = await client.guilds.fetch();
