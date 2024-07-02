@@ -276,6 +276,9 @@
             "Made command parameters more explicit in the help command (eg. >help emote)",
             ">userinfo can now be used with a username",
             "Bot asks for proper permissions upon joining a server",
+            "Reddit commands now work (at least more than before)",
+            "Switch >bird, >otter, and >dog to use reddit",
+            "New >topic command, uses LDA to get the topic of the last X messages",
             "Refactoring"
         ]
     }
