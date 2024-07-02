@@ -7,7 +7,7 @@ module.exports = {
     private: true,
     async execute(logger, client, message, args, found) {
         
-        const guilds = client.guilds.cache;
+        const guilds = client.guilds.cache.sort((a, b) => b.joinedTimestamp - a.joinedTimestamp);
         const guildCount = guilds.size;
         let totalUsers = 0;
         let totalBots = 0;

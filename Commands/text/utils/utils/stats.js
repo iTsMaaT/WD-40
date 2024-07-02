@@ -1,6 +1,6 @@
 const prettyMilliseconds = require("pretty-ms");
 const os = require("os");
-const changelog = require("@root/changelogs.json");
+const changelogs = require("@root/changelogs.json");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
 const { sql } = require("drizzle-orm");
@@ -22,7 +22,7 @@ module.exports = {
         let lastCommandTimeSinceNow = "";
         let lastExecutedCommand = "";
         let lastCommandLink = "";
-        const WDVersion = changelog.slice(-1).map(({ version }) => { return version; }).join();
+        const WDVersion = changelogs[changelogs.length - 1].version;
         const Shards = client.options.shardCount ?? 1;
         const nodeVersion = process.version;
         const amountTextCommands = addedCommands.size;
