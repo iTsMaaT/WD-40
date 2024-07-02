@@ -3,3 +3,4 @@ node_modules
 package-lock.json
 tinker.js
 pnpm-lock.yaml
+utils/reddit/redditConf.json
