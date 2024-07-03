@@ -1,5 +1,5 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const lda = require("lda");
+const lda = require("@utils/algorithms/lda/lda.js");
 
 module.exports = {
     name: "topic",
@@ -12,24 +12,22 @@ module.exports = {
     category: "utils",
     examples: ["50"],
     async execute(logger, client, message, args, optionalArgs) {
-        const count = args[0];
+        const count = args[0] || 100;
         if (count > 100) return SendErrorEmbed(message, "Message count must be less than 100.", "red");
         if (count < 1) return SendErrorEmbed(message, "Message count must be greater than 0.", "red");
 
         try {
             const messages = await message.channel.messages.fetch({ limit: count });
             const text = messages.map(m => m.content);
-            const result = lda(text, 1, 5)[0];
-            const maxLength = Math.max(...result.map(t => t.term.length));
+            const result = lda(text, 3, 5);
+            const maxLength = Math.max(...result.map(topic => topic.map(t => t.term.length)).flat());
 
-            const resultString = result
-                .map(t => `${t.term.padEnd(maxLength)} (${(t.probability * 100).toFixed(1).padStart(4)}%)`)
-                .join("\n");
+            const resultString = result.map((topic, i) => `Topic ${i + 1}:\n\`\`\`${topic.map(t => `${t.term.padEnd(maxLength)} (${(t.probability * 100).toFixed(1).padStart(4)}%)`).join("\n")}\`\`\``).join("\n\n");
 
             const embed = {
-                title: `Topic of the last ${count} messages`,
+                title: `Topics of the last ${count} messages`,
                 color: 0xffffff,
-                description: `\`\`\`\n${resultString}\`\`\``,
+                description: resultString,
                 timestamp: new Date(),
             };
 

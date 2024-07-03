@@ -1,8 +1,8 @@
 const { ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const emoteList = require("@root/utils/emojis.json");
-const findClosestMatch = require("@functions/findClosestMatch");
-const GuildManager = require("@root/utils/GuildManager");
+const emoteList = require("@utils/emojis.json");
+const findClosestMatch = require("@utils/algorithms/findClosestMatch.js");
+const GuildManager = require("@utils/GuildManager");
 
 module.exports = {
     name: "autoreaction",

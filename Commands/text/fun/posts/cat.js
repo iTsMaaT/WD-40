@@ -1,5 +1,5 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const FetchReddit = require("@functions/FetchReddit.js");
+const FetchReddit = require("@utils/reddit/FetchReddit.js");
 
 module.exports = {
     name: "cat",

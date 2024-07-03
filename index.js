@@ -15,8 +15,9 @@ const Discord = require("discord.js");
 const getExactDate = require("@functions/getExactDate");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const RandomMinMax = require("@functions/RandomMinMax");
-const findClosestMatch = require("@functions/findClosestMatch");
-const { initConfFile } = require("@root/utils/reddit/fetchRedditToken");
+const findClosestMatch = require("@utils/algorithms/findClosestMatch.js");
+const { initConfFile } = require("@utils/reddit/fetchRedditToken.js");
+const countCommonChars = require("@utils/functions/countCommonChars.js");
 
 
 const client = new Client({
@@ -474,7 +475,7 @@ client.on(Events.MessageCreate, async (message) => {
             const commandSet = new Set(client.commands.filter(cmd => !cmd.private).map(cmd => cmd.name));
             const commandArray = Array.from(commandSet);
             const closeMatch = findClosestMatch(commandName, commandArray);
-            if (closeMatch.distance <= 2) {
+            if (closeMatch.distance <= 2 && countCommonChars(commandName, closeMatch.closestMatch) != 0) {
                 // command = client.commands.get(closeMatch.closestMatch);
                 await message.reply(`Did you mean \`${prefix}${closeMatch.closestMatch}\`?`);
                 const filter = (m) => m.author.id === message.author.id;

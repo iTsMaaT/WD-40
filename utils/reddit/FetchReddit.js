@@ -1,5 +1,5 @@
 const logger = require("@root/index.js");
-const { getRedditToken, makeRequest } = require("../reddit/fetchRedditToken.js");
+const { getRedditToken, makeRequest } = require("./fetchRedditToken.js");
 
 const FetchReddit = async function(ChannelNSFW, subreddits, limit, type = "sub") {
     try {
