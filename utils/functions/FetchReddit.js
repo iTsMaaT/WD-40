@@ -1,6 +1,5 @@
 const logger = require("@root/index.js");
-const { getRedditToken } = require("../reddit/fetchRedditToken.js");
-const axios = require("axios");
+const { getRedditToken, makeRequest } = require("../reddit/fetchRedditToken.js");
 
 const FetchReddit = async function(ChannelNSFW, subreddits, limit, type = "sub") {
     try {
@@ -8,7 +7,6 @@ const FetchReddit = async function(ChannelNSFW, subreddits, limit, type = "sub")
         if (!limit) limit = subreddit.length;
         let PostImage = "";
         let embed;
-        console.log(subreddit);
         let count = 0;
         const { baseUrl, headers } = await getRedditToken();
         while (!/\.(jpg|png|gif|jpeg)$/.test(PostImage)) {
@@ -33,7 +31,6 @@ const FetchReddit = async function(ChannelNSFW, subreddits, limit, type = "sub")
                 }
                 continue;
             }
-            console.log(post);
             const permalink = post.data.permalink;
             const PostURL = `https://reddit.com${permalink}`;
             const PostTitle = post.data.title;
@@ -76,26 +73,3 @@ const FetchReddit = async function(ChannelNSFW, subreddits, limit, type = "sub")
 };
 
 module.exports = FetchReddit;
-
-
-async function makeRequest(url, headers, attempt = 0) {
-    const response = await axios.request({
-        method: "GET",
-        url,
-        headers: headers,
-        maxBodyLength: Infinity,
-        maxRedirects: 0,
-        validateStatus: (code) => (code >= 200 && code < 300) || code == 302,
-    });
-    if (response.status == 302) {
-        if (attempt > 3) 
-            throw new Error("Too many redirect");
-        
-        const newUrl = response.headers.location.split("/");
-        newUrl[newUrl.length - 2] = encodeURIComponent(newUrl[newUrl.length - 2]);
-        const newHeaders = Object.keys(headers).filter(n => n.toLowerCase() != "authorization").reduce((prev, curr) => prev[curr] = headers[curr], {});
-        return await makeRequest(newUrl.join("/"), newHeaders, attempt + 1);
-    }
-    
-    return response.data;
-}

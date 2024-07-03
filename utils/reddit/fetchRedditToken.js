@@ -1,4 +1,5 @@
 const fs = require("fs");
+const axios = require("axios");
 
 async function getRedditToken() {    
     const changelogs = require("../../changelogs.json");
@@ -66,4 +67,26 @@ async function initConfFile() {
     }
 }
 
-module.exports = { getRedditToken, initConfFile };
+async function makeRequest(url, headers, attempt = 0) {
+    const response = await axios.request({
+        method: "GET",
+        url,
+        headers: headers,
+        maxBodyLength: Infinity,
+        maxRedirects: 0,
+        validateStatus: (code) => (code >= 200 && code < 300) || code == 302,
+    });
+    if (response.status == 302) {
+        if (attempt > 3) 
+            throw new Error("Too many redirect");
+        
+        const newUrl = response.headers.location.split("/");
+        newUrl[newUrl.length - 2] = encodeURIComponent(newUrl[newUrl.length - 2]);
+        const newHeaders = Object.keys(headers).filter(n => n.toLowerCase() != "authorization").reduce((prev, curr) => prev[curr] = headers[curr], {});
+        return await makeRequest(newUrl.join("/"), newHeaders, attempt + 1);
+    }
+    
+    return response.data;
+}
+
+module.exports = { getRedditToken, initConfFile, makeRequest };
