@@ -1,7 +1,7 @@
 const dotenv = require("dotenv");
 dotenv.config();
 
-const { Client, GatewayIntentBits, Events, Partials, ActivityType, PermissionFlagsBits } = require("discord.js");
+const { Client, GatewayIntentBits, Events, Partials, ActivityType, PermissionsBitField } = require("discord.js");
 const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState, AutoCommandMatch } = require("./utils/config.json");
 
 require("module-alias/register");
@@ -529,6 +529,7 @@ client.on(Events.MessageCreate, async (message) => {
 
             // Check if the bot has the required permissions
             const botPermissions = message.guild.members.cache.get(client.user.id)?.permissions?.toArray();
+            if (!botPermissions.includes("SendMessages")) return;
             const requiredPermissions = command.permission || [];
 
             if (requiredPermissions.length > 0 && !botPermissions.includes("Administrator")) {
