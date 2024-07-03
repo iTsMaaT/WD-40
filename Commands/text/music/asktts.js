@@ -15,7 +15,7 @@ module.exports = {
     examples: ["what is the skull emoji used for"],
     permissions: ["Connect"],
     cooldown: 10000,
-    execute: async (logger, client, message, args) => {
+    async execute(logger, client, message, args, optionalArgs) {
         let response, connection, sent;
         const queue = useQueue(message.guild.id);
 

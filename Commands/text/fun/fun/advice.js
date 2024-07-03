@@ -2,7 +2,7 @@ module.exports = {
     name: "advice",
     description: "Get a random advice",
     category: "fun",
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         const advice = await (await fetch("https://api.adviceslip.com/advice")).json();
         try {
             FactEmbed = {

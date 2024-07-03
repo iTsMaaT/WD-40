@@ -5,7 +5,7 @@ module.exports = {
     category: "utils",
     description: "Makes a list of the guilds the bot is in",
     private: true,
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         
         const guilds = client.guilds.cache.sort((a, b) => b.joinedTimestamp - a.joinedTimestamp);
         const guildCount = guilds.size;

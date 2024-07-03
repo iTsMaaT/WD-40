@@ -10,7 +10,7 @@ module.exports = {
     },
     category: "fun",
     examples: ["Canada"],
-    execute(logger, client, message, args, found) {
+    execute(logger, client, message, args, optionalArgs) {
         if (!args[0]) return message.channel.send("No country provided");
         
         fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(args.slice(0).join(" "))}?fullText=true`)

@@ -9,7 +9,7 @@ module.exports = {
         },
     },
     category: "NSFW",
-    execute: async (logger, client, message, args, found) => {
+    execute: async (logger, client, message, args, optionalArgs) => {
 
         if (message.channel.nsfw) {
             try {

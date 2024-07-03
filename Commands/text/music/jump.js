@@ -12,7 +12,7 @@ module.exports = {
     category: "music",
     examples: ["3"],
     inVoiceChannel: true,
-    execute: async (logger, client, message, args, found) => {
+    execute: async (logger, client, message, args, optionalArgs) => {
         const queue = useQueue(message.guild.id);
         const track = parseInt(args[0]);
         const jump = queue?.tracks.at(track);

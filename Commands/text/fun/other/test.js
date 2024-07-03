@@ -11,7 +11,7 @@ module.exports = {
     description: "Test command",
     category: "fun",
     private: true,
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         
         try {
             const embed = {

@@ -7,7 +7,7 @@ module.exports = {
     private: false,
     admin: true,
     permissions: ["CreateInstantInvite"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
 
         const guild = message.guild;
 

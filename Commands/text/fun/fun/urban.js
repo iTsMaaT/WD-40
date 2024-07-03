@@ -8,7 +8,7 @@ module.exports = {
     },
     category: "fun",
     examples: ["amogus"],
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, optionalArgs) {
 
         try {
             const response = await fetch(`https://api.urbandictionary.com/v0/define?term=${encodeURIComponent(args.slice(0).join(" "))}`);

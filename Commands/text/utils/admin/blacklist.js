@@ -12,7 +12,7 @@ module.exports = {
     },
     category: "admin",
     examples: ["1081004946872352958 moveall"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         if (!args[0]) return SendErrorEmbed(message, "You did not provide a user.", "yellow");
         let target, owner;
 

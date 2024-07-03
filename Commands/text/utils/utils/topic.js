@@ -11,7 +11,7 @@ module.exports = {
     },
     category: "utils",
     examples: ["50"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         const count = args[0];
         if (count > 100) return SendErrorEmbed(message, "Message count must be less than 100.", "red");
         if (count < 1) return SendErrorEmbed(message, "Message count must be greater than 0.", "red");
@@ -29,7 +29,7 @@ module.exports = {
             const embed = {
                 title: `Topic of the last ${count} messages`,
                 color: 0xffffff,
-                description: resultString,
+                description: `\`\`\`\n${resultString}\`\`\``,
                 timestamp: new Date(),
             };
 

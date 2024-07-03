@@ -7,7 +7,7 @@ module.exports = {
     description: "Goes back to the last played song",
     category: "music",
     aliases: ["previous"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
 
         const history = useHistory(message.guild.id);

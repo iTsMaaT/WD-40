@@ -13,7 +13,7 @@ module.exports = {
     admin: true,
     permissions: ["MuteMembers"],
     aliases: ["ma"],
-    execute(logger, client, message, args, found) {
+    execute(logger, client, message, args, optionalArgs) {
   
         // Check if the user is in a voice channel
         if (!message.member.voice.channel) 
@@ -29,7 +29,7 @@ module.exports = {
         };
   
         // Check the argument to determine if muting or unmuting
-        if (found["-mute|m"] || Object.keys(found).length === 0) {
+        if (optionalArgs["-mute|m"] || Object.keys(optionalArgs).length === 0) {
         // Mute all members except the executor
             voiceChannel.members.forEach(async (member) => {
                 if (!member.user.bot && member.id !== message.author.id) {
@@ -42,7 +42,7 @@ module.exports = {
             });
   
             embed.title = "Successfully muted all members except yourself.";
-        } else if (found["-unmute|um"]) {
+        } else if (optionalArgs["-unmute|um"]) {
         // Unmute all members
             voiceChannel.members.forEach(async (member) => {
                 try {

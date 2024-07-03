@@ -26,7 +26,7 @@ module.exports = {
     category: "music",
     examples: ["never gonna give you up"],
     permissions: ["Connect"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         let res, research, embed;
         const queue = useQueue(message.guild.id);
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
@@ -117,8 +117,8 @@ module.exports = {
                 }
             }
 
-            if (found["shuffle|s"]) await research?.tracks?.shuffle();
-            if (found["playnext|pn"] && queue) {
+            if (optionalArgs["shuffle|s"]) await research?.tracks?.shuffle();
+            if (optionalArgs["playnext|pn"] && queue) {
                 queue.insertTrack(research.tracks[0], 0);
                 res = {};
                 res.track = research.tracks[0];

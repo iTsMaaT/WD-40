@@ -13,7 +13,7 @@ module.exports = {
     admin: true,
     permissions: ["DeafenMembers"],
     aliases: ["deafa"],
-    execute(logger, client, message, args, found) {
+    execute(logger, client, message, args, optionalArgs) {
       
         // Check if the user is in a voice channel
         if (!message.member.voice.channel) 
@@ -29,7 +29,7 @@ module.exports = {
         };
       
         // Check the argument to determine if deafening or undeafening
-        if (found["-deafen|d"] || Object.keys(found).length === 0) {
+        if (optionalArgs["-deafen|d"] || Object.keys(optionalArgs).length === 0) {
             // Deafen all members except the executor
             voiceChannel.members.forEach(async (member) => {
                 if (!member.user.bot && member.id !== message.author.id) {
@@ -42,7 +42,7 @@ module.exports = {
             });
       
             embed.title = "Successfully deafened all members except yourself.";
-        } else if (found["-undeafen|und"]) {
+        } else if (optionalArgs["-undeafen|und"]) {
             // Undeafen all members
             voiceChannel.members.forEach(async (member) => {
                 try {

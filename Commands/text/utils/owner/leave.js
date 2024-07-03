@@ -5,7 +5,7 @@ module.exports = {
     category: "admin",
     description: "leaves the specified guild",
     private: true,
-    execute(logger, client, message, args, found) {
+    execute(logger, client, message, args, optionalArgs) {
         try {
             if (args[0]) 
                 message.client.guilds.cache.get(args[0]).leave();

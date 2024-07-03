@@ -11,7 +11,7 @@ module.exports = {
     },
     category: "utils",
     examples: ["Hypixel.net"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
 
         let port = "";
         if (args[1]) port = ":" + parseInt(args[1]);

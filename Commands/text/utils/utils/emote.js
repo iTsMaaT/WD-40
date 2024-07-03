@@ -23,9 +23,9 @@ module.exports = {
     examples: ["-e sus", "greatStickerName -s"],
     permissions: ["CreateGuildExpressions"],
     admin: true,
-    async execute(logger, client, message, args, found) {
-        const emoteArg = found["emote|e"];
-        const stickerArg = found["sticker|s"];
+    async execute(logger, client, message, args, optionalArgs) {
+        const emoteArg = optionalArgs["emote|e"];
+        const stickerArg = optionalArgs["sticker|s"];
         if (emoteArg && stickerArg) return SendErrorEmbed(message, "You can't use both -e and -s", "yellow");
         if (!emoteArg && !stickerArg) return SendErrorEmbed(message, "You have to use either -e or -s", "yellow");
         if (!args[0]) return SendErrorEmbed(message, "You have to specify a name for the emote/sticker", "yellow");

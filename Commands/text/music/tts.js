@@ -14,7 +14,7 @@ module.exports = {
     category: "music",
     examples: ["i love eating baguettes"],
     permissions: ["Connect"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         const queue = useQueue(message.guild.id);
         let connection;
 

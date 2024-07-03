@@ -12,9 +12,9 @@ module.exports = {
             },
         },
     },
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         let QuoteEmbed;
-        if (found["image|i"]) {
+        if (optionalArgs["image|i"]) {
             const image = await fetch("http://inspirobot.me/api?generate=true");
             QuoteEmbed = {
                 color: 0xffffff,

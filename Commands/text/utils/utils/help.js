@@ -13,7 +13,7 @@ module.exports = {
             "command name": "The name of the command to get info of (Optional)",
         },
     },
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         const prefix = GuildManager.GetPrefix(message.guild);
 
         if (args[0]) {

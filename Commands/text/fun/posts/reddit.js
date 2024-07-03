@@ -19,9 +19,9 @@ module.exports = {
     category: "fun",
     examples: ["-p aww", "-u spez"],
     cooldown: 3000,
-    async execute(logger, client, message, args, found) {
-        const sub = found["subreddit|s"];
-        const user = found["user|u"];
+    async execute(logger, client, message, args, optionalArgs) {
+        const sub = optionalArgs["subreddit|s"];
+        const user = optionalArgs["user|u"];
         try {
             if (sub) 
                 message.reply({ embeds: [await FetchReddit(message.channel.nsfw, [sub], 5, "sub")] });

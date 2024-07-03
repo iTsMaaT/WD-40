@@ -3,7 +3,7 @@ module.exports = {
     description: "Changes the server nickname",
     category: "utils",
     private: true,
-    execute: async (logger, client, message, args, found) => {
+    execute: async (logger, client, message, args, optionalArgs) => {
         if (args.length >= 1) {
             const member = message.guild.members.cache.get(client.user.id);
 

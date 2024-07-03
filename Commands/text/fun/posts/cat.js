@@ -5,7 +5,7 @@ module.exports = {
     name: "cat",
     description: "Cats!",
     category: "posts",
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         message.reply({ embeds: [await FetchReddit(message.channel.nsfw, ["cat", "cats", "aww", "catswithjobs", "blackpussy", "catswithdogs"], 5)] });
     },
 };

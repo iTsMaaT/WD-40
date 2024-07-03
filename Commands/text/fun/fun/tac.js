@@ -6,7 +6,7 @@ module.exports = {
     description: "Tells you which tetes a claque you are",
     category: "fun",
     aliases: ["tetesaclaque"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         const tacs = ["fernand", "gabriel_samuel", "ginette_tony", "jimmy_rejean", "julie_simon", "les_chasseurs", "monique_lucien", "natacha", "oncleTom", "pilote", "raoul", "rene_charles", "ti_papoutes", "turcotte", "yvon"];
         const unchangedtac = ["les_chasseurs", "rene_charles", "ti_papoutes"];
         let tac = tacs[Math.floor(Math.random() * tacs.length)];

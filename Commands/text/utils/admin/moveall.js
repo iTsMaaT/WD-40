@@ -13,7 +13,7 @@ module.exports = {
     admin: true,
     permissions: ["MoveMembers"],
     aliases: ["mova"],
-    execute(logger, client, message, args, found) {
+    execute(logger, client, message, args, optionalArgs) {
   
         // Check if the user is in a voice channel
         if (!message.member.voice.channel) 

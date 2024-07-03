@@ -7,7 +7,7 @@ module.exports = {
     description: "Gives db info of a table",
     category: "owner",
     private: true,
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         let data;
 
         const tables = Object.keys(repositories);
