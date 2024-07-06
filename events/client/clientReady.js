@@ -1,7 +1,7 @@
 const { Events, ActivityType } = require("discord.js");
 const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState, AutoCommandMatch } = require("@utils/config.json");
 const GuildManager = require("@root/utils/GuildManager");
-const { RandomMinMax } = require("@root/utils/functions/RandomMinMax");
+const RandomMinMax = require("@utils/functions/RandomMinMax");
 const { initConfFile } = require("@root/utils/reddit/fetchRedditToken.js");
 const { useMainPlayer } = require("discord-player");
 const player = useMainPlayer();
