@@ -10,7 +10,7 @@ module.exports = {
     },
     category: "fun",
     examples: ["Hello, World!"],
-    execute(logger, client, message, args, found) {
+    execute(logger, client, message, args, optionalArgs) {
         
         if (!args[0]) SendErrorEmbed(message, "You need a prompt", "yellow");
 

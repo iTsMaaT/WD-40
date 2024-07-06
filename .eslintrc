@@ -49,5 +49,17 @@
         "space-infix-ops": "error",
         "spaced-comment": "error",
         "yoda": "error"
-        }
+        },
+        "settings": {
+            "import/resolver": {
+              "alias": {
+                "map": [
+                  ["@root", "."],
+                  ["@functions", "./utils/functions"],
+                  ["@utils", "./utils"]
+                ],
+                "extensions": [".js", ".json"]
+              }
+            }
+          }
 }

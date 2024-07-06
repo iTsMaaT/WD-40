@@ -12,7 +12,7 @@ module.exports = {
         },
     },
     examples: ["76561198868461949"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         if (!args[0]) return SendErrorEmbed(message, "You must provide a steam ID", "yellow");
         const steamID = args[0];
         let steamInfo;

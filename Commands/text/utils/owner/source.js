@@ -5,7 +5,7 @@ module.exports = {
     category: "utils",
     description: "Gives the source code of a command",
     private: true,
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         const commandName = args[0];
         const command = client.commands.get(commandName);
 

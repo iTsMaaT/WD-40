@@ -11,7 +11,7 @@ module.exports = {
     },
     category: "info",
     aliases: ["uinfo"],
-    execute: async (logger, client, message, args) => {
+    execute: async (logger, client, message, args, optionalArgs) => {
         let id;
         let target;
         let status;

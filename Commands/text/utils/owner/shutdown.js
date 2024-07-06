@@ -6,7 +6,7 @@ module.exports = {
     category: "utils",
     description: "Shutdowns the bot from discord",
     private: true,
-    async execute(logger, client, message, arg, found) {
+    async execute(logger, client, message, arg, optionalArgs) {
         const server = process.env.SERVER;
 
         const YesRestart = new ButtonBuilder()

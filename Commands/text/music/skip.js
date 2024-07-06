@@ -7,7 +7,7 @@ module.exports = {
     description: "Skip a currently playing song",
     category: "music",
     aliases: ["next"],
-    execute(logger, client, message, args, found) {
+    execute(logger, client, message, args, optionalArgs) {
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
 
         const queue = useQueue(message.guild.id);

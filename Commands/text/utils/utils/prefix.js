@@ -12,7 +12,7 @@ module.exports = {
     category: "utils",
     admin: true,
     examples: ["!"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         if (args.length > 3) return SendErrorEmbed(message, "Prefix can't have more than 3 characters", "yellow");
         if (args.length === 0) return SendErrorEmbed(message, "You must enter a prefix.", "yellow");
 

@@ -3,7 +3,7 @@ module.exports = {
     description: "Gives info on an invite",
     category: "info",
     aliases: ["iinfo"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
 
         const inviteCode = args[0].replace("https://discord.gg/", "").replace("https://discord.com/invite/", "");
   

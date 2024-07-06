@@ -1,16 +1,18 @@
 const { SendErrorEmbed } = require("@functions/discordFunctions");
+const { getRedditToken, makeRequest } = require("@root/utils/reddit/fetchRedditToken.js");
+const axios = require("axios");
 
 module.exports = {
     name: "scary",
     description: "Good luck",
     category: "posts",
     aliases: ["twosentencehorror"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         let RedditDesc, RedditTitle, tries;
 
+        const { baseUrl, headers } = await getRedditToken();
         while (!RedditDesc) {
-            const response = await fetch("https://www.reddit.com/r/2sentence2horror/random/.json");
-            const content = await response.json();
+            const content = await makeRequest(`${baseUrl}/r/2sentence2horror/random/.json`, headers);
             RedditTitle = content[0].data.children[0].data.title || "";
             RedditDesc = content[0].data.children[0].data.selftext || "";
             tries++;

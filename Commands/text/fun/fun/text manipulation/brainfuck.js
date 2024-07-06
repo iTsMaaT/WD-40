@@ -11,7 +11,7 @@ module.exports = {
     },
     aliases: ["bf"],
     examples: ["Hello, World!"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");
 
         const bf = stringToBF(args.join(" "));

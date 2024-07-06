@@ -14,7 +14,7 @@ module.exports = {
     },
     examples: ["Hello, World!"],
     aliases: ["mb"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");
 
         /* eslint-disable no-constant-condition */

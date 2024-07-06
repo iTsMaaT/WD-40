@@ -5,7 +5,7 @@ module.exports = {
     category: "utils",
     description: "Makes a list of the guilds the bot is in",
     private: true,
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         
         const guilds = client.guilds.cache.sort((a, b) => b.joinedTimestamp - a.joinedTimestamp);
         const guildCount = guilds.size;
@@ -54,10 +54,6 @@ module.exports = {
         // Set the footer text
         embed.description = `Total Guilds: ${guildCount} | Users: ${totalUsers} | Bots: ${totalBots} | Total: ${totalUsers + totalBots}`;
   
-        // Send the embed
-        message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
-
-
         for (let i = 0; i < fields.length; i += 10) {
             const chunk = fields.slice(i, i + 10);
             serverPages.push(chunk);

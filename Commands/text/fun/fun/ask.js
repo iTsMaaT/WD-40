@@ -12,7 +12,7 @@ module.exports = {
     category: "fun",
     examples: ["what are you used for?"],
     cooldown: 10000,
-    execute: async (logger, client, message, args, found) => {
+    execute: async (logger, client, message, args, optionalArgs) => {
         try {
             const API_URL = process.env.PALM_API_PROXY_URL; // Replace with your API URL
             const apiKey = process.env.PALM_API_KEY; // Replace with your API key

@@ -1,3 +1,4 @@
+const { PermissionsBitField } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { QueryType, useMainPlayer, useQueue } = require("discord-player");
 const cheerio = require("cheerio");
@@ -25,8 +26,8 @@ module.exports = {
     },
     category: "music",
     examples: ["never gonna give you up"],
-    permissions: ["Connect"],
-    async execute(logger, client, message, args, found) {
+    permissions: [PermissionsBitField.Flags.Connect],
+    async execute(logger, client, message, args, optionalArgs) {
         let res, research, embed;
         const queue = useQueue(message.guild.id);
         if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
@@ -117,8 +118,8 @@ module.exports = {
                 }
             }
 
-            if (found["shuffle|s"]) await research?.tracks?.shuffle();
-            if (found["playnext|pn"] && queue) {
+            if (optionalArgs["shuffle|s"]) await research?.tracks?.shuffle();
+            if (optionalArgs["playnext|pn"] && queue) {
                 queue.insertTrack(research.tracks[0], 0);
                 res = {};
                 res.track = research.tracks[0];
@@ -169,7 +170,7 @@ const getSoundgasmLink = async (link) => {
     if (!regex.test(link)) return null;
 
     const response = await fetch(link);
-    const html = await response.json();
+    const html = await response.text();
 
     const $ = cheerio.load(html);
     const scriptContent = $("script").last().html();

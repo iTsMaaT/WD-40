@@ -17,7 +17,7 @@ module.exports = {
     aliases: ["linfo"],
     category: "info",
     cooldown: 10000,
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         const agent = new https.Agent({ keepAlive: true });
         if (!args[0]) return SendErrorEmbed(message, "Please provide a URL", "yellow");
         const link = args[0];

@@ -6,7 +6,7 @@ module.exports = {
     name: "clear",
     description: "Clear currently playing queue",
     category: "music",
-    execute(logger, client, message, args, found) {
+    execute(logger, client, message, args, optionalArgs) {
         const queue = useQueue(message.guild.id);
         if (!queue) return SendErrorEmbed(message, "There is nothing in the queue.", "yellow");
 

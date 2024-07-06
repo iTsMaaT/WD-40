@@ -10,7 +10,7 @@ module.exports = {
     },
     category: "utils",
     examples: ["Notch"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         const name = args[0] ?? "mhf_steve";
     
         try {

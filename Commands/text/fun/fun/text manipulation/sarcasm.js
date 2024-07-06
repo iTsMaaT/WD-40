@@ -10,7 +10,7 @@ module.exports = {
         },
     },
     examples: ["Hello, World!"],
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         if (!args[0]) return SendErrorEmbed(message, "You need to provide a prompt.", "yellow");
         if (args.join(" ").length > 1000) return SendErrorEmbed(message, "The result is too long (>1000)", "yellow");
 

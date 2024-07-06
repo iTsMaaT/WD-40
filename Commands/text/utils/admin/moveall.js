@@ -1,3 +1,4 @@
+const { PermissionsBitField } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { ChannelType } = require("discord.js");
 
@@ -11,9 +12,9 @@ module.exports = {
         },
     },
     admin: true,
-    permissions: ["MoveMembers"],
+    permissions: [PermissionsBitField.Flags.MoveMembers],
     aliases: ["mova"],
-    execute(logger, client, message, args, found) {
+    execute(logger, client, message, args, optionalArgs) {
   
         // Check if the user is in a voice channel
         if (!message.member.voice.channel) 

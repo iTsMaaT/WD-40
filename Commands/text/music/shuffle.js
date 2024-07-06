@@ -5,7 +5,7 @@ module.exports = {
     name: "shuffle",
     description: "Shuffles the playlist",
     category: "music",
-    async execute(logger, client, message, args, found) {
+    async execute(logger, client, message, args, optionalArgs) {
         const queue = useQueue(message.guild.id);
         if (!queue) return SendErrorEmbed(message, "There is nothing in the queue.", "yellow");
         if (queue.tracks.size < 2) return SendErrorEmbed(message, "There is not enough tracks to shuffle.", "yellow");

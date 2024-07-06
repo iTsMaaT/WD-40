@@ -6,8 +6,8 @@ module.exports = {
     description: "Creates a invite to the rules or announcements channel",
     private: false,
     admin: true,
-    permissions: ["CreateInstantInvite"],
-    async execute(logger, client, message, args, found) {
+    permissions: [PermissionsBitField.Flags.CreateInstantInvite],
+    async execute(logger, client, message, args, optionalArgs) {
 
         const guild = message.guild;
 

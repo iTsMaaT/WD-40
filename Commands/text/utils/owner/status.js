@@ -5,7 +5,7 @@ module.exports = {
     description: "Changes the bot's activity status",
     category: "utils",
     private: true,
-    execute(logger, client, message, args, found) {
+    execute(logger, client, message, args, optionalArgs) {
         // Changes the presence of the bot
 
         if (message.author.id != process.env.OWNER_ID) return;

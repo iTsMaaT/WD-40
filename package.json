@@ -41,7 +41,6 @@
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.29.5",
     "google-tts-api": "^0.0.6",
-    "lda": "^0.2.0",
     "m3u8stream": "^0.8.6",
     "mediaplex": "^0.0.9",
     "module-alias": "^2.2.3",
@@ -53,10 +52,12 @@
   },
   "devDependencies": {
     "drizzle-kit": "^0.20.17",
-    "eslint": "^8.57.0"
+    "eslint": "^8.57.0",
+    "eslint-plugin-import": "^2.29.1"
   },
   "_moduleAliases": {
     "@root": ".",
-    "@functions": "./utils/functions"
+    "@functions": "./utils/functions",
+    "@utils": "./utils"
   }
 }
