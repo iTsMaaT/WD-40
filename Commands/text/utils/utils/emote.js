@@ -1,3 +1,4 @@
+const { PermissionsBitField } = require("discord.js");
 const { createCanvas, loadImage } = require("canvas");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 
@@ -20,8 +21,8 @@ module.exports = {
             },
         },
     },
-    examples: ["-e sus", "greatStickerName -s"],
-    permissions: ["CreateGuildExpressions"],
+    examples: ["-e sus", "greatStickerName -s", "-e -s stickerAndEmoteName"],
+    permissions: [PermissionsBitField.Flags.CreateGuildExpressions],
     admin: true,
     async execute(logger, client, message, args, optionalArgs) {
         const emoteArg = optionalArgs["emote|e"];

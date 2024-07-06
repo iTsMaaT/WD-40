@@ -1,3 +1,4 @@
+const { PermissionsBitField } = require("discord.js");
 const { useQueue, useMainPlayer } = require("discord-player");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("@discordjs/voice");
 const googleTTS = require("google-tts-api");
@@ -13,7 +14,7 @@ module.exports = {
     },
     category: "music",
     examples: ["i love eating baguettes"],
-    permissions: ["Connect"],
+    permissions: [PermissionsBitField.Flags.Connect],
     async execute(logger, client, message, args, optionalArgs) {
         const queue = useQueue(message.guild.id);
         let connection;

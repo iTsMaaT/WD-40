@@ -1,3 +1,4 @@
+const { PermissionsBitField } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { ChannelType } = require("discord.js");
 
@@ -11,7 +12,7 @@ module.exports = {
         },
     },
     admin: true,
-    permissions: ["MoveMembers"],
+    permissions: [PermissionsBitField.Flags.MoveMembers],
     aliases: ["mova"],
     execute(logger, client, message, args, optionalArgs) {
   

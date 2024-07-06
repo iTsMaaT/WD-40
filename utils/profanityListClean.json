@@ -1,5 +1,5 @@
 {
-  "Mild": [
+  "mild": [
     {
       "text": 69,
       "canonical_form_1": 69,
@@ -4643,7 +4643,7 @@
       "severity_description": "Mild"
     }
   ],
-  "Severe": [
+  "severe": [
     {
       "text": "@ssfcker",
       "canonical_form_1": "fuck",
@@ -9738,7 +9738,7 @@
       "severity_description": "Severe"
     }
   ],
-  "Strong": [
+  "strong": [
     {
       "text": "@ssfvcker",
       "canonical_form_1": "fuck",

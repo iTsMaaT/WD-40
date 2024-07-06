@@ -8,12 +8,6 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         const server = process.env.SERVER;
 
-        if (message.author.id == process.env.OWNER_ID && (args[0] == "-smart")) {
-            SmartRestartEnabled ? SmartRestartEnabled = 0 : SmartRestartEnabled = 1;
-            message.reply(`Smart restart ${SmartRestartEnabled ? "enabled" : "disabled"}.`);
-            return;
-        }
-
         if (message.author.id == process.env.OWNER_ID) {
             const YesRestart = new ButtonBuilder()
                 .setCustomId("yes")

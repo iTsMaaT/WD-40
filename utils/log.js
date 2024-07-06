@@ -1,15 +1,8 @@
 const { repositories } = require("./db/tableManager.js");
 const { editOrSend } = require("./functions/discordFunctions.js");
+const { colorText, foregroundColor, backgroundColor, textStyle } = require("./functions/consoleColor.js");
 
 const util = require("util");
-/* function checkIfFolderExists(path) {
-    try{
-        fs.readdirSync(path);
-    } catch(e ){
-        fs.mkdirSync(path);
-    }
-}*/
-
 
 /**
  * Get the current date in the format DD-MM-YYYY.
@@ -40,57 +33,6 @@ function getDateTime() {
     return getDate() + " " + time;
 }
 
-/**
- * Write log messages to console, Discord, and database.
- * @param {string} header - The header for the log message.
- * @param {string} message - The log message.
- * @param {object} client - The Discord client object.
- * @param {string} type - The type of log message.
- * @returns {Promise<void>} A Promise indicating completion.
- */
-async function writeLogToFile(header, message, client, type) {
-    
-    // Set the color based on the log type
-    let color;
-    switch (type) {
-        case "ERROR":
-            color = "\x1b[33m"; // Yellow
-            break;
-        case "SEVERE":
-            color = "\x1b[31m"; // Red
-            break;
-        case "MUSIC":
-            color = "\x1b[34m"; // Blue
-            break;
-        case "WARNING":
-            color = "\x1b[35m"; // Magenta
-            break;
-        case "EVENT":
-            color = "\x1b[32m"; // Green
-            break;
-        default:
-            color = "\x1b[0m"; // Reset color
-            break;
-    }
-
-    const formattedLog = util.format(message);
-    // Adds color depending on log type, then the log header, then the log and finally a newline
-    process.stdout.write(`${color}${header} ${formattedLog}\x1b[0m\n`);
-    
-    if (type == "CONSOLE" || type == "EVENT") return;
-    
-    try {
-        await repositories.logs.insert({
-            value: formattedLog,
-            type: type,
-        });
-    } catch (ex) {
-        console.logger(`\x1b[31m[${getDateTime()} - SEVERE] Unable to write to database\x1b[0m`);
-        console.logger(ex);
-    }
-}
-
-
 class Logger {
 
     /**
@@ -100,40 +42,97 @@ class Logger {
      */
     constructor(options) {
         this.options = options;
+        this.types = {
+            "error": "ERROR",
+            "debug": "DEBUG",
+            "info": "INFO",
+            "console": "CONSOLE",
+            "warning": "WARNING",
+            "severe": "SEVERE",
+            "music": "MUSIC",
+            "event": "EVENT",
+        };
+    }
+
+    /**
+ * Write log messages to console, Discord, and database.
+ * @param {string} header - The header for the log message.
+ * @param {string} message - The log message.
+ * @param {object} client - The Discord client object.
+ * @param {string} type - The type of log message.
+ * @returns {Promise<void>} A Promise indicating completion.
+ */
+    async writeLogToFile(message, type) {
+
+        const getColorByType = (text, logType) => {
+            switch (logType) {
+                case "ERROR":
+                    return colorText(text, foregroundColor.red);
+                case "SEVERE":
+                    return colorText(text, foregroundColor.red);
+                case "MUSIC":
+                    return colorText(text, foregroundColor.blue);
+                case "WARNING":
+                    return colorText(text, foregroundColor.yellow);
+                case "EVENT":
+                    return colorText(text, foregroundColor.green);
+                default:
+                    return colorText(text, foregroundColor.white);
+            }
+        };
+
+        const getLongestTypeLength = Object.keys(this.types).reduce((a, b) => a.length > b.length ? a : b).length;
+        const header = `[${getDateTime()} - ${type.padStart(getLongestTypeLength, " ")}]`;
+
+        const formattedLog = util.format(message);
+        // Adds color depending on log type, then the log header, then the log and finally a newline
+        process.stdout.write(getColorByType(`${header} ${formattedLog}`, type) + "\n"); 
+    
+        if (type == "CONSOLE" || type == "EVENT") return;
+    
+        try {
+            await repositories.logs.insert({
+                value: formattedLog,
+                type: type,
+            });
+        } catch (ex) {
+            console.logger(`\x1b[31m[${getDateTime()} - SEVERE] Unable to write to database\x1b[0m`);
+            console.logger(ex);
+        }
     }
 
     error(message) {
         const stackTrace = new Error("Generated Stacktrace: ").stack;
-        writeLogToFile(`[${getDateTime()} -   ERROR]`, message.stack || message + "\n" + stackTrace, this.options.client, "ERROR");
+        this.writeLogToFile(message.stack || message + "\n" + stackTrace, this.types.error);
     }
 
     debug(message) {
-        writeLogToFile(`[${getDateTime()} -   DEBUG]`, message, this.options.client, "DEBUG");
+        this.writeLogToFile(message, this.types.debug);
     }
 
     info(message) {
-        writeLogToFile(`[${getDateTime()} -    INFO]`, message, this.options.client, "INFO");
+        this.writeLogToFile(message, this.types.info);
     }
 
     console(message) {
-        writeLogToFile(`[${getDateTime()} - CONSOLE]`, message, this.options.client, "CONSOLE");
+        this.writeLogToFile(message, this.types.console);
     }
 
     warning(message) {
-        writeLogToFile(`[${getDateTime()} - WARNING]`, message, this.options.client, "WARNING");
+        this.writeLogToFile(message, this.types.warning);
     }
 
     severe(message) {
         const stackTrace = new Error("Generated Stacktrace: ").stack;
-        writeLogToFile(`[${getDateTime()} -  SEVERE]`, message.stack || message + "\n" + stackTrace, this.options.client, "SEVERE");
+        this.writeLogToFile(message.stack || message + "\n" + stackTrace, this.types.severe);
     }
 
     music(message) {
-        writeLogToFile(`[${getDateTime()} -   MUSIC]`, message, this.options.client, "MUSIC");
+        this.writeLogToFile(message, this.types.music);
     }
 
     event(message) {
-        writeLogToFile(`[${getDateTime()} -   EVENT]`, message, this.options.client, "EVENT");
+        this.writeLogToFile(message, this.types.event);
     }
 }
 
@@ -150,18 +149,6 @@ class Logger {
  * @property {function} music - Log a music-related message.
  * @property {function} event - Log an event-related message.
  */
-let instance = null;
-
-/**
- * Instantiate the Logger with the provided client.
- * @param {object} client - The Discord client object.
- * @returns {Promise<void>} A Promise indicating completion.
- */
-module.exports = (function logger(client) {
-    if (!instance) {
-        if (!client) throw new Error("Logger attempted to be instanciated without the client object");
-        instance = new Logger({ client });
-        Object.freeze(instance);
-    }
-    return instance;
-});
+const logger = new Logger();
+Object.freeze(logger);
+module.exports = logger;

@@ -1,3 +1,4 @@
+const { PermissionsBitField } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
@@ -11,7 +12,7 @@ module.exports = {
         },
     },
     admin: true,
-    permissions: ["DeafenMembers"],
+    permissions: [PermissionsBitField.Flags.DeafenMembers],
     aliases: ["deafa"],
     execute(logger, client, message, args, optionalArgs) {
       

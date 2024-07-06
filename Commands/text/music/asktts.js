@@ -1,3 +1,4 @@
+const { PermissionsBitField } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { useQueue, useMainPlayer } = require("discord-player");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("@discordjs/voice");
@@ -13,7 +14,7 @@ module.exports = {
     },
     category: "music",
     examples: ["what is the skull emoji used for"],
-    permissions: ["Connect"],
+    permissions: [PermissionsBitField.Flags.Connect],
     cooldown: 10000,
     async execute(logger, client, message, args, optionalArgs) {
         let response, connection, sent;
