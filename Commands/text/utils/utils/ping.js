@@ -5,7 +5,7 @@ module.exports = {
     description: "Gives ping and uptime",
     category: "utils",
     async execute(logger, client, message, args, optionalArgs) {
-        const sent = await message.reply({ content: "Pinging...", fetchReply: true, allowedMentions: { RepliedUser: false } });
+        const sent = await message.reply({ content: "Pinging..." });
 
         const pingEmbed = {
             title: "Ping Information",
