@@ -1,6 +1,7 @@
 const { PermissionsBitField } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { QueryType, useMainPlayer, useQueue } = require("discord-player");
+const { discordPlayer } = require("@utils/config.json");
 const cheerio = require("cheerio");
 
 const player = useMainPlayer();
@@ -55,7 +56,7 @@ module.exports = {
         try {
             const linkRegex = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])/igm;
             const spotifyRegex = /^(?:https:\/\/open\.spotify\.com\/(?:intl-[a-zA-Z]{0,3}\/)?(?:user\/[A-Za-z0-9]+\/)?|spotify:)(?:track\/)([A-Za-z0-9]+).*$/;
-            if (spotifyRegex.test(string) || !linkRegex.test(string)) {
+            if ((spotifyRegex.test(string) || !linkRegex.test(string)) && !discordPlayer.removeYoutube) {
                 
                 if (spotifyRegex.test(string)) {
                     research = await player.search(string, {
@@ -130,6 +131,7 @@ module.exports = {
                             channel: message.channel,
                             client: message.guild.members.me,
                             requestedBy: message.user,
+                            guild: message.guild,
                         },
                         bufferingTimeout: 15000,
                         leaveOnStop: true,

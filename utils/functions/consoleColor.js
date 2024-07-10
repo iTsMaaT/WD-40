@@ -85,4 +85,9 @@ function colorText(text, fgColor, bgColor, ...styles) {
     return `${colorCodes}${text}${allStyles.Reset}`;
 }
 
-module.exports = { colorText, foregroundColor, backgroundColor, textStyle };
+module.exports = { 
+    colorText, 
+    foregroundColor, 
+    backgroundColor,
+    textStyle, 
+};

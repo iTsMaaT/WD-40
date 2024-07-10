@@ -1,10 +1,12 @@
 const Discord = require("discord.js");
 const dotenv = require("dotenv");
 dotenv.config();
+require("module-alias/register");
 
 const { Client, GatewayIntentBits, Partials } = require("discord.js");
-
-require("module-alias/register");
+const { getPermissionArrayNames } = require("@functions/discordFunctions");
+const { YouTubeExtractor, BridgeProvider, BridgeSource } = require("@discord-player/extractor");
+const { discordPlayer } = require("@utils/config.json");
 
 const fs = require("fs");
 
@@ -36,6 +38,7 @@ Array.prototype.shuffle = function() {
 // music
 const { Player } = require("discord-player");
 const player = new Player(client, {
+    bridgeProvider: discordPlayer.removeYoutube ? new BridgeProvider(BridgeSource.SoundCloud) : null,
     ytdlOptions: {
         requestOptions: {
             headers: {
@@ -61,6 +64,7 @@ client.contextCommands = new Discord.Collection();
 client.consoleCommands = new Discord.Collection();
 client.TextCooldowns = new Map();
 client.SlashCooldowns = new Map();
+const permissionBitFields = [];
 
 // File finder/loader
 function loadFiles(folder, callback) {
@@ -104,7 +108,17 @@ loadFiles("./Commands/text/", function(command) {
             client.commands.set(alias, command);
         });
     }
+
+    if (command.permissions) permissionBitFields.push(...command.permissions);
 });
+
+console.log(`
+--------------------------------------------------
+Required permissions:
+--------------------------------------------------
+${getPermissionArrayNames(permissionBitFields).join("\n")}
+--------------------------------------------------
+`);
 
 // Context menu command handler
 loadFiles("./Commands/context/", (contextcommand, fileName) => {

@@ -21,7 +21,7 @@ function init(guilds) {
 
 async function SetActiveOrCreate(guild, status = true) {
     if (await CheckIfGuildExists(guild))
-        await UpdateGuild(guild, { Active: status });
+        await UpdateGuild(guild, { active: status });
     else
         await AddGuildToDatabase(guild);
 }

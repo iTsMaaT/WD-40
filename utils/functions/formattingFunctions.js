@@ -123,4 +123,9 @@ const numberToWord = function(numberString) {
     wordString = wordString.replace(/\s+/g, " ");
     return wordString.trim();
 };
-module.exports = { numberToWord, prettyString, TimeFormatToMS, ToEngineerNotation };
+module.exports = { 
+    numberToWord, 
+    prettyString, 
+    TimeFormatToMS, 
+    ToEngineerNotation, 
+};
