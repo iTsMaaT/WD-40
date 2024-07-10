@@ -50,7 +50,11 @@
         273587964334964737
     ],
 
-    "DefaultSuperuserState": 0,
-    "DefaultDebugState": 0,
-    "AutoCommandMatch": 1
+    "discordPlayer": {
+        "removeYoutube": true
+    },
+
+    "DefaultSuperuserState": false,
+    "DefaultDebugState": false,
+    "AutoCommandMatch": true
 }
