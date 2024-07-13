@@ -50,8 +50,8 @@
         273587964334964737
     ],
 
-    "discordPlayer": {
-        "removeYoutube": true
+    "discordPlayerConf": {
+        "removeYoutube": false
     },
 
     "DefaultSuperuserState": false,

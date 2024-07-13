@@ -106,7 +106,6 @@ module.exports = {
                     requestedBy: message.member,
                     searchEngine: QueryType.AUTO,
                 });
-                
 
                 if (!research.hasTracks()) {
                     embed = {

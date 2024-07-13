@@ -5,8 +5,7 @@ require("module-alias/register");
 
 const { Client, GatewayIntentBits, Partials } = require("discord.js");
 const { getPermissionArrayNames } = require("@functions/discordFunctions");
-const { YouTubeExtractor, BridgeProvider, BridgeSource } = require("@discord-player/extractor");
-const { discordPlayer } = require("@utils/config.json");
+const { discordPlayerConf, DefaultDebugState, DefaultSuperuserState } = require("@utils/config.json");
 
 const fs = require("fs");
 
@@ -20,6 +19,8 @@ const client = new Client({
 const logger = require("./utils/log");
 
 global.wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+process.env.CURRENT_DEBUG_STATE = DefaultDebugState;
+process.env.CURRENT_SUPERUSER_STATE = DefaultSuperuserState;
 
 // Add array.equals()
 Array.prototype.equals = function(otherArray) {
@@ -34,11 +35,14 @@ Array.prototype.shuffle = function() {
     }
     return this;
 };
-
 // music
 const { Player } = require("discord-player");
+const { YouTubeExtractor, BridgeProvider, BridgeSource, SpotifyExtractor } = require("@discord-player/extractor");
+const { default: DeezerExtractor } = require("discord-player-deezer");
+const { default: TidalExtractor } = require("discord-player-tidal");
+const { YoutubeiExtractor, createYoutubeiStream } = require("discord-player-youtubei");
 const player = new Player(client, {
-    bridgeProvider: discordPlayer.removeYoutube ? new BridgeProvider(BridgeSource.SoundCloud) : null,
+    // bridgeProvider: discordPlayer.removeYoutube ? new BridgeProvider(BridgeSource.SoundCloud) : new BridgeProvider(BridgeSource.Auto),
     ytdlOptions: {
         requestOptions: {
             headers: {
@@ -48,7 +52,21 @@ const player = new Player(client, {
     },
     skipFFmpeg: false,
 });
-player.extractors.loadDefault();
+(async () => {
+    if (!discordPlayerConf.removeYoutube) {
+        await player.extractors.register(YoutubeiExtractor, {
+            authentication: process.env.YOUTUBE_ACCESS_STRING,
+        });
+    }
+    await player.extractors.register(SpotifyExtractor, {
+        createStream: discordPlayerConf.removeYoutube ? createYoutubeiStream : undefined,
+    });
+    // await player.extractors.loadDefault();
+    await player.extractors.loadDefault((ext) => !["YouTubeExtractor", "SpotifyExtractor"].includes(ext));
+    await player.extractors.register(DeezerExtractor);
+    await player.extractors.register(TidalExtractor);
+})();
+
 
 console.log("Variables loaded");
 
