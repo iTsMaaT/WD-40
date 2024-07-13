@@ -18,8 +18,7 @@ const FetchReddit = async function(ChannelNSFW, subreddits, limit, type = "sub")
             else  
                 logger.error("Wrong type");
             
-            console.log(content);
-            const post = content[0].data.children.filter((p) => p.data.post_hint === "image" && /\.(jpg|png|gif|jpeg)$/.test(p.data.url))[0];
+            const post = content[0].data.children.shuffle().filter((p) => p.data.post_hint === "image" && /\.(jpg|png|gif|jpeg)$/.test(p.data.url))[0];
             if (post == undefined || post.length == 0) {
                 count += 1;
                 if (count == limit) {
@@ -51,7 +50,6 @@ const FetchReddit = async function(ChannelNSFW, subreddits, limit, type = "sub")
                         text: `Posted by ${PostAuthor} in ${PostRSlash}`,
                     },
                 };
-                console.log(PostImage);
             } else {
                 embed = {
                     color: 0xffff00,

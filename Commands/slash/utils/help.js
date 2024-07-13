@@ -1,4 +1,6 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ApplicationCommandOptionType } = require("discord.js");
+const { prettyString } = require("@functions/formattingFunctions");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 const GuildManager = require("@root/utils/GuildManager.js");
 
 module.exports = {
@@ -14,26 +16,47 @@ module.exports = {
     ],
     async execute(logger, interaction, client) {
         const command = interaction.options.get("command")?.value;
-        // Finds all command files and separate them from categories, then use page to list the commands per category, -admin shows the private ones (admin or iTsMaaT only)
+        const prefix = GuildManager.GetPrefix(interaction.guild);
+
         if (command) {
             const CommandName = client.commands.get(command);
             if (!CommandName || CommandName.private) return SendErrorEmbed(interaction, "This command doesn't exist.", "red");
 
             const CommandEmbed = {
-                title: `**${CommandName.name}** ${CommandName.usage ?? ""}`,
+                title: `**${prefix}${CommandName.name}**`,
                 color: 0xffffff,
-                description: CommandName.description,
+                fields: [{ name: "Description", value: CommandName.description }],
                 timestamp: new Date(),
             };
+
+            if (typeof CommandName.usage === "string") {
+                CommandEmbed.fields.push({ name: "Options", value: CommandName.description });
+            } else if (typeof CommandName.usage === "object") {
+                let requiredString = "";
+                let optionalString = "";
+                let usageString = "";
+                if (Object.keys(CommandName.usage.required ?? {}).length) 
+                    requiredString += `__Required__:\n${Object.keys(CommandName.usage.required).map(key => `${key.toLowerCase()}: ${prettyString(CommandName.usage.required[key], "first", false)}`).join("\n")}`;
+                if (Object.keys(CommandName.usage.optional ?? {}).length) 
+                    optionalString += `__Optional__:\n${Object.keys(CommandName.usage.optional).map(key => `-${key.split("|")[0].toLowerCase()}${key.split("|").slice(1).length > 0 ? `[${key.split("|").slice(1).join(",").toLowerCase()}]` : ""}${(CommandName.usage.optional[key].hasValue ?? false) ? " <value>" : ""}: ${prettyString(CommandName.usage.optional[key].description, "first", false)}`).join("\n")}`;
+                usageString = `${requiredString}${requiredString.length > 0 && optionalString.length > 0 ? "\n" : ""}${optionalString}`;
+                CommandEmbed.fields.push({ name: "Options", value: usageString });
+                CommandEmbed.footer = { text: "Optional options explanation: -parameterName[parameterAliases]: parameterDescription" };
+            }
+
+            if (CommandName.aliases) CommandEmbed.fields.push({ name: "Aliases", value: CommandName.aliases.join(", ") });
+            if (CommandName.examples) {
+                const formattedExamples = [];
+                CommandName.examples.forEach(ex => {formattedExamples.push(`${prefix}${CommandName.name} ${ex}`);});
+                CommandEmbed.fields.push({ name: "Examples", value: formattedExamples.join("\n") });
+            }
+            if (CommandName.cooldown) CommandEmbed.fields.push({ name: "Cooldown", value: parseInt(CommandName.cooldown) / 1000 + "s" });
+
             return interaction.reply({ embeds: [CommandEmbed]  });
-            
         }
         // Finds all command files and separate them from categories, then use page to list the commands per category
 
         let counter = 0;
-        const chunkSize = 7; // Number of elements in each chunk
-        const prefix = GuildManager.GetPrefix(message.guild);
-        
         const categorymapper = {};
         const addedCommands = new Set(); // Keep track of added commands
         client.commands.each((val) => {
@@ -49,7 +72,8 @@ module.exports = {
         Object.keys(categorymapper).forEach(category => {
             const commands = categorymapper[category];
             const commandsArray = Object.entries(commands);
-  
+            const chunkSize = Math.ceil(commandsArray.length / Math.ceil(commandsArray.length / 8)); 
+             
             for (let i = 0; i < commandsArray.length; i += chunkSize) {
                 const chunkCommands = commandsArray.slice(i, i + chunkSize);
                 const chunkedCategory = `${category} (${Math.floor(i / chunkSize) + 1})`;
@@ -99,11 +123,12 @@ module.exports = {
 
         const categoryEmbed = {
             title: "Command categories",
-            description: `**The prefix is:** \`${prefix}\`\n\nTotal commands: ${addedCommands.size}\n${pages.join("\n")}`,
+            description: `**The prefix is:** \`${prefix}\`\nSupport server: https://discord.gg/pqKE2QZrFM\n\nTotal commands: ${addedCommands.size}\n${pages.join("\n")}`,
             color: 0xffffff,
             footer: { text: "Buttons expire after 2 minutes." },
         };
               
+
         row.components[0].setDisabled(true);
         row.components[1].setDisabled(true);
         const helpMessage = await interaction.reply({
@@ -113,8 +138,8 @@ module.exports = {
         });
 
 
-        const filter = (filterInteraction) => {
-            return filterInteraction.user.id == message.author.id;
+        const filter = (interac) => {
+            if (interac.user.id == interac.user.id) return true;
         };
 
         const collector = helpMessage.createMessageComponentCollector({
@@ -124,15 +149,15 @@ module.exports = {
         });
         
         let embed = categoryEmbed;
-        collector.on("collect", async (collectoriInteraction) => {
+        collector.on("collect", async (interac) => {
 
-            if (collectoriInteraction.customId === "next") 
+            if (interac.customId === "next") 
                 counter++;
-            else if (collectoriInteraction.customId === "previous") 
+            else if (interac.customId === "previous") 
                 counter--;
-            else if (collectoriInteraction.customId === "first") 
+            else if (interac.customId === "first") 
                 counter = 0;
-            else if (collectoriInteraction.customId === "last") 
+            else if (interac.customId === "last") 
                 counter = categories.length;
             
             if (counter < 0) counter = 0;
@@ -169,7 +194,7 @@ module.exports = {
                 allowedMentions: { repliedUser: false },
             });
 
-            await collectoriInteraction.update({
+            await interac.update({
                 embeds: [embed],
                 components: [row],
             });

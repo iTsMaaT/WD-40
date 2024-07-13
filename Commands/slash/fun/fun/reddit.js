@@ -1,4 +1,6 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
+const FetchReddit = require("@utils/reddit/FetchReddit.js");
 
 module.exports = {
     name: "reddit",
@@ -22,104 +24,23 @@ module.exports = {
             required: true,
         },
     ],
-    execute: async (logger, interaction, client) => {
+    async execute(logger, interaction, client) {
         const option = interaction.options.get("option").value;
-        const optiondata = interaction.options.get("data").value;
+        const optiondata = interaction.options.get("data").value.split(" ")[0];
         await interaction.deferReply();
-        switch (option) {
-            case "sub": {
-                let sent = "";
-                // Gore subreddits blacklist
-                if (optiondata != "eyeblech" && optiondata != "gore" && optiondata != "guro") {
-                    let RedditImage = "";
-                    let RedditTries = 1;
-                    sent = await interaction.editReply({ content: `Attempt ${RedditTries}/10`, fetchreply: true });
-                    // Tries to fetch a post 10 times
-                    for (let i = 0; i <= 10; i++) {
-                        try {
-                            const response = await fetch(`https://www.reddit.com/r/${optiondata}/random/.json`);
-                            const content = await response.json();
-                            const permalink = content[0].data.children[0].data.permalink;
-                            const RedditURL = `https://reddit.com${permalink}`;
-                            const RedditTitle = content[0].data.children[0].data.title;
-                            const PostNsfw = content[0].data.children[0].data.over_18;
-                            RedditImage = content[0].data.children[0].data.url;
-                            RedditTries += 1;
-                            // Updates the counter
-                            if (RedditTries % 2 == 0 && RedditTries <= 10) 
-                                sent.edit({ content: `Attempt ${RedditTries}/10`, fetchreply: true });
-                            
-                            if (RedditImage.endsWith(".jpg") || RedditImage.endsWith(".png") || RedditImage.endsWith(".gif")) {
-                                if (!PostNsfw || (PostNsfw && message.channel.nsfw)) {
-
-                                    const embed = {
-                                        title: RedditTitle,
-                                        url: RedditURL,
-                                        image: {
-                                            url: RedditImage,
-                                        },
-                                        footer: {
-                                            text: `Posted by ${content[0].data.children[0].data.author} in ${content[0].data.children[0].data.subreddit_name_prefixed}`,
-                                        },
-                                    };
-
-
-                                    sent.edit({ content: `Attempt ${RedditTries}/10`, fetchreply: true });
-                                    sent.edit({ embeds: [embed]  });
-                                    logger.info(RedditImage);
-                                    return;
-                                } else {
-                                    return sent.edit("The post is NSFW but the channel isn't");
-                                }
-                            }
-                        } catch (err) {
-                        // Catches the error, probably a non-existent or banned subreddit
-                            sent.edit(`Non-existent Subreddit\n\`${err}\``);
-                            logger.error(`Non-existent Subreddit\n\`${err.stack}\``);
-                            return;
-                        }
-                    }
-                    sent.edit("Could not find post containing a picture or compatible gif link (10 tries)");
-                }
-                break;
+        try {
+            if (option == "sub") 
+                await interaction.editReply({ embeds: [await FetchReddit(interaction.channel.nsfw, [optiondata], 5, "sub")] });
+            else if (option == "user") 
+                await interaction.editReply({ embeds: [await FetchReddit(interaction.channel.nsfw, [optiondata], 5, "user")] });
+            else 
+                return SendErrorEmbed(interaction, "Wrong argument usage, please refer to `help reddit`", "yellow", true);
+            
+        } catch (err) {
+            if (err.toString().startsWith("SyntaxError: Unexpected token")) {
+                logger.error("Reddit API error");
+                return SendErrorEmbed(interaction, "Reddit API error, please try again later.", "yellow", true);
             }
-            case "user": {
-                const url = `https://www.reddit.com/user/${optiondata}/submitted.json`;
-                let response;
-                try {
-                    response = await fetch(url);
-                } catch (error) {
-                    console.error(error);
-                    return interaction.reply({ content: "an error occurred while fetching posts from the Reddit API.", ephemeral: true });
-                }
-
-                // Parse the JSON response
-                const data = await response.json();
-
-                // Filter the posts to only include image posts
-                const imagePosts = data.data.children.filter((post) => post.data.post_hint === "image");
-
-                // Select a random post from the image posts
-                const randomPost = imagePosts[Math.floor(Math.random() * imagePosts.length)];
-
-                // If no image posts were found, return an error message
-                if (!randomPost) 
-                    return interaction.editReply({ content: `no image posts found for user "${data}".`, ephemeral: true });
-                
-
-                // Send the post as an embed in the channel
-                const embed = {
-                    title: randomPost.data.title,
-                    url: `https://www.reddit.com${randomPost.data.permalink}`,
-                    image: {
-                        url: randomPost.data.url,
-                    },
-                    footer: {
-                        text: `Posted by ${randomPost.data.author} in ${randomPost.data.subreddit_name_prefixed}`,
-                    },
-                };
-                interaction.editReply({ embeds: [embed]  });
-            }
-        } 
+        }
     },
 };
