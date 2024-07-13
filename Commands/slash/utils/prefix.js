@@ -1,4 +1,6 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
+const GuildManager = require("@root/utils/GuildManager");
 
 module.exports = {
     name: "prefix",
@@ -15,15 +17,18 @@ module.exports = {
     async execute(logger, interaction, client) {
         // set or deletes the prefix, if a custom one was already applied
         const prefix = interaction.options.get("prefix").value.replace(/\s/g, "");
-        // Set or delete the prefix if a custom one was already applied
-        await global.GuildManager.TogglePrefix(interaction.guild, prefix.charAt(0));
+        if (prefix.length > 3) return SendErrorEmbed(interaction, "Prefix can't have more than 3 characters", "yellow", true);
+        if (prefix.length === 0) return SendErrorEmbed(interaction, "You must enter a prefix.", "yellow", true);
+
+        const newPrefix = prefix.substring(0, 3);
+        await GuildManager.TogglePrefix(interaction.guild, newPrefix);
         const responseEmbed = {
             title: "Prefix Changed",
             color: 0xffffff, 
-            description: `The new prefix is \`${prefix.charAt(0)}\` in \`${interaction.member.guild.name}\``,
+            description: `The new prefix is \`${newPrefix}\` in \`${interaction.member.guild.name}\``,
             timestamp: new Date(),
         };
         interaction.reply({ embeds: [responseEmbed]  });
-        logger.info(`Prefix changed to ${prefix.charAt(0)} in \`${interaction.member.guild.name}\``);
+        logger.info(`Prefix changed to ${newPrefix} in \`${interaction.member.guild.name}\``);
     },
 };

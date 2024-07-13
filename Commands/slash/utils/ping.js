@@ -7,7 +7,7 @@ module.exports = {
     type: ApplicationCommandType.ChatInput,
     async execute(logger, interaction, client) {
         await interaction.deferReply();
-        const sent = await interaction.editReply({ content: "Pinging...", fetchReply: true, allowedMentions: { RepliedUser: false } });
+        const sent = await interaction.editReply({ content: "Pinging..." });
 
         const pingEmbed = {
             title: "Ping Information",

@@ -65,7 +65,7 @@ module.exports = {
         if (process.env.SERVER == "prod")
             updateActivities();
         else
-            client.user.setActivity("Under maintenace...", { type: ActivityType.Custom });
+            client.user.setActivity("Under maintenance...", { type: ActivityType.Custom });
         console.log("Activity status setup done.");
 
         console.log("Discord.js version: " + require("discord.js").version);

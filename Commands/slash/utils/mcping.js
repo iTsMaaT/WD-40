@@ -1,4 +1,5 @@
 const { ApplicationCommandType, ApplicationCommandOptionType, AttachmentBuilder } = require("discord.js");
+const { SendErrorEmbed } = require("@functions/discordFunctions");
 
 module.exports = {
     name: "mcping",
@@ -21,46 +22,41 @@ module.exports = {
     async execute(logger, interaction, client) {
         await interaction.deferReply();
         const server_ip = interaction.options.get("ip").value;
-        const server_port_string = interaction.options.get("port")?.value;
-        let port;
-        if (server_port_string) port = ":" + parseInt(server_port_string); 
-        fetch(`https://api.mcstatus.io/v2/status/java/${server_ip}${port ?? ""}`)
-            .then(async response => {
-                const server = await response.json();
-    
-                if (!server.online) await interaction.editReply({ embeds: [{ title: `${server.eula_blocked ? "The server is banned by Mojang." : "Server offline or nonexistent."}`, color: 0xff0000, timestamp: new Date() }] });
-   
-                let imgfile;
-                if (server.icon) {
-                    const data = server.icon.split(",")[1];
-                    const buf = Buffer.from(data, "base64");
-                    imgfile = new AttachmentBuilder(buf, "img.png");
-                }
-    
-                const serverStatusEmbed = {
-                    title: `Server Status for ${server.host} (Port: ${server.port})`,
-                    color: 0xffffff,
-                    thumbnail: {
-                        url: "attachment://file.jpg" || "",
-                    },
-                    fields: [
-                        { name: "Server Version", value: server.version.name_clean },
-                        { name: "MOTD (May Not Display Accurately)", value: server.motd.clean ?? "`N/A`" },
-                        { name: "Players Online", value: `${server.players.online}/${server.players.max}` },
-                    ],
-                    timestamp: new Date(),
-                };
-    
-                if (server.players.list[0] && server.players.list.length < 10) {
-                    const playerNames = [];
-    
-                    for (const player of server.players.list) 
-                        playerNames.push(player.name_clean);
+        let server_port_string = interaction.options.get("port")?.value;
+
+        if (server_port_string) server_port_string = ":" + parseInt(server_port_string);
+        try {
+            const server = await (await fetch(`https://api.mcstatus.io/v2/status/java/${server_ip}${server_port_string || ""}`)).json();
+
+            if (!server.online) return SendErrorEmbed(interaction, `${server.eula_blocked ? "The server is banned by Mojang." : "Server offline or nonexistant."}`, "red", true);
+
+            const serverStatusEmbed = {
+                title: `Server Status for ${server.host} (Port: ${server.port})`,
+                color: 0xffffff,
+                thumbnail: {
+                    url: `https://api.mcstatus.io/v2/icon/${server_ip}${server_port_string ?? ""}` || "",
+                },
+                fields: [
+                    { name: "Server Version", value: server.version.name_clean },
+                    { name: "MOTD (May Not Display Accurately)", value: server.motd.clean ?? "`N/A`" },
+                    { name: "Players Online", value: `${server.players.online}/${server.players.max}` },
+                ],
+                timestamp: new Date(),
+            };
+
+            if (server.players.list[0] && server.players.list.length < 10) {
+                const playerNames = [];
+
+                for (const player of server.players.list) 
+                    playerNames.push(player.name_clean);
                     
-                    serverStatusEmbed.fields.push({ name: "Player list", value: playerNames.join(", ") });
-                }
-    
-                await interaction.editReply({ embeds: [serverStatusEmbed], files: [imgfile]  });
-            });
+                serverStatusEmbed.fields.push({ name: "Player list", value: playerNames.join(", ") });
+            }
+                
+            interaction.editReply({ embeds: [serverStatusEmbed] });
+        } catch (err) {
+            logger.error(err);
+            return SendErrorEmbed(interaction, "An error occured", "red", true);
+        }
     },
 };

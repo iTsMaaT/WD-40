@@ -281,5 +281,13 @@
             "New >topic command, uses LDA to get the topic of the last X messages",
             "Refactoring"
         ]
+    },
+    {
+        "version": "5.3.1",
+        "date": "2024-07-13",
+        "changes": [
+            "Added Tidal and Deezer support for music",
+            "Fixed music by using a new YT extractor (use SoundCloud links if any issues arise while I fix it)"
+        ]
     }
 ]

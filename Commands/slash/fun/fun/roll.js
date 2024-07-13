@@ -22,20 +22,30 @@ module.exports = {
         const numDices = interaction.options.get("amount")?.value ?? 1;
         const numSides = interaction.options.get("sides")?.value ?? 6;
 
-        // Limits the input to 500d500
-        if (numDices > 250 || numSides > 250) 
-            return interaction.reply({ content: "Maximum of 500 dices with 500 sides", ephemeral: true });
-        
+        if (isNaN(numDices) || isNaN(numSides) || numDices < 1 || numSides < 2) 
+            return interaction.reply("The amount of dices or sides per dices is invalid, please use at least a 1d2 (1 dice with 2 sides)");
+            
+
+        // Limits the input to 50d50
+        if (numDices > 50 || numSides > 50) 
+            return interaction.reply("Maximum of 50 dices with 50 sides");
+            
 
         // Roll the dices
         const rolls = Array.from({ length: numDices }, () => Math.floor(Math.random() * numSides) + 1);
         const total = rolls.reduce((acc, cur) => acc + cur, 0);
 
-        interaction.reply({
-            content: `
-Rolling **${numDices}d${numSides}**...
-**${rolls.join(", ")}**\nTotal: **${total}**
-            `, 
-        });
+        RollEmbed = {
+            color: 0xffffff,
+            title: `Rolling **${numDices}d${numSides}**...`,
+            fields: [
+                { name: "Rolls", value: rolls.join(", ") },
+                { name: "Total", value: total, inline: true },
+                { name: "Maximum possible", value: numDices * numSides, inline: true },
+            ],
+            timestamp: new Date(),
+        };
+
+        interaction.reply({ embeds: [RollEmbed] });
     },
 };

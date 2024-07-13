@@ -16,7 +16,7 @@ module.exports = {
         await interaction.deferReply();
         const guild = await client.guilds.fetch(interaction.guildId);
         const user = interaction.options.getUser("user");
-        const id = user ?? interaction.user.id;
+        const id = user || interaction.user.id;
         
         let target;
         let status;
