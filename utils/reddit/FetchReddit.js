@@ -1,4 +1,4 @@
-const logger = require("@root/index.js");
+const logger = require("@utils/log");
 const { getRedditToken, makeRequest } = require("./fetchRedditToken.js");
 
 const FetchReddit = async function(ChannelNSFW, subreddits, limit, type = "sub") {

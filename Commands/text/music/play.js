@@ -1,7 +1,7 @@
 const { PermissionsBitField } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { QueryType, useMainPlayer, useQueue } = require("discord-player");
-const { discordPlayer } = require("@utils/config.json");
+const { discordPlayerConf } = require("@utils/config.json");
 const cheerio = require("cheerio");
 
 const player = useMainPlayer();
@@ -36,6 +36,7 @@ module.exports = {
         const Attachment = message.attachments.first()?.attachment;
 
         let string = args.join(" ");
+        string = string.split("&list=")[0];
         if (!string) string = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
         // return SendErrorEmbed(message, "Please enter a song URL or query to search.", "yellow");
 
@@ -56,7 +57,7 @@ module.exports = {
         try {
             const linkRegex = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])/igm;
             const spotifyRegex = /^(?:https:\/\/open\.spotify\.com\/(?:intl-[a-zA-Z]{0,3}\/)?(?:user\/[A-Za-z0-9]+\/)?|spotify:)(?:track\/)([A-Za-z0-9]+).*$/;
-            if ((spotifyRegex.test(string) || !linkRegex.test(string)) && !discordPlayer.removeYoutube) {
+            if ((spotifyRegex.test(string) || !linkRegex.test(string)) && !discordPlayerConf.removeYoutube) {
                 
                 if (spotifyRegex.test(string)) {
                     research = await player.search(string, {
@@ -147,7 +148,10 @@ module.exports = {
 
             embed = {
                 color: 0xffffff,
-                description: `Successfully enqueued${res.track.playlist ? ` **track(s)** from: **${res.track.playlist.title}**` : `: **${res.track.title}**`}`,
+                title: `${res.searchResult.hasPlaylist() ? "Playlist" : "Track"} enqueued!`,
+                thumbnail: { url: res.track.thumbnail },
+                description: `[${res.track.title}](${res.track.url})`,
+                fields: res.searchResult.playlist ? [{ name: "Playlist", value: res.searchResult.playlist.title }] : [],
                 timestamp: new Date(),
             };
     

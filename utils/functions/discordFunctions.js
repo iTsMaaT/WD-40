@@ -41,7 +41,7 @@ const id = function(mention) {
  * @param {string} color The color of the embed
  * @param {boolean} isSlash Whether the message is a slash command
  */
-const SendErrorEmbed = async function(message, string, color, isSlash) {
+const SendErrorEmbed = async function(message, string, color) {
     const embed = {
         title: prettyString(string.toString(), false, true),
         timestamp: new Date(),
@@ -49,15 +49,10 @@ const SendErrorEmbed = async function(message, string, color, isSlash) {
     };
     if (color == "red") embed.color = 0xff0000;
     else if (color == "yellow") embed.color = 0xffff00;
-    if (isSlash) {
-        if (!message.deferred) 
-            await message.reply({ embeds: [embed] });
-        else 
-            await message.editReply({ embeds: [embed] });
-    
-    } else {
+    if (message.deferred)
+        await message.editReply({ embeds: [embed] });
+    else
         await message.reply({ embeds: [embed] });
-    }
 };
 
 /**

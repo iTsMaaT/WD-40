@@ -1,5 +1,5 @@
 const { ToEngineerNotation } = require("@functions/formattingFunctions");
-const logger = require("@root/index.js");
+const logger = require("@utils/log");
 const prettyMilliseconds = require("pretty-ms");
 
 const GetPterodactylInfo = async function() {

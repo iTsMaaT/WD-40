@@ -1,4 +1,4 @@
-const logger = require("@root/index.js");
+const logger = require("@utils/log");
 
 /**
  * Object to hold multiple queues.
