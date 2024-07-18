@@ -1,7 +1,7 @@
 const { PermissionsBitField } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { QueryType, useMainPlayer, useQueue } = require("discord-player");
-const { discordPlayer } = require("@utils/config.json");
+const { discordPlayerConf } = require("@utils/config.json");
 const cheerio = require("cheerio");
 
 const player = useMainPlayer();
@@ -57,7 +57,7 @@ module.exports = {
         try {
             const linkRegex = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])/igm;
             const spotifyRegex = /^(?:https:\/\/open\.spotify\.com\/(?:intl-[a-zA-Z]{0,3}\/)?(?:user\/[A-Za-z0-9]+\/)?|spotify:)(?:track\/)([A-Za-z0-9]+).*$/;
-            if ((spotifyRegex.test(string) || !linkRegex.test(string)) && !discordPlayer.removeYoutube) {
+            if ((spotifyRegex.test(string) || !linkRegex.test(string)) && !discordPlayerConf.removeYoutube) {
                 
                 if (spotifyRegex.test(string)) {
                     research = await player.search(string, {
@@ -148,7 +148,10 @@ module.exports = {
 
             embed = {
                 color: 0xffffff,
-                description: `Successfully enqueued${res.track.playlist ? ` **track(s)** from: **${res.track.playlist.title}**` : `: **${res.track.title}**`}`,
+                title: `${searchResult.hasPlaylist() ? "Playlist" : "Track"} queued!`,
+                thumbnail: { url: track.thumbnail },
+                description: `[${track.title}](${track.url})`,
+                fields: searchResult.playlist ? [{ name: "Playlist", value: searchResult.playlist.title }] : [],
                 timestamp: new Date(),
             };
     

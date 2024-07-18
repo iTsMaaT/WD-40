@@ -1,6 +1,6 @@
 /* eslint-disable no-shadow */
 const { eq, and } = require("drizzle-orm");
-const logger = require("@root/index.js");
+const logger = require("@utils/log");
 const { repositories } = require("./db/tableManager.js");
 const schema = require("../schema/schema.js");
 

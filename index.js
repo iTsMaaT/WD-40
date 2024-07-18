@@ -16,7 +16,7 @@ const client = new Client({
     allowedMentions: { repliedUser: false },
 });
 
-const logger = require("./utils/log");
+const logger = require("@utils/log");
 
 global.wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 process.env.CURRENT_DEBUG_STATE = DefaultDebugState;
@@ -67,13 +67,16 @@ const player = new Player(client, {
     await player.extractors.register(TidalExtractor);
 })();
 
-
 console.log("Variables loaded");
 
 // Logger system and databases
 console.logger = console.log;
 console.log = (log) => logger.console(log);
 console.log("Logger instanciated");
+
+module.exports = { client };
+
+const EmbedGenerator = require("@utils/helpers/embedGenerator");
 
 // Collections creation
 client.commands = new Discord.Collection();

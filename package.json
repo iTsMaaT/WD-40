@@ -59,6 +59,7 @@
   "_moduleAliases": {
     "@root": ".",
     "@functions": "./utils/functions",
-    "@utils": "./utils"
+    "@utils": "./utils",
+    "@config": "./utils/config.json"
   }
 }
