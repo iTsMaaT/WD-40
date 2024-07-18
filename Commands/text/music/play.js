@@ -148,10 +148,10 @@ module.exports = {
 
             embed = {
                 color: 0xffffff,
-                title: `${searchResult.hasPlaylist() ? "Playlist" : "Track"} queued!`,
-                thumbnail: { url: track.thumbnail },
-                description: `[${track.title}](${track.url})`,
-                fields: searchResult.playlist ? [{ name: "Playlist", value: searchResult.playlist.title }] : [],
+                title: `${res.searchResult.hasPlaylist() ? "Playlist" : "Track"} enqueued!`,
+                thumbnail: { url: res.track.thumbnail },
+                description: `[${res.track.title}](${res.track.url})`,
+                fields: res.searchResult.playlist ? [{ name: "Playlist", value: res.searchResult.playlist.title }] : [],
                 timestamp: new Date(),
             };
     
