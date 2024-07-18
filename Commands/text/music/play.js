@@ -36,6 +36,7 @@ module.exports = {
         const Attachment = message.attachments.first()?.attachment;
 
         let string = args.join(" ");
+        string = string.split("&list=")[0];
         if (!string) string = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
         // return SendErrorEmbed(message, "Please enter a song URL or query to search.", "yellow");
 
