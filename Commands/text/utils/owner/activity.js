@@ -5,6 +5,11 @@ module.exports = {
     name: "activity",
     description: "Changes the bot's activity status",
     category: "utils",
+    usage: {
+        required: {
+            "activity": "activity to change to",
+        },
+    },
     private: true,
     execute(logger, client, message, args, optionalArgs) {
         // Changes the activity or gives a list of all presets

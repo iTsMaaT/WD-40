@@ -32,7 +32,7 @@ module.exports = {
                 message.reply({ embeds: [embed] });
             }
 
-            if (DefaultSuperuserState && (message.author.id != process.env.OWNER_ID && whitelist.includes(message.author.id))) return;
+            if (process.env.CURRENT_SUPERUSER_STATE && (message.author.id != process.env.OWNER_ID && whitelist.includes(message.author.id))) return;
             if (blacklist.includes(message.author.id)) return;
 
             const autoreactions = await GuildManager.getAutoReactions(message.guild.id);
@@ -77,7 +77,7 @@ Step 5 - Send the downloaded media to your favorite social media!
 
         async function handleCommand(message) {
             if (message.author.bot) return;
-            if (DefaultSuperuserState && !whitelist.includes(message.author.id)) return;
+            if (process.env.CURRENT_SUPERUSER_STATE && !whitelist.includes(message.author.id)) return;
             if (!message.guild) return message.reply("Commands cannot be executed inside DMs.");
             if (blacklist.includes(message.author.id)) return;
 

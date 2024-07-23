@@ -2,6 +2,11 @@ module.exports = {
     name: "superuser",
     description: "Makes only iTsMaaT be able to execute commands",
     category: "utils",
+    usage: {
+        required: {
+            "server": "server to make superuser",
+        },
+    },
     private: true,
     execute(logger, client, message, args, optionalArgs) {
         // Superuser command (Only iTsMaaT can execute commands)

@@ -1,5 +1,5 @@
 const { ApplicationCommandType, ApplicationCommandOptionType, AttachmentBuilder } = require("discord.js");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "mcping",
@@ -20,7 +20,6 @@ module.exports = {
         },
     ],
     async execute(logger, interaction, client) {
-        await interaction.deferReply();
         const server_ip = interaction.options.get("ip").value;
         let server_port_string = interaction.options.get("port")?.value;
 
@@ -28,7 +27,7 @@ module.exports = {
         try {
             const server = await (await fetch(`https://api.mcstatus.io/v2/status/java/${server_ip}${server_port_string || ""}`)).json();
 
-            if (!server.online) return SendErrorEmbed(interaction, `${server.eula_blocked ? "The server is banned by Mojang." : "Server offline or nonexistant."}`, "red", true);
+            if (!server.online) return await interaction.reply({ embeds: [embedGenerator.warning(`${server.eula_blocked ? "The server is banned by Mojang." : "Server offline or nonexistant."}`)] });
 
             const serverStatusEmbed = {
                 title: `Server Status for ${server.host} (Port: ${server.port})`,
@@ -56,7 +55,7 @@ module.exports = {
             interaction.editReply({ embeds: [serverStatusEmbed] });
         } catch (err) {
             logger.error(err);
-            return SendErrorEmbed(interaction, "An error occured", "red", true);
+            return await interaction.editReply({ embeds: [embedGenerator.error("An error occured.")] });
         }
     },
 };

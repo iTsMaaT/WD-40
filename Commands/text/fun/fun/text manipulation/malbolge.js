@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-var */
 /* eslint-disable no-shadow */
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "malbolge",
@@ -15,7 +15,7 @@ module.exports = {
     examples: ["Hello, World!"],
     aliases: ["mb"],
     async execute(logger, client, message, args, optionalArgs) {
-        if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");
+        if (!args[0]) return await message.reply({ embeds: [embedGenerator.error("Please provide a string to translate")] });
 
         /* eslint-disable no-constant-condition */
         const mb = {};
@@ -707,11 +707,11 @@ so update to [] version
             if (malbolge.length < 2000) 
                 await message.reply(`\`\`\`malbolge\n${malbolge}\`\`\``);
             else 
-                SendErrorEmbed(message, "The result is too long (>2000)", "yellow");
+                return await message.reply({ embeds: [embedGenerator.error("The result is too long (>2000)")] });
             
         } catch (err) {
             logger.error(err.stack);
-            return SendErrorEmbed(message, "An error occured", "red");
+            return await message.reply({ embeds: [embedGenerator.error("An error occured")] });
         }
     },
 };

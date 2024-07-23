@@ -1,23 +1,25 @@
 const { ApplicationCommandType } = require("discord.js");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "Preview Invite",
     type: ApplicationCommandType.Message,
-    execute: async (logger, interaction, client) => {
-        await interaction.deferReply();
-
-        const regex = /(https?:\/\/|http?:\/\/)?(www.)?(discord.(gg|io|me|li)|discordapp.com\/invite|discord.com\/invite)\/[^\s/]+?(?=\b)/;
+    async execute(logger, interaction, client) {
+        const regex = /(https?:\/\/|http?:\/\/)?(www.)?(discord.(gg|io|me|li)|discordapp.com\/invite|discord.com\/invite)\/[^\s/]+?(?=\b)/g;
         const text = interaction.targetMessage.content;
         const invites = text.match(regex);
+        if (!invites) return await interaction.editReply({ embeds: [embedGenerator.warning("Couldn't find invite code")], ephemeral: true });
+        console.log(invites);
 
         const invitecodes = [];
         for (const invite of invites) {
-            invite.replace("https://discord.gg/", "")?.replace("https://discord.com/invite/", "");
-            invitecodes.push(invite);
+            const inviteArray = invite.split("/");
+            invitecodes.push(inviteArray[inviteArray.length - 1]);
         }
-        if (!invitecodes || invitecodes.length <= 0) SendErrorEmbed(interaction, "Couldn't find invite code", "red");
+        
+        if (!invitecodes || invitecodes.length <= 0) return await interaction.editReply({ embeds: [embedGenerator.warning("Couldn't find invite code")], ephemeral: true });
   
+        await interaction.editReply({ embeds: [embedGenerator.info("Fetching invite information...")], ephemeral: true });
         for (const inv of invitecodes) {
             try {
                 const invite = await interaction.client.fetchInvite(inv);
@@ -73,10 +75,10 @@ module.exports = {
                     timestamp: new Date(),
                 };
   
-                await interaction.editReply({ embeds: [embed], ephemeral: true });
+                await interaction.followUp({ embeds: [embed], ephemeral: true });
             } catch (error) {
                 console.error(error);
-                await interaction.editReply("An error occurred while fetching invite information.");
+                await interaction.editReply({ embeds: [embedGenerator.error("An error occurred while fetching invite information.")], ephemeral: true });
             }
         }
     },

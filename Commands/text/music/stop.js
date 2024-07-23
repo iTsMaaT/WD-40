@@ -1,19 +1,25 @@
-const { EmbedBuilder } = require("discord.js");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const { useQueue, useMainPlayer } = require("discord-player");
 
 module.exports = {
     name: "stop",
     description: "Stop currently playing queue",
     category: "music",
-    execute(logger, client, message, args, optionalArgs) {
-        const queue = useQueue(message.guild.id);
-        if (!queue) return message.guild?.me?.voice?.setChannel(null).catch(() => null);
+    async execute(logger, client, message, args, optionalArgs) {
+        try {
+            const queue = useQueue(message.guild.id);
+            if (!queue) return message.guild?.me?.voice?.setChannel(null).catch(() => null);
+            
+            queue.delete();
 
-        queue.delete();
-        const stoppped_music_embed = new EmbedBuilder()
-            .setColor("#ffffff")
-            .setDescription("Stopped!")
-            .setTimestamp();
-        message.reply({ embeds: [stoppped_music_embed] });
+            const stoppped_music_embed = embedGenerator.info({
+                title: "Stopped!",
+            }).withAuthor(message.author);
+
+            message.reply({ embeds: [stoppped_music_embed] });
+        } catch (e) {
+            logger.error(e);
+            return await message.reply({ embeds: [embedGenerator.error("An error occurred.")] });
+        }
     },
 };

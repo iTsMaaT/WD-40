@@ -1,6 +1,6 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { prettyString } = require("@functions/formattingFunctions");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const GuildManager = require("@root/utils/GuildManager.js");
 
 module.exports = {
@@ -18,7 +18,7 @@ module.exports = {
 
         if (args[0]) {
             const CommandName = client.commands.get(args[0]);
-            if (!CommandName || CommandName.private) return SendErrorEmbed(message, "This command doesn't exist.", "red");
+            if (!CommandName || CommandName.private) return await message.reply({ embeds: [embedGenerator.error("This command doesn't exist.")] });
 
             const CommandEmbed = {
                 title: `**${prefix}${CommandName.name}**`,

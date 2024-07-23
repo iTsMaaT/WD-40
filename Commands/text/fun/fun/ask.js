@@ -1,4 +1,4 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const GuildManager = require("@root/utils/GuildManager.js");
 
 module.exports = {
@@ -18,7 +18,7 @@ module.exports = {
             const apiKey = process.env.GEMINI_API_KEY; // Replace with your API key
             
             const prompt = args.join(" ");
-            if (!prompt) return SendErrorEmbed(message, "Please provide a prompt.", "yellow");
+            if (!prompt) return await message.reply({ embeds: [embedGenerator.warning("Please provide a prompt.")] });
             const owner = await message.guild.fetchOwner();
             const requestBody = {
                 api_key: apiKey,
@@ -34,7 +34,7 @@ module.exports = {
                      - The server is owned by: ${owner.displayName} (To ping on discord, type: <@${owner.id}>)
                      - The channel you are in is called: <#${message.channel.id}> (Or ${message.channel.name} if you only want the raw name)
                      - Discord uses a system to specify channels, which is what you see as what the channel is called, always use that and not the raw name, and always send it directly, whithout formatting, so it gets sent correctly on discord.
-                     - Current time: ${(new Date()).toUTCString()}
+                     - Current time (UTC): ${(new Date()).toUTCString()}
             
                     You are not a personal assistant and cannot complete tasks for people. You only have access to a limited number of text chats in this channel. You cannot access any other information on Discord. You can't see images or avatars. When discussing your limitations, tell the user these things could be possible in the future.
                     When responding to the following prompt, try to condense your response as much as possible.
@@ -77,9 +77,9 @@ module.exports = {
             logger.error(err);
 
             if (err.name === "TimeoutError") 
-                return SendErrorEmbed(message, "I do not wish to answer that question. (Request timed out)", "yellow");
+                return await message.reply({ embeds: [embedGenerator.warning("I do not wish to answer that question. (Request timed out)")] });
             else 
-                SendErrorEmbed(message, "An error occurred.", "red");
+                return await message.reply({ embeds: [embedGenerator.error("An error occurred.")] });
             
         }
 

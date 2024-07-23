@@ -1,3 +1,5 @@
+const embedGenerator = require("@utils/helpers/embedGenerator");
+
 module.exports = {
     name: "joke",
     description: "le funny",
@@ -17,13 +19,12 @@ module.exports = {
 
             if (trueFlags.length === 0) trueFlags = ["None"];
 
-            FactEmbed = {
-                color: 0xffffff,
+            FactEmbed = embedGenerator.info({
                 title: "The joke:",
                 description: `Catagory: ${joke.category}\nFlags: ${trueFlags.join(", ")}\n\n ${joke.setup ?? joke.joke} \n ${joke.delivery ?? ""}`,
-                timestamp: new Date(),
                 footer: { text: `ID : ${joke.id}` },
-            };
+            }).withAuthor(message.author);
+
 
             message.reply({ embeds: [FactEmbed] });
         } catch (err) {

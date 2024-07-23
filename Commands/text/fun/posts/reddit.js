@@ -1,4 +1,4 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const FetchReddit = require("@utils/reddit/FetchReddit.js");
 
 module.exports = {
@@ -28,12 +28,12 @@ module.exports = {
             else if (user) 
                 message.reply({ embeds: [await FetchReddit(message.channel.nsfw, [user], 5, "user")] });
             else 
-                return SendErrorEmbed(message, "Wrong argument usage, please refer to `help reddit`", "yellow");
+                return await message.reply({ embeds: [embedGenerator.warning("Wrong argument usage, please refer to `help reddit`")] });
             
         } catch (err) {
             if (err.toString().startsWith("SyntaxError: Unexpected token")) {
                 logger.error("Reddit API error");
-                return SendErrorEmbed(message, "Reddit API error, please try again later.", "yellow");
+                return await message.reply({ embeds: [embedGenerator.error("Reddit API error, please try again later.")] });
             }
         }
     },

@@ -15,6 +15,7 @@ module.exports = {
     log: false,
     async execute(client, logger, interaction) {
         if (interaction.isChatInputCommand()) {
+            await interaction.deferReply();
             const SlashCooldowns = client.SlashCooldowns;
 
             const slash = interaction.client.slashcommands.get(interaction.commandName);
@@ -47,30 +48,19 @@ module.exports = {
                     .replace(/^\s+/gm, ""));
     
             } catch (error) {
-                if (!interaction.deferred) {
-                    await interaction.reply({
-                        embeds: [{
-                            title: "An error occured while executing the command",
-                            color: 0xff0000,
-                            timestamp: new Date(),
-                        }],
-                        ephemeral: true,
-                    });
-                } else {
-                    await interaction.editReply({
-                        embeds: [{
-                            title: "An error occured while executing the command",
-                            color: 0xff0000,
-                            timestamp: new Date(),
-                        }],
-                        ephemeral: true,
-                    });
-                }
-    
+                await interaction.editReply({
+                    embeds: [{
+                        title: "An error occured while executing the command",
+                        color: 0xff0000,
+                        timestamp: new Date(),
+                    }],
+                    ephemeral: true,
+                });    
                 logger.error(`Error executing slash command [${interaction.commandName}]`);
                 logger.error(error.stack);
             }
         } else if (interaction.isContextMenuCommand()) {
+            await interaction.deferReply({ ephemeral: true });
             
             const context = client.contextCommands.get(interaction.commandName);
     
@@ -87,7 +77,7 @@ module.exports = {
                     .replace(/^\s+/gm, ""));
     
             } catch (error) {
-                interaction.reply({
+                await interaction.editReply({
                     embeds: [{
                         title: "An error occured while executing the command",
                         color: 0xff0000,

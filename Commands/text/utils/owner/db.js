@@ -19,8 +19,8 @@ module.exports = {
         const sent = await message.reply({ content: "Fetching the DB...", fetchReply: true });
 
         try {
-            const columnFinder = (await repositories[tableName].select().limit(1))[0];
-            if (!columnFinder[0]) return sent.edit("This table is empty.");
+            const columnFinder = await repositories[tableName].select().limit(1);
+            if (!columnFinder[0]) return await sent.edit("This table is empty.");
             const firstColumn = Object.keys(columnFinder[0])[0];
 
             data = await repositories[tableName].select().orderBy(firstColumn, "desc").limit(2500);
@@ -55,7 +55,7 @@ module.exports = {
             // Create a text file
             const fileName = `./${tableName}_data.txt`;
             await fs.writeFile(fileName, table, { encoding: "utf8" });
-            await sent.edit({ content: `Operation took ${prettyMilliseconds(Date.now() - sent.createdTimestamp)}`, files: [fileName] });
+            await sent.edit({ content: `Operation took ${prettyMilliseconds(parseInt(sent.createdTimestamp) - parseInt(Date.now()))}`, files: [fileName] });
             await fs.unlink(fileName);
         } catch (error) {
             logger.error(error.stack);

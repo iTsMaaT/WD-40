@@ -1,21 +1,28 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "leave",
-    category: "admin",
     description: "leaves the specified guild",
+    category: "admin",
+    usage: {
+        required: {
+            "guild": "ID of the guild to leave",
+        },
+    },
     private: true,
-    execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, optionalArgs) {
+        let guild;
         try {
             if (args[0]) 
-                message.client.guilds.cache.get(args[0]).leave();
+                guild = await message.client.guilds.cache.get(args[0]);
             else 
-                message.client.guild.cache.get(message.guild.id).leave();
-            
-            message.reply("left: `" + args[0] ?? message.guild.id + "`");
+                guild = await message.client.guild.cache.get(message.guild.id);
+
+            await guild.leave();
+            await message.reply({ embeds: [embedGenerator.success(`Left ${guild.name}`)] });
         } catch (err) {
-            SendErrorEmbed(message, "Couldn't leave the specified guild", "red");
             logger.error(err);
+            return await message.reply({ embeds: [embedGenerator.error(`Failed to leave ${guild?.name || args[0] || message.guild.name}`)] });
         }
     },
 };

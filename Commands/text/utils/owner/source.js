@@ -2,8 +2,13 @@ const SplitIntoChunks = require("@functions/SplitIntoChunks");
 
 module.exports = {
     name: "source",
-    category: "utils",
     description: "Gives the source code of a command",
+    category: "utils",
+    usage: {
+        required: {
+            "command": "command to get the source code of",
+        },
+    },
     private: true,
     async execute(logger, client, message, args, optionalArgs) {
         const commandName = args[0];
@@ -18,6 +23,5 @@ module.exports = {
 
         for (const chunk of chunks) 
             await message.channel.send(`\`\`\`javascript\n${chunk}\n\`\`\``);
-        
     },
 };

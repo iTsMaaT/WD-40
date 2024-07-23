@@ -13,7 +13,7 @@ module.exports = {
             title: "Changelogs",
             description: latestChanges
                 .map(({ version, date, changes }) => {
-                    const changeList = changes.map(change => `- ${change}`).join("\n");
+                    const changeList = changes.map(change => `- ${change}`).join("\n").substring(0, 1000) + "...";
                     return `**Version: ${version}** (${date}):\n${changeList}\n`;
                 })
                 .join("\n"),

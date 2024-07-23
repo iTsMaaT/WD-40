@@ -1,5 +1,4 @@
-const { EmbedBuilder } = require("discord.js");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const { useQueue, useTimeline, useMainPlayer } = require("discord-player");
 
 module.exports = {
@@ -7,27 +6,25 @@ module.exports = {
     description: "See what song is currently playing",
     category: "music",
     aliases: ["np"],
-    execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, optionalArgs) {
         const queue = useQueue(message.guild.id);
         const timeline = useTimeline(message.guild.id);
 
-        if (!queue || !queue.currentTrack) return SendErrorEmbed(message, "There is nothing in the queue right now.", "yellow");
+        if (!queue || !queue.currentTrack) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue right now.")] });
 
         const track = queue.currentTrack;
 
-        const song_playing_embed = new EmbedBuilder()
-            .setColor(0xffffff)
-            .setTitle("Now Playing")
-            .setDescription(`[${track.title}](${track.url})`)
-            .addFields([
+        const embed = embedGenerator.info({
+            title: "Now Playing",
+            description: `[${track.title}](${track.url})`,
+            fields: [
                 { name: "Author", value: track.author },
-                { name: "Progress", value: `${queue.node.createProgressBar()} (${timeline.timestamp?.progress}%)` },
+                { name: "Progress", value: track.isLive ? "Live ┃ ▬▬▬▬▬▬▬▬▬▬▬▬▬▬🔘 ┃ Infinity (99%)" : `${queue.node.createProgressBar()} (${timeline.timestamp?.progress}%)` },    
                 { name: "Extractor", value: `\`${track.extractor?.identifier || "N/A"}\`` },
-            ])
-            .setFooter({
-                text: `Event Loop Lag: ${queue.player.eventLoopLag.toFixed(0)}ms`,
-            })
-            .setTimestamp();
-        message.reply({ embeds: [song_playing_embed] });
+            ],
+            footer: { text: `Event Loop Lag: ${queue.player.eventLoopLag.toFixed(0)}ms` },
+        }).withAuthor(message.author);
+
+        await message.reply({ embeds: [embed] });
     },
 };

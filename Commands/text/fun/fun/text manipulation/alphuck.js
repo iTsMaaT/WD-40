@@ -1,4 +1,4 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "alphuck",
@@ -11,7 +11,7 @@ module.exports = {
     },
     examples: ["Hello, World!"],
     async execute(logger, client, message, args, optionalArgs) {
-        if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");
+        if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("Please provide a string to translate")] });
 
         const bf = brainfuckToAlphuck(stringToBF(args.join(" ")));
 
@@ -20,11 +20,11 @@ module.exports = {
             if (bf.length < 2000) 
                 await message.reply(`\`\`\`alphuck\n${bf}\`\`\``);
             else 
-                SendErrorEmbed(message, "The result is too long (>2000)", "yellow");
+                return await message.reply({ embeds: [embedGenerator.warning("The result is too long (>2000)")] });
             
         } catch (err) {
             logger.error(err.stack);
-            return SendErrorEmbed(message, "An error occured", "red");
+            return await message.reply({ embeds: [embedGenerator.error("An error occured")] });
         }
 
         // Converts a char to brainfuck

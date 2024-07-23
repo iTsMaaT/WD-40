@@ -291,5 +291,21 @@
             "Added -pn to >play, puts the song up next ([p]lay [n]ext)",
             "Removed Herobrine"
         ]
+    },
+    {
+        "version": "5.4.0",
+        "date": "2024-07-18",
+        "changes": [
+            "Fixed music again dammnit",
+            "Better >play response embed",
+            "Hotfix to YouTube links containing 'list' search parameter not fetching and erroring out"
+        ]
+    },
+    {
+        "version": "5.4.1",
+        "date": "2024-07-18",
+        "changes": [
+            "Massive embed refactoring"
+        ]
     }
 ]

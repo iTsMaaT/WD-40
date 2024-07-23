@@ -1,5 +1,5 @@
 const { PermissionsBitField } = require("discord.js");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "deafenall",
@@ -14,49 +14,27 @@ module.exports = {
     admin: true,
     permissions: [PermissionsBitField.Flags.DeafenMembers],
     aliases: ["deafa"],
-    execute(logger, client, message, args, optionalArgs) {
-      
-        // Check if the user is in a voice channel
+    async execute(logger, client, message, args, optionalArgs) {
         if (!message.member.voice.channel) 
-            return SendErrorEmbed(message, "You need to be in a voice channel to use this command.", "yellow");
+            return await message.reply({ embeds: [embedGenerator.warning("You need to be in a voice channel to use this command.")] });
         
-      
         const voiceChannel = message.member.voice.channel;
+        if (!optionalArgs["deafen|d"] && !optionalArgs["undeafen|und"]) return await message.reply({ embeds: [embedGenerator.warning("Invalid argument. Please specify either \"-deafen\" or \"-undeafen\".")] });
+        const deafenBool = optionalArgs["deafen|d"] || Object.keys(optionalArgs).length === 0;
 
-        const embed = {
-            color: 0xffffff,
-            title: "",
-            timestamp: new Date(),
-        };
-      
-        // Check the argument to determine if deafening or undeafening
-        if (optionalArgs["-deafen|d"] || Object.keys(optionalArgs).length === 0) {
-            // Deafen all members except the executor
-            voiceChannel.members.forEach(async (member) => {
-                if (!member.user.bot && member.id !== message.author.id) {
-                    try {
-                        await member.voice.setDeaf(true);
-                    } catch (error) {
-                        console.error(`Failed to deafen member ${member.user.tag}:`, error);
-                    }
-                }
-            });
-      
-            embed.title = "Successfully deafened all members except yourself.";
-        } else if (optionalArgs["-undeafen|und"]) {
-            // Undeafen all members
-            voiceChannel.members.forEach(async (member) => {
+        voiceChannel.members.forEach(async (member) => {
+            if (!member.user.bot && member.id !== message.author.id) {
                 try {
-                    await member.voice.setDeaf(false);
+                    await member.voice.setDeaf(deafenBool);
                 } catch (error) {
-                    logger.error(`Failed to undeafen member ${member.user.tag}:`);
+                    logger.error(`Failed to ${deafenBool ? "deafen" : "undeafen"} member ${member.user.tag}:`);
                 }
-            });
-            
-            embed.title = "Successfully undeafened all members.";
-            message.reply({ embeds: [embed] });
-        } else {
-            SendErrorEmbed(message, "Invalid argument. Please specify either \"-deafen\" or \"-undeafen\".", "yellow");
-        }
+            }
+        });
+
+        const embed = embedGenerator.info(deafenBool ? "Successfully deafened all members except yourself." : "Successfully undeafened all members.")
+            .withAuthor(message.author);
+
+        await message.reply({ embeds: [embed] });
     },
 };

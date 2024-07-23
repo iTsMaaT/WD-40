@@ -174,7 +174,7 @@ function getPermissionArrayNames(flags) {
 module.exports = { 
     CreateOrUseWebhook,
     id,
-    SendErrorEmbed,
+    // SendErrorEmbed,
     StringReact,
     InfoFromMessageLink,
     editOrSend, 

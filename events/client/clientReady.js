@@ -61,7 +61,8 @@ module.exports = {
         console.log(`${client.commands.size} (text) commands (including aliases)`);
         console.log("commands setup done.");
 
-        console.log(`Setting up activity status... (${activities.length} statuses)`);
+        console.log("Setting up activity status...");
+        console.log(`${activities.length} statuses`);
         if (process.env.SERVER == "prod")
             updateActivities();
         else
@@ -76,7 +77,7 @@ module.exports = {
         if (process.env.SERVER == "dev") global.superuser = 1;
         console.log(`Debug is ${debug ? "en" : "dis"}abled\nSuperuser is ${superuser ? "en" : "dis"}abled`);
 
-        console.log("Waiting for websocket to successfully connect.");
+        console.log("Waiting for websocket to report sensical ping (> -1ms)");
         console.logger(`
                                                                                   
                                  ██████████████                                 
@@ -127,7 +128,7 @@ module.exports = {
         const interval = setInterval(() => {
             if (client.ws.ping !== -1) {
                 if (process.env.SERVER != "dev") client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
-                logger.info("Bot started successfully.");
+                logger.info(`Bot started successfully with a websocket ping of ${client.ws.ping}ms`);
                 clearInterval(interval);
             }
         }, 500);

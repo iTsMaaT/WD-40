@@ -1,4 +1,4 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator"); 
 const { useQueue, useMainPlayer } = require("discord-player");
 
 module.exports = {
@@ -29,16 +29,15 @@ module.exports = {
             });
         }
 
-        if (!queue || !queue.tracks) return SendErrorEmbed(message, "There is nothing in the queue.", "yellow");
+        if (!queue || !queue.tracks) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue.")] });
 
-        if (!args[0]) return SendErrorEmbed(message, "Please enter a number to skip to.", "yellow");
+        if (!args[0]) return await message.reply({ embeds: [embedGenerator.error("Please enter a number to skip to.")] });
 
         const trackResolvable = queue.tracks.at(jump);
 
-        if (isNaN(track) || !trackResolvable) return SendErrorEmbed(message, "Couldn't find song to skip to.", "red");
+        if (isNaN(track) || !trackResolvable) return await message.reply({ embeds: [embedGenerator.error("Couldn't find song to skip to.")] });
 
         queue.node.jump(trackResolvable);
-        return SendErrorEmbed(message, `Skiped to ${trackResolvable.title}`);
-
+        return await message.reply({ embeds: [embedGenerator.info(`Skiped to ${trackResolvable.title}`)] });
     },
 };

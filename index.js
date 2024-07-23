@@ -20,7 +20,7 @@ const logger = require("@utils/log");
 
 global.wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 process.env.CURRENT_DEBUG_STATE = DefaultDebugState;
-process.env.CURRENT_SUPERUSER_STATE = DefaultSuperuserState;
+process.env.CURRENT_SUPERUSER_STATE = process.env.SERVER = "dev" || DefaultSuperuserState;
 
 // Add array.equals()
 Array.prototype.equals = function(otherArray) {
@@ -38,8 +38,8 @@ Array.prototype.shuffle = function() {
 // music
 const { Player } = require("discord-player");
 const { YouTubeExtractor, BridgeProvider, BridgeSource, SpotifyExtractor } = require("@discord-player/extractor");
-const { default: DeezerExtractor } = require("discord-player-deezer");
-const { default: TidalExtractor } = require("discord-player-tidal");
+// const { default: DeezerExtractor } = require("discord-player-deezer");
+// const { default: TidalExtractor } = require("discord-player-tidal");
 const { YoutubeiExtractor, createYoutubeiStream } = require("discord-player-youtubei");
 const player = new Player(client, {
     // bridgeProvider: discordPlayer.removeYoutube ? new BridgeProvider(BridgeSource.SoundCloud) : new BridgeProvider(BridgeSource.Auto),
@@ -63,8 +63,8 @@ const player = new Player(client, {
     });
     // await player.extractors.loadDefault();
     await player.extractors.loadDefault((ext) => !["YouTubeExtractor", "SpotifyExtractor"].includes(ext));
-    await player.extractors.register(DeezerExtractor);
-    await player.extractors.register(TidalExtractor);
+    // await player.extractors.register(DeezerExtractor);
+    // await player.extractors.register(TidalExtractor);
 })();
 
 console.log("Variables loaded");
@@ -107,7 +107,7 @@ function loadFiles(folder, callback) {
 
 // Slash command handler
 client.discoveredCommands = [];
-loadFiles("./Commands/slash/", (slashcommand, fileName) => {
+loadFiles("./commands/slash/", (slashcommand, fileName) => {
     if ("name" in slashcommand && "execute" in slashcommand && "description" in slashcommand) {
         if (client.slashcommands.get(slashcommand.name)) throw new Error(`Slash command or alias [${slashcommand.name}] already exists`);
         client.slashcommands.set(slashcommand.name, slashcommand);
@@ -118,7 +118,7 @@ loadFiles("./Commands/slash/", (slashcommand, fileName) => {
 });
 
 // Text command handler
-loadFiles("./Commands/text/", function(command) {
+loadFiles("./commands/text/", function(command) {
     if (client.commands.get(command.name)) throw new Error(`Text command [${command.name}] already exists\n${command.filePath}`);
     client.commands.set(command.name, command);
     if (!command.cooldown) command.cooldown = 3000;
@@ -142,7 +142,7 @@ ${getPermissionArrayNames(permissionBitFields).join("\n")}
 `);
 
 // Context menu command handler
-loadFiles("./Commands/context/", (contextcommand, fileName) => {
+loadFiles("./commands/context/", (contextcommand, fileName) => {
     if ("name" in contextcommand && "execute" in contextcommand && "type" in contextcommand) {
         if (client.contextCommands.get(contextcommand.name)) throw new Error(`Context command or alias [${contextcommand.name}] already exists`);
         client.contextCommands.set(contextcommand.name, contextcommand);

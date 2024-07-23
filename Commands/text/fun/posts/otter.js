@@ -1,5 +1,3 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { AttachmentBuilder } = require("discord.js");
 const FetchReddit = require("@utils/reddit/FetchReddit.js");
 
 module.exports = {

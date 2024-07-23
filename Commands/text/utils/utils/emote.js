@@ -1,6 +1,6 @@
 const { PermissionsBitField } = require("discord.js");
 const { createCanvas, loadImage } = require("canvas");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "emote",
@@ -27,15 +27,15 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         const emoteArg = optionalArgs["emote|e"];
         const stickerArg = optionalArgs["sticker|s"];
-        if (emoteArg && stickerArg) return SendErrorEmbed(message, "You can't use both -e and -s", "yellow");
-        if (!emoteArg && !stickerArg) return SendErrorEmbed(message, "You have to use either -e or -s", "yellow");
-        if (!args[0]) return SendErrorEmbed(message, "You have to specify a name for the emote/sticker", "yellow");
+        if (emoteArg && stickerArg) return await message.reply({ embeds: [embedGenerator.warning("You can't use both -e and -s")] });
+        if (!emoteArg && !stickerArg) return await message.reply({ embeds: [embedGenerator.warning("You have to use either -e or -s")] });
+        if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You have to specify a name for the emote/sticker")] });
         
         const tag = ":dotted_line_face:";
         const name = args[0].toString();
 
         const imageAttachment = message.attachments.first();
-        if (!imageAttachment || !imageAttachment.attachment) return SendErrorEmbed(message, "Invalid attachment", "yellow");
+        if (!imageAttachment || !imageAttachment.attachment) return await message.reply({ embeds: [embedGenerator.warning("Invalid attachment")] });
 
         const canvas = createCanvas(128, 128); 
         const ctx = canvas.getContext("2d");
@@ -44,22 +44,19 @@ module.exports = {
 
         const buffer = canvas.toBuffer();
         
-        if (emoteArg) {
-            message.guild.emojis.create({ attachment: buffer, name: name })
-                .then(emoji => message.reply({ content: `Emote added: **${emoji.name}**` }))
-                .catch((err) => {
-                    SendErrorEmbed(message, "An error occured", "red");
-                    logger.error(err.stack);
-                });
-        } 
-        
-        if (stickerArg) {
-            message.guild.stickers.create({ file: buffer, name: name, tags: tag })
-                .then(sticker => message.reply({ content: `Sticker added: **${sticker.name}**` }))
-                .catch((err) => {
-                    SendErrorEmbed(message, "An error occured", "red");
-                    logger.error(err);
-                });
+        try {
+            if (emoteArg) {
+                const emoji = await message.guild.emojis.create({ attachment: buffer, name: name });
+                await message.reply({ content: `Emote added: **${emoji.name}**` });
+            }
+    
+            if (stickerArg) {
+                const sticker = await message.guild.stickers.create({ file: buffer, name: name, tags: tag });
+                await message.reply({ content: `Sticker added: **${sticker.name}**` });
+            }
+        } catch (err) {
+            logger.error(err.stack || err);
+            await message.reply({ embeds: [embedGenerator.error("An error occurred while adding the emote or sticker")] });
         }
     },
 };

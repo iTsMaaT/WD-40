@@ -1,4 +1,4 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "emojify",
@@ -10,7 +10,7 @@ module.exports = {
     },
     category: "text manipulation",
     examples: ["Hello, World!"],
-    execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, optionalArgs) {
 
         // Map of all characters to emotes
         const emoteMap = {
@@ -65,20 +65,13 @@ module.exports = {
             "^": "🔺",
         };
 
-        if (!args[0]) SendErrorEmbed(message, "You need a prompt", "yellow");
+        if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You need a prompt")] });
 
         // Use emote mapping or original character if mapping doesn't exist
         const emotesPromt = Array.from(args.join("🌌").toLowerCase()).map((char) => emoteMap[char] || char).join(" ");
 
-        if (emotesPromt.length > 1000) SendErrorEmbed(message, "Prompt too long", "yellow");
+        if (emotesPromt.length > 1000) return await message.reply({ embeds: [embedGenerator.error("The result is too long (>1000)")] });
 
-        const embed = {
-            color: 0xffffff,
-            title: "Emotified text",
-            description: emotesPromt,
-            timestamp: new Date(),
-        };
-
-        message.reply({ embeds: [embed] });
+        message.reply(emotesPromt);
     },
 };

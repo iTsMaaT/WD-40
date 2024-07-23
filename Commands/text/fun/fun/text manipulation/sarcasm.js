@@ -1,4 +1,4 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "sarcasm",
@@ -11,8 +11,8 @@ module.exports = {
     },
     examples: ["Hello, World!"],
     async execute(logger, client, message, args, optionalArgs) {
-        if (!args[0]) return SendErrorEmbed(message, "You need to provide a prompt.", "yellow");
-        if (args.join(" ").length > 1000) return SendErrorEmbed(message, "The result is too long (>1000)", "yellow");
+        if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You need to provide a prompt.")] });
+        if (args.join(" ").length > 1000) return await message.reply({ embeds: [embedGenerator.error("The result is too long (>1000)")] });
 
         const prompt = args;
         let sarcasm = "";

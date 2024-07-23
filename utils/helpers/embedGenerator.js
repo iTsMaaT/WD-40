@@ -11,7 +11,7 @@ class EmbedGenerator extends EmbedBuilder {
      * @returns {EmbedGenerator} The created error embed.
      */
     error(data) {
-        return this.create(data, 0xff0000);
+        return this.create(data, data.color || 0xff0000);
     }
 
     /**
@@ -20,7 +20,7 @@ class EmbedGenerator extends EmbedBuilder {
      * @returns {EmbedGenerator} The created success embed.
      */
     success(data) {
-        return this.create(data, 0x00ff00);
+        return this.create(data, data.color || 0x00ff00);
     }
 
     /**
@@ -29,7 +29,7 @@ class EmbedGenerator extends EmbedBuilder {
      * @returns {EmbedGenerator} The created warning embed.
      */
     warning(data) {
-        return this.create(data, 0xffff00);
+        return this.create(data, data.color || 0xffff00);
     }
 
     /**
@@ -38,7 +38,7 @@ class EmbedGenerator extends EmbedBuilder {
      * @returns {EmbedGenerator} The created info embed.
      */
     info(data) {
-        return this.create(data, 0xffffff);
+        return this.create(data, data.color || 0xffffff);
     }
 
     /**
@@ -48,10 +48,10 @@ class EmbedGenerator extends EmbedBuilder {
      * @returns {EmbedGenerator} The created embed.
      */
     create(data, color) {
-        if (typeof data == "string") data = { description: data };
+        if (typeof data == "string") data = { title: data };
         return new EmbedGenerator(data)
             .setColor(color)
-            .setTimestamp(new Date());
+            .setTimestamp(data.timestamp || new Date());
     }
 
     /**

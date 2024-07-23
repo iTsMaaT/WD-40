@@ -1,5 +1,5 @@
 const { PermissionsBitField } = require("discord.js");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const { ChannelType } = require("discord.js");
 
 module.exports = {
@@ -14,31 +14,25 @@ module.exports = {
     admin: true,
     permissions: [PermissionsBitField.Flags.MoveMembers],
     aliases: ["mova"],
-    execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, optionalArgs) {
   
         // Check if the user is in a voice channel
         if (!message.member.voice.channel) 
-            return SendErrorEmbed(message, "You need to be in a voice channel to use this command.", "yellow");
+            return await message.reply({ embeds: [embedGenerator.warning("You need to be in a voice channel to use this command.")] });
         
   
         // Check if a channel ID is provided
         const channelID = args[0];
         if (!channelID) 
-            return SendErrorEmbed(message, "Please provide a valid channel ID.", "yellow");
+            return await message.reply({ embeds: [embedGenerator.warning("Please provide a valid channel ID.")] });
         
   
         const voiceChannel = message.member.voice.channel;
         const targetChannel = message.guild.channels.cache.get(channelID);
-
-        const embed = {
-            color: 0xffffff,
-            title: "",
-            timestamp: new Date(),
-        };
   
         // Check if the target channel exists and is a voice channel
         if (!targetChannel || targetChannel.type !== ChannelType.GuildVoice) 
-            return SendErrorEmbed(message, "Please provide a valid voice channel ID.", "yellow");
+            return await message.reply({ embeds: [embedGenerator.warning("Please provide a valid voice channel ID.")] });
         
   
         // Move all members except the executor to the target channel
@@ -52,7 +46,8 @@ module.exports = {
             }
         });
   
-        embed.title = "Successfully moved all members to the specified channel.";
+        const embed = embedGenerator.info("Successfully moved all members to the specified channel.")
+            .withAuthor(message.author);
         message.reply({ embeds: [embed] });
     },
 };

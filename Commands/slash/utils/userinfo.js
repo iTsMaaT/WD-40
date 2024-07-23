@@ -13,7 +13,6 @@ module.exports = {
         },
     ],
     execute: async (logger, interaction, client) => {
-        await interaction.deferReply();
         const guild = await client.guilds.fetch(interaction.guildId);
         const user = interaction.options.getUser("user");
         const id = user || interaction.user.id;
@@ -31,11 +30,11 @@ module.exports = {
                     status = null; // No presence information available
                 } catch (err) {
                     console.log(err);
-                    await interaction.editReply({ embeds: [{ title: "User not found", color: 0xff0000, timestamp: new Date() }] });
+                    await interaction.editReply({ embeds: [embedGenerator.error("User not found")] });
                 }
             } else {
                 console.log(e);
-                return await interaction.editReply({ embeds: [{ title: "An error occured.", color: 0xff0000, timestamp: new Date() }] });
+                return await interaction.editReply({ embeds: [embedGenerator.error("An error occured.")] });
             }
         }
 
@@ -74,7 +73,7 @@ module.exports = {
 
             await interaction.editReply({ embeds: [userInfoEmbed]  });
         } catch (err) {
-            await interaction.editReply({ embeds: [{ title: "An error occured.", color: 0xff0000, timestamp: new Date() }] });
+            await interaction.editReply({ embeds: [embedGenerator.error("An error occured.")] });
         }
     },
 };

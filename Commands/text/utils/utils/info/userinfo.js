@@ -1,4 +1,4 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const { prettyString } = require("@functions/formattingFunctions");
 
 module.exports = {
@@ -35,11 +35,11 @@ module.exports = {
                     status = null; // No presence information available
                 } catch (err) {
                     logger.log(err);
-                    return SendErrorEmbed(message, "User not found.", "red");
+                    return await message.reply({ embeds: [embedGenerator.error("User not found.")] });
                 }
             } else {
                 logger.error(e);
-                return SendErrorEmbed(message, "An error occurred while fetching the user.", "red");
+                return await message.reply({ embeds: [embedGenerator.error("An error occurred while fetching the user.")] });
             }
         }
 
@@ -85,7 +85,7 @@ module.exports = {
             message.reply({ embeds: [userInfoEmbed]  });
         } catch (err) {
             logger.error(err);
-            SendErrorEmbed(message, "An error occured.", "red");
+            return await message.reply({ embeds: [embedGenerator.error("An error occured.")] });
         }
     },
 };
