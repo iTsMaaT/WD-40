@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/iTsMaaT/Discord_bot.git"
+    "url": "git+https://github.com/iTsMaaT/WD-40.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/iTsMaaT/Discord_bot"
+    "url": "https://github.com/iTsMaaT/WD-40"
   },
-  "homepage": "https://github.com/iTsMaaT/Discord_bot",
+  "homepage": "https://github.com/iTsMaaT/WD-40",
   "dependencies": {
     "@discord-player/extractor": "^4.5.0",
     "@discordjs/opus": "^0.9.0",
