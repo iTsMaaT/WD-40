@@ -1,5 +1,6 @@
 const { PermissionsBitField } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
+const { getLoopMode } = require("@utils/helpers/playerHelpers");
 const { QueryType, useMainPlayer, useQueue } = require("discord-player");
 const { discordPlayerConf } = require("@utils/config.json");
 const { parse } = require("node-html-parser");
@@ -145,28 +146,21 @@ module.exports = {
                     },
                 });
             }
-            logger.music(`Playing [${res.track.title}] in [${message.member.voice.channel.name}]`); 
+            logger.music(`Playing [${res.track.title}] in [${message.member.voice.channel.name}]`);
 
-            embed = {
-                color: 0xffffff,
+            embed = embedGenerator.info({
                 title: `${res.searchResult.hasPlaylist() ? "Playlist" : "Track"} enqueued!`,
                 thumbnail: { url: res.track.thumbnail },
                 description: `[${res.track.title}](${res.track.url})`,
                 fields: res.searchResult?.playlist ? [{ name: "Playlist", value: res.searchResult.playlist.title }] : [],
-                timestamp: new Date(),
-            };
+                footer: { text: `Loop mode: ${getLoopMode(queue)}` },
+            }).withAuthor(message.author);
     
             await msg.edit({ embeds: [embed] });
 
         } catch (err) {
             logger.error(err);
-            embed = {
-                color: 0xff0000,
-                description: "Failed to fetch / play the requested track",
-                timestamp: new Date(),
-            };
-
-            await msg.edit({ embeds: [embed] });
+            return await msg.edit({ embeds: [embedGenerator.error("Failed to fetch / play the requested track")] });
         }
     },
 };
