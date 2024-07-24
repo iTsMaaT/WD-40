@@ -1,4 +1,5 @@
 const embedGenerator = require("@utils/helpers/embedGenerator");
+const { getLoopMode } = require("@utils/helpers/playerHelpers");
 const { useQueue, useTimeline, useMainPlayer } = require("discord-player");
 
 module.exports = {
@@ -17,9 +18,12 @@ module.exports = {
         const embed = embedGenerator.info({
             title: "Now Playing",
             description: `[${track.title}](${track.url})`,
+            thumbnail: { url: track.thumbnail },
             fields: [
                 { name: "Author", value: track.author },
-                { name: "Progress", value: track.isLive ? "Live ┃ ▬▬▬▬▬▬▬▬▬▬▬▬▬▬🔘 ┃ Infinity (99%)" : `${queue.node.createProgressBar()} (${timeline.timestamp?.progress}%)` },    
+                { name: "Progress", value: track.live ? "Live ┃ ▬▬▬▬▬▬▬▬▬▬▬▬▬▬🔘 ┃ Infinity (99%)" : `${queue.node.createProgressBar()} (${timeline.timestamp?.progress}%)` }, 
+                { name: "Loop mode", value: getLoopMode(queue), inline: true },
+                { name: "Paused", value: timeline.paused ? "Yes" : "No", inline: true },
                 { name: "Extractor", value: `\`${track.extractor?.identifier || "N/A"}\`` },
             ],
             footer: { text: `Event Loop Lag: ${queue.player.eventLoopLag.toFixed(0)}ms` },
