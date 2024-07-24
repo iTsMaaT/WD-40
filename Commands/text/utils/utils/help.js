@@ -18,7 +18,7 @@ module.exports = {
 
         if (args[0]) {
             const CommandName = client.commands.get(args[0]);
-            if (!CommandName || CommandName.private) return await message.reply({ embeds: [embedGenerator.error("This command doesn't exist.")] });
+            if (!CommandName || (CommandName.private && !message.author.id == process.env.OWNER_ID)) return await message.reply({ embeds: [embedGenerator.error("This command doesn't exist.")] });
 
             const CommandEmbed = {
                 title: `**${prefix}${CommandName.name}**`,
