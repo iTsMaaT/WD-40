@@ -6,6 +6,7 @@ const { StringReact } = require("@functions/discordFunctions.js");
 const GetPterodactylInfo = require("@functions/GetPterodactylInfo.js");
 const GetUniqueValues = require("@functions/GetUniqueValues.js");
 const EmbedGenerator = require("@utils/helpers/embedGenerator");
+const { repositories } = require("@utils/db/tableManager.js");
 
 module.exports = {
     name: "test",
@@ -13,7 +14,14 @@ module.exports = {
     category: "fun",
     private: true,
     async execute(logger, client, message, args, optionalArgs) {
-        
-        message.channel.send({ embeds: [EmbedGenerator.error({ title:"Error", description:"This is an error" }).withAuthor()] });
+        const DBguildIDs = (await repositories.guildsettings.select()).map(item => item.guildId);
+        const botGuildIds = client.guilds.cache.map(gui => gui.id);
+        const notInGuildIds = DBguildIDs.filter(id => !botGuildIds.includes(id));
+        const notInGuildObjects = [];
+        for (const notInGuildId of notInGuildIds) {
+            const guild = client.guilds.cache.get(notInGuildId);
+            if (guild) notInGuildObjects.push(guild);
+        }
+        console.log(notInGuildObjects);
     },
 };
