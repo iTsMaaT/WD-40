@@ -40,24 +40,6 @@ const logs = mysqlTable("Logs", {
     };
 });
 
-const message = mysqlTable("Message", {
-    id: bigint("ID", { mode: "number" }).autoincrement().notNull(),
-    messageId: varchar("MessageID", { length: 191 }).notNull(),
-    userId: varchar("UserID", { length: 191 }).notNull(),
-    channelId: varchar("ChannelID", { length: 191 }).notNull(),
-    guildId: varchar("GuildID", { length: 191 }).notNull(),
-    timestamp: datetime("Timestamp", { mode: "string", fsp: 3 }).default(sql`CURRENT_TIMESTAMP(3)`).notNull(),
-    content: text("Content").notNull(),
-    channelName: varchar("ChannelName", { length: 191 }).notNull(),
-    guildName: varchar("GuildName", { length: 191 }).notNull(),
-    userName: varchar("UserName", { length: 191 }).notNull(),
-},
-(table) => {
-    return {
-        messageIdPk: primaryKey({ columns: [table.id], name: "message_ID_pk" }),
-    };
-});
-
 const reactions = mysqlTable("Reactions", {
     id: bigint("ID", { mode: "number" }).autoincrement().notNull(),
     guildId: varchar("GuildID", { length: 25 }).notNull(),
@@ -101,7 +83,6 @@ module.exports = {
     blacklist,
     guildsettings,
     logs,
-    message,
     reactions,
     responses,
     snowflake,
