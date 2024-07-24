@@ -37,21 +37,23 @@ module.exports = {
         const totalExecutedCommands = (await DB.drizzle.execute(sql`SELECT COUNT(m.ID) AS count FROM Logs m WHERE m.Value LIKE "Executing [%"`))[0][0].count;
         const VoicesPlaying = client.voice.adapters.size;
       
-        const lastExecutedCommands = (await DB.drizzle.execute(sql`SELECT m.* FROM Message m WHERE m.Content LIKE ${prefix + "%"} AND m.MessageID != ${message.id} AND m.GuildID = ${message.guild.id} ORDER BY m.ID DESC LIMIT 10`))[0];
+        const fetchedMessages = await message.channel.messages.fetch({ limit: 100 });
+        const lastExecutedCommands = Array.from(fetchedMessages.values()).filter(msg => 
+            msg.content.startsWith(prefix) && 
+            msg.id !== message.id,
+        ).sort((a, b) => b.createdTimestamp - a.createdTimestamp).slice(0, 10);        
         const TextCommands = client.commands.map(command => command.name);
-        if (lastExecutedCommands) {
-            for (const command of lastExecutedCommands) {
-                if (TextCommands.includes(command.Content?.split(" ")[0]?.replace(prefix, ""))) {
-                    lastExecutedCommand = command;
-                    break;
-                }
+        for (const command of lastExecutedCommands) {
+            if (TextCommands.includes(command.content.split(" ")[0].replace(prefix, ""))) {
+                lastExecutedCommand = command;
+                break;
             }
         }
 
-        const lastCommandContent = lastExecutedCommand?.Content;
+        const lastCommandContent = lastExecutedCommand?.content;
         if (lastExecutedCommand) {
-            lastCommandLink = `https://discord.com/channels/${lastExecutedCommand.GuildID}/${lastExecutedCommand.ChannelID}/${lastExecutedCommand.MessageID}`;
-            lastCommandTimeSinceNow = prettyMilliseconds(Date.now() - (await client.channels.cache.get(lastExecutedCommand.ChannelID).messages.fetch(lastExecutedCommand.MessageID).then(msg => msg.createdTimestamp)));
+            lastCommandLink = `https://discord.com/channels/${lastExecutedCommand.guild.id}/${lastExecutedCommand.channel.id}/${lastExecutedCommand.id}`;
+            lastCommandTimeSinceNow = prettyMilliseconds(Date.now() - lastExecutedCommand.createdTimestamp);
         }
 
         const embed = {
