@@ -31,7 +31,7 @@ module.exports = {
         };
         const randomTacIndex = Math.floor(Math.random() * Object.keys(tacs).length);
         let tac = tacs[Object.keys(tacs)[randomTacIndex]];
-        const tacimage = `https://www.tetesaclaques.tv/public/images/series/fr-ca/${Object.entries(tacs)[randomTacIndex].replace(/[1-9]/g, "")}.png`;
+        const tacimage = `https://www.tetesaclaques.tv/public/images/series/fr-ca/${Object.entries(tacs)[randomTacIndex][0].replace(/[1-9]/g, "")}.png`;
         
         tac = prettyString(tac, "first", false);
 

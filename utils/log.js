@@ -120,6 +120,7 @@ class Logger {
 
     warning(message) {
         this.writeLogToFile(message, this.types.warning);
+        if (message == "[YOUTUBEJS][Player]:") logger.severe("Youtube player not working.");
     }
 
     severe(message) {

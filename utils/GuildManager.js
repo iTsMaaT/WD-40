@@ -8,7 +8,7 @@ const prefixes = {};
 const responses = {};
 const personality = {};
 
-function init(guilds) {
+async function init(guilds, client) {
     guilds.forEach(async (guild) => {
         const exists = await CheckIfGuildExists(guild);
         if (!exists) await AddGuildToDatabase(guild);
@@ -17,6 +17,12 @@ function init(guilds) {
         responses[guild.id] = settings.responses;
         personality[guild.id] = settings.personality;
     });
+
+    const DBguildIDs = (await repositories.guildsettings.select()).map(item => item.guildId);
+    const botGuildIds = client.guilds.cache.map(gui => gui.id);
+    const notInGuildIds = DBguildIDs.filter(id => !botGuildIds.includes(id));
+    for (const notInGuildId of notInGuildIds) 
+        await SetActiveOrCreate({ id: notInGuildId }, false);
 }
 
 async function SetActiveOrCreate(guild, status = true) {

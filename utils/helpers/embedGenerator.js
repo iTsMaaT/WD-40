@@ -69,7 +69,6 @@ class EmbedGenerator extends EmbedBuilder {
             author = client.user;
         
         if (!author) return this;
-        console.log(author);
         return this.setAuthor({
             name: author.username,
             iconURL: author.displayAvatarURL(),
