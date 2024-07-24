@@ -3,6 +3,13 @@ const dotenv = require("dotenv");
 dotenv.config();
 require("module-alias/register");
 
+const logger = require("@utils/log");
+console.warner = console.warn;
+console.logger = console.log;
+console.warn = (log) => logger.warning(log);
+console.log = (log) => logger.console(log);
+console.log("Logger instanciated");
+
 const { Client, GatewayIntentBits, Partials } = require("discord.js");
 const { getPermissionArrayNames } = require("@functions/discordFunctions");
 const { discordPlayerConf, DefaultDebugState, DefaultSuperuserState } = require("@utils/config.json");
@@ -15,8 +22,6 @@ const client = new Client({
     shards: "auto",
     allowedMentions: { repliedUser: false },
 });
-
-const logger = require("@utils/log");
 
 global.wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 process.env.CURRENT_DEBUG_STATE = DefaultDebugState;
@@ -55,7 +60,7 @@ const player = new Player(client, {
 (async () => {
     if (!discordPlayerConf.removeYoutube) {
         await player.extractors.register(YoutubeiExtractor, {
-            authentication: process.env.YOUTUBE_ACCESS_STRING,
+            authentication: process.env.YOUTUBE_ACCESS_STRING || "", 
         });
     }
     await player.extractors.register(SpotifyExtractor, {
@@ -68,11 +73,6 @@ const player = new Player(client, {
 })();
 
 console.log("Variables loaded");
-
-// Logger system and databases
-console.logger = console.log;
-console.log = (log) => logger.console(log);
-console.log("Logger instanciated");
 
 module.exports = { client };
 
