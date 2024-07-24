@@ -2,7 +2,7 @@ const { Events, PermissionsBitField } = require("discord.js");
 const GuildManager = require("@root/utils/GuildManager");
 const { repositories } = require("@utils/db/tableManager.js");
 const getExactDate = require("@functions/getExactDate");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const RandomMinMax = require("@functions/RandomMinMax");
 const findClosestMatch = require("@utils/algorithms/findClosestMatch.js");
 const { initConfFile } = require("@utils/reddit/fetchRedditToken.js");
@@ -81,26 +81,6 @@ Step 5 - Send the downloaded media to your favorite social media!
             if (!message.guild) return message.reply("Commands cannot be executed inside DMs.");
             if (blacklist.includes(message.author.id)) return;
 
-            try {
-                const messageRepository = repositories.message;
-
-                if (messageRepository) {
-                    await messageRepository.insert({
-                        messageId: message.id,
-                        userId: message.author.id,
-                        userName: message.member.user.tag,
-                        channelId: message.channel.id,
-                        channelName: message.channel.name,
-                        guildId: message.guild.id,
-                        guildName: message.guild.name,
-                        content: message.content,
-                    });
-                }
-            } catch (ex) {
-                console.log(`[${getExactDate()} - SEVERE] Unable to write to database`);
-                console.log(ex);
-            }
-
             // Text command executing
             const prefix = GuildManager.GetPrefix(message.guild);
             if (message.content.startsWith(prefix) || message.content.startsWith(`<@${client.user.id}>`)) {
@@ -135,13 +115,13 @@ Step 5 - Send the downloaded media to your favorite social media!
                 if (!command) return;
                 if (command.private && message.author.id !== process.env.OWNER_ID) return;
                 // Admin commands checking
-                if (command.admin && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return SendErrorEmbed(message, "You are not administrator", "red");
+                if (command.admin && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return await message.reply({ embeds: [embedGenerator.error("You are not administrator")] });
 
                 const userBlacklist = await GuildManager.GetBlacklist(message.guild.id);
                 const blCategory = !userBlacklist.CheckPermission(message.author.id, command.category);
                 const blCommand = !userBlacklist.CheckPermission(message.author.id, command.name);
                 if (blCategory || blCommand) 
-                    return SendErrorEmbed(message, `You are blacklisted from executing ${blCategory ? `commands in the **${command.category}** category` : `the **${command.name}** command`}.`, "red");
+                    return await message.reply({ embeds: [embedGenerator.error(`You are blacklisted from executing ${blCategory ? `commands in the **${command.category}** category` : `the **${command.name}** command`}.`)] });
     
 
                 // Check command cooldown
@@ -149,7 +129,7 @@ Step 5 - Send the downloaded media to your favorite social media!
                     const cooldown = TextCooldowns.get(message.author.id);
                     const timeLeft = cooldown - Date.now();
                     if (timeLeft > 0) {
-                        message.reply(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before using that command again.`);
+                        message.reply({ embeds: [embedGenerator.warning(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before using that command again.`)] });
                         return;
                     }
                 }
@@ -185,7 +165,7 @@ Step 5 - Send the downloaded media to your favorite social media!
                     if (requiredPermissions.length > 0 && !botPermissions.has(PermissionsBitField.Flags.Administrator)) {
                         const missingPermissions = requiredPermissions.filter(permission => !botPermissions.has(permission));
                         if (missingPermissions.length > 0) 
-                            return SendErrorEmbed(message, `The bot is missing the following permissions: ${missingPermissions.join(", ")}`, "red");
+                            return await message.reply({ embeds: [embedGenerator.error(`The bot is missing the following permissions: ${missingPermissions.join(", ")}`)] });
                     }
 
 
@@ -214,7 +194,7 @@ Step 5 - Send the downloaded media to your favorite social media!
 
                 } catch (error) {
                     logger.error(error.stack);
-                    return SendErrorEmbed(message, "An error occured while executing the command", "red");
+                    return await message.reply({ embeds: [embedGenerator.error("An error occured while executing the command")] });
                 }
             }
         }

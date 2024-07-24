@@ -15,10 +15,7 @@ module.exports = {
 
         try {
             await history.previous();
-            const skipped_embed = new EmbedBuilder()
-                .setColor("#ffffff")
-                .setDescription("Went back a track!")
-                .setTimestamp();
+            const skipped_embed = embedGenerator.info("Went back a track!").withAuthor(message.author);
             message.reply({ embeds: [skipped_embed] });
         } catch (e) {
             logger.error(e);
