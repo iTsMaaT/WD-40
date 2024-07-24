@@ -74,12 +74,14 @@ module.exports = {
             
 
         } catch (err) {
-            logger.error(err);
-
-            if (err.name === "TimeoutError") 
+            
+            if (err.name === "TimeoutError") {   
+                logger.error("Timed out");
                 return await message.reply({ embeds: [embedGenerator.warning("I do not wish to answer that question. (Request timed out)")] });
-            else 
+            } else {
+                logger.error(err);
                 return await message.reply({ embeds: [embedGenerator.error("An error occurred.")] });
+            }
             
         }
 
