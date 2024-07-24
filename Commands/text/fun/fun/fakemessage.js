@@ -1,5 +1,6 @@
 const { CreateOrUseWebhook, id } = require("@functions/discordFunctions");
 const embedGenerator = require("@utils/helpers/embedGenerator");
+const { PermissionsBitField } = require("discord.js");
 
 module.exports = {
     name: "fakemessage",
@@ -11,7 +12,7 @@ module.exports = {
     },
     category: "fun",
     examples: ["1081004946872352958 You are weird looking"],
-    permission: ["ManageWebhooks"],
+    permission: [PermissionsBitField.Flags.ManageWebhooks, PermissionsBitField.Flags.ManageMessages],
     aliases: ["fmsg"],
     async execute(logger, client, message, args, optionalArgs) {
         let UserID;
