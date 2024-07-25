@@ -1,4 +1,4 @@
-const { Events } = require("discord.js");
+const { Events, PermissionsBitField } = require("discord.js");
 const GuildManager = require("@root/utils/GuildManager");
 const { repositories } = require("@utils/db/tableManager.js");
 const getExactDate = require("@functions/getExactDate");
@@ -21,6 +21,12 @@ module.exports = {
             const slash = interaction.client.slashcommands.get(interaction.commandName);
     
             if (!slash) return logger.error(`No command matching ${interaction.commandName} was found.`);
+
+            const userBlacklist = await GuildManager.GetBlacklist(message.guild.id);
+            const blCategory = !userBlacklist.CheckPermission(message.author.id, command.category);
+            const blCommand = !userBlacklist.CheckPermission(message.author.id, command.name);
+            if (blCategory || blCommand) 
+                return await message.editReply({ embeds: [embedGenerator.error(`You are blacklisted from executing ${blCategory ? `commands in the **${command.category}** category` : `the **${command.name}** command`}.`)] });
     
             // Check command cooldown
             if (SlashCooldowns.has(interaction.user.id)) {
@@ -37,15 +43,32 @@ module.exports = {
             SlashCooldowns.set(interaction.user.id, Date.now() + cooldownTime);
     
             try {
-            // execute the slash command
-                await slash.execute(logger, interaction, client);
-    
+
                 // Logging the command
-                logger.info(`Executing [/${interaction.commandName}]
-                by    [${interaction.user.tag} (${interaction.user.id})]
-                in    [${interaction.channel.name} (${interaction.channel.id})]
-                from  [${interaction.guild.name} (${interaction.guild.id})]`
+                logger.info(`
+            Executing [/${interaction.commandName}]
+            by    [${interaction.user.tag} (${interaction.user.id})]
+            in    [${interaction.channel.name} (${interaction.channel.id})]
+            from  [${interaction.guild.name} (${interaction.guild.id})]`
                     .replace(/^\s+/gm, ""));
+                                        
+                const botMember = message.guild.members.me;
+                if (!botMember) return;
+
+                const botPermissions = botMember.permissions;
+                    
+                if (!botPermissions.has(PermissionsBitField.Flags.SendMessages)) return;
+
+                const requiredPermissions = slash.permissions || [];
+
+                if (requiredPermissions.length > 0 && !botPermissions.has(PermissionsBitField.Flags.Administrator)) {
+                    const missingPermissions = requiredPermissions.filter(permission => !botPermissions.has(permission));
+                    if (missingPermissions.length > 0) 
+                        return await message.editReply({ embeds: [embedGenerator.error(`The bot is missing the following permissions: ${missingPermissions.join(", ")}`)] });
+                }
+
+                // execute the slash command
+                await slash.execute(logger, interaction, client);
     
             } catch (error) {
                 await interaction.editReply({
