@@ -2,11 +2,12 @@ const Discord = require("discord.js");
 const dotenv = require("dotenv");
 dotenv.config();
 require("module-alias/register");
+const util = require("util");
 
 const logger = require("@utils/log");
 console.warner = console.warn;
 console.logger = console.log;
-console.warn = (log) => logger.warning(log);
+console.warn = (log, args) => logger.warning(log + " " + util.format(args));
 console.log = (log) => logger.console(log);
 console.log("Logger instanciated");
 
@@ -60,7 +61,10 @@ const player = new Player(client, {
 (async () => {
     if (!discordPlayerConf.removeYoutube) {
         await player.extractors.register(YoutubeiExtractor, {
-            authentication: process.env.YOUTUBE_ACCESS_STRING || "", 
+            authentication: process.env.YOUTUBE_ACCESS_STRING || "",
+            streamOptions: {
+                useClient: "ANDROID",
+            }, 
         });
     }
     await player.extractors.register(SpotifyExtractor, {
