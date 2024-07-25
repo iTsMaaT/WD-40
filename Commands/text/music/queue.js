@@ -1,6 +1,6 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { useQueue, useMainPlayer, useHistory } = require("discord-player");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "queue",
@@ -11,7 +11,7 @@ module.exports = {
         const queue = useQueue(message.guild.id);
         const history = useHistory(message.guild.id);
 
-        if (!queue || !queue.tracks || !queue.currentTrack) return SendErrorEmbed(message, "There is nothing in the queue / currently playing.", "yellow");
+        if (!queue || !queue.tracks || !queue.currentTrack || queue.tracks.data.length === 0) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue / currently playing.")] });
         const tracks = queue.tracks ? queue.tracks.data : [];
         const historyTracks = history.tracks?.data?.length > 0 ? history.tracks.data.reverse() : []; // Reverse history if it's not empty
         const currentTrack = queue.currentTrack;
@@ -22,8 +22,8 @@ module.exports = {
         const trackFields = [];
         const historyFields = [];
 
-        tracks.map(track => {
-            trackFields.push({ name: `${track.title} - ${track.author}`, value: `requested by : ${track.requestedBy?.displayName ?? "N/A"}` });
+        tracks.map((track, index) => {
+            trackFields.push({ name: `${index + 1} - ${track.title} - ${track.author}`, value: `requested by : ${track.requestedBy?.displayName ?? "N/A"}` });
         });
 
         historyTracks.map(track => {
@@ -128,7 +128,6 @@ module.exports = {
             helpMessage.edit({
                 embeds: [setEmbed(counter)],
                 components: [row],
-                allowedMentions: { repliedUser: false },
             });
 
             await interaction.update({
@@ -144,7 +143,6 @@ module.exports = {
             await helpMessage.edit({
                 embeds: [setEmbed(counter)],
                 components: [row],
-                allowedMentions: { repliedUser: false },
             });
         });
     },

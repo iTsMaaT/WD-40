@@ -1,4 +1,4 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "morse",
@@ -11,7 +11,7 @@ module.exports = {
     },
     examples: ["Hello, World!"],
     async execute(logger, client, message, args, optionalArgs) {
-        if (!args[0]) return SendErrorEmbed(message, "You need to provide a prompt.", "yellow");
+        if (!args[0]) return await message.reply({ embeds: [embedGenerator.error("You need to provide a prompt.")] });
 
         // All morse charaters
         const conversionMap = {
@@ -99,7 +99,7 @@ module.exports = {
         if (morseCode.length < 2000) 
             await message.reply(`\`\`\`${morseCode}\`\`\``);
         else 
-            SendErrorEmbed(message, "The result is too long (>2000)", "yellow");
+            return await message.reply({ embeds: [embedGenerator.error("The result is too long (>2000)")] });
         
     },
 };

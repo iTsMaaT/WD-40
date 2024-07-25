@@ -1,5 +1,5 @@
 const { PermissionsBitField } = require("discord.js");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const { useQueue, useMainPlayer } = require("discord-player");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("@discordjs/voice");
 const googleTTS = require("google-tts-api");
@@ -26,9 +26,9 @@ module.exports = {
             timestamp: new Date(),
         };
 
-        if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
-        if (!args[0]) return SendErrorEmbed(message, "You must provide a prompt.", "yellow");
-        if (queue || queue?.tracks || queue?.currentTrack) return SendErrorEmbed(message, "You must stop the music before playing TTS.", "yellow");
+        if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
+        if (!args[0]) return await message.reply({ embeds: [embedGenerator.error("You must provide a prompt.")] });
+        if (queue || queue?.tracks || queue?.currentTrack) return await message.reply({ embeds: [embedGenerator.warning("You must stop the music before playing TTS.")] });
         
         embed.title = "Requesting a response from Gemini.";
 
@@ -37,7 +37,7 @@ module.exports = {
             const apiKey = process.env.GEMINI_API_KEY; // Replace with your API key
                 
             const prompt = args.join(" ");
-            if (!prompt) return SendErrorEmbed(message, "Please provide a prompt.", "yellow");
+            if (!prompt) return await message.reply({ embeds: [embedGenerator.warning("Please provide a prompt.")] });
     
             const requestBody = {
                 api_key: apiKey,
@@ -80,9 +80,9 @@ module.exports = {
             logger.error(err.stack);
     
             if (err.name === "AbortError") 
-                return SendErrorEmbed(message, "I do not wish to answer that question. (Request timed out)", "yellow");
+                return await message.reply({ embeds: [embedGenerator.warning("I do not wish to answer that question. (Request timed out)")] });
             else 
-                SendErrorEmbed(message, "An error occurred.", "red");
+                return await message.reply({ embeds: [embedGenerator.error("An error occurred.")] });
                 
         }
 
@@ -98,7 +98,7 @@ module.exports = {
             });
         } catch (err) {
             logger.error(err);
-            return SendErrorEmbed(message, "Connection to the voice channel failed", "red");
+            return await message.reply({ embeds: [embedGenerator.error("Connection to the voice channel failed")] });
         }
 
         const audioUrls = googleTTS.getAllAudioUrls(response, {
@@ -140,7 +140,7 @@ module.exports = {
             playNextAudio(); // Start playing the first audio
         } catch (err) {
             logger.error(err);
-            return SendErrorEmbed(message, "Error while trying to play the TTS", "red");
+            return await message.reply({ embeds: [embedGenerator.error("Error while trying to play the TTS")] });
         }
 
         function limitString(string, limit) {

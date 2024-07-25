@@ -1,4 +1,5 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "rule34",
@@ -13,36 +14,30 @@ module.exports = {
         },
     ],
     execute: async (logger, interaction, client) => {
-        await interaction.deferReply();
+        if (!interaction.channel.nsfw) return await interaction.reply({ embeds: [embedGenerator.warning("The channel you are in isn't NSFW")]  });
+
         const tags = interaction.options.get("tags")?.value.trim().replace(" ", "+") ?? "";
-        if (interaction.channel.nsfw) {
-            try {
-                const url = "http://rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=" + tags;
-                const response = await fetch(url);
 
-                const data = await response.json();
-                const post = data[Math.floor(Math.random() * data.length)];
+        try {
+            const url = "http://rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=" + tags;
+            const response = await fetch(url);
 
-                const RuleEmbed = {
-                    color: 0xffffff,
-                    title: `Posted by: ${post.owner}`,
-                    image: {
-                        url: post.file_url,
-                    },
-                    timestamp: new Date(),
-                };
-                await interaction.editReply({ embeds: [RuleEmbed] });
-            } catch (err) {
-                const RuleEmbed = {
-                    color: 0xff0000,
-                    title: "An error occured, probably a invalid tag",
-                    timestamp: new Date(),
-                };
-                await interaction.editReply({ embeds: [RuleEmbed] });
-                logger.error(err);
-            }
-        } else {
-            interaction.editRyply({ content: "The channel you are in isn't NSFW"  });
+            const data = await response.json();
+            const post = data[Math.floor(Math.random() * data.length)];
+
+            const RuleEmbed = embedGenerator.info({
+                title: `Posted by: ${post.owner}`,
+                image: {
+                    url: post.file_url,
+                },
+                footer: {
+                    text: `Score: ${post.score} | Rating: ${post.rating} | Comment count: ${post.comment_count}`,
+                },
+            });
+            await interaction.editReply({ embeds: [RuleEmbed] });
+        } catch (err) {
+            await interaction.editReply({ embeds: [embedGenerator.error("An error occured, probably a invalid tag")] });
+            logger.error(err);
         }
     },
 };

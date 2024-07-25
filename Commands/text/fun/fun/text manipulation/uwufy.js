@@ -1,4 +1,4 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "uwufy",
@@ -10,12 +10,12 @@ module.exports = {
     },
     category: "fun",
     examples: ["Hello, World!"],
-    execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, optionalArgs) {
         
-        if (!args[0]) SendErrorEmbed(message, "You need a prompt", "yellow");
+        if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You need a prompt")] });
 
         const UwUprompt = uwufyText(args.join(" "));
-        if (UwUprompt.length > 1000) SendErrorEmbed(message, "Prompt too long", "yellow");
+        if (UwUprompt.length > 1000) return await message.reply({ embeds: [embedGenerator.error("Prompt too long")] });
 
         const embed = {
             color: 0xffffff,

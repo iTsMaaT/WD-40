@@ -1,5 +1,5 @@
 const { ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField } = require("discord.js");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const GuildManager = require("@root/utils/GuildManager");
 
 module.exports = {
@@ -81,11 +81,12 @@ module.exports = {
         const autoresponses = await GuildManager.getAutoResponses(interaction.guild.id);
         const responses = await autoresponses.getResponses();
 
-        if ((subcommand == "add" || subcommand == "remove" || subcommand == "removeall") && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) return SendErrorEmbed(interaction, "You must be a administrator to execute this action", "yellow", true);
+        if ((subcommand == "add" || subcommand == "remove" || subcommand == "removeall") && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) 
+            return await interaction.reply({ embeds: [embedGenerator.warning("You must be a administrator to execute this action")], ephemeral: true });
 
         switch (subcommand) {
             case "list": {
-                if (Object.keys(responses).length === 0) return SendErrorEmbed(interaction, "There are no auto-responses in this guild", "yellow", true);
+                if (Object.keys(responses).length === 0) return await interaction.editReply({ embeds: [embedGenerator.warning("There are no auto-responses in this guild")], ephemeral: true });
             
                 const embed = {
                     title: "List of auto-responses",
@@ -110,7 +111,7 @@ module.exports = {
             }
             
             case "remove": {
-                if (!responses[ChannelPromptInput]) return SendErrorEmbed(interaction, "There is no entry for that channel prompt", "yellow", true);
+                if (!responses[ChannelPromptInput]) return await interaction.editReplyeply({ embeds: [embedGenerator.warning("There is no entry for that channel prompt")], ephemeral: true });
 
                 autoresponses.removeResponse(ChannelPromptInput, StringInput);
                 const embed = {
@@ -123,7 +124,7 @@ module.exports = {
                 break;
             }
             case "removeall": {
-                if (!responses[ChannelPromptInput]) return SendErrorEmbed(interaction, "There is no entry for that channel prompt", "yellow", true);
+                if (!responses[ChannelPromptInput]) return await interaction.editReply({ embeds: [embedGenerator.warning("There is no entry for that channel prompt")], ephemeral: true });
 
                 autoresponses.removeResponse(ChannelPromptInput);
                 const embed = {
@@ -137,11 +138,11 @@ module.exports = {
             }
             case "add": {
 
-                if (Object.keys(responses).length >= 20) return SendErrorEmbed(interaction, "You cannot have more than 20 auto-responses", "yellow", true);
+                if (Object.keys(responses).length >= 20) return await interaction.editReply({ embeds: [embedGenerator.warning("You cannot have more than 20 auto-responses")], ephemeral: true });
 
                 if (responses[ChannelPromptInput]) {
                     const existingEntry = responses[ChannelPromptInput].find(entry => entry.string === StringInput);
-                    if (existingEntry) return SendErrorEmbed(interaction, "An entry for that channel prompt and string combination already exists.", "red", true);
+                    if (existingEntry) return await interaction.editReply({ embeds: [embedGenerator.warning("An entry for that channel prompt and string combination already exists.")], ephemeral: true });
                 }
 
                 const embed = {

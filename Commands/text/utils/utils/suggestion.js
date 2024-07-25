@@ -1,3 +1,5 @@
+const embedGenerator = require("@utils/helpers/embedGenerator");
+
 module.exports = {
     name: "suggestion",
     description: "Suggest ideas for the bot",
@@ -12,7 +14,7 @@ module.exports = {
         await sent.react("🔴");
         await sent.react("🟢");
         await sent.react("✅");
-        message.reply("Suggestion received.\nIf it's a bug report, you can join the support server via the help command");
         logger.info("Suggestion received");
+        await message.reply({ embeds: [embedGenerator.info("Your suggestion has been sent.\nFor a bug report, you can join the support server by doing >help")] });
     },
 };

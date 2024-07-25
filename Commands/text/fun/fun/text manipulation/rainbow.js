@@ -1,4 +1,4 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "rainbow",
@@ -11,8 +11,8 @@ module.exports = {
     },
     examples: ["Hello, World!"],
     async execute(logger, client, message, args, optionalArgs) {
-        if (!args[0]) return SendErrorEmbed(message, "You need to provide a prompt.", "yellow");
-        if (args.join(" ").length > 250) return SendErrorEmbed(message, "The result is too long (>250)", "yellow");
+        if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You need to provide a prompt.")] });
+        if (args.join(" ").length > 250) return await message.reply({ embeds: [embedGenerator.error("The result is too long (>250)")] });
 
         // Array of different ansi colors supported by discord (removed grey because ugly)
         const colors = ["[0;31m", "[0;32m", "[0;33m", "[0;34m", "[0;35m", "[0;36m", "[0;37m"];

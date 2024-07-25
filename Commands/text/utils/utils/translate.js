@@ -1,5 +1,5 @@
 const translate = require("@iamtraction/google-translate");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "translate",
@@ -8,7 +8,7 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         const LanguageCode = message.guild.preferredLocale.split("-")[0].toString().toLowerCase();
 
-        if (!message.reference) SendErrorEmbed(message, "You need to reply to a message", "yellow");
+        if (!message.reference) return await message.reply({ embeds: [embedGenerator.warning("You need to reply to a message")] });
 
         const reference = await message.channel.messages.fetch(message.reference.messageId);
         const text = reference.content;
@@ -42,7 +42,7 @@ module.exports = {
                 
         } catch (err) {
             logger.error(err.stack);
-            message.reply({ embeds: [{ title: "An error occured.", color: 0xff0000, timestamp: new Date() }] });
+            return await message.reply({ embeds: [embedGenerator.error("An error occured")] });
         } 
 
         function limitString(string, limit) {

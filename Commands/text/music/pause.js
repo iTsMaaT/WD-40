@@ -1,32 +1,26 @@
 const { EmbedBuilder } = require("discord.js");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const { useQueue, useTimeline, useMainPlayer } = require("discord-player");
 
 module.exports = {
     name: "pause",
     description: "Pauses / Resumes currently playing music",
     category: "music",
-    execute(logger, client, message, args, optionalArgs) {
-        if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
+    async execute(logger, client, message, args, optionalArgs) {
+        if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
 
         const queue = useQueue(message.guild.id);
         const timeline = useTimeline(message.guild.id);
 
-        if (!queue || !queue.currentTrack) return SendErrorEmbed(message, "There is nothing in the queue right now.", "yellow");
+        if (!queue || !queue.currentTrack) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue right now.")] });
 
         timeline.paused ? timeline.resume() : timeline.pause();
         const state = timeline.paused;
 
-        const music_resumed_embed = new EmbedBuilder()
-            .setColor("#ffffff")
-            .setDescription("Music resumed.")
-            .setTimestamp();
+        const embed = embedGenerator.info({
+            title: state ? "Music paused." : "Music resumed.",
+        }).withAuthor(message.author);
 
-        const music_paused_embed = new EmbedBuilder()
-            .setColor("#ffffff")
-            .setDescription("Music paused.")
-            .setTimestamp();
-
-        message.reply({ embeds: [state ? music_paused_embed : music_resumed_embed] });
+        await message.reply({ embeds: [embed] });
     },
 }; 

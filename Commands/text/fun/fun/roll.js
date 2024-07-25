@@ -1,3 +1,5 @@
+const embedGenerator = require("@utils/helpers/embedGenerator");
+
 module.exports = {
     name: "roll",
     description: "Roll between 1 and 50 dices of up to 50 sides. Defaults to rolling 1d6 when no arguments are given.",
@@ -28,29 +30,26 @@ module.exports = {
             const rolls = Array.from({ length: numDices }, () => Math.floor(Math.random() * numSides) + 1);
             const total = rolls.reduce((acc, cur) => acc + cur, 0);
 
-            RollEmbed = {
-                color: 0xffffff,
+            RollEmbed = embedGenerator.info({
                 title: `Rolling **${numDices}d${numSides}**...`,
                 fields: [
                     { name: "Rolls", value: rolls.join(", ") },
                     { name: "Total", value: total, inline: true },
                     { name: "Maximum possible", value: numDices * numSides, inline: true },
                 ],
-                timestamp: new Date(),
-            };
+            }).withAuthor(message.author);
 
             message.reply({ embeds: [RollEmbed] });
         } else {
             // Roll 1d6 by default
             const roll = Math.floor(Math.random() * 6) + 1;
-            RollEmbed = {
-                color: 0xffffff,
+            RollEmbed = embedGenerator.info({
                 title: "Rolling **1d6**...",
                 fields: [
                     { name: "Roll", value: roll },
                 ],
-                timestamp: new Date(),
-            };
+            }).withAuthor(message.author);
+            
             message.reply({ embeds: [RollEmbed] });
         }
     },

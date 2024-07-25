@@ -1,31 +1,25 @@
+const embedGenerator = require("@utils/helpers/embedGenerator");
+
 module.exports = {
     name: "nick",
     description: "Changes the server nickname",
     category: "utils",
+    usage: {
+        required: {
+            "nickname": "nickname to set",
+        },
+    },
     private: true,
-    execute: async (logger, client, message, args, optionalArgs) => {
-        if (args.length >= 1) {
+    async execute(logger, client, message, args, optionalArgs) {
+        try {
+            const newNickname = args.join(" ");
             const member = message.guild.members.cache.get(client.user.id);
-
-            // Tries to set the server nickname
-            try {
-                await member.setNickname(args.join(" "));
-                message.reply("Server nickname changed.");
-            } catch (err) {
-                message.reply(`Nickname change failed.\n\`${err}\``);
-            }
-        } else if (args.length === 0) {
-            const member = message.guild.members.cache.get(client.user.id);
-
-            // Resets the server nickname to default
-            try {
-                await member.setNickname(null);
-                message.reply({ content: "Server nickname set to default" });
-            } catch (err) {
-                message.reply(`Nickname reset failed.\n\`${err}\``);
-            }
-        } else {
-            message.reply("You are not allowed to execute that command.");
+            
+            await member.setNickname(newNickname || null);
+            await message.reply({ embeds: [embedGenerator.success(`Server nickname changed to ${newNickname || "default"}`)] });
+        } catch (err) {
+            logger.error(err);
+            return await message.reply({ embeds: [embedGenerator.error("Nickname change failed.")] });
         }
     },
 };

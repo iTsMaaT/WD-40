@@ -1,6 +1,6 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ApplicationCommandOptionType } = require("discord.js");
 const { prettyString } = require("@functions/formattingFunctions");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const GuildManager = require("@root/utils/GuildManager.js");
 
 module.exports = {
@@ -20,7 +20,7 @@ module.exports = {
 
         if (command) {
             const CommandName = client.commands.get(command);
-            if (!CommandName || CommandName.private) return SendErrorEmbed(interaction, "This command doesn't exist.", "red");
+            if (!CommandName || CommandName.private) return await interaction.editReply({ embeds: [embedGenerator.warning("This command doesn't exist.")] });
 
             const CommandEmbed = {
                 title: `**${prefix}${CommandName.name}**`,
@@ -52,7 +52,7 @@ module.exports = {
             }
             if (CommandName.cooldown) CommandEmbed.fields.push({ name: "Cooldown", value: parseInt(CommandName.cooldown) / 1000 + "s" });
 
-            return interaction.reply({ embeds: [CommandEmbed]  });
+            return await interaction.editReply({ embeds: [CommandEmbed]  });
         }
         // Finds all command files and separate them from categories, then use page to list the commands per category
 
@@ -131,7 +131,7 @@ module.exports = {
 
         row.components[0].setDisabled(true);
         row.components[1].setDisabled(true);
-        const helpMessage = await interaction.reply({
+        const helpMessage = await interaction.editReply({
             embeds: [categoryEmbed],
             components: [row],
             allowedMentions: { repliedUser: false },

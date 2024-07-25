@@ -1,7 +1,7 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
 const { createCanvas } = require("canvas");
 const { AttachmentBuilder } = require("discord.js");
 const { PermissionFlagsBits } = require("discord.js");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 
 module.exports = {
@@ -16,7 +16,7 @@ module.exports = {
     examples: ["Hello, World!"],
     permission: [PermissionFlagsBits.AttachFiles],
     async execute(logger, client, message, args, optionalArgs) {
-        if (!args[0]) return SendErrorEmbed(message, "Please provide a string to translate", "yellow");
+        if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("Please provide a string to translate")] });
 
         const prompt = args.join(" ");
 

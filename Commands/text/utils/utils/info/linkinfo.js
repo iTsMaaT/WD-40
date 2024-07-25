@@ -2,9 +2,9 @@ const https = require("https");
 const dns = require("dns/promises");
 const fs = require("fs/promises");
 // const puppeteer = require("puppeteer");
-const cheerio = require("cheerio");
+const { parse } = require("node-html-parser");
 const path = require("path");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "linkinfo",
@@ -18,13 +18,13 @@ module.exports = {
     category: "info",
     cooldown: 10000,
     async execute(logger, client, message, args, optionalArgs) {
-        const agent = new https.Agent({ keepAlive: true });
-        if (!args[0]) return SendErrorEmbed(message, "Please provide a URL", "yellow");
+        const agent = new https.Agent();
+        if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("Please provide a URL")] });
         const link = args[0];
         const MAX_FIELD_LENGTH = 1000;
 
         try {
-            if (!await validateURL(link)) return SendErrorEmbed(message, "Invalid URL", "yellow");
+            if (!await validateURL(link)) return await message.reply({ embeds: [embedGenerator.error("Invalid URL")] });
             const result = await analyzeLink(link);
             // let file;
             // if (result.screenshotPath) file = new AttachmentBuilder(result.screenshotPath, { name: "screenshot.png" });
@@ -34,7 +34,7 @@ module.exports = {
                 title: "Link Analysis",
                 fields: [
                     { name: "Unshortened URL", value: truncateText(result.unshortenedURL, MAX_FIELD_LENGTH) ?? "-" },
-                    { name: "Redirects (without search params)", value: result.redirects.length !== 1 ? truncateText(result.redirects.join(" ➤\n")) : "None" ?? "-" },
+                    { name: "Redirects (without search params)", value: result.redirects.length !== 1 ? truncateText(result.redirects.join(" ->\n")) : "None" ?? "-" },
                     { name: "Response Status", value: truncateText(result.responseStatus, MAX_FIELD_LENGTH) ?? "-" },
                     { name: "IP Address", value: truncateText(result.ip, MAX_FIELD_LENGTH) ?? "-" },
                     { name: "Type", value: truncateText(result.type, MAX_FIELD_LENGTH) },
@@ -51,12 +51,11 @@ module.exports = {
                 },*/
             };
 
-            if (args[1] == "-f") 
-                await message.reply({ embeds: [embed, (await generateIPInfoEmbeds(result.ip.split(", ")))[0]]/* , files: [file]*/ });
-            else
-                await message.reply({ embeds: [embed]/* , files: [file]*/ });
+            // if (args[1] == "-f") 
+            //    await message.reply({ embeds: [embed, (await generateIPInfoEmbeds(result.ip.split(", ")))[0]]/* , files: [file]*/ });
+            // else
+            await message.reply({ embeds: [embed]/* , files: [file]*/ });
             // if (result.screenshotPath) await fs.unlink(result.screenshotPath);
-
         } catch (error) {
             logger.error(error.stack);
             const responseStatus = error.response?.status || "-";
@@ -213,32 +212,42 @@ module.exports = {
         }
 
         async function getPageTitle(url) {
+            const controller = new AbortController();
+            const { signal } = controller;
+        
+            setTimeout(() => controller.abort(), 5000);
+        
             try {
-                const response = await fetch(url, { agent: agent, signal: AbortSignal.timeout(5000) });
+                const response = await fetch(url, { agent, signal });
                 const body = await response.text();
-                const $ = cheerio.load(body);
-                const title = $("title").text();
+                const root = parse(body);
+                const title = root.querySelector("title")?.text;
                 return title || null;
             } catch (error) {
                 logger.error(error);
-                return "Error while getting the page title using cheerio";
+                return "Error while getting the page title using node-html-parser";
             }
         }
-
+        
         async function getMetadata(url) {
+            const controller = new AbortController();
+            const { signal } = controller;
+        
+            setTimeout(() => controller.abort(), 5000);
+        
             try {
-                const response = await fetch(url, { agent: agent, signal: AbortSignal.timeout(5000) });
+                const response = await fetch(url, { agent, signal });
                 const body = await response.text();
-                const $ = cheerio.load(body);
-
-                const description = $("meta[name=\"description\"]").attr("content");
-                const keywords = $("meta[name=\"keywords\"]").attr("content");
-                const ogTitle = $("meta[property=\"og:title\"]").attr("content");
-                const ogDescription = $("meta[property=\"og:description\"]").attr("content");
-                const author = $("meta[name=\"author\"]").attr("content");
-                const publisher = $("meta[property=\"article:publisher\"]").attr("content");
-                const creator = $("meta[name=\"creator\"]").attr("content");
-
+                const root = parse(body);
+        
+                const description = root.querySelector("meta[name=\"description\"]")?.getAttribute("content");
+                const keywords = root.querySelector("meta[name=\"keywords\"]")?.getAttribute("content");
+                const ogTitle = root.querySelector("meta[property=\"og:title\"]")?.getAttribute("content");
+                const ogDescription = root.querySelector("meta[property=\"og:description\"]")?.getAttribute("content");
+                const author = root.querySelector("meta[name=\"author\"]")?.getAttribute("content");
+                const publisher = root.querySelector("meta[property=\"article:publisher\"]")?.getAttribute("content");
+                const creator = root.querySelector("meta[name=\"creator\"]")?.getAttribute("content");
+        
                 const metadata = {
                     description: description || "-",
                     keywords: keywords || "-",
@@ -248,7 +257,7 @@ module.exports = {
                     publisher: publisher || "-",
                     creator: creator || "-",
                 };
-
+        
                 return metadata;
             } catch (error) {
                 logger.error(error);

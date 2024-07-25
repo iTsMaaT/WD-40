@@ -1,4 +1,5 @@
-const { SendErrorEmbed, multipleImageEmbed } = require("@functions/discordFunctions");
+const { multipleImageEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "mcskin",
@@ -25,8 +26,8 @@ module.exports = {
             };
             message.reply({ embeds: multipleImageEmbed(embed, `https://mc-heads.net/skin/${name}`, `https://mc-heads.net/user/${name}`, `https://mc-heads.net/body/${name}`) });
         } catch (err) {
-            SendErrorEmbed(message, "An unknown error occured", "red");
             logger.error(err);
+            return await message.reply({ embeds: [embedGenerator.error("An unknown error occured")] });
         }
     },
 };

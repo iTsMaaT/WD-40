@@ -1,11 +1,11 @@
 const { ApplicationCommandType } = require("discord.js");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const translate = require("@iamtraction/google-translate");
 
 module.exports = {
     name: "Translate",
     type: ApplicationCommandType.Message,
     execute: async (logger, interaction, client) => {
-        await interaction.deferReply();
         const LanguageCode = interaction.guild.preferredLocale.split("-")[0].toString().toLowerCase();
         const text = interaction.targetMessage.content;
         console.log(text);
@@ -18,19 +18,16 @@ module.exports = {
 
             if (enTr.text.replace(" ", "") == "" || !enTr.text) throw new Error("Invalid text to translate");
 
-            const embed = {
-                color: 0xffffff,
+            const embed = embedGenerator.info({
                 title: "Translation",
                 fields: [
                     { name: "**Original: **", value: text },
-                    { name:  "**English: **", value: limitString(enTr.text, 1000) },
+                    { name: "**English: **", value: limitString(enTr.text, 1000) },
                 ],
-                footer: { text: "" },
-                timestamp: new Date(),        
-            };
+            });
 
             try {
-                if (LanguageCode !== "en") embed.fields.push({ name:"**Server language: **", value: limitString(localeTr.text, 1000) });
+                if (LanguageCode !== "en") embed.data.fields.push({ name:"**Server language: **", value: limitString(localeTr.text, 1000) });
             } catch (err) {
                 logger.error(err);
             }
@@ -39,7 +36,7 @@ module.exports = {
                 
         } catch (err) {
             logger.error(err.stack);
-            await interaction.editReply({ embeds: [{ title: "An error occured.", color: 0xff0000, timestamp: new Date() }] });
+            await interaction.editReply({ embeds: [embedGenerator.error("An error occured.")] });
         } 
 
         function limitString(string, limit) {

@@ -1,3 +1,5 @@
+const embedGenerator = require("@utils/helpers/embedGenerator");
+
 module.exports = {
     name: "inviteinfo",
     description: "Gives info on an invite",
@@ -63,8 +65,8 @@ module.exports = {
   
             await message.reply({ embeds: [embed] });
         } catch (error) {
-            console.error(error);
-            await message.reply("An error occurred while fetching invite information.");
+            logger.error(error);
+            return await message.reply({ embeds: [embedGenerator.error("An error occurred while fetching invite information.")] });
         }
     },
 };

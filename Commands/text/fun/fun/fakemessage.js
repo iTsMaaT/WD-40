@@ -1,4 +1,6 @@
-const { SendErrorEmbed, CreateOrUseWebhook, id } = require("@functions/discordFunctions");
+const { CreateOrUseWebhook, id } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
+const { PermissionsBitField } = require("discord.js");
 
 module.exports = {
     name: "fakemessage",
@@ -10,12 +12,12 @@ module.exports = {
     },
     category: "fun",
     examples: ["1081004946872352958 You are weird looking"],
-    permission: ["ManageWebhooks"],
+    permission: [PermissionsBitField.Flags.ManageWebhooks, PermissionsBitField.Flags.ManageMessages],
     aliases: ["fmsg"],
     async execute(logger, client, message, args, optionalArgs) {
         let UserID;
 
-        if (!args[0]) return SendErrorEmbed(message, "You must provide a prompt", "yellow");
+        if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You must provide a prompt")] });
         
         if (id(args[0])) 
             UserID = id(args.shift());
@@ -26,7 +28,7 @@ module.exports = {
         try {
             User = await message.guild.members.fetch(UserID);
         } catch (err) {
-            return SendErrorEmbed(message, "Couldn't fetch the user", "red");
+            return await message.reply({ embeds: [embedGenerator.error("Couldn't fetch the user")] });
         }
 
         message.delete();

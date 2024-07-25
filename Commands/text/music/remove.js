@@ -1,29 +1,37 @@
 const { useQueue, useMainPlayer } = require("discord-player");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
-const { EmbedBuilder } = require("discord.js");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "remove",
     description: "Removes a given track",
-    usage: "< [Track]: track to remove >",
+    usage: {
+        required: {
+            "song number": "the song number in the queue to remove",
+        },
+    },
     category: "music",
     examples: ["3"],
-    execute(logger, client, message, args, optionalArgs) {
-        const queue = useQueue(message.guild.id);
+    async execute(logger, client, message, args, optionalArgs) {
+        try {
+            const queue = useQueue(message.guild.id);
 
-        if (!queue || !queue.tracks || !queue.currentTrack) return SendErrorEmbed(message, "There is nothing in the queue / currently playing.", "yellow");
+            if (!queue || !queue.tracks || !queue.currentTrack) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue / currently playing.")] });
 
-        const remove = parseInt(args[0]);
-        const trackResolvable = queue.tracks.at(remove);
+            const remove = parseInt(args[0]);
+            const trackResolvable = queue.tracks.at(remove);
 
-        if (isNaN(remove) || !trackResolvable) return SendErrorEmbed(message, "Couldn't find song to skip to.", "red");
+            if (isNaN(remove) || !trackResolvable) return await message.reply({ embeds: [embedGenerator.error("Couldn't find song to remove")] });
 
-        queue.node.remove(trackResolvable);
+            queue.node.remove(trackResolvable);
 
-        const embed = new EmbedBuilder()
-            .setColor("#ffffff")
-            .setDescription(`Removed: ${trackResolvable.title}`)
-            .setTimestamp();
-        message.reply({ embeds: [embed] });
+            const embed = embedGenerator.info({
+                title: `Removed: ${trackResolvable.title}`,
+            }).withAuthor(message.author);
+
+            message.reply({ embeds: [embed] });
+        } catch (err) {
+            logger.error(e);
+            return await message.reply({ embeds: [embedGenerator.error("An error occurred.")] });
+        }
     },
 };

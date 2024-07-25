@@ -1,8 +1,9 @@
 const { PermissionsBitField } = require("discord.js");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
+const { getLoopMode } = require("@utils/helpers/playerHelpers");
 const { QueryType, useMainPlayer, useQueue } = require("discord-player");
 const { discordPlayerConf } = require("@utils/config.json");
-const cheerio = require("cheerio");
+const { parse } = require("node-html-parser");
 
 const player = useMainPlayer();
 
@@ -31,14 +32,14 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         let res, research, embed;
         const queue = useQueue(message.guild.id);
-        if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
+        if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
         
         const Attachment = message.attachments.first()?.attachment;
 
         let string = args.join(" ");
-        string = string.split("&list=")[0];
+        // string = string.split("&list=")[0];
         if (!string) string = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
-        // return SendErrorEmbed(message, "Please enter a song URL or query to search.", "yellow");
+        // return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
 
         embed = {
             color: 0xffffff,
@@ -51,7 +52,7 @@ module.exports = {
             requestedBy: message.member,
             searchEngine: QueryType.AUTO_SEARCH,
         });
-        
+
         const msg = await message.reply({ embeds: [embed] });
         
         try {
@@ -95,6 +96,7 @@ module.exports = {
                     .then((collected) => {
                         const responseMessage = collected.first();
                         research = choices[parseInt(responseMessage.content) - 1];
+                        responseMessage.delete();
                     })
                     .catch(() => research = choices[0]);
                     
@@ -144,28 +146,21 @@ module.exports = {
                     },
                 });
             }
-            logger.music(`Playing [${res.track.title}] in [${message.member.voice.channel.name}]`); 
+            logger.music(`Playing [${res.track.title}] in [${message.member.voice.channel.name}]`);
 
-            embed = {
-                color: 0xffffff,
+            embed = embedGenerator.info({
                 title: `${res.searchResult.hasPlaylist() ? "Playlist" : "Track"} enqueued!`,
                 thumbnail: { url: res.track.thumbnail },
                 description: `[${res.track.title}](${res.track.url})`,
-                fields: res.searchResult.playlist ? [{ name: "Playlist", value: res.searchResult.playlist.title }] : [],
-                timestamp: new Date(),
-            };
+                fields: res.searchResult?.playlist ? [{ name: "Playlist", value: res.searchResult.playlist.title }] : [],
+                footer: { text: `Loop mode: ${getLoopMode(queue)}` },
+            }).withAuthor(message.author);
     
             await msg.edit({ embeds: [embed] });
 
         } catch (err) {
             logger.error(err);
-            embed = {
-                color: 0xff0000,
-                description: "Failed to fetch / play the requested track",
-                timestamp: new Date(),
-            };
-
-            await msg.edit({ embeds: [embed] });
+            return await msg.edit({ embeds: [embedGenerator.error("Failed to fetch / play the requested track")] });
         }
     },
 };
@@ -177,8 +172,8 @@ const getSoundgasmLink = async (link) => {
     const response = await fetch(link);
     const html = await response.text();
 
-    const $ = cheerio.load(html);
-    const scriptContent = $("script").last().html();
+    const root = parse(html);
+    const scriptContent = root.querySelectorAll("script").pop().text;
 
     const startIndex = scriptContent.indexOf("\"https://media.soundgasm.net/sounds/");
     const endIndex = scriptContent.indexOf(".m4a\"", startIndex) + 4;

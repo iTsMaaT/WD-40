@@ -1,10 +1,10 @@
 const { ApplicationCommandType } = require("discord.js");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "User information",
     type: ApplicationCommandType.User,
     execute: async (logger, interaction, client) => {
-        await interaction.deferReply();
         const target = interaction.targetMember ?? await client.users.fetch(interaction.targetId);
         const status = target.presence;
 
@@ -44,7 +44,7 @@ module.exports = {
             await interaction.editReply({ embeds: [userInfoEmbed]  });
         } catch (err) {
             console.log(err);
-            await interaction.editReply({ embeds: [{ title: "An error occured.", color: 0xff0000, timestamp: new Date() }] });
+            await interaction.editReply({ embeds: [embedGenerator.error("An error occured.")] });
         }
 
     },

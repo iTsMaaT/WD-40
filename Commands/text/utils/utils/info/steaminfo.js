@@ -1,4 +1,4 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const prettyMilliseconds = require("pretty-ms");
 
 module.exports = {
@@ -13,14 +13,14 @@ module.exports = {
     },
     examples: ["76561198868461949"],
     async execute(logger, client, message, args, optionalArgs) {
-        if (!args[0]) return SendErrorEmbed(message, "You must provide a steam ID", "yellow");
+        if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You must provide a steam ID")] });
         const steamID = args[0];
         let steamInfo;
         try {
             steamInfo = await getSteamInfo(steamID);
         } catch (err) {
             logger.error(err);
-            return SendErrorEmbed(message, "Couldn't fetch steam info", "yellow");
+            return await message.reply({ embeds: [embedGenerator.error("Couldn't fetch steam info")] });
         }
 
         const formattedGames = steamInfo.threeRecentGames.games.map((game, index) => `
@@ -63,12 +63,10 @@ module.exports = {
 
 const getSteamInfo = async (steamID) => {
     const baseURL = "http://api.steampowered.com/";
-    // console.log(await(await fetch(`${baseURL}IPlayerService/GetOwnedGames/v0001/?key=${process.env.STEAM_API_KEY}&steamid=${steamID}&format=json`)).text());
     const [allGames, recentGames, profile] = await Promise.all([
         await (await fetch(`${baseURL}IPlayerService/GetOwnedGames/v0001/?key=${process.env.STEAM_API_KEY}&steamid=${steamID}&format=json`)).json(),
         await (await fetch(`${baseURL}IPlayerService/GetRecentlyPlayedGames/v0001/?key=${process.env.STEAM_API_KEY}&steamid=${steamID}&count=3&format=json`)).json(),
         await (await fetch(`${baseURL}ISteamUser/GetPlayerSummaries/v0002/?key=${process.env.STEAM_API_KEY}&steamids=${steamID}&format=json`)).json(),
-        // http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=C8F93CB635E0B5B50E2908C8698B04D4&steamid=76561197960434622&format=json
     ]);
 
     const gameCount = allGames.response.game_count;

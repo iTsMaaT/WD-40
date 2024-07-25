@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const { useHistory, useMainPlayer } = require("discord-player");
 
 module.exports = {
@@ -8,21 +8,18 @@ module.exports = {
     category: "music",
     aliases: ["previous"],
     async execute(logger, client, message, args, optionalArgs) {
-        if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
+        if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
 
         const history = useHistory(message.guild.id);
-        if (!history) SendErrorEmbed(message, "There is nothing in the history", "yellow");
+        if (!history) return await message.reply({ embeds: [embedGenerator.error("There is no history to go back to.")] });
 
         try {
             await history.previous();
-            const skipped_embed = new EmbedBuilder()
-                .setColor("#ffffff")
-                .setDescription("Went back a track!")
-                .setTimestamp();
+            const skipped_embed = embedGenerator.info("Went back a track!").withAuthor(message.author);
             message.reply({ embeds: [skipped_embed] });
         } catch (e) {
             logger.error(e);
-            SendErrorEmbed(message, "An error occurred.", "red");
+            return await message.reply({ embeds: [embedGenerator.error("An error occurred.")] });
         }
     },
 }; 

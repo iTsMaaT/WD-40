@@ -1,3 +1,4 @@
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const { ChannelType, PermissionsBitField } = require("discord.js");
 
 module.exports = {
@@ -20,10 +21,9 @@ module.exports = {
             rulesChannel = guild.channels.cache.find((channel) => channel.type === ChannelType.GuildText);
         
 
-        if (!rulesChannel) {
-            message.reply("Couldn't find a rules / announcements / general channel accessible by everyone.");
-            return;
-        }
+        if (!rulesChannel) 
+            return await message.reply({ embeds: [embedGenerator.error("Couldn't find a rules / announcements / general channel accessible by everyone.")] });
+        
 
         try {
             // Create an invite to the rules channel

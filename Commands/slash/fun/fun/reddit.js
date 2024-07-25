@@ -1,6 +1,7 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const FetchReddit = require("@utils/reddit/FetchReddit.js");
+const { int } = require("drizzle-orm/mysql-core");
 
 module.exports = {
     name: "reddit",
@@ -27,19 +28,18 @@ module.exports = {
     async execute(logger, interaction, client) {
         const option = interaction.options.get("option").value;
         const optiondata = interaction.options.get("data").value.split(" ")[0];
-        await interaction.deferReply();
         try {
             if (option == "sub") 
                 await interaction.editReply({ embeds: [await FetchReddit(interaction.channel.nsfw, [optiondata], 5, "sub")] });
             else if (option == "user") 
                 await interaction.editReply({ embeds: [await FetchReddit(interaction.channel.nsfw, [optiondata], 5, "user")] });
             else 
-                return SendErrorEmbed(interaction, "Wrong argument usage, please refer to `help reddit`", "yellow", true);
+                return interaction.editReply({ embeds: [embedGenerator.warning("Wrong argument usage, please refer to `help reddit`")] });
             
         } catch (err) {
             if (err.toString().startsWith("SyntaxError: Unexpected token")) {
                 logger.error("Reddit API error");
-                return SendErrorEmbed(interaction, "Reddit API error, please try again later.", "yellow", true);
+                return interaction.editReply({ embeds: [embedGenerator.error("Reddit API error, please try again later.")] });
             }
         }
     },

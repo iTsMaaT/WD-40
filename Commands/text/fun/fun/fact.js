@@ -1,4 +1,4 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "fact",
@@ -18,7 +18,7 @@ module.exports = {
             message.reply({ embeds: [FactEmbed] });
         } catch (err) {
             logger.error(err);
-            return SendErrorEmbed(message, "An error occured", "red");
+            return await message.reply({ embeds: [embedGenerator.error("An error occured")] });
         }
     },
 };

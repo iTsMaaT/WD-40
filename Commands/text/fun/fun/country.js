@@ -1,4 +1,4 @@
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "country",
@@ -15,7 +15,7 @@ module.exports = {
         try {
 
             const json = await (await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(args.slice(0).join(" "))}?fullText=true`)).json();
-            if (json.status === "404") return SendErrorEmbed(message, "Couldn't find the specified country.", "red");
+            if (json.status === "404") return await message.reply({ embeds: [embedGenerator.error("Couldn't find the specified country.")] });
 
             const country = json[0];
             const currencies = Object.values(country.currencies).map(currency => `${currency.name} (${currency.symbol})`);
@@ -50,7 +50,7 @@ module.exports = {
             message.channel.send({ embeds: [countryEmbed] });
         } catch (error) {
             logger.error(`Error retrieving country information: ${error}`);
-            return SendErrorEmbed(message, "Couldn't fetch country infomations", "red");
+            return await message.reply({ embeds: [embedGenerator.error("Couldn't fetch country infomations")] });
         }
     },
 };

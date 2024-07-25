@@ -1,4 +1,6 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
+const embedGenerator = require("@utils/helpers/embedGenerator");
+
 module.exports = {
     name: "roll",
     description: "Roll between 1 and 250 dices of up to 250 sides. Defaults to rolling 1d6.",
@@ -23,12 +25,12 @@ module.exports = {
         const numSides = interaction.options.get("sides")?.value ?? 6;
 
         if (isNaN(numDices) || isNaN(numSides) || numDices < 1 || numSides < 2) 
-            return interaction.reply("The amount of dices or sides per dices is invalid, please use at least a 1d2 (1 dice with 2 sides)");
+            return interaction.editReply({ embeds: [embedGenerator.warning("The amount of dices or sides per dices is invalid, please use at least a 1d2 (1 dice with 2 sides)")] });
             
 
         // Limits the input to 50d50
         if (numDices > 50 || numSides > 50) 
-            return interaction.reply("Maximum of 50 dices with 50 sides");
+            return interaction.editReplyeply({ embeds: [embedGenerator.warning("Maximum of 50 dices with 50 sides")] });
             
 
         // Roll the dices
@@ -46,6 +48,6 @@ module.exports = {
             timestamp: new Date(),
         };
 
-        interaction.reply({ embeds: [RollEmbed] });
+        interaction.editReply({ embeds: [RollEmbed] });
     },
 };

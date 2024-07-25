@@ -2,7 +2,7 @@ const { PermissionsBitField } = require("discord.js");
 const { useQueue, useMainPlayer } = require("discord-player");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("@discordjs/voice");
 const googleTTS = require("google-tts-api");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: "tts",
@@ -19,15 +19,15 @@ module.exports = {
         const queue = useQueue(message.guild.id);
         let connection;
 
-        if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
-        if (!args[0]) return SendErrorEmbed(message, "You must provide a prompt.", "yellow");
-        if (queue || queue?.tracks || queue?.currentTrack) return SendErrorEmbed(message, "You must stop the music before playing a TTS.", "yellow");
+        if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
+        if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You must provide a prompt.")] });
+        if (queue || queue?.tracks || queue?.currentTrack) return await message.reply({ embeds: [embedGenerator.warning("You must stop the music before playing a TTS.")] });
 
-        if (args.filter(word => word.length > 200).length) return SendErrorEmbed(message, "The prompt contains a word longer than 200 characters", "yellow");
+        if (args.filter(word => word.length > 200).length) return await message.reply({ embeds: [embedGenerator.warning("The prompt contains a word longer than 200 characters")] });
 
         const text = args.join(" ");
 
-        if (text.length > 1000) return SendErrorEmbed(message, "The prompt must be shorter than 1000 characters", "yellow");
+        if (text.length > 1000) return await message.reply({ embeds: [embedGenerator.warning("The prompt must be shorter than 1000 characters")] });
 
         try {
             connection = joinVoiceChannel({
@@ -37,7 +37,7 @@ module.exports = {
             });
         } catch (err) {
             logger.error(err);
-            return SendErrorEmbed(message, "Connection to the voice channel failed", "red");
+            return await message.reply({ embeds: [embedGenerator.error("Connection to the voice channel failed")] });
         }
 
         const audioUrls = googleTTS.getAllAudioUrls(text, {
@@ -74,7 +74,7 @@ module.exports = {
             playNextAudio(); // Start playing the first audio
         } catch (err) {
             logger.error(err);
-            return SendErrorEmbed(message, "Error while trying to play the TTS", "red");
+            return await message.reply({ embeds: [embedGenerator.error("Error while trying to play the TTS")] });
         }
 
         message.reply({ embeds: [{ title: "Playing the TTS", timestamp: new Date(), color: 0xffffff }] });

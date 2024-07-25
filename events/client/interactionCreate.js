@@ -2,12 +2,12 @@ const { Events } = require("discord.js");
 const GuildManager = require("@root/utils/GuildManager");
 const { repositories } = require("@utils/db/tableManager.js");
 const getExactDate = require("@functions/getExactDate");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
 const RandomMinMax = require("@functions/RandomMinMax");
 const findClosestMatch = require("@utils/algorithms/findClosestMatch.js");
 const { initConfFile } = require("@utils/reddit/fetchRedditToken.js");
 const countCommonChars = require("@utils/functions/countCommonChars.js");
 const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState, AutoCommandMatch } = require("@utils/config.json");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -15,6 +15,7 @@ module.exports = {
     log: false,
     async execute(client, logger, interaction) {
         if (interaction.isChatInputCommand()) {
+            await interaction.deferReply();
             const SlashCooldowns = client.SlashCooldowns;
 
             const slash = interaction.client.slashcommands.get(interaction.commandName);
@@ -26,7 +27,7 @@ module.exports = {
                 const cooldown = SlashCooldowns.get(interaction.user.id);
                 const timeLeft = cooldown - Date.now();
                 if (timeLeft > 0) {
-                    interaction.reply(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before using that command again.`);
+                    interaction.reply({ embeds: [embedGenerator.warning(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before using that command again.`)] });
                     return;
                 }
             }
@@ -47,34 +48,19 @@ module.exports = {
                     .replace(/^\s+/gm, ""));
     
             } catch (error) {
-                if (!interaction.deferred) {
-                    await interaction.reply({
-                        embeds: [{
-                            title: "An error occured while executing the command",
-                            color: 0xff0000,
-                            timestamp: new Date(),
-                        }],
-                        ephemeral: true,
-                    });
-                } else {
-                    await interaction.editReply({
-                        embeds: [{
-                            title: "An error occured while executing the command",
-                            color: 0xff0000,
-                            timestamp: new Date(),
-                        }],
-                        ephemeral: true,
-                    });
-                }
-    
+                await interaction.editReply({
+                    embeds: [embedGenerator.error("An error occured while executing the command")],
+                    ephemeral: true,
+                });    
                 logger.error(`Error executing slash command [${interaction.commandName}]`);
                 logger.error(error.stack);
             }
         } else if (interaction.isContextMenuCommand()) {
+            await interaction.deferReply({ ephemeral: true });
             
             const context = client.contextCommands.get(interaction.commandName);
     
-            if (!context) return console.error(`No command matching ${interaction.commandName} was found.`);
+            if (!context) return logger.error(`No command matching ${interaction.commandName} was found.`);
     
             try {
                 await context.execute(logger, interaction, client);
@@ -87,12 +73,8 @@ module.exports = {
                     .replace(/^\s+/gm, ""));
     
             } catch (error) {
-                interaction.reply({
-                    embeds: [{
-                        title: "An error occured while executing the command",
-                        color: 0xff0000,
-                        timestamp: new Date(),
-                    }],
+                await interaction.editReply({
+                    embeds: [embedGenerator.error("An error occured while executing the command")],
                     ephemeral: true,
                 });
                 

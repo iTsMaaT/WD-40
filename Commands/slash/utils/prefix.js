@@ -17,8 +17,8 @@ module.exports = {
     async execute(logger, interaction, client) {
         // set or deletes the prefix, if a custom one was already applied
         const prefix = interaction.options.get("prefix").value.replace(/\s/g, "");
-        if (prefix.length > 3) return SendErrorEmbed(interaction, "Prefix can't have more than 3 characters", "yellow", true);
-        if (prefix.length === 0) return SendErrorEmbed(interaction, "You must enter a prefix.", "yellow", true);
+        if (prefix.length > 3) return await interaction.reply({ embeds: [embedGenerator.warning("Prefix can't have more than 3 characters")], ephemeral: true });
+        if (prefix.length === 0) return await interaction.reply({ embeds: [embedGenerator.warning("You must enter a prefix.")], ephemeral: true });
 
         const newPrefix = prefix.substring(0, 3);
         await GuildManager.TogglePrefix(interaction.guild, newPrefix);

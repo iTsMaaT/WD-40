@@ -1,5 +1,5 @@
 const { ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField } = require("discord.js");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const emoteList = require("@utils/emojis.json");
 const findClosestMatch = require("@utils/algorithms/findClosestMatch.js");
 const GuildManager = require("@utils/GuildManager");
@@ -83,11 +83,12 @@ module.exports = {
         const autoreactions = await GuildManager.getAutoReactions(interaction.guild.id);
         const reactions = await autoreactions.getReactions();
 
-        if ((subcommand == "add" || subcommand == "remove" || subcommand == "removeall") && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) return SendErrorEmbed(interaction, "You must be a administrator to execute this action", "yellow", true);
+        if ((subcommand == "add" || subcommand == "remove" || subcommand == "removeall") && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) 
+            return await interaction.reply({ embeds: [embedGenerator.warning("You must be a administrator to execute this action")], ephemeral: true });
 
         switch (subcommand) {
             case "list": {
-                if (Object.keys(reactions).length === 0) return SendErrorEmbed(interaction, "There are no auto-reactions in this guild", "yellow", true);
+                if (Object.keys(reactions).length === 0) return await interaction.reply({ embeds: [embedGenerator.warning("There are no auto-reactions in this guild")], ephemeral: true });
             
                 const embed = {
                     title: "List of auto-reactions",
@@ -112,7 +113,7 @@ module.exports = {
             }
             
             case "remove": {
-                if (!reactions[ChannelPromptInput]) return SendErrorEmbed(interaction, "There is no entry for that channel prompt", "yellow", true);
+                if (!reactions[ChannelPromptInput]) return await interaction.reply({ embeds: [embedGenerator.warning("There is no entry for that channel prompt")], ephemeral: true });
 
                 autoreactions.removeReaction(ChannelPromptInput, StringInput);
                 const embed = {
@@ -125,7 +126,7 @@ module.exports = {
                 break;
             }
             case "removeall": {
-                if (!reactions[ChannelPromptInput]) return SendErrorEmbed(interaction, "There is no entry for that channel prompt", "yellow", true);
+                if (!reactions[ChannelPromptInput]) return await interaction.reply({ embeds: [embedGenerator.warning("There is no entry for that channel prompt")], ephemeral: true });
 
                 autoreactions.removeReaction(ChannelPromptInput);
                 const embed = {
@@ -139,11 +140,11 @@ module.exports = {
             }
             case "add": {
 
-                if (Object.keys(reactions).length >= 20) return SendErrorEmbed(interaction, "You cannot have more than 20 auto-reactions", "yellow", true);
+                if (Object.keys(reactions).length >= 20) return await interaction.reply({ embeds: [embedGenerator.warning("You cannot have more than 20 auto-reactions")], ephemeral: true });
 
                 if (reactions[ChannelPromptInput]) {
                     const existingEntry = reactions[ChannelPromptInput].find(entry => entry.string === StringInput);
-                    if (existingEntry) return SendErrorEmbed(interaction, "An entry for that channel prompt and string combination already exists.", "red", true);
+                    if (existingEntry) return await interaction.reply({ embeds: [embedGenerator.warning("An entry for that channel prompt and string combination already exists.")], ephemeral: true });
                 }
 
                 let emotes = [];
@@ -161,7 +162,7 @@ module.exports = {
                     }, []);
                 }
 
-                if (emotes.length == 0) return SendErrorEmbed(interaction, "No compatible emotes found", "red", true);
+                if (emotes.length == 0) return await interaction.reply({ embeds: [embedGenerator.warning("No compatible emotes found")], ephemeral: true });
                 const embed = {
                     color: 0xffff00,
                     title: "Auto-reactions",

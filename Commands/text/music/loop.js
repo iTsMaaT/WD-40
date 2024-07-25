@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
+const embedGenerator = require("@utils/helpers/embedGenerator");
 const { QueueRepeatMode, useQueue, useMainPlayer } = require("discord-player");
 
 module.exports = {
@@ -13,12 +13,12 @@ module.exports = {
     },
     category: "music",
     examples: ["track"],
-    execute(logger, client, message, args, optionalArgs) {
-        if (!message.member.voice.channel) return SendErrorEmbed(message, "You must be in a voice channel.", "yellow");
+    async execute(logger, client, message, args, optionalArgs) {
+        if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.error("You must be in a voice channel.")] });
 
         const queue = useQueue(message.guild.id);
 
-        if (!queue || !queue.tracks) return SendErrorEmbed(message, "There is nothing playing.", "yellow");
+        if (!queue || !queue.tracks) return await message.reply({ embeds: [embedGenerator.error("There is nothing playing.")] });
         switch (args[0]?.toLowerCase() ?? "queue") {
             case "off":
                 queue.setRepeatMode(QueueRepeatMode.OFF);
@@ -34,7 +34,7 @@ module.exports = {
                 queue.setRepeatMode(QueueRepeatMode.AUTOPLAY);
                 break;
             default:
-                SendErrorEmbed(message, "Invalid loop type. (Needs to be: off, queue, song or autoplay)", "yellow");
+                return await message.reply({ embeds: [embedGenerator.warning("Invalid loop type. (Needs to be: off, queue, song or autoplay)")] });
         }
 
         const repeat_mode_embed = new EmbedBuilder()
