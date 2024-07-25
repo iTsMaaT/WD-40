@@ -65,6 +65,17 @@ module.exports = {
                 addedCommands.add(val.name);
             }
         });
+
+        const addedSlashCommands = new Set(); // Keep track of added commands
+        client.slashcommands.each((val) => {
+            if (!addedSlashCommands.has(val.name)) {
+                if (!val.category) val.category = "slash";
+                if (!categorymapper[val.category]) categorymapper[val.category] = {};
+                
+                categorymapper[val.category][`**${val.name}${val.aliases ? ` [${(val.aliases).join(", ")}]` : ""}: **`] = (prettyString(val.description, "first", true));
+                addedSlashCommands.add(val.name);
+            }
+        });
         
         const groupedObject = {};
         Object.keys(categorymapper).forEach(category => {
