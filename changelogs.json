@@ -305,7 +305,10 @@
         "version": "5.4.1",
         "date": "2024-07-18",
         "changes": [
-            "Massive embed refactoring"
+            "Massive embed refactoring",
+            "Help page has slash commands",
+            "Blacklist (should) work for slash commands",
+            "New >source command"
         ]
     }
 ]
