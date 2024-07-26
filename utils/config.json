@@ -54,7 +54,7 @@
         "removeYoutube": false
     },
 
-    "DefaultSuperuserState": false,
-    "DefaultDebugState": false,
+    "DefaultSuperuserState": 0,
+    "DefaultDebugState": 0,
     "AutoCommandMatch": true
 }
