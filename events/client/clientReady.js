@@ -125,6 +125,7 @@ module.exports = {
                                  ██████████████                                 
         
     `);
+process.env.CURRENT_SUPERUSER_STATE = "0";
         console.warn = console.warning;
         // start confirmation
         const interval = setInterval(() => {
