@@ -32,7 +32,7 @@ module.exports = {
                 message.reply({ embeds: [embed] });
             }
 
-            if (process.env.CURRENT_SUPERUSER_STATE && (message.author.id != process.env.OWNER_ID && whitelist.includes(message.author.id))) return;
+            if (process.env.CURRENT_SUPERUSER_STATE == "1" && (message.author.id != process.env.OWNER_ID && whitelist.includes(message.author.id))) return;
             if (blacklist.includes(message.author.id)) return;
 
             const autoreactions = await GuildManager.getAutoReactions(message.guild.id);
