@@ -77,7 +77,7 @@ Step 5 - Send the downloaded media to your favorite social media!
 
         async function handleCommand(message) {
             if (message.author.bot) return;
-            if (process.env.CURRENT_SUPERUSER_STATE && !whitelist.includes(message.author.id)) return;
+            if (process.env.CURRENT_SUPERUSER_STATE == "1" && !whitelist.includes(message.author.id)) return;
             if (!message.guild) return message.reply("Commands cannot be executed inside DMs.");
             if (blacklist.includes(message.author.id)) return;
 
