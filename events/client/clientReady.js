@@ -72,8 +72,8 @@ module.exports = {
         console.log("Discord.js version: " + require("discord.js").version);
         console.log(`There is ${client.options.shardCount} shard${client.options.shardCount > 1 ? "s" : ""} spawned`);
         whitelist.push(process.env.OWNER_ID);
-        process.env.CURRENT_DEBUG_STATE = DefaultDebugState;
-        process.env.CURRENT_SUPERUSER_STATE = DefaultSuperuserState;
+        process.env.CURRENT_DEBUG_STATE = DefaultDebugState == "1";
+        process.env.CURRENT_SUPERUSER_STATE = DefaultSuperuserState == "1";
         if (process.env.SERVER == "dev") process.env.CURRENT_SUPERUSER_STATE = 1;
         console.log(`Debug is ${process.env.CURRENT_DEBUG_STATE == "1" ? "en" : "dis"}abled`);
         console.log(`Superuser is ${process.env.CURRENT_SUPERUSER_STATE == "1" ? "en" : "dis"}abled`);
