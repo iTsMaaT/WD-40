@@ -1,7 +1,6 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const FetchReddit = require("@utils/reddit/FetchReddit.js");
-const { int } = require("drizzle-orm/mysql-core");
 
 module.exports = {
     name: "reddit",
