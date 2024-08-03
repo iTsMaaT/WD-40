@@ -18,7 +18,7 @@ const GetPterodactylInfo = async function() {
 
     try {
         const [serverResponse, resourcesResponse] = await Promise.all([
-            fetch("https://dash.kpotatto.net/api/client/servers/adc0f433", {
+            fetch(`${process.env.PTERODACTYL_URL}api/client/servers/${process.env.PTERODACTYL_SERVER_ID}`, {
                 method: "GET",
                 headers: {
                     "Accept": "application/json",
@@ -26,7 +26,7 @@ const GetPterodactylInfo = async function() {
                     "Authorization": `Bearer ${process.env.PTERODACTYL_API_KEY}`,
                 },
             }),
-            fetch("https://dash.kpotatto.net/api/client/servers/adc0f433/resources", {
+            fetch(`${process.env.PTERODACTYL_URL}api/client/servers/${process.env.PTERODACTYL_SERVER_ID}/resources`, {
                 method: "GET",
                 headers: {
                     "Accept": "application/json",
