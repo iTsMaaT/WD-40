@@ -5,7 +5,7 @@
         "@root/*": ["./*"],
         "@functions/*": ["./utils/functions/*"],
         "@utils/*": ["./utils/*"],
-        "@config/*": ["./utils/config.json"]
+        "@config/*": ["./utils/config/*"]
       }
     },
     "include": ["./**/*"]
