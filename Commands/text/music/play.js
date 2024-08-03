@@ -2,7 +2,7 @@ const { PermissionsBitField } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { getLoopMode } = require("@utils/helpers/playerHelpers");
 const { QueryType, useMainPlayer, useQueue } = require("discord-player");
-const { discordPlayerConf } = require("@utils/config.json");
+const config = require("@utils/config/configUtils");
 const { parse } = require("node-html-parser");
 
 const player = useMainPlayer();
@@ -58,7 +58,7 @@ module.exports = {
         try {
             const linkRegex = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])/igm;
             const spotifyRegex = /^(?:https:\/\/open\.spotify\.com\/(?:intl-[a-zA-Z]{0,3}\/)?(?:user\/[A-Za-z0-9]+\/)?|spotify:)(?:track\/)([A-Za-z0-9]+).*$/;
-            if ((spotifyRegex.test(string) || !linkRegex.test(string)) && !discordPlayerConf.removeYoutube) {
+            if ((spotifyRegex.test(string) || !linkRegex.test(string)) && !config.get("discordPlayerConf")?.removeYoutube) {
                 
                 if (spotifyRegex.test(string)) {
                     research = await player.search(string, {
