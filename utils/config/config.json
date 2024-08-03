@@ -1,0 +1,63 @@
+{
+    "_types" : [
+        { "Playing":   0 },
+        { "Streaming": 1 },
+        { "Listening": 2 },
+        { "Watching":  3 },
+        { "Custom":    4 },
+        { "Competing": 5 }
+    ],
+
+    "activities": [
+        { "type": 2, "name": ">help" },
+        { "type": 2, "name": "your freaky songs" },
+        { "type": 2, "name": "your freaky playlists" },
+        { "type": 4, "name": ">help | Time to be annoying!" },
+        { "type": 4, "name": "Do >help for SEX!" },
+        { "type": 5, "name": "I am the best, you cannot even compare" },
+        { "type": 4, "name": "I think, therefore I think" },
+        { "type": 4, "name": "Anon, 'tis time to annoy!" },
+        { "type": 4, "name": "Nitro is kinda mid ngl" },
+        { "type": 4, "name": "Me omw (on my way) to do >help" },
+        { "type": 4, "name": "You have a Placeholder01% chance to see this" },
+        { "type": 4, "name": "There is Placeholder02 other statuses" },
+        { "type": 4, "name": "Tokebac icitte" },
+        { "type": 4, "name": "Don't go on page 5 of >help!" },
+        { "type": 4, "name": "*you're" },
+        { "type": 4, "name": "The time has cum" },
+        { "type": 4, "name": "bonjour" },
+        { "type": 4, "name": "Use me pwease UwU" },
+        { "type": 4, "name": "nuzzles *breaks your spine*" },
+        { "type": 4, "name": "That's the gros sourire message" },
+        { "type": 4, "name": "Barbeque bacon burger" },
+        { "type": 4, "name": "Give suggestions! (I'm desperate) | >suggestion" },
+        { "type": 4, "name": "Do you know who else suffers from dimentia?" },
+        { "type": 4, "name": "Fuck Mee6" },
+        { "type": 4, "name": "Amongst Us" },
+        { "type": 4, "name": "Ferme ta yeule" },
+        { "type": 2, "name": "Yes, enqueued is a word." },
+        { "type": 4, "name": "Placeholder03" },
+        { "type": 4, "name": "Currently in Placeholder04 guilds" },
+        { "type": 4, "name": "fr fr ong no cap" },
+        { "type": 4, "name": "You fucking bitch" },
+        { "type": 0, "name": "Minecraft, the best game ever." },
+        { "type": 0, "name": "Cookie Clicker" },
+        { "type": 4, "name": "The byte of 1010111" }
+    ],
+    
+    "guildBlacklist": [],
+
+    "blacklist": [],
+
+    "whitelist": [
+        273587964334964737
+    ],
+
+    "discordPlayerConf": {
+        "removeYoutube": false
+    },
+
+    "defaultSuperuserState": false,
+    "defaultDebugState": false,
+    "autoCommandMatch": true
+}
