@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-const { guildblacklist } = require("@root/utils/config.json");
+const config = require("@utils/config/configUtils");
 const GuildManager = require("@root/utils/GuildManager");
 
 module.exports = {
@@ -7,6 +7,7 @@ module.exports = {
     once: false,
     log: true,
     async execute(client, logger, guild) {
+        const guildblacklist = config.get("guildBlacklist");
         await GuildManager.SetActiveOrCreate(guild);
         logger.info(`The bot has been added to \`${guild.name}\``);
         client.channels.cache.get(process.env.MEMBERS_UPDATE_ID).send(`The bot has been added to \`${guild.name}\``);

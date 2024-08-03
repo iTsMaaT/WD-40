@@ -6,7 +6,6 @@ const RandomMinMax = require("@functions/RandomMinMax");
 const findClosestMatch = require("@utils/algorithms/findClosestMatch.js");
 const { initConfFile } = require("@utils/reddit/fetchRedditToken.js");
 const countCommonChars = require("@utils/functions/countCommonChars.js");
-const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState, AutoCommandMatch } = require("@utils/config.json");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {

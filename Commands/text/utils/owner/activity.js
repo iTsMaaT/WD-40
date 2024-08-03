@@ -1,4 +1,4 @@
-const { activities } = require("@root/utils/config.json");
+const config = require("@config/configUtils");
 const { ActivityType } = require("discord.js");
 
 module.exports = {
@@ -22,6 +22,7 @@ module.exports = {
     },
     private: true,
     async execute(logger, client, message, args, optionalArgs) {
+        const activities = config.get("activities");
         if (!args[0] && !optionalArgs["preset|p"] && !optionalArgs["list|l"]) {
             client.user.setActivity(activities[Math.floor(Math.random() * activities.length)], { type: ActivityType.Custom });
             return await message.reply({ content: "Activity randomised" });

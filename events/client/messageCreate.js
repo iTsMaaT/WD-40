@@ -7,7 +7,7 @@ const RandomMinMax = require("@functions/RandomMinMax");
 const findClosestMatch = require("@utils/algorithms/findClosestMatch.js");
 const { initConfFile } = require("@utils/reddit/fetchRedditToken.js");
 const countCommonChars = require("@utils/functions/countCommonChars.js");
-const { activities, blacklist, whitelist, DefaultSuperuserState, DefaultDebugState, AutoCommandMatch } = require("@utils/config.json");
+const config = require("@utils/config/configUtils");
 
 module.exports = {
     name: Events.MessageCreate,
@@ -32,8 +32,8 @@ module.exports = {
                 message.reply({ embeds: [embed] });
             }
 
-            if (process.env.CURRENT_SUPERUSER_STATE && (message.author.id != process.env.OWNER_ID && whitelist.includes(message.author.id))) return;
-            if (blacklist.includes(message.author.id)) return;
+            if (config.get("defaultSuperuserState") && (message.author.id != process.env.OWNER_ID && config.get("whitelist").includes(message.author.id))) return;
+            if (config.get("blacklist").includes(message.author.id)) return;
 
             const autoreactions = await GuildManager.getAutoReactions(message.guild.id);
             const reactions = await autoreactions.matchReactions(message.channel.name, message.content, message.attachments.size > 0);
@@ -77,9 +77,9 @@ Step 5 - Send the downloaded media to your favorite social media!
 
         async function handleCommand(message) {
             if (message.author.bot) return;
-            if (process.env.CURRENT_SUPERUSER_STATE && !whitelist.includes(message.author.id)) return;
+            if (config.get("defaultSuperuserState") && !config.get("whitelist").includes(message.author.id)) return;
             if (!message.guild) return message.reply("Commands cannot be executed inside DMs.");
-            if (blacklist.includes(message.author.id)) return;
+            if (config.get("blacklist").includes(message.author.id)) return;
 
             // Text command executing
             const prefix = GuildManager.GetPrefix(message.guild);
@@ -96,7 +96,7 @@ Step 5 - Send the downloaded media to your favorite social media!
 
                 // Command auto-correction
                 let command = client.commands.get(commandName);
-                if (!command && AutoCommandMatch) {
+                if (!command && config.get("autoCommandMatch")) {
                     const commandSet = new Set(client.commands.filter(cmd => !cmd.private).map(cmd => cmd.name));
                     const commandArray = Array.from(commandSet);
                     const closeMatch = findClosestMatch(commandName, commandArray);

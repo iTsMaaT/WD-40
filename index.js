@@ -13,7 +13,21 @@ console.log("Logger instanciated");
 
 const { Client, GatewayIntentBits, Partials } = require("discord.js");
 const { getPermissionArrayNames } = require("@functions/discordFunctions");
-const { discordPlayerConf, DefaultDebugState, DefaultSuperuserState } = require("@utils/config.json");
+const { discordPlayerConf, DefaultDebugState, DefaultSuperuserState } = require("@utils/config/config.json");
+
+// Validations
+const { checkFFmpegInstalled } = require("@utils/validators/checkFFMPEG");
+const { validateEnvironmentVariables } = require("@utils/validators/checkENV");
+const { checkNodeJsVersion } = require("@utils/validators/checkNodeJS");
+const { checkBotVersion } = require("@utils/validators/checkBotVersion");
+const { checkGitHubVersion } = require("@utils/validators/checkGitHubVersion");
+(async () => {
+    await checkFFmpegInstalled();
+    await validateEnvironmentVariables();
+    await checkNodeJsVersion();
+    checkBotVersion();
+    await checkGitHubVersion();
+})();
 
 const fs = require("fs");
 
@@ -63,7 +77,7 @@ const player = new Player(client, {
         await player.extractors.register(YoutubeiExtractor, {
             authentication: process.env.YOUTUBE_ACCESS_STRING || "",
             streamOptions: {
-                useClient: "ANDROID",
+                useClient: undefined,
             }, 
         });
     }
