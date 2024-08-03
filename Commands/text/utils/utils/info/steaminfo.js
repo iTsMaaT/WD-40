@@ -42,7 +42,7 @@ module.exports = {
             title: `Steam stats for ${steamInfo.userProfile.personaname}`,
             description: `
                 **Profile**
-                Real name: ${steamInfo.userProfile.realname}
+                Real name: ${steamInfo.userProfile.realname || "-"}
                 Created: <t:${steamInfo.userProfile.timecreated}:R>
                 Profile URL: ${steamInfo.userProfile.profileurl}
                 ---
