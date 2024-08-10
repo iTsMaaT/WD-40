@@ -1,3 +1,5 @@
+const { toggleLiveChat } = require("./playerLiveChat");
+
 const getLoopMode = function(queue) {
     let LoopMode;
     switch (queue?.repeatMode) {
@@ -20,6 +22,24 @@ const getLoopMode = function(queue) {
     return LoopMode;
 };
 
+const getPauseMode = function(queue) {
+    let PauseMode;
+    switch (queue?.paused) {
+        case true:
+            PauseMode = "✅ Paused";
+            break;
+        case false:
+            PauseMode = "❌ Unpaused";
+            break;
+        default:
+            PauseMode = "❌ Unpaused";
+            break;
+    }
+    return PauseMode;
+};
+
 module.exports = {
     getLoopMode,
+    getPauseMode,
+    toggleLiveChat,
 };
