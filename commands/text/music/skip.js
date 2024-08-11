@@ -9,18 +9,26 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
 
-        const queue = useQueue(message.guild.id);
+        let queue = useQueue(message.guild.id);
         if (!queue || !queue.currentTrack) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue right now.")] });
 
         try {
             queue.node.skip();
             
-            const skipped_embed = embedGenerator.info({
-                title: "Skipped!",
-                description: "Skipped the current song.",
-            }).withAuthor(message.author);
+            await message.reply({ embeds: [embedGenerator.info({
+                title: "Skipped",
+                thumbnail: { url: queue.currentTrack.thumbnail },
+                description: `[${queue.currentTrack.title}](${queue.currentTrack.url})`,
+            }).withAuthor(message.author)] });
 
-            message.reply({ embeds: [skipped_embed] });
+            queue = useQueue(message.guild.id);
+            if (!queue || !queue.currentTrack) return await message.channel.send({ embeds: [embedGenerator.error("There is nothing left to play.")] });
+
+            await message.channel.send({ embeds: [embedGenerator.info({
+                title: "Now playing",
+                thumbnail: { url: queue.currentTrack.thumbnail },
+                description: `[${queue.currentTrack.title}](${queue.currentTrack.url})`,
+            })] });
         } catch (e) {
             logger.error(e);
             return await message.reply({ embeds: [embedGenerator.error("An error occurred.")] });
