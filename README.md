@@ -62,15 +62,15 @@ Good luck.
 | REDDIT_CLIENT_TOKEN | The refresh token for the Reddit API, which you can get from the [Reddit](https://www.reddit.com/prefs/apps) website. |
 | YOUTUBE_ACCESS_STRING | The access string for the YouTube API, which you can get from executing `npx --no discord-player-youtubei` in your terminal ([more info](https://github.com/retrouser955/discord-player-youtubei)). |
 | DATABASE_URL | The URL for the database, to create the DB, please refer to [DATABASE](#database) below.
-| - | - |
+| | |
 | OWNER_ID | The ID of the owner of the bot. |
 | STATUS_CHANNEL_ID | The ID of the channel where the bot will post status updates. |
 | MEMBERS_UPDATE_ID | The ID of the channel where the bot will post member updates. |
 | SUGGESTION_CHANNEL_ID | The ID of the channel where the bot will post suggestions from the `/suggestion` (`>suggestion`) command. |
-| - | - |
+| | |
 | SERVER | Either `prod` or `dev`, will make the bot only react to it's owner on dev. |
 
-> Reddit client secret, ID and token are optional, as it will use the normal API instead of going trough OAUTH if not specidfied.
+> Reddit client secret, ID and token are optional, as it will use the normal API instead of going trough OAUTH if not specified.
 
 4. Set up the database.
 
