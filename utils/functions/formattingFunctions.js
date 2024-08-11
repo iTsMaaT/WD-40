@@ -1,14 +1,11 @@
-const ToEngineerNotation = function(number) {
+const ToEngineerNotation = function(number, sizes = ["", "Ki", "Mi", "Gi", "Ti", "Pi"], k = 1024, decimals = 2) {
     if (number === 0) return "0";
-
-    const k = 1024;
-    const sizes = ["", "k", "m", "g", "t", "p"];
 
     // Calculate the logarithm of the value in base 'k' (1024)
     const i = Math.floor(Math.log(number) / Math.log(k));
 
     // Calculate the value in the appropriate unit
-    const formattedValue = parseFloat((number / Math.pow(k, i)).toFixed(2));
+    const formattedValue = parseFloat((number / Math.pow(k, i)).toFixed(decimals));
 
     // Combine the formatted value with the unit
     return formattedValue + " " + sizes[i];
