@@ -93,7 +93,7 @@ module.exports = {
                                  ██████████████                                 
         
     `);
-        console.warn = console.warning;
+        // console.warn = console.warning;
         // start confirmation
         const interval = setInterval(() => {
             if (client.ws.ping !== -1) {
