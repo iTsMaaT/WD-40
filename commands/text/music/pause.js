@@ -1,6 +1,7 @@
 const { EmbedBuilder } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { useQueue, useTimeline, useMainPlayer } = require("discord-player");
+const { getPauseMode } = require("@utils/helpers/playerHelpers");
 
 module.exports = {
     name: "pause",
@@ -15,10 +16,9 @@ module.exports = {
         if (!queue || !queue.currentTrack) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue right now.")] });
 
         timeline.paused ? timeline.resume() : timeline.pause();
-        const state = timeline.paused;
 
         const embed = embedGenerator.info({
-            title: state ? "Music paused." : "Music resumed.",
+            title: getPauseMode(timeline),
         }).withAuthor(message.author);
 
         await message.reply({ embeds: [embed] });

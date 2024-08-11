@@ -1,6 +1,7 @@
 const { EmbedBuilder } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { QueueRepeatMode, useQueue, useMainPlayer } = require("discord-player");
+const { getLoopMode } = require("@utils/helpers/playerHelpers");
 
 module.exports = {
     name: "loop",
@@ -16,10 +17,12 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.error("You must be in a voice channel.")] });
 
-        const queue = useQueue(message.guild.id);
+        let queue = useQueue(message.guild.id);
+        const loopMode = args[0]?.toLowerCase() || "queue";
 
         if (!queue || !queue.tracks) return await message.reply({ embeds: [embedGenerator.error("There is nothing playing.")] });
-        switch (args[0]?.toLowerCase() ?? "queue") {
+
+        switch (loopMode) {
             case "off":
                 queue.setRepeatMode(QueueRepeatMode.OFF);
                 break;
@@ -37,10 +40,8 @@ module.exports = {
                 return await message.reply({ embeds: [embedGenerator.warning("Invalid loop type. (Needs to be: off, queue, song or autoplay)")] });
         }
 
-        const repeat_mode_embed = new EmbedBuilder()
-            .setColor("#ffffff")
-            .setDescription(`Set repeat mode to \`${args[0] ?? "Queue"}\``)
-            .setTimestamp();
-        message.reply({ embeds: [repeat_mode_embed]  });
+        queue = useQueue(message.guild.id);
+
+        await message.reply({ embeds: [embedGenerator.info(`Loop mode set to \`${getLoopMode(queue)}\``)] });
     },
 }; 
