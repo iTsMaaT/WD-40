@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder } = require("discord.js");
 const { prettyString } = require("@functions/formattingFunctions");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const GuildManager = require("@root/utils/GuildManager.js");
@@ -16,44 +16,73 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         const prefix = GuildManager.GetPrefix(message.guild);
 
-        if (args[0]) {
-            const CommandName = client.commands.get(args[0]);
-            if (!CommandName || (CommandName.private && !message.author.id == process.env.OWNER_ID)) return await message.reply({ embeds: [embedGenerator.error("This command doesn't exist.")] });
-
+        // Function to generate the full help embed for a command
+        const generateFullCommandEmbed = (command) => {
             const CommandEmbed = {
-                title: `**${prefix}${CommandName.name}**`,
+                title: `**${prefix}${command.name}**`,
                 color: 0xffffff,
-                fields: [{ name: "Description", value: CommandName.description }],
+                fields: [{ name: "Description", value: command.description }],
                 timestamp: new Date(),
             };
 
-            if (typeof CommandName.usage === "string") {
-                CommandEmbed.fields.push({ name: "Options", value: CommandName.description });
-            } else if (typeof CommandName.usage === "object") {
+            if (typeof command.usage === "string") {
+                CommandEmbed.fields.push({ name: "Options", value: command.description });
+            } else if (typeof command.usage === "object") {
                 let requiredString = "";
                 let optionalString = "";
                 let usageString = "";
-                if (Object.keys(CommandName.usage.required ?? {}).length) 
-                    requiredString += `__Required__:\n${Object.keys(CommandName.usage.required).map(key => `${key.toLowerCase()}: ${prettyString(CommandName.usage.required[key], "first", false)}`).join("\n")}`;
-                if (Object.keys(CommandName.usage.optional ?? {}).length) 
-                    optionalString += `__Optional__:\n${Object.keys(CommandName.usage.optional).map(key => `-${key.split("|")[0].toLowerCase()}${key.split("|").slice(1).length > 0 ? `[${key.split("|").slice(1).join(",").toLowerCase()}]` : ""}${(CommandName.usage.optional[key].hasValue ?? false) ? " <value>" : ""}: ${prettyString(CommandName.usage.optional[key].description, "first", false)}`).join("\n")}`;
+                if (Object.keys(command.usage.required ?? {}).length) 
+                    requiredString += `__Required__:\n${Object.keys(command.usage.required).map(key => `${key.toLowerCase()}: ${prettyString(command.usage.required[key], "first", false)}`).join("\n")}`;
+                if (Object.keys(command.usage.optional ?? {}).length) 
+                    optionalString += `__Optional__:\n${Object.keys(command.usage.optional).map(key => `-${key.split("|")[0].toLowerCase()}${key.split("|").slice(1).length > 0 ? `[${key.split("|").slice(1).join(",").toLowerCase()}]` : ""}${(command.usage.optional[key].hasValue ?? false) ? " <value>" : ""}: ${prettyString(command.usage.optional[key].description, "first", false)}`).join("\n")}`;
                 usageString = `${requiredString}${requiredString.length > 0 && optionalString.length > 0 ? "\n" : ""}${optionalString}`;
                 CommandEmbed.fields.push({ name: "Options", value: usageString });
                 CommandEmbed.footer = { text: "Optional options explanation: -parameterName[parameterAliases]: parameterDescription" };
             }
 
-            if (CommandName.aliases) CommandEmbed.fields.push({ name: "Aliases", value: CommandName.aliases.join(", ") });
-            if (CommandName.examples) {
+            if (command.aliases) CommandEmbed.fields.push({ name: "Aliases", value: command.aliases.join(", ") });
+            if (command.examples) {
                 const formattedExamples = [];
-                CommandName.examples.forEach(ex => {formattedExamples.push(`${prefix}${CommandName.name} ${ex}`);});
+                command.examples.forEach(ex => {formattedExamples.push(`${prefix}${command.name} ${ex}`);});
                 CommandEmbed.fields.push({ name: "Examples", value: formattedExamples.join("\n") });
             }
-            if (CommandName.cooldown) CommandEmbed.fields.push({ name: "Cooldown", value: parseInt(CommandName.cooldown) / 1000 + "s" });
+            if (command.cooldown) CommandEmbed.fields.push({ name: "Cooldown", value: parseInt(command.cooldown) / 1000 + "s" });
 
-            return message.reply({ embeds: [CommandEmbed]  });
+            return CommandEmbed;
+        };
+
+        const getSelectMenuOptions = (counter) => {
+            const currentCategory = categories[counter - 1];
+            const commandsInCategory = groupedObject[currentCategory];
+            embed = {
+                title: `Commands for category: ${currentCategory.toUpperCase().replace(" (1)", "")}`,
+                fields: commandsInCategory,
+                color: 0xffffff,
+            };
+        
+            // Create a select menu for the current page's commands
+            const selectMenu = new StringSelectMenuBuilder()
+                .setCustomId("command_select")
+                .setPlaceholder("Select a command")
+                .addOptions(commandsInCategory.map(command => ({
+                    label: command.name.replace(/[*:[\] ]/g, ""), // Simplified label
+                    description: command.value,
+                    value: command.name.replace(/[*:[\] ]/g, ""), // Simplified value
+                })));
+        
+            const selectRow = new ActionRowBuilder().addComponents(selectMenu);
+            return selectRow;
+        };
+
+        if (args[0]) {
+            const CommandName = client.commands.get(args[0]);
+            if (!CommandName || (CommandName.private && !message.author.id == process.env.OWNER_ID)) return await message.reply({ embeds: [embedGenerator.error("This command doesn't exist.")] });
+
+            const CommandEmbed = generateFullCommandEmbed(CommandName);
+            return message.reply({ embeds: [CommandEmbed] });
         }
-        // Finds all command files and separate them from categories, then use page to list the commands per category
 
+        // Logic for generating the category pages and paginated command lists
         let counter = 0;
         const categorymapper = {};
         const addedCommands = new Set(); // Keep track of added commands
@@ -76,7 +105,7 @@ module.exports = {
                 addedSlashCommands.add(val.name);
             }
         });
-        
+
         const groupedObject = {};
         Object.keys(categorymapper).forEach(category => {
             const commands = categorymapper[category];
@@ -127,7 +156,6 @@ module.exports = {
             const categoryName = category.split(" ")[0]; // Get the category name
             if (index === 0 || categoryName !== categories[index - 1].split(" ")[0]) 
                 pages.push(`**Page ${index + 1}:** ${categoryName.toUpperCase()}`);
-            
         });
 
         const categoryEmbed = {
@@ -146,7 +174,6 @@ module.exports = {
             allowedMentions: { repliedUser: false },
         });
 
-
         const filter = (interaction) => {
             if (interaction.user.id == message.author.id) return true;
         };
@@ -159,54 +186,99 @@ module.exports = {
         
         let embed = categoryEmbed;
         collector.on("collect", async (interaction) => {
+            try {
+                if (interaction.customId === "command_select") {
+                    const commandName = interaction.values[0].replace(/[*:[\] ]/g, ""); // Retrieve selected command
+                    const command = client.commands.get(commandName) || client.slashcommands.get(commandName);
+                    
+                    if (command) {
+                        const fullCommandEmbed = generateFullCommandEmbed(command);
+                        await interaction.deferReply({ ephemeral: true });
+                        await interaction.followUp({
+                            embeds: [fullCommandEmbed],
+                            ephemeral: true,
+                        });
+                        return;
+                    }
+                }
 
-            if (interaction.customId === "next") 
-                counter++;
-            else if (interaction.customId === "previous") 
-                counter--;
-            else if (interaction.customId === "first") 
-                counter = 0;
-            else if (interaction.customId === "last") 
-                counter = categories.length;
-            
-            if (counter < 0) counter = 0;
-            if (counter >= categories.length) counter = categories.length;
+                if (interaction.customId === "next") 
+                    counter++;
+                else if (interaction.customId === "previous") 
+                    counter--;
+                else if (interaction.customId === "first") 
+                    counter = 0;
+                else if (interaction.customId === "last") 
+                    counter = categories.length;
+                
+                if (counter < 0) counter = 0;
+                if (counter >= categories.length) counter = categories.length;
+        
+                // Update the label to show the current page number
+                row.components[2].setLabel(`${counter} / ${categories.length}`);
+        
+                if (counter == 0) {
+                    embed = categoryEmbed;
+        
+                    await row.components[0].setDisabled(counter == 0);
+                    await row.components[1].setDisabled(counter == 0);
+                    await row.components[3].setDisabled(counter == categories.length);
+                    await row.components[4].setDisabled(counter == categories.length);
 
-            // Update the label to show the current page number
-            row.components[2].setLabel(`${counter} / ${categories.length}`);
-
-            if (counter == 0) {
-                embed = categoryEmbed;
-
-                await row.components[0].setDisabled(counter == 0);
-                await row.components[1].setDisabled(counter == 0);
-                await row.components[3].setDisabled(counter == categories.length);
-                await row.components[4].setDisabled(counter == categories.length);
-
-            } else {
-                const currentCategory = categories[counter - 1];
-                embed = {
-                    title: `Commands for category: ${currentCategory.toUpperCase().replace(" (1)", "")}`,
-                    fields: groupedObject[currentCategory],
-                    color: 0xffffff, // Embed color (you can change it to any color you like)
-                };
-
-                await row.components[0].setDisabled(counter == 0);
-                await row.components[1].setDisabled(counter == 0);
-                await row.components[3].setDisabled(counter == categories.length);
-                await row.components[4].setDisabled(counter == categories.length);
+                            
+                    // Edit the message with the new embed and components
+                    await helpMessage.edit({
+                        embeds: [embed],
+                        components: [row],
+                    });
+        
+                    // Respond to the interaction
+                    await interaction.update({
+                        embeds: [embed],
+                        components: [row],
+                    });
+                } else {
+                    const currentCategory = categories[counter - 1];
+                    const commandsInCategory = groupedObject[currentCategory];
+                    embed = {
+                        title: `Commands for category: ${currentCategory.toUpperCase().replace(" (1)", "")}`,
+                        fields: commandsInCategory,
+                        color: 0xffffff,
+                    };
+        
+                    // Create a select menu for the current page's commands
+                    const selectMenu = new StringSelectMenuBuilder()
+                        .setCustomId("command_select")
+                        .setPlaceholder("Select a command")
+                        .addOptions(commandsInCategory.map(command => ({
+                            label: command.name.replace(/[*:[\] ]/g, ""), // Simplified label
+                            description: command.value,
+                            value: command.name.replace(/[*:[\] ]/g, ""), // Simplified value
+                        })));
+        
+                    const selectRow = new ActionRowBuilder().addComponents(selectMenu);
+        
+                    await row.components[0].setDisabled(counter == 0);
+                    await row.components[1].setDisabled(counter == 0);
+                    await row.components[3].setDisabled(counter == categories.length);
+                    await row.components[4].setDisabled(counter == categories.length);
+        
+                    // Edit the message with the new embed and components
+                    await helpMessage.edit({
+                        embeds: [embed],
+                        components: [row, selectRow],
+                        allowedMentions: { repliedUser: false },
+                    });
+        
+                    // Respond to the interaction
+                    await interaction.update({
+                        embeds: [embed],
+                        components: [row, selectRow],
+                    });
+                }
+            } catch (error) {
+                console.error("Error during interaction:", error);
             }
-
-            helpMessage.edit({
-                embeds: [embed],
-                components: [row],
-                allowedMentions: { repliedUser: false },
-            });
-
-            await interaction.update({
-                embeds: [embed],
-                components: [row],
-            });
         });
 
         collector.on("end", async () => {
