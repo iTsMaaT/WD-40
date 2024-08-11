@@ -16,7 +16,7 @@ module.exports = {
         let port = "";
         if (args[1]) port = ":" + parseInt(args[1]);
         try {
-            const server = await (await fetch(`https://api.mcstatus.io/v2/status/java/${args[0]}${port ?? ""}`)).json();
+            const server = await (await fetch(`https://api.mcstatus.io/v2/status/java/${args[0]}${port}`)).json();
 
             if (!server.online) return await message.reply({ embeds: [embedGenerator.error(`${server.eula_blocked ? "The server is banned by Mojang." : "Server offline or nonexistant."}`)] });
 
@@ -24,7 +24,7 @@ module.exports = {
                 title: `Server Status for ${server.host} (Port: ${server.port})`,
                 color: 0xffffff,
                 thumbnail: {
-                    url: `https://api.mcstatus.io/v2/icon/${args[0]}${port ?? ""}` || "",
+                    url: `https://api.mcstatus.io/v2/icon/${args[0]}${port}` || "",
                 },
                 fields: [
                     { name: "Server Version", value: server.version.name_clean },
