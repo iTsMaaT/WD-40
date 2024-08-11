@@ -118,10 +118,10 @@ module.exports = {
             else if (interaction.customId === "first") 
                 counter = historyPages.length;
             else if (interaction.customId === "last") 
-                counter = trackPages.length;
+                counter = alltracks.length - 1;
             
             if (counter < 0) counter = 0;
-            if (counter >= trackPages.length + 1) counter = trackPages.length - 1;
+            if (counter > alltracks.length) counter = alltracks.length;
 
             updateComponents(counter);
 
