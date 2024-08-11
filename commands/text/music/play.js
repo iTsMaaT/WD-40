@@ -5,8 +5,6 @@ const { QueryType, useMainPlayer, useQueue } = require("discord-player");
 const config = require("@utils/config/configUtils");
 const { parse } = require("node-html-parser");
 
-const player = useMainPlayer();
-
 module.exports = {
     name: "play",
     description: "Play a song (works best with YouTube or Soucloud links)",
@@ -30,8 +28,9 @@ module.exports = {
     examples: ["never gonna give you up"],
     permissions: [PermissionsBitField.Flags.Connect],
     async execute(logger, client, message, args, optionalArgs) {
-        let res, research, embed;
+        const player = useMainPlayer();
         const queue = useQueue(message.guild.id);
+        let res, research, embed;
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
         
         const Attachment = message.attachments.first()?.attachment;
@@ -66,6 +65,8 @@ module.exports = {
                         searchEngine: QueryType.SPOTIFY_SONG,
                     });
                 }
+
+                if (!research.hasTracks()) return await message.reply({ embeds: [embedGenerator.warning("No results found")] });
 
                 let newResearch = "";
                 if (research && research.hasTracks()) newResearch = `${research.tracks[0].title} - ${research.tracks[0].author}`;
@@ -123,6 +124,7 @@ module.exports = {
 
             if (optionalArgs["shuffle|s"]) await research?.tracks?.shuffle();
             if (optionalArgs["playnext|pn"] && queue) {
+                for (const track of research.tracks) queue.insertTrack(track, 0);
                 queue.insertTrack(research.tracks[0], 0);
                 res = {};
                 res.track = research.tracks[0];
@@ -152,9 +154,14 @@ module.exports = {
                 title: `${res.searchResult.hasPlaylist() ? "Playlist" : "Track"} enqueued!`,
                 thumbnail: { url: res.track.thumbnail },
                 description: `[${res.track.title}](${res.track.url})`,
-                fields: res.searchResult?.playlist ? [{ name: "Playlist", value: res.searchResult.playlist.title }] : [],
-                footer: { text: `Loop mode: ${getLoopMode(queue)}` },
+                fields: [
+                    { name: "Pre-shuffled", value: optionalArgs["shuffle|s"] ? "Yes" : "No" },
+                    { name: "Will play next", value: optionalArgs["playnext|pn"] && queue ? "Yes" : "No" },
+                ],
+                footer: { text: `Loop mode: ${getLoopMode(queue)} | Playlists cannot be played next (yet)` },
             }).withAuthor(message.author);
+
+            if (res.searchResult?.playlist) embed.data.fields.push({ name: "Playlist", value: res.searchResult.playlist.title });
     
             await msg.edit({ embeds: [embed] });
 
