@@ -7,13 +7,13 @@ const util = require("util");
 const logger = require("@utils/log");
 console.warner = console.warn;
 console.logger = console.log;
-console.warn = (log, args) => logger.warning(log + " " + util.format(args));
+// console.warn = (log, args) => logger.warning(log + " " + util.format(args));
 console.log = (log) => logger.console(log);
 console.log("Logger instanciated");
 
 const { Client, GatewayIntentBits, Partials } = require("discord.js");
 const { getPermissionArrayNames } = require("@functions/discordFunctions");
-const { discordPlayerConf, DefaultDebugState, DefaultSuperuserState } = require("@utils/config/config.json");
+const config = require("@utils/config/configUtils");
 
 // Validations
 const { checkFFmpegInstalled } = require("@utils/validators/checkFFMPEG");
@@ -39,8 +39,6 @@ const client = new Client({
 });
 
 global.wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-process.env.CURRENT_DEBUG_STATE = DefaultDebugState;
-process.env.CURRENT_SUPERUSER_STATE = process.env.SERVER = "dev" || DefaultSuperuserState;
 
 // Add array.equals()
 Array.prototype.equals = function(otherArray) {
@@ -73,7 +71,7 @@ const player = new Player(client, {
     skipFFmpeg: false,
 });
 (async () => {
-    if (!discordPlayerConf.removeYoutube) {
+    if (!config.get("discordPlayerConf")?.removeYoutube) {
         await player.extractors.register(YoutubeiExtractor, {
             authentication: process.env.YOUTUBE_ACCESS_STRING || "",
             streamOptions: {
@@ -81,11 +79,8 @@ const player = new Player(client, {
             }, 
         });
     }
-    await player.extractors.register(SpotifyExtractor, {
-        createStream: discordPlayerConf.removeYoutube ? createYoutubeiStream : undefined,
-    });
     // await player.extractors.loadDefault();
-    await player.extractors.loadDefault((ext) => !["YouTubeExtractor", "SpotifyExtractor"].includes(ext));
+    await player.extractors.loadDefault((ext) => !["YouTubeExtractor"].includes(ext));
     // await player.extractors.register(DeezerExtractor);
     // await player.extractors.register(TidalExtractor);
 })();
@@ -197,6 +192,11 @@ loadFiles("./events/player/", function(event) {
         if (event.log) logger.event(`Event: [${event.name}] fired.`);
         await event.execute(client, logger, ...args);
     });
+
+    player.on(event.name, async (...args) => {
+        if (event.log) logger.event(`Event: [${event.name}] fired.`);
+        await event.execute(client, logger, ...args);
+    });
 });
 
 process.stdin.setEncoding("utf8");
@@ -222,4 +222,4 @@ process.stdin.on("data", async (input) => {
 });
 
 // Logins with the token
-client.login(process.env.TOKEN);
+client.login(process.env.SERVER === "dev" ? process.env.DEV_TOKEN : process.env.TOKEN);
