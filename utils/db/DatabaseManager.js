@@ -1,4 +1,4 @@
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise"); // Switch to the promise-based API
 const { drizzle } = require("drizzle-orm/mysql2");
 
 let instance;
@@ -17,18 +17,24 @@ class DatabaseManager {
         instance = this;
 
         /**
-         * The MySQL connection object.
-         * @type {mysql.Connection}
+         * The MySQL connection pool.
+         * @type {mysql.Pool}
          * @private
          */
-        this._dbConnection = mysql.createConnection(process.env.DATABASE_URL);
+        this._dbPool = mysql.createPool({
+            uri: process.env.DATABASE_URL,
+            waitForConnections: true,
+            connectionLimit: 10,
+            queueLimit: 0,
+            connectTimeout: 10000,
+        });
 
         /**
-         * The Drizzle ORM instance.
-         * @type {drizzle}
-         * @private
+         * The Drizzle ORM instance for the database.
          */
-        this._drizzle = drizzle(this._dbConnection);
+        this._drizzle = drizzle(this._dbPool);
+
+        this._handleDisconnect();
     }
 
     /**
@@ -37,6 +43,38 @@ class DatabaseManager {
      */
     get drizzle() {
         return this._drizzle;
+    }
+
+    /**
+     * Get a MySQL connection from the pool.
+     * @returns {Promise<mysql.PoolConnection>} A MySQL connection from the pool.
+     * @throws {Error} Throws an error if unable to establish a connection.
+     */
+    async getConnection() {
+        try {
+            const connection = await this._dbPool.getConnection();
+            return connection;
+        } catch (error) {
+            console.error("Error getting a database connection:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Reconnects the database if the connection is lost.
+     * @private
+     */
+    _handleDisconnect() {
+        this._dbPool.on("connection", (connection) => {
+            connection.on("error", async (err) => {
+                if (err.code === "PROTOCOL_CONNECTION_LOST") {
+                    console.error("Database connection lost. Reconnecting...");
+                    await this.getConnection(); // Attempt to reconnect
+                } else {
+                    throw err;
+                }
+            });
+        });
     }
 }
 
