@@ -3,11 +3,16 @@ const embedGenerator = require("@utils/helpers/embedGenerator");
 module.exports = {
     name: "suggestion",
     description: "Suggest ideas for the bot",
-    usage: "< [Suggestion] >",
+    usage: {
+        required: {
+            "suggestion": "The suggestion you want to send",
+        },
+    },
     category: "utils",
     async execute(logger, client, message, args, optionalArgs) {
-        
-        // Sends the suggestion and other info in a channel
+
+        if (!process.env.SUGGESTION_CHANNEL_ID) return await message.reply({ embeds: [embedGenerator.error("No suggestion channel has been set by the owner.")] });
+
         const channel = await client.channels.fetch(process.env.SUGGESTION_CHANNEL_ID);
         const sent = await channel.send(`**Suggestion by ${interaction.user} (${interaction.user.tag}) received: **` + suggestion);
         await channel.send("===================");
