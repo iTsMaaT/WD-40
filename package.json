@@ -23,10 +23,11 @@
   },
   "homepage": "https://github.com/iTsMaaT/WD-40",
   "dependencies": {
-    "@discord-player/extractor": "^4.5.0",
+    "@discord-player/extractor": "^4.5.1",
     "@discordjs/opus": "^0.9.0",
     "@discordjs/voice": "^0.16.1",
     "@distube/ytdl-core": "^4.14.4",
+    "@google/generative-ai": "^0.15.0",
     "@iamtraction/google-translate": "^2.0.1",
     "axios": "^1.7.3",
     "canvas": "^2.11.2",
