@@ -16,7 +16,7 @@ module.exports = {
         const results = await player.lyrics.search({ q: queue.currentTrack });
         if (!results) return await message.reply({ embeds: [embedGenerator.error("Couldn't find lyrics.")] });
         const lyrics = results[0];
-        const plainLyrics = lyrics.plainLyrics;
+        const plainLyrics = lyrics?.plainLyrics;
 
         if (!plainLyrics) return await message.reply({ embeds: [embedGenerator.error("Couldn't find lyrics.")] });
 
