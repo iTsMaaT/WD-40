@@ -38,8 +38,37 @@ const getPauseMode = function(queue) {
     return PauseMode;
 };
 
+const getFormattedSource = function(queue) {
+    let source;
+    switch (queue?.source) {
+        case "youtube":
+            source = "YouTube";
+            break;
+        case "soundcloud":
+            source = "SoundCloud";
+            break;
+        case "deezer":
+            source = "Deezer";
+            break;
+        case "spotify":
+            source = "Spotify";
+            break;
+        case "applemusic":
+            source = "Apple Music";
+            break;
+        case "tidal":
+            source = "Tidal";
+            break;
+        default:
+            source = "N/A";
+            break;
+    }
+    return source;
+};
+
 module.exports = {
     getLoopMode,
     getPauseMode,
+    getFormattedSource,
     toggleLiveChat,
 };
