@@ -4,7 +4,7 @@ const { repositories } = require("@utils/db/tableManager.js");
 const getExactDate = require("@functions/getExactDate");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const RandomMinMax = require("@functions/RandomMinMax");
-const findClosestMatch = require("@utils/algorithms/findClosestMatch.js");
+const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
 const { initConfFile } = require("@utils/reddit/fetchRedditToken.js");
 const countCommonChars = require("@utils/functions/countCommonChars.js");
 const config = require("@utils/config/configUtils");
@@ -99,7 +99,7 @@ Step 5 - Send the downloaded media to your favorite social media!
                 if (!command && config.get("autoCommandMatch")) {
                     const commandSet = new Set(client.commands.filter(cmd => !cmd.private).map(cmd => cmd.name));
                     const commandArray = Array.from(commandSet);
-                    const closeMatch = findClosestMatch(commandName, commandArray);
+                    const closeMatch = findBestMatch(algorithms.FUZZY_MATCH, commandName, commandArray).match;
                     if (closeMatch.distance <= 2 && countCommonChars(commandName, closeMatch.closestMatch) != 0) {
                         // command = client.commands.get(closeMatch.closestMatch);
                         await message.reply(`Did you mean \`${prefix}${closeMatch.closestMatch}\`?`);
@@ -116,6 +116,7 @@ Step 5 - Send the downloaded media to your favorite social media!
                 if (command.private && message.author.id !== process.env.OWNER_ID) return;
                 // Admin commands checking
                 if (command.admin && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return await message.reply({ embeds: [embedGenerator.error("You are not administrator")] });
+                if (command.inVoiceChannel && !message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.error("You must be in a voice channel.")] });
 
                 const userBlacklist = await GuildManager.GetBlacklist(message.guild.id);
                 const blCategory = !userBlacklist.CheckPermission(message.author.id, command.category);
