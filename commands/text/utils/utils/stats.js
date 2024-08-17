@@ -6,12 +6,14 @@ const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
 const { sql } = require("drizzle-orm");
 const DB = require("@root/utils/db/DatabaseManager");
 const GuildManager = require("@root/utils/GuildManager");
+const { useMainPlayer } = require("discord-player");
 
 module.exports = {
     name: "stats",
     description: "Gives statistics about the bot",
     category: "utils",
-    execute: async (logger, client, message, args, optionalArgs) => {
+    async execute(logger, client, message, args, optionalArgs) {
+        const player = useMainPlayer();
 
         const addedCommands = new Set();
         client.commands.each((val) => {if (!val.private && !addedCommands.has(val.name))  addedCommands.add(val.name); });
@@ -36,6 +38,13 @@ module.exports = {
         const botAge = prettyMilliseconds(Date.now() - client.user.createdAt);
         const totalExecutedCommands = (await DB.drizzle.execute(sql`SELECT COUNT(m.ID) AS count FROM Logs m WHERE m.Value LIKE "Executing [%"`))[0][0].count;
         const VoicesPlaying = client.voice.adapters.size;
+        const playerStatitics = player.generateStatistics();
+        let totalTracks = 0;
+        let totalListeners = 0;
+        playerStatitics.queues.map((queue) => {
+            totalTracks += queue.status.playing ? queue.tracksCount + 1 : queue.tracksCount;
+            totalListeners += queue.listeners;
+        });
       
         const fetchedMessages = await message.channel.messages.fetch({ limit: 100 });
         const lastExecutedCommands = Array.from(fetchedMessages.values()).filter(msg => 
@@ -63,22 +72,40 @@ module.exports = {
             fields: [
                 {
                     name: "Commands count",
-                    value: `Text commands: **${amountTextCommands}**\nSlash commands: **${amountSlashCommands}**`,
+                    value: `
+                    Text commands: **${amountTextCommands}**
+                    Slash commands: **${amountSlashCommands}**`,
                 }, {
                     name: "Server count",
-                    value: `Guilds: **${totalGuilds}**\nUsers: **${totalUsers}** (Here: **${userHere}**)\nChannels: **${totalChannels}**`,
+                    value: `
+                    Guilds: **${totalGuilds}**
+                    Users: **${totalUsers}** (Here: **${userHere}**)
+                    Channels: **${totalChannels}**`,
                 }, {
                     name: "Connection info",
-                    value: `Ping: **${ping}**\nUptime: **${uptime}**`,
+                    value: `
+                    Ping: **${ping}**
+                    Uptime: **${uptime}**`,
                 }, {
                     name: "Commands stats",
-                    value: `Total executed commands (since 08-05-23): **${totalExecutedCommands}**\nLast executed command (in \`${message.guild.name}\`):\n\`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow ?? "Never"} ago) ${lastCommandLink ? `\nLink: ${lastCommandLink}` : ""}`,
+                    value: `
+                    Total executed commands (appromixately): **${totalExecutedCommands}**
+                    Last executed command (in \`${message.guild.name}\`):
+                    \`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow ?? "Never"} ago) ${lastCommandLink ? `
+                    Link: ${lastCommandLink}` : ""}`,
                 }, {
                     name: "Hosting",
-                    value: `Host: **${os.platform()} ${os.release()}**\nShard count: **${Shards}**\nNodeJS version: **${nodeVersion}**\nRam usage: **${RamUsageFormatted}**`,
+                    value: `
+                    Host: **${os.platform()} ${os.release()}**
+                    Shard count: **${Shards}**
+                    NodeJS version: **${nodeVersion}**\nRam usage: **${RamUsageFormatted}**`,
                 }, {
                     name: "Voice",
-                    value: `Playing in **${VoicesPlaying} / ${totalGuilds}** VCs`,
+                    value: `
+                    Playing in **${VoicesPlaying} / ${totalGuilds}** VCs
+                    Queues: **${playerStatitics.queues.length}**
+                    Tracks: **${totalTracks}**
+                    Listeners: **${totalListeners}**`,
                 },
             ],
             footer: {
