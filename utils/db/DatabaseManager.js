@@ -24,9 +24,7 @@ class DatabaseManager {
         this._dbPool = mysql.createPool({
             uri: process.env.DATABASE_URL,
             waitForConnections: true,
-            connectionLimit: 10,
-            queueLimit: 0,
-            connectTimeout: 10000,
+            connectionLimit: 2,
         });
 
         /**
@@ -34,7 +32,7 @@ class DatabaseManager {
          */
         this._drizzle = drizzle(this._dbPool);
 
-        this._handleDisconnect();
+        // this._handleDisconnect();
     }
 
     /**
