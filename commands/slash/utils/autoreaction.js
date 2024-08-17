@@ -1,7 +1,7 @@
 const { ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const emoteList = require("@utils/emojis.json");
-const findClosestMatch = require("@utils/algorithms/findClosestMatch.js");
+const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
 const GuildManager = require("@utils/GuildManager");
 
 module.exports = {
@@ -152,7 +152,7 @@ module.exports = {
                 if (/^[a-z:0-9_]+$/.test(EmotesInput)) {
                     const emoteNames = EmotesInput.replace(" ", "").trim(":").split("::");
                     emoteNames.forEach(emote => {
-                        const closestMatch = findClosestMatch(emote, emoteList);
+                        const closestMatch = findBestMatch(algorithms.LEVENSHTEIN_DISTANCE, emote, Object.values(emoteList)).match;
                         if (closestMatch.closestDistance <= 5) emotes.push(emoteList[closestMatch.closestMatch]);
                     });
                 } else {

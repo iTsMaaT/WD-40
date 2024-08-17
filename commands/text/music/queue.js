@@ -1,10 +1,19 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { useQueue, useMainPlayer, useHistory } = require("discord-player");
+const prettyMs = require("pretty-ms");
 const embedGenerator = require("@utils/helpers/embedGenerator");
+const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
 
 module.exports = {
     name: "queue",
     description: "Shows the current queue for songs",
+    usage: {
+        optional: {
+            "search|s": {
+                description: "Searches for a song in the queue",
+            },
+        },
+    },
     category: "music",
     aliases: ["q"],
     async execute(logger, client, message, args, optionalArgs) {
@@ -16,11 +25,25 @@ module.exports = {
         const historyTracks = history.tracks?.data?.length > 0 ? history.tracks.data.reverse() : []; // Reverse history if it's not empty
         const currentTrack = queue.currentTrack;
 
+        const fieldPerPage = 10;
         let counter = 0;
         const trackPages = [];
         const historyPages = [];
         const trackFields = [];
         const historyFields = [];
+
+        if (optionalArgs["search|s"]) {
+            const search = args.join(" ");
+            const bestMatch = findBestMatch(algorithms.FUZZY_MATCH, search, tracks.map(track => track.title));
+            const arrayPosition = tracks.map(track => track.title).indexOf(bestMatch.match);
+
+            if (arrayPosition === -1) return await message.reply({ embeds: [embedGenerator.error("No results found")] });
+
+            return await message.reply({ embeds: [embedGenerator.info({
+                title: `Search results for [${search}]`,
+                description: `${arrayPosition + 1} - [${tracks[arrayPosition].title} - ${tracks[arrayPosition].author}](${tracks[arrayPosition].url})`,
+            }).withAuthor(message.author)] });
+        }
 
         tracks.map((track, index) => {
             trackFields.push({ name: `${index + 1} - ${track.title} - ${track.author}`, value: `requested by : ${track.requestedBy?.displayName ?? "N/A"}` });
@@ -30,13 +53,13 @@ module.exports = {
             historyFields.push({ name: `${track.title} - ${track.author}`, value: `requested by : ${track.requestedBy?.displayName ?? "N/A"}` });
         });
 
-        for (let i = 0; i < trackFields.length; i += 10) {
-            const chunk = trackFields.slice(i, i + 10);
+        for (let i = 0; i < trackFields.length; i += fieldPerPage) {
+            const chunk = trackFields.slice(i, i + fieldPerPage);
             trackPages.push(chunk);
         }
 
-        for (let i = 0; i < historyFields.length; i += 10) {
-            const chunk = historyFields.slice(i, i + 10);
+        for (let i = 0; i < historyFields.length; i += fieldPerPage) {
+            const chunk = historyFields.slice(i, i + fieldPerPage);
             historyPages.push(chunk);
         }
 
@@ -77,6 +100,7 @@ module.exports = {
                 description: `Currently playing : **${currentTrack.title}** - ${currentTrack.author}`,
                 color: 0xffffff,
                 fields: alltracks[count],
+                footer: { text: `Estimated time left: ${prettyMs(queue.estimatedDuration)}` },
             };
             if ((counter - historyPages.length) < 0) embed.title = "History for the current guild";
 
