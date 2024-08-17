@@ -1,5 +1,5 @@
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const { useQueue, useMainPlayer } = require("discord-player");
+const { useQueue, useMainPlayer, QueueRepeatMode } = require("discord-player");
 
 module.exports = {
     name: "skip",
@@ -22,7 +22,10 @@ module.exports = {
             }).withAuthor(message.author)] });
 
             queue = useQueue(message.guild.id);
-            if (!queue || !queue.currentTrack) return await message.channel.send({ embeds: [embedGenerator.error("There is nothing left to play.")] });
+            if (!queue || !queue.currentTrack) {
+                if (queue.repeatMode !== QueueRepeatMode.AUTOPLAY) return await message.channel.send({ embeds: [embedGenerator.error("There is nothing left to play.")] });
+                else return await message.channel.send({ embeds: [embedGenerator.warning("Autoplay is enabled, a song will start playing shortly.")] });
+            } 
 
             await message.channel.send({ embeds: [embedGenerator.info({
                 title: "Now playing",
