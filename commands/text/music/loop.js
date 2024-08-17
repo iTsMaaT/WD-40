@@ -16,9 +16,10 @@ module.exports = {
     examples: ["track"],
     async execute(logger, client, message, args, optionalArgs) {
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.error("You must be in a voice channel.")] });
-
+        
         let queue = useQueue(message.guild.id);
         const loopMode = args[0]?.toLowerCase() || "queue";
+        const oldLoopMode = getLoopMode(queue);
 
         if (!queue || !queue.tracks) return await message.reply({ embeds: [embedGenerator.error("There is nothing playing.")] });
 
@@ -42,6 +43,6 @@ module.exports = {
 
         queue = useQueue(message.guild.id);
 
-        await message.reply({ embeds: [embedGenerator.info(`Loop mode set to \`${getLoopMode(queue)}\``)] });
+        await message.reply({ embeds: [embedGenerator.info(`Loop mode set from [\`${oldLoopMode}\`] to [\`${getLoopMode(queue)}\`]`)] });
     },
 }; 
