@@ -16,7 +16,7 @@ module.exports = {
         if (args[0] === "-t" || !args[0] || !tableList.includes(args[0])) return message.reply(`Tables: ${tableList.join(", ")}`);
 
         const tableName = args[0];
-        const sent = await message.reply({ content: "Fetching the DB...", fetchReply: true });
+        const sent = await message.reply({ content: "Fetching the DB..." });
 
         try {
             const columnFinder = await repositories[tableName].select().limit(1);
@@ -55,7 +55,7 @@ module.exports = {
             // Create a text file
             const fileName = `./${tableName}_data.txt`;
             await fs.writeFile(fileName, table, { encoding: "utf8" });
-            await sent.edit({ content: `Operation took ${prettyMilliseconds(parseInt(sent.createdTimestamp) - parseInt(Date.now()))}`, files: [fileName] });
+            await sent.edit({ content: `Operation took ${prettyMilliseconds(parseInt(Date.now())) - parseInt(sent.createdTimestamp)}`, files: [fileName] });
             await fs.unlink(fileName);
         } catch (error) {
             logger.error(error.stack);
