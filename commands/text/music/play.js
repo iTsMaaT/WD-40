@@ -7,7 +7,7 @@ const { parse } = require("node-html-parser");
 
 module.exports = {
     name: "play",
-    description: "Play a song (works best with YouTube or Soucloud links)",
+    description: "Play a song (works best with YouTube or Soundcloud links)",
     aliases: ["p"],
     usage: {
         required: {
@@ -28,6 +28,8 @@ module.exports = {
     examples: ["never gonna give you up"],
     permissions: [PermissionsBitField.Flags.Connect],
     async execute(logger, client, message, args, optionalArgs) {
+        const MAX_QUEUE_SIZE = 10000;
+
         const player = useMainPlayer();
         const queue = useQueue(message.guild.id);
         let res, research, embed;
@@ -122,12 +124,15 @@ module.exports = {
                 }
             }
 
+            if (research?.tracks?.length + (queue?.size ?? 0) > MAX_QUEUE_SIZE) return await msg.edit({ embeds: [embedGenerator.error(`Cannot enqueue more than ${MAX_QUEUE_SIZE} tracks.`)] });
+
             if (optionalArgs["shuffle|s"]) await research?.tracks?.shuffle();
             if (optionalArgs["playnext|pn"] && queue) {
-                for (const track of research.tracks) queue.insertTrack(track, 0);
-                queue.insertTrack(research.tracks[0], 0);
-                res = {};
+                for (const track of research.tracks.reverse()) queue.insertTrack(track, 0);
+                res = { searchResult: { hasPlaylist: () => false } };
                 res.track = research.tracks[0];
+                if (research.tracks.length > 1) res.searchResult.hasPlaylist = () => true;
+                else res.searchResult.hasPlaylist = () => false;
             } else {
                 res = await player.play(message.member.voice.channel.id, Attachment ?? research, {
                     nodeOptions: {
@@ -137,9 +142,11 @@ module.exports = {
                             requestedBy: message.user,
                             guild: message.guild,
                         },
+                        volume: 50,
+                        maxSize: MAX_QUEUE_SIZE,
                         bufferingTimeout: 15000,
                         leaveOnStop: true,
-                        leaveOnStopCooldown: 5000,
+                        leaveOnStopCooldown: 0,
                         leaveOnEnd: true,
                         leaveOnEndCooldown: 15000,
                         leaveOnEmpty: true,
@@ -148,17 +155,20 @@ module.exports = {
                     },
                 });
             }
+            
             logger.music(`Playing [${res.track.title}] in [${message.member.voice.channel.name}]`);
 
             embed = embedGenerator.info({
-                title: `${res.searchResult.hasPlaylist() ? "Playlist" : "Track"} enqueued!`,
+                title: `${!queue?.currentTrack 
+                    ? `${res.searchResult.hasPlaylist() ? "Playlist" : "Track"} now playing!` 
+                    : `${res.searchResult.hasPlaylist() ? "Playlist" : "Track"} enqueued!`}`,
                 thumbnail: { url: res.track.thumbnail },
                 description: `[${res.track.title}](${res.track.url})`,
                 fields: [
                     { name: "Pre-shuffled", value: optionalArgs["shuffle|s"] ? "Yes" : "No" },
                     { name: "Will play next", value: optionalArgs["playnext|pn"] && queue ? "Yes" : "No" },
                 ],
-                footer: { text: `Loop mode: ${getLoopMode(queue)} | Playlists cannot be played next (yet)` },
+                footer: { text: `Loop mode: ${getLoopMode(queue)}` },
             }).withAuthor(message.author);
 
             if (res.searchResult?.playlist) embed.data.fields.push({ name: "Playlist", value: res.searchResult.playlist.title });
