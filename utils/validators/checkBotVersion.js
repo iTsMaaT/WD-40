@@ -2,6 +2,10 @@ const changelog = require("@root/changelogs.json");
 const logger = require("@utils/log");
 const { version } = require("@root/package.json");
 
+/**
+ * Check if the bot version is up to date between the changelog and package.json
+ * @returns {void}
+ */
 const checkBotVersion = function() {
     const changelogLatestVersion = changelog[changelog.length - 1].version.split(".");
     const packageJSONVersion = version.split(".");
@@ -33,4 +37,4 @@ const checkBotVersion = function() {
     logger.info("Bot version is up to date");
 };
 
-module.exports = { checkBotVersion };
+module.exports = { execute: checkBotVersion };

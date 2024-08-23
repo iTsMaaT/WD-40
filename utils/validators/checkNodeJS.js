@@ -1,6 +1,10 @@
 const { exec } = require("child_process");
 const logger = require("@utils/log");
 
+/**
+ * Check if Node.js is up to date on the system
+ * @returns {void}
+ */
 const checkNodeJsVersion = async function() {
     await new Promise((resolve, reject) => {
         exec("node -v", (error, stdout) => {
@@ -31,4 +35,4 @@ const checkNodeJsVersion = async function() {
     });
 };
 
-module.exports = { checkNodeJsVersion };
+module.exports = { execute: checkNodeJsVersion };

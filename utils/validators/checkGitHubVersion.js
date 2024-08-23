@@ -1,6 +1,10 @@
 const logger = require("@utils/log");
 const { version, repository } = require("@root/package.json");
 
+/**
+ * Check if the application version is up to date between github and package.json
+ * @returns {void}
+ */
 const checkGitHubVersion = async function() {
     logger.debug("Checking application version compared to GitHub...");
     const repoUrlArray = repository.url.split("/");
@@ -22,4 +26,4 @@ const checkGitHubVersion = async function() {
     logger.info("Successfully checked application version.");
 };
 
-module.exports = { checkGitHubVersion };
+module.exports = { execute: checkGitHubVersion };
