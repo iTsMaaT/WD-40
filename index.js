@@ -15,20 +15,6 @@ const { Client, GatewayIntentBits, Partials } = require("discord.js");
 const { getPermissionArrayNames } = require("@functions/discordFunctions");
 const config = require("@utils/config/configUtils");
 
-// Validations
-const { checkFFmpegInstalled } = require("@utils/validators/checkFFMPEG");
-const { validateEnvironmentVariables } = require("@utils/validators/checkENV");
-const { checkNodeJsVersion } = require("@utils/validators/checkNodeJS");
-const { checkBotVersion } = require("@utils/validators/checkBotVersion");
-const { checkGitHubVersion } = require("@utils/validators/checkGitHubVersion");
-(async () => {
-    await checkFFmpegInstalled();
-    await validateEnvironmentVariables();
-    await checkNodeJsVersion();
-    checkBotVersion();
-    await checkGitHubVersion();
-})();
-
 const fs = require("fs");
 
 const client = new Client({
@@ -76,6 +62,7 @@ const player = new Player(client, {
             authentication: process.env.YOUTUBE_ACCESS_STRING || "",
             streamOptions: {
                 useClient: undefined,
+                highWaterMark: 2 * 1024 * 1024,
             }, 
         });
     }
@@ -107,7 +94,7 @@ function loadFiles(folder, callback) {
         const file = commandFiles.shift();
         if (file.endsWith(".js")) {
             const loaded = require(`${folder}${file}`);
-            loaded.filePath = folder + file;
+            loaded.filePath = (folder + file).replace("./", process.cwd() + "/");
             loaded.lastExecutionTime = 1000;
             callback(loaded, file);
         } else {
@@ -117,6 +104,14 @@ function loadFiles(folder, callback) {
         }
     }
 }
+
+loadFiles("./utils/validators/", async function(validator) {
+    if (!validator.execute) {
+        logger.severe(`Validator [${validator.filePath}] is missing an execute function`);
+        process.exit(0);
+    }
+    await validator.execute();
+});
 
 // Slash command handler
 client.discoveredCommands = [];

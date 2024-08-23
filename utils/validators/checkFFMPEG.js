@@ -1,6 +1,10 @@
 const { exec } = require("child_process");
 const logger = require("@utils/log");
 
+/**
+ * Check if FFmpeg is installed on the system
+ * @returns {void}
+ */
 const checkFFmpegInstalled = async function() {
     await new Promise((resolve, reject) => {
         exec("ffmpeg -version", (error) => {
@@ -19,4 +23,4 @@ const checkFFmpegInstalled = async function() {
     });
 };
 
-module.exports = { checkFFmpegInstalled };
+module.exports = { execute: checkFFmpegInstalled };

@@ -1,5 +1,9 @@
 const logger = require("@utils/log");
 
+/**
+ * Validate the environment variables
+ * @returns {void}
+ */
 const validateEnvironmentVariables = async function() {
     logger.debug("Validating environment variables...");
     const requiredEnvironmentVariables = [
@@ -51,4 +55,4 @@ const validateEnvironmentVariables = async function() {
     logger.info("Successfully validated environment variables.");
 };
 
-module.exports = { validateEnvironmentVariables };
+module.exports = { execute: validateEnvironmentVariables };
