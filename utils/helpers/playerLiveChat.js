@@ -1,12 +1,11 @@
 const { getLiveChat, LiveChatEvents, ChatMessageType } = require("discord-player-youtubei");
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const cat = require("@root/commands/text/fun/posts/cat");
 
 const liveChatEnabled = new Set();
 const activeChats = new Map();
 const messageBuffers = new Map(); // Map of {buffer, bufferSize, timer} objects
-const MAX_MESSAGE_SIZE = 1000; // Discord's message size limit (in characters)
-const FLUSH_INTERVAL = 7000; // 5 seconds
+const MAX_MESSAGE_SIZE = 1000;
+const FLUSH_INTERVAL = 7000;
 
 const flushBuffer = async (channel) => {
     const buffer = messageBuffers?.get(channel.id)?.buffer;

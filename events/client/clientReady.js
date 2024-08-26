@@ -1,7 +1,7 @@
 const { Events, ActivityType } = require("discord.js");
 const config = require("@utils/config/configUtils");
 const GuildManager = require("@root/utils/GuildManager");
-const RandomMinMax = require("@utils/functions/RandomMinMax");
+const RandomMinMax = require("@root/utils/functions/randomMinMax");
 const { initConfFile } = require("@root/utils/reddit/fetchRedditToken.js");
 const { useMainPlayer } = require("discord-player");
 const { activateRotator } = require("@utils/helpers/activityStatusRotator");

@@ -1,5 +1,5 @@
 const cron = require("cron");
-const RandomMinMax = require("@utils/functions/RandomMinMax");
+const RandomMinMax = require("@root/utils/functions/randomMinMax");
 const config = require("@utils/config/configUtils");
 const { ActivityType } = require("discord.js");
 const logger = require("@utils/log");

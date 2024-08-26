@@ -95,7 +95,6 @@ function loadFiles(folder, callback) {
         if (file.endsWith(".js")) {
             const loaded = require(`${folder}${file}`);
             loaded.filePath = (folder + file).replace("./", process.cwd() + "/");
-            loaded.lastExecutionTime = 1000;
             callback(loaded, file);
         } else {
             if (!fs.lstatSync(folder + file).isDirectory()) continue;
@@ -105,7 +104,7 @@ function loadFiles(folder, callback) {
     }
 }
 
-loadFiles("./utils/validators/", async function(validator) {
+loadFiles("./utils/validators/", async (validator) => {
     if (!validator.execute) {
         logger.severe(`Validator [${validator.filePath}] is missing an execute function`);
         process.exit(0);
@@ -126,12 +125,15 @@ loadFiles("./commands/slash/", (slashcommand, fileName) => {
 });
 
 // Text command handler
-loadFiles("./commands/text/", function(command) {
+loadFiles("./commands/text/", (command) => {
+    command.isAlias = false;
+    command.lastExecutionTime = 1000;
     if (client.commands.get(command.name)) throw new Error(`Text command [${command.name}] already exists\n${command.filePath}`);
     client.commands.set(command.name, command);
     if (!command.cooldown) command.cooldown = 3000;
 
     if (command.aliases && Array.isArray(command.aliases)) {
+        command.isAlias = true;
         command.aliases.forEach(alias => {
             if (client.commands.get(alias)) throw new Error(`Text command alias [${alias}] already exists\n${command.filePath}`);
             client.commands.set(alias, command);
@@ -161,7 +163,7 @@ loadFiles("./commands/context/", (contextcommand, fileName) => {
 });
 
 // Event handler
-loadFiles("./events/client/", function(event) {
+loadFiles("./events/client/", (event) => {
     if (event.once) {
         client.once(event.name, async (...args) => {
             if (event.log) logger.event(`Event: [${event.name}] fired.`);
@@ -175,14 +177,14 @@ loadFiles("./events/client/", function(event) {
     }
 });
 
-loadFiles("./events/process/", function(event) {
+loadFiles("./events/process/", (event) => {
     process.on(event.name, async (...args) => {
         if (event.log) logger.event(`Event: [${event.name}] fired.`);
         await event.execute(client, logger, ...args);
     });
 });
 
-loadFiles("./events/player/", function(event) {
+loadFiles("./events/player/", (event) => {
     player.events.on(event.name, async (...args) => {
         if (event.log) logger.event(`Event: [${event.name}] fired.`);
         await event.execute(client, logger, ...args);
@@ -195,7 +197,7 @@ loadFiles("./events/player/", function(event) {
 });
 
 process.stdin.setEncoding("utf8");
-loadFiles("./events/console/", function(event) {
+loadFiles("./events/console/", (event) => {
     if (client.consoleCommands.get(event.name)) throw new Error(`Command or alias [${event.name}] already exists`);
     client.consoleCommands.set(event.name, event);
 });

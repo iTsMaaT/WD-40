@@ -2,7 +2,7 @@ const prettyMilliseconds = require("pretty-ms");
 const os = require("os");
 const changelogs = require("@root/changelogs.json");
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
+const GetPterodactylInfo = require("@root/utils/functions/getPterodactylInfo");
 const { sql } = require("drizzle-orm");
 const DB = require("@root/utils/db/DatabaseManager");
 const GuildManager = require("@root/utils/GuildManager");
@@ -72,40 +72,40 @@ module.exports = {
             fields: [
                 {
                     name: "Commands count",
-                    value: `
-                    Text commands: **${amountTextCommands}**
-                    Slash commands: **${amountSlashCommands}**`,
+                    value: 
+                    `Text commands: **${amountTextCommands}**\n` + 
+                    `Slash commands: **${amountSlashCommands}**`,
                 }, {
                     name: "Server count",
-                    value: `
-                    Guilds: **${totalGuilds}**
-                    Users: **${totalUsers}** (Here: **${userHere}**)
-                    Channels: **${totalChannels}**`,
+                    value: 
+                    `Guilds: **${totalGuilds}**\n` + 
+                    `Users: **${totalUsers}** (Here: **${userHere}**)\n` + 
+                    `Channels: **${totalChannels}**`,
                 }, {
                     name: "Connection info",
-                    value: `
-                    Ping: **${ping}**
-                    Uptime: **${uptime}**`,
+                    value: 
+                    `Ping: **${ping}**\n` + 
+                    `Uptime: **${uptime}**`,
                 }, {
                     name: "Commands stats",
-                    value: `
-                    Total executed commands (appromixately): **${totalExecutedCommands}**
-                    Last executed command (in \`${message.guild.name}\`):
-                    \`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow ?? "Never"} ago) ${lastCommandLink ? `
-                    Link: ${lastCommandLink}` : ""}`,
+                    value: 
+                    `Total executed commands (appromixately): **${totalExecutedCommands}**\n` + 
+                    `Last executed command (in \`${message.guild.name}\`):\n` + 
+                    `\`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow ?? "Never"} ago) ${lastCommandLink ? `Link: ${lastCommandLink}` : ""}`,
                 }, {
                     name: "Hosting",
-                    value: `
-                    Host: **${os.platform()} ${os.release()}**
-                    Shard count: **${Shards}**
-                    NodeJS version: **${nodeVersion}**\nRam usage: **${RamUsageFormatted}**`,
+                    value: 
+                    `Host: **${os.platform()} ${os.release()}**\n` + 
+                    `Shard count: **${Shards}**\n` + 
+                    `NodeJS version: **${nodeVersion}**\n` + 
+                    `Ram usage: **${RamUsageFormatted}**`,
                 }, {
                     name: "Voice",
-                    value: `
-                    Playing in **${VoicesPlaying} / ${totalGuilds}** VCs
-                    Queues: **${playerStatitics.queues.length}**
-                    Tracks: **${totalTracks}**
-                    Listeners: **${totalListeners}**`,
+                    value: 
+                    `Playing in **${VoicesPlaying} / ${totalGuilds}** VCs\n` + 
+                    `Queues: **${playerStatitics.queues.length}**\n` + 
+                    `Tracks: **${totalTracks}**\n` + 
+                    `Listeners: **${totalListeners}**`,
                 },
             ],
             footer: {

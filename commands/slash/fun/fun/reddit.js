@@ -1,6 +1,6 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const FetchReddit = require("@utils/reddit/FetchReddit.js");
+const FetchReddit = require("@utils/reddit/fetchReddit.js");
 
 module.exports = {
     name: "reddit",

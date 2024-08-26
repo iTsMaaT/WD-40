@@ -1,4 +1,4 @@
-const SplitIntoChunks = require("@functions/SplitIntoChunks");
+const SplitIntoChunks = require("@root/utils/functions/splitIntoChunks");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {

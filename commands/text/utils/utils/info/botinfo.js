@@ -1,4 +1,4 @@
-const GetPterodactylInfo = require("@functions/GetPterodactylInfo");
+const GetPterodactylInfo = require("@root/utils/functions/getPterodactylInfo");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { ToEngineerNotation } = require("@functions/formattingFunctions");
 

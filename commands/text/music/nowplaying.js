@@ -23,7 +23,7 @@ module.exports = {
                 { name: "Author", value: track.author },
                 { name: "Progress", value: track.raw.live ? "Live ┃ ▬▬▬▬▬▬▬▬▬▬▬▬▬▬🔘 ┃ Infinity (99%)" : `${queue.node.createProgressBar()} (${timeline.timestamp?.progress}%)` }, 
                 { name: "Loop mode", value: getLoopMode(queue), inline: true },
-                { name: "Paused", value: getPauseMode(queue), inline: true },
+                { name: "Play mode", value: getPauseMode(queue), inline: true },
                 { name: "Extractor", value: `\`${track.extractor?.identifier || "N/A"}\`` },
             ],
             footer: { text: `Event Loop Lag: ${queue.player.eventLoopLag.toFixed(0)}ms` },

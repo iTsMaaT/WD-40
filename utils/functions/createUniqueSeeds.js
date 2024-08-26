@@ -1,4 +1,4 @@
-const getExactDate = require("./getExactDate");
+const getExactDate = require("./getExactDates");
 
 const CreateUniqueSeed = function(message) {
     let seed = getExactDate().replace(/-|\s|:|\./g, "") +  Math.floor(Math.random() * 9999);

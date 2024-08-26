@@ -1,5 +1,5 @@
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const FetchReddit = require("@utils/reddit/FetchReddit.js");
+const FetchReddit = require("@root/utils/reddit/fetchReddit.js");
 
 module.exports = {
     name: "reddit",

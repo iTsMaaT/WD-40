@@ -251,9 +251,9 @@ module.exports = {
                         .setCustomId("command_select")
                         .setPlaceholder("Select a command")
                         .addOptions(commandsInCategory.map(command => ({
-                            label: command.name.replace(/[*:[\] ]/g, ""), // Simplified label
+                            label: command.name.match(/([a-zA-Z0-9]+)/g)[0],
                             description: command.value,
-                            value: command.name.replace(/[*:[\] ]/g, ""), // Simplified value
+                            value: command.name.match(/([a-zA-Z0-9]+)/g)[0],
                         })));
         
                     const selectRow = new ActionRowBuilder().addComponents(selectMenu);

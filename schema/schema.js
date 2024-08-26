@@ -20,7 +20,7 @@ const guildsettings = mysqlTable("GuildSettings", {
     guildName: varchar("GuildName", { length: 255 }).notNull(),
     active: tinyint("Active").default(1).notNull(),
     responses: tinyint("Responses").default(0).notNull(),
-    personality: varchar("Personality", { length: 500 }).default("Answer as if you are annoying.").notNull(),
+    personality: varchar("Personality", { length: 500 }).default("Neutral").notNull(),
 },
 (table) => {
     return {
