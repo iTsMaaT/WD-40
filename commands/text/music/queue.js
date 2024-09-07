@@ -48,7 +48,7 @@ module.exports = {
             const description = matches.map(match => {
                 const arrayPosition = tracks.findIndex(t => t.title === match.value);
                 const paddedIndex = (arrayPosition + 1).toString().padStart(maxIndexLength, " ");
-                return `[${paddedIndex}] - [${tracks[arrayPosition].title} - ${tracks[arrayPosition].author}](${tracks[arrayPosition].url})`;
+                return `[\`${paddedIndex}\`] - [${tracks[arrayPosition].title} - ${tracks[arrayPosition].author}](${tracks[arrayPosition].url})`;
             }).join("\n");
         
             return await message.reply({
