@@ -128,7 +128,8 @@ Step 5 - Send the downloaded media to your favorite social media!
                 // Check command cooldown
                 if (TextCooldowns.has(message.author.id)) {
                     const cooldown = TextCooldowns.get(message.author.id);
-                    const timeLeft = cooldown - Date.now();
+                    let timeLeft = cooldown - Date.now();
+                    if (config.get("defaultSuperuserState") && config.get("whitelist").includes(message.author.id)) timeLeft = 0;
                     if (timeLeft > 0) {
                         message.reply({ embeds: [embedGenerator.warning(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before using that command again.`)] });
                         return;
