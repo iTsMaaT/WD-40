@@ -1,6 +1,6 @@
 {
   "name": "wd40",
-  "version": "5.4.1",
+  "version": "5.5.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,8 @@
     "drizzle:push": "npx drizzle-kit push:mysql --config=drizzle-cli-conf.js",
     "code": "git pull && npm i && code WD-40.code-workspace && eslint --no-fix .",
     "c": "npm run code",
-    "createChangelogMD": "node ./utils/helpers/createChangelogMD.js"
+    "createChangelogMD": "node ./utils/helpers/createChangelogMD.js",
+    "cl": "npm run createChangelogMD"
   },
   "repository": {
     "type": "git",
@@ -29,13 +30,13 @@
     "@distube/ytdl-core": "^4.14.4",
     "@google/generative-ai": "^0.15.0",
     "@iamtraction/google-translate": "^2.0.1",
-    "axios": "^1.7.3",
+    "axios": "^1.7.7",
     "canvas": "^2.11.2",
     "cron": "^3.1.7",
     "discord-player": "^6.7.1",
-    "discord-player-youtubei": "^1.2.6",
+    "discord-player-youtubei": "^1.3.1",
     "discord-tts": "^1.2.2",
-    "discord.js": "^14.15.3",
+    "discord.js": "^14.16.1",
     "discord.js-akinator": "^4.1.5",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.29.5",
@@ -52,7 +53,7 @@
   "devDependencies": {
     "drizzle-kit": "^0.20.18",
     "eslint": "^8.57.0",
-    "eslint-plugin-import": "^2.29.1"
+    "eslint-plugin-import": "^2.30.0"
   },
   "_moduleAliases": {
     "@root": ".",

@@ -120,7 +120,6 @@ class Logger {
 
     warning(message) {
         this.writeLogToFile(message, this.types.warning);
-        if (message.startsWith("[YOUTUBEJS][Player]:")) logger.severe("^^^ Youtube player not working. A temp fix has been applied, please ignore.");
     }
 
     severe(message) {

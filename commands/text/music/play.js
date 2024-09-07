@@ -1,7 +1,7 @@
 const { PermissionsBitField } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { getLoopMode } = require("@utils/helpers/playerHelpers");
-const { QueryType, useMainPlayer, useQueue } = require("discord-player");
+const { QueryType, useMainPlayer, useQueue, QueryResolver } = require("discord-player");
 const config = require("@utils/config/configUtils");
 const { parse } = require("node-html-parser");
 
@@ -32,67 +32,56 @@ module.exports = {
 
         const player = useMainPlayer();
         const queue = useQueue(message.guild.id);
-        let res, research, embed;
+        let res, research, specificSearch;
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
-        
-        const Attachment = message.attachments.first()?.attachment;
+
+        const attachment = message.attachments.first()?.attachment;
 
         let string = args.join(" ");
-        // string = string.split("&list=")[0];
         if (!string) string = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
         // return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
+        const stringQueryType = QueryResolver.resolve(string).type;
 
-        embed = {
-            color: 0xffffff,
+        const sentMessage = await message.reply({ embeds: [embedGenerator.info({
             description: "Request received, fetching...",
-            timestamp: new Date(),
             footer: { text: "Age restricted videos might not work." },
-        };
-
-        research = await player.search(string, {
-            requestedBy: message.member,
-            searchEngine: QueryType.AUTO_SEARCH,
-        });
-
-        const msg = await message.reply({ embeds: [embed] });
+        })] });
         
         try {
-            const linkRegex = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])/igm;
-            const spotifyRegex = /^(?:https:\/\/open\.spotify\.com\/(?:intl-[a-zA-Z]{0,3}\/)?(?:user\/[A-Za-z0-9]+\/)?|spotify:)(?:track\/)([A-Za-z0-9]+).*$/;
-            if ((spotifyRegex.test(string) || !linkRegex.test(string)) && !config.get("discordPlayerConf")?.removeYoutube) {
+            if (stringQueryType === QueryType.AUTO_SEARCH || stringQueryType === QueryType.SPOTIFY_SONG) {
                 
-                if (spotifyRegex.test(string)) {
+                if (stringQueryType === QueryType.SPOTIFY_SONG) {
                     research = await player.search(string, {
                         requestedBy: message.member,
                         searchEngine: QueryType.SPOTIFY_SONG,
                     });
+                    if (!research.hasTracks()) return await sentMessage.edit({ embeds: [embedGenerator.warning("No results found")] });
+                    if (research && research.hasTracks()) specificSearch = `${research.tracks[0].title} - ${research.tracks[0].author}`;
+                    else if (!linkRegex.test(string)) specificSearch = string;
+                } else {
+                    specificSearch = string;
                 }
 
-                if (!research.hasTracks()) return await message.reply({ embeds: [embedGenerator.warning("No results found")] });
-
-                let newResearch = "";
-                if (research && research.hasTracks()) newResearch = `${research.tracks[0].title} - ${research.tracks[0].author}`;
-                else if (!linkRegex.test(string)) newResearch = string;
-
-                research = await player.search(newResearch, {
+                research = await player.search(specificSearch, {
                     requestedBy: message.member,
                     searchEngine: QueryType.YOUTUBE_SEARCH,
                 });
 
-                embed = {
-                    color: 0xffffff,
+                if (!research.hasTracks()) return await sentMessage.edit({ embeds: [embedGenerator.warning("No results found")] });
+
+                const choicesEmbed = embedGenerator.info({
                     title: "Type in chat the number you want to play",
                     description: "Not entering a number will make it play the best match",
                     fields: [],
                     timestamp: new Date(),
-                };
+                });
 
                 const choices = research.tracks.slice(0, 10);
                 choices.map((track, index) => {
-                    embed.fields.push({ name: `${index + 1} - ${track.title}`, value: `By ${track.author}` });
+                    choicesEmbed.data.fields.push({ name: `${index + 1} - ${track.title}`, value: `By ${track.author}` });
                 });
 
-                await msg.edit({ embeds: [embed] });
+                await sentMessage.edit({ embeds: [choicesEmbed] });
 
                 const filter = (m) => m.author.id === message.author.id;
                 await message.channel.awaitMessages({ filter, max: 1, time: 10000, errors: ["time"] })
@@ -102,9 +91,7 @@ module.exports = {
                         responseMessage.delete();
                     })
                     .catch(() => research = choices[0]);
-                    
             } else {
-
                 const soundgasm = await getSoundgasmLink(args.join(" "));
                 if (soundgasm) string = soundgasm;
 
@@ -113,28 +100,20 @@ module.exports = {
                     searchEngine: QueryType.AUTO,
                 });
 
-                if (!research.hasTracks()) {
-                    embed = {
-                        color: 0xff0000,
-                        description: "No results found",
-                        timestamp: new Date(),
-                    };
-    
-                    await msg.edit({ embeds: [embed] });
-                }
+                if (!research.hasTracks()) return await message.reply({ embeds: [embedGenerator.warning("No results found")] });
             }
 
-            if (research?.tracks?.length + (queue?.size ?? 0) > MAX_QUEUE_SIZE) return await msg.edit({ embeds: [embedGenerator.error(`Cannot enqueue more than ${MAX_QUEUE_SIZE} tracks.`)] });
+            if (research?.tracks?.length + (queue?.size ?? 0) > MAX_QUEUE_SIZE) return await sentMessage.edit({ embeds: [embedGenerator.error(`Cannot enqueue more than ${MAX_QUEUE_SIZE} tracks.`)] });
 
+            let finalTrack, finalSearchResult;
             if (optionalArgs["shuffle|s"]) await research?.tracks?.shuffle();
+
             if (optionalArgs["playnext|pn"] && queue) {
                 for (const track of research.tracks.reverse()) queue.insertTrack(track, 0);
-                res = { searchResult: { hasPlaylist: () => false } };
-                res.track = research.tracks[0];
-                if (research.tracks.length > 1) res.searchResult.hasPlaylist = () => true;
-                else res.searchResult.hasPlaylist = () => false;
+                finalTrack = research.tracks[0];
+                finalSearchResult = research;
             } else {
-                res = await player.play(message.member.voice.channel.id, Attachment ?? research, {
+                const playResult = await player.play(message.member.voice.channel.id, attachment ?? research, {
                     nodeOptions: {
                         metadata: {
                             channel: message.channel,
@@ -154,16 +133,16 @@ module.exports = {
                         skipOnNoStream: true,
                     },
                 });
+                finalTrack = playResult.track;
+                finalSearchResult = playResult.searchResult;
             }
             
-            logger.music(`Playing [${res.track.title}] in [${message.member.voice.channel.name}]`);
+            logger.music(`Playing [${finalTrack.title}] in [${message.member.voice.channel.name}]`);
 
             embed = embedGenerator.info({
-                title: `${!queue?.currentTrack 
-                    ? `${res.searchResult.hasPlaylist() ? "Playlist" : "Track"} now playing!` 
-                    : `${res.searchResult.hasPlaylist() ? "Playlist" : "Track"} enqueued!`}`,
-                thumbnail: { url: res.track.thumbnail },
-                description: `[${res.track.title}](${res.track.url})`,
+                title: `${finalSearchResult.hasPlaylist() ? "Playlist" : "Track"} ${!queue?.currentTrack ? "now playing!" : "enqueued!"}`,
+                thumbnail: { url: finalTrack.thumbnail },
+                description: `[${finalTrack.title}](${finalTrack.url})`,
                 fields: [
                     { name: "Pre-shuffled", value: optionalArgs["shuffle|s"] ? "Yes" : "No" },
                     { name: "Will play next", value: optionalArgs["playnext|pn"] && queue ? "Yes" : "No" },
@@ -171,13 +150,13 @@ module.exports = {
                 footer: { text: `Loop mode: ${getLoopMode(queue)}` },
             }).withAuthor(message.author);
 
-            if (res.searchResult?.playlist) embed.data.fields.push({ name: "Playlist", value: res.searchResult.playlist.title });
+            if (finalSearchResult?.playlist) embed.data.fields.push({ name: "Playlist", value: finalSearchResult.playlist.title });
     
-            await msg.edit({ embeds: [embed] });
+            await sentMessage.edit({ embeds: [embed] });
 
         } catch (err) {
             logger.error(err);
-            return await msg.edit({ embeds: [embedGenerator.error("Failed to fetch / play the requested track")] });
+            return await sentMessage.edit({ embeds: [embedGenerator.error("Failed to fetch / play the requested track")] });
         }
     },
 };

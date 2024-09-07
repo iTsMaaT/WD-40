@@ -3,6 +3,7 @@ const { useQueue, useMainPlayer, useHistory } = require("discord-player");
 const prettyMs = require("pretty-ms");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
+const { all } = require("axios");
 
 module.exports = {
     name: "queue",
@@ -22,7 +23,7 @@ module.exports = {
 
         if (!queue || !queue.tracks || !queue.currentTrack || queue.tracks.data.length === 0) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue / currently playing.")] });
         const tracks = queue.tracks ? queue.tracks.data : [];
-        const historyTracks = history.tracks?.data?.length > 0 ? history.tracks.data.reverse() : []; // Reverse history if it's not empty
+        const historyTracks = history.tracks?.data?.length > 0 ? history.tracks.data : []; // Reverse history if it's not empty
         const currentTrack = queue.currentTrack;
 
         const fieldPerPage = 10;
@@ -35,23 +36,49 @@ module.exports = {
         if (optionalArgs["search|s"]) {
             const search = args.join(" ");
             const bestMatch = findBestMatch(algorithms.FUZZY_MATCH, search, tracks.map(track => track.title));
-            const arrayPosition = tracks.map(track => track.title).indexOf(bestMatch.match);
-
-            if (arrayPosition === -1) return await message.reply({ embeds: [embedGenerator.error("No results found")] });
-
-            return await message.reply({ embeds: [embedGenerator.info({
-                title: `Search results for [${search}]`,
-                description: `${arrayPosition + 1} - [${tracks[arrayPosition].title} - ${tracks[arrayPosition].author}](${tracks[arrayPosition].url})`,
-            }).withAuthor(message.author)] });
+            const matches = bestMatch.matches.slice(0, 5); // Get the first 5 matches
+        
+            if (matches.length === 0) 
+                return await message.reply({ embeds: [embedGenerator.error("No results found")] });
+            
+        
+            // Find the length of the largest index for padding
+            const maxIndexLength = tracks.length.toString().length;
+        
+            const description = matches.map(match => {
+                const arrayPosition = tracks.findIndex(t => t.title === match.value);
+                const paddedIndex = (arrayPosition + 1).toString().padStart(maxIndexLength, " ");
+                return `[\`${paddedIndex}\`] - [${tracks[arrayPosition].title} - ${tracks[arrayPosition].author}](${tracks[arrayPosition].url})`;
+            }).join("\n");
+        
+            return await message.reply({
+                embeds: [embedGenerator.info({
+                    title: `Search results for [${search}]`,
+                    description: description,
+                }).withAuthor(message.author)],
+            });
         }
+        
+
+        const maxTrackIndexLength = tracks.length.toString().length;
+        const maxHistoryIndexLength = historyTracks.length.toString().length;
 
         tracks.map((track, index) => {
-            trackFields.push({ name: `${index + 1} - ${track.title} - ${track.author}`, value: `requested by : ${track.requestedBy?.displayName ?? "N/A"}` });
+            const paddedIndex = (index + 1).toString().padStart(maxTrackIndexLength, " ");
+            trackFields.push({
+                name: `[${paddedIndex}] - ${track.title} - ${track.author}`,
+                value: `requested by : ${track.requestedBy?.displayName ?? "N/A"}`,
+            });
         });
 
-        historyTracks.map(track => {
-            historyFields.push({ name: `${track.title} - ${track.author}`, value: `requested by : ${track.requestedBy?.displayName ?? "N/A"}` });
+        historyTracks.map((track, index) => {
+            const paddedIndex = (-1 * (index + 1)).toString().padStart(maxHistoryIndexLength + 1, " "); // +1 for the negative sign
+            historyFields.push({
+                name: `[${paddedIndex}] - ${track.title} - ${track.author}`,
+                value: `requested by : ${track.requestedBy?.displayName ?? "N/A"}`,
+            });
         });
+
 
         for (let i = 0; i < trackFields.length; i += fieldPerPage) {
             const chunk = trackFields.slice(i, i + fieldPerPage);
@@ -63,7 +90,10 @@ module.exports = {
             historyPages.push(chunk);
         }
 
+        historyPages.reverse();
+        
         const alltracks = [...historyPages, ...trackPages];
+        console.log(alltracks);
 
         const FirstPage = new ButtonBuilder()
             .setCustomId("first")
@@ -108,11 +138,13 @@ module.exports = {
         };
 
         const updateComponents = (count) => {
+            console.log(count);
+            console.log(historyPages.length);
             row.components[0].setDisabled(count === historyPages.length);
             row.components[1].setDisabled(count === 0);
             row.components[2].setLabel(`${counter - historyPages.length} / ${alltracks.length - historyPages.length - 1}`);
-            row.components[3].setDisabled(count === trackPages.length);
-            row.components[4].setDisabled(count === trackPages.length);
+            row.components[3].setDisabled(count === alltracks.length - 1);
+            row.components[4].setDisabled(count === alltracks.length - 1);
         };
 
         counter = historyPages.length;

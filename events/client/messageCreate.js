@@ -3,7 +3,7 @@ const GuildManager = require("@root/utils/GuildManager");
 const { repositories } = require("@utils/db/tableManager.js");
 const getExactDate = require("@functions/getExactDate");
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const RandomMinMax = require("@functions/RandomMinMax");
+const RandomMinMax = require("@root/utils/functions/randomMinMax");
 const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
 const { initConfFile } = require("@utils/reddit/fetchRedditToken.js");
 const countCommonChars = require("@utils/functions/countCommonChars.js");
@@ -128,7 +128,8 @@ Step 5 - Send the downloaded media to your favorite social media!
                 // Check command cooldown
                 if (TextCooldowns.has(message.author.id)) {
                     const cooldown = TextCooldowns.get(message.author.id);
-                    const timeLeft = cooldown - Date.now();
+                    let timeLeft = cooldown - Date.now();
+                    if (config.get("defaultSuperuserState") && config.get("whitelist").includes(message.author.id)) timeLeft = 0;
                     if (timeLeft > 0) {
                         message.reply({ embeds: [embedGenerator.warning(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before using that command again.`)] });
                         return;
