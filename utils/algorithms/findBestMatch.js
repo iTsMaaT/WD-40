@@ -13,13 +13,12 @@ const algorithms = {
  * @param {string} algorithm - The algorithm to use for finding the best match.
  * @param {string} input - The input string to find the best match for.
  * @param {string[]} values - An array of strings to find the best match in.
- * @returns {{match: string, score: number}} An object containing the best match and its score.
+ * @returns {{match: string, score: number, matches: Array<{value: string, score: number}>}} An object containing the best match, its score, and a sorted array of matches.
  * @throws {Error} If an invalid algorithm is provided.
  */
 const findBestMatch = (algorithm, input, values) => {
     if (!Object.values(algorithms).includes(algorithm))
         throw new Error("Invalid algorithm provided");
-    
 
     switch (algorithm) {
         case algorithms.LEVENSHTEIN_DISTANCE:
@@ -66,23 +65,20 @@ function levenshteinDistance(s1, s2) {
  * 
  * @param {string} input - The input string to find the best match for.
  * @param {string[]} values - An array of strings to find the best match in.
- * @returns {{match: string, score: number}} An object containing the best match and its score.
+ * @returns {{match: string, score: number, matches: Array<{value: string, score: number}>}} An object containing the best match, its score, and a sorted array of matches.
  */
 function levenshteinDistanceAlgorithm(input, values) {
-    let closestMatch = "";
-    let closestDistance = Number.MAX_SAFE_INTEGER;
+    const matches = values.map(value => ({
+        value,
+        score: levenshteinDistance(input, value),
+    }));
 
-    for (const value of values) {
-        const distance = levenshteinDistance(input, value);
-        if (distance < closestDistance) {
-            closestMatch = value;
-            closestDistance = distance;
-        }
-    }
+    matches.sort((a, b) => a.score - b.score);
 
     return {
-        match: closestMatch,
-        score: closestDistance,
+        match: matches[0].value,
+        score: matches[0].score,
+        matches,
     };
 }
 
@@ -111,7 +107,6 @@ function similarityRatio(a, b) {
     for (let i = 0; i < shorter.length; i++) {
         if (shorter[i] === longer[i]) 
             matches++;
-        
     }
 
     return (matches / longer.length) - (lengthDifference / longer.length);
@@ -122,14 +117,11 @@ function similarityRatio(a, b) {
  * 
  * @param {string} searchString - The input string to find the best match for.
  * @param {string[]} listOfStrings - An array of strings to find the best match in.
- * @returns {{match: string, score: number}} An object containing the best match and its score.
+ * @returns {{match: string, score: number, matches: Array<{value: string, score: number}>}} An object containing the best match, its score, and a sorted array of matches.
  */
 function fuzzyMatchAlgorithm(searchString, listOfStrings) {
     const searchTokens = tokenize(searchString);
-    let bestMatch = "";
-    let highestScore = -Infinity;
-
-    for (const target of listOfStrings) {
+    const matches = listOfStrings.map(target => {
         const targetTokens = tokenize(target);
         let score = 0;
 
@@ -143,15 +135,18 @@ function fuzzyMatchAlgorithm(searchString, listOfStrings) {
             score += bestTokenScore;
         }
 
-        if (score > highestScore) {
-            highestScore = score;
-            bestMatch = target;
-        }
-    }
+        return {
+            value: target,
+            score,
+        };
+    });
+
+    matches.sort((a, b) => b.score - a.score);
 
     return {
-        match: bestMatch,
-        score: highestScore,
+        match: matches[0].value,
+        score: matches[0].score,
+        matches,
     };
 }
 
