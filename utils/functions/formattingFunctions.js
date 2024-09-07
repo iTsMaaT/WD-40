@@ -120,9 +120,29 @@ const numberToWord = function(numberString) {
     wordString = wordString.replace(/\s+/g, " ");
     return wordString.trim();
 };
+
+function generateProgressBar(options) {
+    const current = options.current;
+    const max = options.max;
+    const totalCount = options.totalCount || 20;
+    const withPercentage = options.withPercentage || false;
+    if (!current) throw new Error("No current value specified");
+    if (!max) throw new Error("No max value specified");
+    if (current > max) throw new Error("Current value is bigger than the max value");
+    const percentage = (current / max) * 100;
+    const filledLength = Math.round((totalCount * percentage) / 100);
+    const emptyLength = totalCount - filledLength;
+
+    const filledBar = "█".repeat(filledLength);
+    const emptyBar = "░".repeat(emptyLength);
+
+    return `[${filledBar}${emptyBar}]${withPercentage ? ` ${percentage.toFixed(2)}%` : ""}`;
+}
+
 module.exports = { 
     numberToWord, 
     prettyString, 
     TimeFormatToMS, 
     ToEngineerNotation, 
+    generateProgressBar,
 };
