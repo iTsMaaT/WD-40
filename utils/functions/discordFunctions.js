@@ -140,7 +140,7 @@ async function editOrSend(channel, messageOptions, add) {
  * @returns {Array} The embed array
  */
 function multipleImageEmbed(embedOBJ, ...links) {
-    if (!links || links.length == 0) throw new Error("Image links missing");
+    if (!links || links.length == 0 || !Array.isArray(links)) return [embedOBJ];
     const mainLink = links[0];
     const embedParts = [];
     embedOBJ.url = mainLink;
