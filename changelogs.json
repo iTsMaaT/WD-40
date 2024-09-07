@@ -303,12 +303,23 @@
     },
     {
         "version": "5.4.1",
-        "date": "2024-07-18",
+        "date": "2024-08-18",
         "changes": [
             "Massive embed refactoring",
             "Help page has slash commands",
             "Blacklist (should) work for slash commands",
             "New >source command"
+        ]
+    },
+    {
+        "version": "5.5.0",
+        "date": "2024-08-26",
+        "changes": [
+            ">jump, >remove and >move now can take queries instead of a position",
+            "Added -search to >queue, searches for a song in the queue and get it's position",
+            ">botinfo now has process info",
+            ">nowplaying now shows the paused and loop status better",
+            ">skip now shows what you skipped, and what will now play"
         ]
     }
 ]
