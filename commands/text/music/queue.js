@@ -3,7 +3,6 @@ const { useQueue, useMainPlayer, useHistory } = require("discord-player");
 const prettyMs = require("pretty-ms");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
-const { all } = require("axios");
 
 module.exports = {
     name: "queue",
