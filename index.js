@@ -40,6 +40,9 @@ Array.prototype.shuffle = function() {
     return this;
 };
 // music
+const { Log } = require("youtubei.js");
+Log.setLevel(Log.Level.NONE);
+
 const { Player } = require("discord-player");
 const { YouTubeExtractor, BridgeProvider, BridgeSource, SpotifyExtractor } = require("@discord-player/extractor");
 // const { default: DeezerExtractor } = require("discord-player-deezer");
