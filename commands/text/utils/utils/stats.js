@@ -89,7 +89,7 @@ module.exports = {
                 }, {
                     name: "Commands stats",
                     value: 
-                    `Total executed commands (approximately): **${totalCommands}**\n` +
+                    `Total executed commands (approximately): **${totalExecutedCommands}**\n` +
                     `Last executed command (in \`${message.guild.name}\`):\n` + 
                     `\`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow ?? "Never"} ago) ${lastCommandLink ? `Link: ${lastCommandLink}` : ""}`,
                 }, {
