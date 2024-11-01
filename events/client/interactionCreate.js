@@ -21,11 +21,11 @@ module.exports = {
     
             if (!slash) return logger.error(`No command matching ${interaction.commandName} was found.`);
 
-            const userBlacklist = await GuildManager.GetBlacklist(message.guild.id);
-            const blCategory = !userBlacklist.CheckPermission(message.author.id, command.category);
-            const blCommand = !userBlacklist.CheckPermission(message.author.id, command.name);
+            const userBlacklist = await GuildManager.GetBlacklist(interaction.guild.id);
+            const blCategory = !userBlacklist.CheckPermission(interaction.user.id, slash.category);
+            const blCommand = !userBlacklist.CheckPermission(interaction.user.id, slash.name);
             if (blCategory || blCommand) 
-                return await message.editReply({ embeds: [embedGenerator.error(`You are blacklisted from executing ${blCategory ? `commands in the **${command.category}** category` : `the **${command.name}** command`}.`)] });
+                return await interaction.editReply({ embeds: [embedGenerator.error(`You are blacklisted from executing ${blCategory ? `commands in the **${command.category}** category` : `the **${command.name}** command`}.`)] });
     
             // Check command cooldown
             if (SlashCooldowns.has(interaction.user.id)) {
@@ -51,7 +51,7 @@ module.exports = {
             from  [${interaction.guild.name} (${interaction.guild.id})]`
                     .replace(/^\s+/gm, ""));
                                         
-                const botMember = message.guild.members.me;
+                const botMember = interaction.guild.members.me;
                 if (!botMember) return;
 
                 const botPermissions = botMember.permissions;
