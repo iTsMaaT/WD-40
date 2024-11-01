@@ -62,17 +62,19 @@ const player = new Player(client, {
 (async () => {
     if (!config.get("discordPlayerConf")?.removeYoutube) {
         await player.extractors.register(YoutubeiExtractor, {
-            // authentication: config.get("discordPlayerConf").skipLogin ? undefined : process.env.YOUTUBE_ACCESS_STRING || "",
+            authentication: config.get("discordPlayerConf").skipLogin ? undefined : process.env.YOUTUBE_ACCESS_STRING || "",
             streamOptions: {
-                useClient: "WEB",
-                highWaterMark: 2 * 1024 * 1024,
+                useClient: config.get("discordPlayerConf").usePoToken ? "WEB" : undefined,
+                highWaterMark: config.get("discordPlayerConf").highWaterMark,
             }, 
         });
 
-        const ext = YoutubeiExtractor.getInstance();
-        const attrationToken = await poTokenExtraction(ext.innerTube);
+        if (config.get("discordPlayerConf").usePoToken) {
+            const ext = YoutubeiExtractor.getInstance();
+            const attrationToken = await poTokenExtraction(ext.innerTube);
 
-        ext.setPoToken(attrationToken, ext.innerTube.session.context.client.visitorData);
+            ext.setPoToken(attrationToken, ext.innerTube.session.context.client.visitorData);
+        }
     }
     // await player.extractors.loadDefault();
     await player.extractors.loadDefault((ext) => !["YouTubeExtractor"].includes(ext));

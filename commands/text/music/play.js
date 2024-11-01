@@ -38,7 +38,7 @@ module.exports = {
         const attachment = message.attachments.first()?.attachment;
 
         let string = args.join(" ");
-        if (!string) string = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+        if (!string) string = config.get("discordPlayerConf").removeYoutube ? undefined : "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
         // return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
         const stringQueryType = QueryResolver.resolve(string).type;
 
@@ -64,10 +64,18 @@ module.exports = {
 
                 research = await player.search(specificSearch, {
                     requestedBy: message.member,
-                    searchEngine: QueryType.YOUTUBE_SEARCH,
+                    searchEngine: config.get("discordPlayerConf")?.removeYoutube ? QueryType.SOUNDCLOUD_SEARCH : QueryType.YOUTUBE_SEARCH,
                 });
 
-                if (!research.hasTracks()) return await sentMessage.edit({ embeds: [embedGenerator.warning("No results found")] });
+                if (!research.hasTracks()) {return await sentMessage.edit({ embeds: [embedGenerator.warning({
+                    description: "No results found",
+                    footer: { 
+                        text: config.get("discordPlayerConf").removeYoutube && (
+                            stringQueryType == QueryType.YOUTUBE_SEARCH || stringQueryType == QueryType.YOUTUBE || 
+                            stringQueryType == QueryType.YOUTUBE_PLAYLIST || stringQueryType == QueryType.YOUTUBE_VIDEO
+                        ) ? "Youtube has been disabled, for more info, use the help command and go in the support server." : undefined,
+                    },
+                })] });}
 
                 const choicesEmbed = embedGenerator.info({
                     title: "Type in chat the number you want to play",
@@ -100,7 +108,15 @@ module.exports = {
                     searchEngine: QueryType.AUTO,
                 });
 
-                if (!research.hasTracks()) return await message.reply({ embeds: [embedGenerator.warning("No results found")] });
+                if (!research.hasTracks()) {return await sentMessage.edit({ embeds: [embedGenerator.warning({
+                    description: "No results found",
+                    footer: { 
+                        text: config.get("discordPlayerConf").removeYoutube && (
+                            stringQueryType == QueryType.YOUTUBE_SEARCH || stringQueryType == QueryType.YOUTUBE || 
+                            stringQueryType == QueryType.YOUTUBE_PLAYLIST || stringQueryType == QueryType.YOUTUBE_VIDEO
+                        ) ? "Youtube has been disabled, for more info, use the help command and go in the support server." : undefined,
+                    },
+                })] });}
             }
 
             if (research?.tracks?.length + (queue?.size ?? 0) > MAX_QUEUE_SIZE) return await sentMessage.edit({ embeds: [embedGenerator.error(`Cannot enqueue more than ${MAX_QUEUE_SIZE} tracks.`)] });
