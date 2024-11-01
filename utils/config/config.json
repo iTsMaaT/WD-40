@@ -54,7 +54,8 @@
     ],
 
     "discordPlayerConf": {
-        "removeYoutube": false
+        "removeYoutube": false,
+        "skipLogin": false
     },
 
     "defaultSuperuserState": false,
