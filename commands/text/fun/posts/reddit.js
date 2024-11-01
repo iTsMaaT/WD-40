@@ -10,7 +10,7 @@ module.exports = {
                 hasValue: true,
                 description: "username of the user. Either -u or -s has to be passed",
             },
-            "subreddit|s": {
+            "subreddit|s|p": {
                 hasValue: true,
                 description: "subreddit to fetch from. Either -u or -s has to be passed",
             },
@@ -20,7 +20,7 @@ module.exports = {
     examples: ["-p aww", "-u spez"],
     cooldown: 3000,
     async execute(logger, client, message, args, optionalArgs) {
-        const sub = optionalArgs["subreddit|s"];
+        const sub = optionalArgs["subreddit|s|p"];
         const user = optionalArgs["user|u"];
         try {
             if (sub) 

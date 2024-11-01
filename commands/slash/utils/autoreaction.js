@@ -108,12 +108,12 @@ module.exports = {
                     embed.fields.push({ name: channelPrompt, value: fieldValue });
                 }
             
-                interaction.reply({ embeds: [embed] });
+                interaction.editReply({ embeds: [embed] });
                 break;
             }
             
             case "remove": {
-                if (!reactions[ChannelPromptInput]) return await interaction.reply({ embeds: [embedGenerator.warning("There is no entry for that channel prompt")], ephemeral: true });
+                if (!reactions[ChannelPromptInput]) return await interaction.editReply({ embeds: [embedGenerator.warning("There is no entry for that channel prompt")], ephemeral: true });
 
                 autoreactions.removeReaction(ChannelPromptInput, StringInput);
                 const embed = {
@@ -126,7 +126,7 @@ module.exports = {
                 break;
             }
             case "removeall": {
-                if (!reactions[ChannelPromptInput]) return await interaction.reply({ embeds: [embedGenerator.warning("There is no entry for that channel prompt")], ephemeral: true });
+                if (!reactions[ChannelPromptInput]) return await interaction.editReply({ embeds: [embedGenerator.warning("There is no entry for that channel prompt")], ephemeral: true });
 
                 autoreactions.removeReaction(ChannelPromptInput);
                 const embed = {
@@ -139,12 +139,13 @@ module.exports = {
                 break;
             }
             case "add": {
+                console.log("executed");
 
-                if (Object.keys(reactions).length >= 20) return await interaction.reply({ embeds: [embedGenerator.warning("You cannot have more than 20 auto-reactions")], ephemeral: true });
+                if (Object.keys(reactions).length >= 20) return await interaction.editReply({ embeds: [embedGenerator.warning("You cannot have more than 20 auto-reactions")], ephemeral: true });
 
                 if (reactions[ChannelPromptInput]) {
                     const existingEntry = reactions[ChannelPromptInput].find(entry => entry.string === StringInput);
-                    if (existingEntry) return await interaction.reply({ embeds: [embedGenerator.warning("An entry for that channel prompt and string combination already exists.")], ephemeral: true });
+                    if (existingEntry) return await interaction.editReply({ embeds: [embedGenerator.warning("An entry for that channel prompt and string combination already exists.")], ephemeral: true });
                 }
 
                 let emotes = [];
@@ -162,7 +163,7 @@ module.exports = {
                     }, []);
                 }
 
-                if (emotes.length == 0) return await interaction.reply({ embeds: [embedGenerator.warning("No compatible emotes found")], ephemeral: true });
+                if (emotes.length == 0) return await interaction.editReply({ embeds: [embedGenerator.warning("No compatible emotes found")], ephemeral: true });
                 const embed = {
                     color: 0xffff00,
                     title: "Auto-reactions",
@@ -193,7 +194,7 @@ module.exports = {
                     return ButtonInteraction.user.id === interaction.user.id;
                 };
                 
-                const ConfirmationMessage = await interaction.reply({
+                const ConfirmationMessage = await interaction.editReply({
                     embeds: [embed],
                     components: [row],
                 });

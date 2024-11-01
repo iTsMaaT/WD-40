@@ -99,15 +99,15 @@ Step 5 - Send the downloaded media to your favorite social media!
                 if (!command && config.get("autoCommandMatch")) {
                     const commandSet = new Set(client.commands.filter(cmd => !cmd.private).map(cmd => cmd.name));
                     const commandArray = Array.from(commandSet);
-                    const closeMatch = findBestMatch(algorithms.FUZZY_MATCH, commandName, commandArray).match;
-                    if (closeMatch.distance <= 2 && countCommonChars(commandName, closeMatch.closestMatch) != 0) {
+                    const closeMatch = findBestMatch(algorithms.LEVENSHTEIN_DISTANCE, commandName, commandArray);
+                    if (closeMatch.score <= 2 && countCommonChars(commandName, closeMatch.match) != 0) {
                         // command = client.commands.get(closeMatch.closestMatch);
-                        await message.reply(`Did you mean \`${prefix}${closeMatch.closestMatch}\`?`);
+                        await message.reply(`Did you mean \`${prefix}${closeMatch.match}\`?`);
                         const filter = (m) => m.author.id === message.author.id;
                         await message.channel.awaitMessages({ filter, max: 1, time: 5000, errors: ["time"] })
                             .then((collected) => {
                                 const responseMessage = collected.first();
-                                if (responseMessage.content.toLowerCase().startsWith("yes")) command = client.commands.get(closeMatch.closestMatch);
+                                if (responseMessage.content.toLowerCase().startsWith("yes")) command = client.commands.get(closeMatch.match);
                             }).catch(() => null);
                     }
                 }

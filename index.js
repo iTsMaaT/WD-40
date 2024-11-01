@@ -47,7 +47,7 @@ const { Player } = require("discord-player");
 const { YouTubeExtractor, BridgeProvider, BridgeSource, SpotifyExtractor } = require("@discord-player/extractor");
 // const { default: DeezerExtractor } = require("discord-player-deezer");
 // const { default: TidalExtractor } = require("discord-player-tidal");
-const { YoutubeiExtractor, createYoutubeiStream } = require("discord-player-youtubei");
+const { YoutubeiExtractor, createYoutubeiStream, poTokenExtraction } = require("discord-player-youtubei");
 const player = new Player(client, {
     // bridgeProvider: discordPlayer.removeYoutube ? new BridgeProvider(BridgeSource.SoundCloud) : new BridgeProvider(BridgeSource.Auto),
     ytdlOptions: {
@@ -62,12 +62,17 @@ const player = new Player(client, {
 (async () => {
     if (!config.get("discordPlayerConf")?.removeYoutube) {
         await player.extractors.register(YoutubeiExtractor, {
-            authentication: process.env.YOUTUBE_ACCESS_STRING || "",
+            // authentication: config.get("discordPlayerConf").skipLogin ? undefined : process.env.YOUTUBE_ACCESS_STRING || "",
             streamOptions: {
-                useClient: undefined,
+                useClient: "WEB",
                 highWaterMark: 2 * 1024 * 1024,
             }, 
         });
+
+        const ext = YoutubeiExtractor.getInstance();
+        const attrationToken = await poTokenExtraction(ext.innerTube);
+
+        ext.setPoToken(attrationToken, ext.innerTube.session.context.client.visitorData);
     }
     // await player.extractors.loadDefault();
     await player.extractors.loadDefault((ext) => !["YouTubeExtractor"].includes(ext));
@@ -98,6 +103,7 @@ function loadFiles(folder, callback) {
         if (file.endsWith(".js")) {
             const loaded = require(`${folder}${file}`);
             loaded.filePath = (folder + file).replace("./", process.cwd() + "/");
+            if (loaded.loadFileIgnore) continue;
             callback(loaded, file);
         } else {
             if (!fs.lstatSync(folder + file).isDirectory()) continue;

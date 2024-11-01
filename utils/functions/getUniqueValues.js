@@ -1,3 +1,9 @@
+/**
+ * Returns an array of unique values from the input.
+ * 
+ * @param {Array|Object} input - The input array or object.
+ * @returns {Array} An array of unique values.
+ */
 const GetUniqueValues = function(input) {
     const uniqueValues = [];
     const valueCounts = new Map();

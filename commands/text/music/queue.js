@@ -92,7 +92,6 @@ module.exports = {
         historyPages.reverse();
         
         const alltracks = [...historyPages, ...trackPages];
-        console.log(alltracks);
 
         const FirstPage = new ButtonBuilder()
             .setCustomId("first")
@@ -137,8 +136,6 @@ module.exports = {
         };
 
         const updateComponents = (count) => {
-            console.log(count);
-            console.log(historyPages.length);
             row.components[0].setDisabled(count === historyPages.length);
             row.components[1].setDisabled(count === 0);
             row.components[2].setLabel(`${counter - historyPages.length} / ${alltracks.length - historyPages.length - 1}`);
