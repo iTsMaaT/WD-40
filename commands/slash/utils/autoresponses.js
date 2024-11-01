@@ -82,7 +82,7 @@ module.exports = {
         const responses = await autoresponses.getResponses();
 
         if ((subcommand == "add" || subcommand == "remove" || subcommand == "removeall") && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) 
-            return await interaction.reply({ embeds: [embedGenerator.warning("You must be a administrator to execute this action")], ephemeral: true });
+            return await interaction.editReply({ embeds: [embedGenerator.warning("You must be a administrator to execute this action")], ephemeral: true });
 
         switch (subcommand) {
             case "list": {
@@ -106,7 +106,7 @@ module.exports = {
                     embed.fields.push({ name: channelPrompt, value: fieldValue });
                 }
             
-                interaction.reply({ embeds: [embed] });
+                interaction.editReply({ embeds: [embed] });
                 break;
             }
             
@@ -120,7 +120,7 @@ module.exports = {
                     timestamp: new Date(),
                 };
 
-                interaction.reply({ embeds: [embed] });
+                interaction.editReply({ embeds: [embed] });
                 break;
             }
             case "removeall": {
@@ -133,7 +133,7 @@ module.exports = {
                     timestamp: new Date(),
                 };
 
-                interaction.reply({ embeds: [embed] });
+                interaction.editReply({ embeds: [embed] });
                 break;
             }
             case "add": {
@@ -174,7 +174,7 @@ module.exports = {
                     return ButtonInteraction.user.id === interaction.user.id;
                 };
                 
-                const ConfirmationMessage = await interaction.reply({
+                const ConfirmationMessage = await interaction.editReply({
                     embeds: [embed],
                     components: [row],
                 });

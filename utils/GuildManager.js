@@ -210,39 +210,32 @@ async function autoReactFn(guildId) {
     async function matchReactions(ChannelPrompt, String, hasAttachment = false) {
         const matchedReactions = [];
 
-        if (cache) {
-            for (const channelPrompt of Object.keys(cache)) {
-                if (!ChannelPrompt.includes(channelPrompt)) continue;
-                for (const entry of cache[channelPrompt]) {
-                    const { string, emotes } = entry;
+        // Check for reactions in the specified channel and for <all>
+        const applicablePrompts = [...Object.keys(cache).filter(cp => ChannelPrompt.includes(cp)), "<all>"];
 
-                    // Check if the string matches <media> or <link> for URLs
-                    if ((/(https?:\/\/[^\s]+)/.test(String) || hasAttachment) && string === "<media>")
-                        matchedReactions.push(...emotes.split(";"));
+        for (const channelPrompt of applicablePrompts) {
+            if (!cache[channelPrompt]) continue;
+            for (const entry of cache[channelPrompt]) {
+                const { string, emotes } = entry;
 
+                // Match for specific strings or patterns
+                if ((/(https?:\/\/[^\s]+)/.test(String) || hasAttachment) && string === "<media>")
+                    matchedReactions.push(...emotes.split(";"));
 
-                    if (/(https?:\/\/[^\s]+)/.test(String) && string === "<link>")
-                        matchedReactions.push(...emotes.split(";"));
+                if (/(https?:\/\/[^\s]+)/.test(String) && string === "<link>")
+                    matchedReactions.push(...emotes.split(";"));
 
+                if (hasAttachment && string === "<attachment>")
+                    matchedReactions.push(...emotes.split(";"));
 
-                    // Check if the string matches <attachment> for attachments
-                    if (hasAttachment && string === "<attachment>")
-                        matchedReactions.push(...emotes.split(";"));
+                if (String.includes(string))
+                    matchedReactions.push(...emotes.split(";"));
 
-
-                    // Check for other matches anywhere in the strings
-                    if (String.includes(string))
-                        matchedReactions.push(...emotes.split(";"));
-
-
-                    if (string === "<all>")
-                        matchedReactions.push(...emotes.split(";"));
-
-                }
+                if (string === "<all>")
+                    matchedReactions.push(...emotes.split(";"));
             }
         }
 
-        // if (!matchedReactions[0]) return null;
         return matchedReactions;
     }
 
@@ -280,6 +273,7 @@ async function autoReactFn(guildId) {
             }
         }
     }
+
     return { addReaction, removeReaction, matchReactions, getReactions }; 
 }
 
@@ -292,7 +286,6 @@ async function getAutoReactions(guildId) {
     return reactions[guildId];
 }
 
-// eefefef
 
 async function autoResponseFn(guildId) {
     const cache = {};
@@ -345,9 +338,11 @@ async function autoResponseFn(guildId) {
     async function matchResponses(ChannelPrompt, String, hasAttachment = false) {
         const matchedResponses = [];
 
+        const applicablePrompts = [...Object.keys(cache).filter(cp => ChannelPrompt.includes(cp)), "<all>"];
+
         if (cache) {
-            for (const channelPrompt of Object.keys(cache)) {
-                if (!ChannelPrompt.includes(channelPrompt)) continue;
+            for (const channelPrompt of applicablePrompts) {
+                if (!cache[channelPrompt]) continue;
                 for (const entry of cache[channelPrompt]) {
                     const { string, response } = entry;
 
