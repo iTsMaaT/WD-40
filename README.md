@@ -70,6 +70,8 @@ Good luck.
 | MEMBERS_UPDATE_ID | The ID of the channel where the bot will post member updates. |
 | SUGGESTION_CHANNEL_ID | The ID of the channel where the bot will post suggestions from the `/suggestion` (`>suggestion`) command. |
 | | |
+| SENTRY_DSN | (optional) Sentry DSN to enable Sentry logging of ERROR/SEVERE/WARNING |
+| | |
 | SERVER | Either `prod` or `dev`, will make the bot only react to it's owner on dev. |
 
 > Reddit client secret, ID and token are optional, as it will use the normal API instead of going trough OAUTH if not specified.

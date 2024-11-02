@@ -74,7 +74,7 @@ module.exports = {
             );
 
         } catch (err) {
-            logger.error(err.stack);
+            logger.error(err);
 
             if (err.message.includes("API key is invalid")) 
                 return await message.reply({ embeds: [embedGenerator.error("Invalid API key. Please check your configuration.")] });

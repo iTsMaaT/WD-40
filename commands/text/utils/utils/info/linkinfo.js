@@ -57,7 +57,7 @@ module.exports = {
             await message.reply({ embeds: [embed]/* , files: [file]*/ });
             // if (result.screenshotPath) await fs.unlink(result.screenshotPath);
         } catch (error) {
-            logger.error(error.stack);
+            logger.error(error);
             const responseStatus = error.response?.status || "-";
             const statusDescription = error.response?.statusText || "Unknown Error";
 

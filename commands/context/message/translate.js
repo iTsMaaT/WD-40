@@ -35,7 +35,7 @@ module.exports = {
             await interaction.editReply({ embeds: [embed] });
                 
         } catch (err) {
-            logger.error(err.stack);
+            logger.error(err);
             await interaction.editReply({ embeds: [embedGenerator.error("An error occured.")] });
         } 
 

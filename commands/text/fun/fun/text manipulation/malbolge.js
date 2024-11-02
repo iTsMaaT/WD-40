@@ -710,7 +710,7 @@ so update to [] version
                 return await message.reply({ embeds: [embedGenerator.error("The result is too long (>2000)")] });
             
         } catch (err) {
-            logger.error(err.stack);
+            logger.error(err);
             return await message.reply({ embeds: [embedGenerator.error("An error occured")] });
         }
     },

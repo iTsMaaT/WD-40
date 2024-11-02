@@ -52,7 +52,7 @@ const GetPterodactylInfo = async function() {
         NETWORKout = resourcesJson.attributes.resources.network_tx_bytes;
         BOTuptime = resourcesJson.attributes.resources.uptime;
     } catch (err) {
-        logger.error(err.stack);
+        logger.error(err);
         return null;
     }
 
