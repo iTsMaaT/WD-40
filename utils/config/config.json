@@ -54,7 +54,7 @@
     ],
 
     "discordPlayerConf": {
-        "removeYoutube": true,
+        "removeYoutube": false,
         "skipLogin": false,
         "usePoToken": false,
         "highWaterMark": 2097152
