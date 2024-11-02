@@ -4,11 +4,14 @@ dotenv.config();
 require("module-alias/register");
 const util = require("util");
 
-const Sentry = require('@sentry/node');
+const Sentry = require("@sentry/node");
 
-if (process.env.SERVER == 'prod' && process.env.SENTRY_DSN) {
+if (process.env.SERVER == "prod" && process.env.SENTRY_DSN) {
+    const { version } = require("@root/package.json");
+    const packageJSONVersion = version.split(".");
     Sentry.init({
-        dsn: process.env.SENTRY_DSN
+        dsn: process.env.SENTRY_DSN,
+        release: packageJSONVersion,
     });
 }
 

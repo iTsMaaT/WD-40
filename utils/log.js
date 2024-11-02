@@ -105,15 +105,15 @@ class Logger {
     }
 
     error(message) {
-        if (process.env.SERVER == 'prod' && process.env.SENTRY_DSN) {
+        if (process.env.SERVER == "prod" && process.env.SENTRY_DSN) {
             let sError;
-            if (message.stack) {
+            if (message.stack) 
                 sError = message;
-            } else {
+            else 
                 sError = new Error(message);
-            }
+            
             Sentry.withScope((scope) => {
-                scope.setLevel('error');
+                scope.setLevel("error");
                 Sentry.captureException(sError);
             });
         }
@@ -134,9 +134,9 @@ class Logger {
     }
 
     warning(message) {
-        if (process.env.SERVER == 'prod' && process.env.SENTRY_DSN) {
+        if (process.env.SERVER == "prod" && process.env.SENTRY_DSN) {
             Sentry.withScope((scope) => {
-                scope.setLevel('warning');
+                scope.setLevel("warning");
                 Sentry.captureException(new Error(message));
             });
         }
@@ -144,15 +144,15 @@ class Logger {
     }
 
     severe(message) {
-        if (process.env.SERVER == 'prod' && process.env.SENTRY_DSN) {
+        if (process.env.SERVER == "prod" && process.env.SENTRY_DSN) {
             let sError;
-            if (message.stack) {
+            if (message.stack) 
                 sError = message;
-            } else {
+            else 
                 sError = new Error(message);
-            }
+            
             Sentry.withScope((scope) => {
-                scope.setLevel('fatal');
+                scope.setLevel("fatal");
                 Sentry.captureException(sError);
             });
         }
