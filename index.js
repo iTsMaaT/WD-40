@@ -4,6 +4,14 @@ dotenv.config();
 require("module-alias/register");
 const util = require("util");
 
+const Sentry = require('@sentry/node');
+
+if (process.env.SERVER == 'prod' && process.env.SENTRY_DSN) {
+    Sentry.init({
+        dsn: process.env.SENTRY_DSN
+    });
+}
+
 const logger = require("@utils/log");
 console.warner = console.warn;
 console.logger = console.log;

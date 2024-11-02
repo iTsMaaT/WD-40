@@ -1,6 +1,7 @@
 const { repositories } = require("./db/tableManager.js");
 const { editOrSend } = require("./functions/discordFunctions.js");
 const { colorText, foregroundColor, backgroundColor, textStyle } = require("./functions/consoleColor.js");
+const Sentry = require("@sentry/node");
 
 const util = require("util");
 
@@ -75,6 +76,8 @@ class Logger {
                 case "WARNING":
                     return colorText(text, foregroundColor.yellow);
                 case "EVENT":
+                    return colorText(text, foregroundColor.magenta);
+                case "INFO":
                     return colorText(text, foregroundColor.green);
                 default:
                     return colorText(text, foregroundColor.white);
@@ -102,6 +105,18 @@ class Logger {
     }
 
     error(message) {
+        if (process.env.SERVER == 'prod' && process.env.SENTRY_DSN) {
+            let sError;
+            if (message.stack) {
+                sError = message;
+            } else {
+                sError = new Error(message);
+            }
+            Sentry.withScope((scope) => {
+                scope.setLevel('error');
+                Sentry.captureException(sError);
+            });
+        }
         const stackTrace = new Error("Generated Stacktrace: ").stack;
         this.writeLogToFile(message.stack || message + "\n" + stackTrace, this.types.error);
     }
@@ -119,10 +134,28 @@ class Logger {
     }
 
     warning(message) {
+        if (process.env.SERVER == 'prod' && process.env.SENTRY_DSN) {
+            Sentry.withScope((scope) => {
+                scope.setLevel('warning');
+                Sentry.captureException(new Error(message));
+            });
+        }
         this.writeLogToFile(message, this.types.warning);
     }
 
     severe(message) {
+        if (process.env.SERVER == 'prod' && process.env.SENTRY_DSN) {
+            let sError;
+            if (message.stack) {
+                sError = message;
+            } else {
+                sError = new Error(message);
+            }
+            Sentry.withScope((scope) => {
+                scope.setLevel('fatal');
+                Sentry.captureException(sError);
+            });
+        }
         const stackTrace = new Error("Generated Stacktrace: ").stack;
         this.writeLogToFile(message.stack || message + "\n" + stackTrace, this.types.severe);
     }

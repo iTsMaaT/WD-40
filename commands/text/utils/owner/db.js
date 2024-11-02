@@ -58,7 +58,7 @@ module.exports = {
             await sent.edit({ content: `Operation took ${prettyMilliseconds(parseInt(Date.now())) - parseInt(sent.createdTimestamp)}`, files: [fileName] });
             await fs.unlink(fileName);
         } catch (error) {
-            logger.error(error.stack);
+            logger.error(error);
             sent.edit("An error occurred while fetching data.");
         }
     },

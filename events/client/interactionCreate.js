@@ -74,8 +74,8 @@ module.exports = {
                     embeds: [embedGenerator.error("An error occured while executing the command")],
                     ephemeral: true,
                 });    
-                logger.error(`Error executing slash command [${interaction.commandName}]`);
-                logger.error(error.stack);
+                logger.event(`Error executing slash command [${interaction.commandName}]`);
+                logger.error(error);
             }
         } else if (interaction.isContextMenuCommand()) {
             await interaction.deferReply({ ephemeral: true });
@@ -100,7 +100,7 @@ module.exports = {
                     ephemeral: true,
                 });
                 
-                logger.error(`Error executing context menu command [${interaction.commandName}]`);
+                logger.event(`Error executing context menu command [${interaction.commandName}]`);
                 logger.error(error);
             }
         }

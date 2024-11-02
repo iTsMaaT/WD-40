@@ -321,5 +321,12 @@
             ">nowplaying now shows the paused and loop status better",
             ">skip now shows what you skipped, and what will now play"
         ]
+    },
+    {
+        "version": "5.5.1",
+        "date": "2024-11-01",
+        "changes": [
+            "Added Sentry logging support"
+        ]
     }
 ]
