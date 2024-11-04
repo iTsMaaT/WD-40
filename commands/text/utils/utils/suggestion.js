@@ -14,7 +14,7 @@ module.exports = {
         if (!process.env.SUGGESTION_CHANNEL_ID) return await message.reply({ embeds: [embedGenerator.error("No suggestion channel has been set by the owner.")] });
 
         const channel = await client.channels.fetch(process.env.SUGGESTION_CHANNEL_ID);
-        const sent = await channel.send(`**Suggestion by ${interaction.user} (${interaction.user.tag}) received: **` + suggestion);
+        const sent = await channel.send(`**Suggestion by ${message.author.displayName} (<@${message.author.id}>) received: **` + args.join(" "));
         await channel.send("===================");
         await sent.react("🔴");
         await sent.react("🟢");
