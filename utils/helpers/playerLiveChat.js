@@ -7,6 +7,12 @@ const messageBuffers = new Map(); // Map of {buffer, bufferSize, timer} objects
 const MAX_MESSAGE_SIZE = 1000;
 const FLUSH_INTERVAL = 7000;
 
+/**
+ * Flush the buffer of messages to the channel.
+ * 
+ * @param {TextChannel} channel - The channel to flush the buffer to.
+ * @returns {Promise<void>} A promise that resolves when the buffer is flushed.
+ */
 const flushBuffer = async (channel) => {
     const buffer = messageBuffers?.get(channel.id)?.buffer;
     if (buffer.length > 0) {
@@ -19,6 +25,12 @@ const flushBuffer = async (channel) => {
     }
 };
 
+/**
+ * Add a message to the buffer.
+ * 
+ * @param {TextChannel} channel - The channel to add the message to.
+ * @param {string} message - The message to add.
+ */
 const addMessageToBuffer = (channel, message) => {
     let bufferData = messageBuffers.get(channel.id);
     
@@ -37,6 +49,13 @@ const addMessageToBuffer = (channel, message) => {
     
 };
 
+/**
+ * Handle a message create event for a channel.
+ * 
+ * @param {TextChannel} channel - The channel the message was sent in.
+ * @param {Message} message - The message that was sent.
+ * @returns {Promise<void>} A promise that resolves when the message is handled.
+ */
 const handleMessageCreate = async (channel, message) => {
     if (message.type === ChatMessageType.Regular || message.type === ChatMessageType.Premium) {
         const formattedMessage = `[${message.author.username}] ${message.content}`;
@@ -57,6 +76,13 @@ const handleMessageCreate = async (channel, message) => {
     }
 };
 
+/**
+ * Enable live chat for a channel.
+ * 
+ * @param {string} url - The URL of the video to enable live chat for.
+ * @param {TextChannel} channel - The channel to enable live chat for.
+ * @returns {Promise<void>} A promise that resolves when live chat is enabled.
+ */
 const enableLiveChat = async (url, channel) => {
     liveChatEnabled.add(channel.id);
     console.log(`Live chat enabled for ${channel.name}`);
@@ -80,6 +106,12 @@ const enableLiveChat = async (url, channel) => {
     }
 };
 
+/**
+ * Disable live chat for a channel.
+ * 
+ * @param {TextChannel} channel - The channel to disable live chat for.
+ * @returns {Promise<void>} A promise that resolves when live chat is disabled.
+ */
 const disableLiveChat = async (channel) => {
     liveChatEnabled.delete(channel.id);
     const chatData = activeChats.get(channel.id);
@@ -95,6 +127,13 @@ const disableLiveChat = async (channel) => {
     console.log(`Live chat disabled for ${channel.name}`);
 };
 
+/**
+ * Toggle live chat for a channel.
+ * 
+ * @param {string} url - The URL of the video to toggle live chat for.
+ * @param {TextChannel} channel - The channel to toggle live chat for.
+ * @returns {Promise<boolean>} A promise that resolves to true if live chat is enabled, false if it is disabled.
+ */
 const toggleLiveChat = async function(url, channel) {
     let enabled;
     if (!liveChatEnabled.has(channel.id)) {
