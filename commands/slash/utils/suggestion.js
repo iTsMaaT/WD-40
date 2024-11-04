@@ -24,7 +24,7 @@ module.exports = {
         await sent.react("🔴");
         await sent.react("🟢");
         await sent.react("✅");
-        interaction.reply({ embeds: [embedGenerator.info("Your suggestion has been sent.\nFor a bug report, you can join the support server by doing >help")], ephemeral: true });
+        interaction.editReply({ embeds: [embedGenerator.info("Your suggestion has been sent.\nFor a bug report, you can join the support server by doing >help")], ephemeral: true });
         logger.info("Suggestion received");
     },
 };
