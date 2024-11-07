@@ -4,6 +4,7 @@ const embedGenerator = require("@utils/helpers/embedGenerator");
 module.exports = {
     name: "blackjack",
     description: "Play a game of Blackjack.",
+    aliases: ["bj"],
     category: "games",
     async execute(logger, client, message, args) {
 
@@ -36,10 +37,11 @@ module.exports = {
             return value;
         }
 
-        const getHandsDescription = () => `
-            **Your Hand**: ${playerHand.map(card => `${card.value}${card.suit}`).join(", ")} (Value: ${calculateHandValue(playerHand)})
-            **Dealer's Hand**: ${dealerHand[0].value}${dealerHand[0].suit}, ???
-        `;
+        const getHandsDescription = () => {
+            return `
+                **Your Hand**: ${playerHand.map(card => `${card.value}${card.suit}`).join(", ")} (Value: ${calculateHandValue(playerHand)})\n` +
+                `**Dealer's Hand**: ${dealerHand[0].value}${dealerHand[0].suit}, ???`;
+        };
 
         const gameEmbed = embedGenerator.info({
             title: "Blackjack",
@@ -74,6 +76,7 @@ module.exports = {
                 if (calculateHandValue(playerHand) > 21) {
                     playerTurn = false;
                     gameEmbed.setDescription(`${getHandsDescription()}\n\n**You bust! Dealer wins.**`);
+                    gameEmbed.setFooter(null);
                     await gameMessage.edit({ embeds: [gameEmbed], components: [] });
                     collector.stop();
                 } else {
@@ -99,10 +102,10 @@ module.exports = {
                     result = "It's a tie!";
                 
 
-                gameEmbed.setDescription(`
-                    **Your Hand**: ${playerHand.map(card => `${card.value}${card.suit}`).join(", ")} (Value: ${playerScore})
-                    **Dealer's Hand**: ${dealerHand.map(card => `${card.value}${card.suit}`).join(", ")} (Value: ${dealerScore})
-                `);
+                gameEmbed.setDescription(
+                    `**Your Hand**: ${playerHand.map(card => `${card.value}${card.suit}`).join(", ")} (Value: ${playerScore})\n` +
+                    `**Dealer's Hand**: ${dealerHand.map(card => `${card.value}${card.suit}`).join(", ")} (Value: ${dealerScore})`,
+                );
                 gameEmbed.setFooter(null);
                 gameEmbed.addFields({ name: "Result", value: result });
                 await gameMessage.edit({ embeds: [gameEmbed], components: [] });
