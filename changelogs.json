@@ -328,5 +328,26 @@
         "changes": [
             "Added Sentry logging support"
         ]
+    },
+    {
+        "version": "5.6.0",
+        "date": "2024-11-03",
+        "changes": [
+            "Added >blackjack",
+            "Moved >blackjack and >guess to games category",
+            "Multiple fixes"
+        ]
+    },
+    {
+        "version": "5.7.0",
+        "date": "2024-11-07",
+        "changes": [
+            "Added >hangman",
+            "Added >rockpaperscissors",
+            "Added >roulette",
+            "Added >russianroulette",
+            "Added >femboys (against my will)",
+            "Multiple fixes"
+        ]
     }
 ]
