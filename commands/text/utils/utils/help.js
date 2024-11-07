@@ -51,29 +51,6 @@ module.exports = {
             return CommandEmbed;
         };
 
-        const getSelectMenuOptions = (counter) => {
-            const currentCategory = categories[counter - 1];
-            const commandsInCategory = groupedObject[currentCategory];
-            embed = {
-                title: `Commands for category: ${currentCategory.toUpperCase().replace(" (1)", "")}`,
-                fields: commandsInCategory,
-                color: 0xffffff,
-            };
-        
-            // Create a select menu for the current page's commands
-            const selectMenu = new StringSelectMenuBuilder()
-                .setCustomId("command_select")
-                .setPlaceholder("Select a command")
-                .addOptions(commandsInCategory.map(command => ({
-                    label: command.name.replace(/[*:[\] ]/g, ""), // Simplified label
-                    description: command.value,
-                    value: command.name.replace(/[*:[\] ]/g, ""), // Simplified value
-                })));
-        
-            const selectRow = new ActionRowBuilder().addComponents(selectMenu);
-            return selectRow;
-        };
-
         if (args[0]) {
             const CommandName = client.commands.get(args[0]);
             if (!CommandName || (CommandName.private && !message.author.id == process.env.OWNER_ID)) return await message.reply({ embeds: [embedGenerator.error("This command doesn't exist.")] });
