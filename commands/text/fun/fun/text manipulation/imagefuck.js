@@ -1,8 +1,7 @@
-const { createCanvas } = require("canvas");
+const sharp = require("sharp");
 const { AttachmentBuilder } = require("discord.js");
 const { PermissionFlagsBits } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
-
 
 module.exports = {
     name: "imagefuck",
@@ -31,14 +30,16 @@ module.exports = {
             "102,0,204": ",",
         };
 
-        const buffer = await createImage(stringToBF(prompt), 10);
-        const img = new AttachmentBuilder(buffer, "img.png");
+        // Dynamic pixel size based on word length to maintain consistent image size
+        const basePixelSize = 10; // Base pixel size for larger words
+        const buffer = await createImage(stringToBF(prompt), Math.max(basePixelSize, Math.floor(500 / prompt.length)));
+        const img = new AttachmentBuilder(buffer, { name: "img.png" });
 
         const embed = {
             title: "ImageFuck code",
             color: 0xffffff,
             image: {
-                url: "attachment://file.jpg",
+                url: "attachment://img.png",
             },
             timestamp: new Date(),
         };
@@ -64,24 +65,21 @@ module.exports = {
             for (let i = 0; i < Math.floor(Math.abs(delta) / 10); i++) 
                 buffer += "+";
             
-          
             if (delta > 0) 
                 buffer += "[>++++++++++<-]>";
             else 
                 buffer += "[>----------<-]>";
             
-          
             for (let i = 0; i < Math.abs(delta) % 10; i++) {
                 if (delta > 0) 
                     buffer += "+";
                 else 
                     buffer += "-";
-                
             }
             buffer += ".<";
             return buffer;
         }
-        
+
         // Takes a string and translates it to brainfuck
         function stringToBF(string, commented) {
             let buffer = "";
@@ -97,7 +95,6 @@ module.exports = {
                 }
                 if (commented) 
                     buffer += " " + string[i].replace(/[+-<>[],.]/g, "") + "\n";
-                
             }
             return buffer;
         }
@@ -107,32 +104,44 @@ module.exports = {
             for (const key in colourToBf) 
                 bfToColour[colourToBf[key]] = key;
             
-        
             const colours = [];
             for (const char of source) {
                 if (bfToColour[char]) 
                     colours.push(bfToColour[char].split(",").map(Number));
-                
             }
         
             const pixelsPerRow = Math.ceil(Math.sqrt(colours.length));
             const canvasSize = pixelsPerRow * pixelSize; // Calculate the canvas size based on pixelSize
         
-            const canvas = createCanvas(canvasSize, canvasSize);
-            const context = canvas.getContext("2d");
+            const imageBuffer = Buffer.alloc(canvasSize * canvasSize * 3); // RGB (3 channels per pixel)
         
             for (let i = 0; i < colours.length; i++) {
                 const [r, g, b] = colours[i];
-                context.fillStyle = `rgb(${r},${g},${b})`;
-                
-                // Calculate the positions in terms of pixelSize
-                const x = (i % pixelsPerRow) * pixelSize;
-                const y = Math.floor(i / pixelsPerRow) * pixelSize;
-                
-                context.fillRect(x, y, pixelSize, pixelSize);
+
+                // Calculate the position for this pixel
+                const x = i % pixelsPerRow;
+                const y = Math.floor(i / pixelsPerRow);
+        
+                // Calculate the index in the image buffer (RGB values for the pixel)
+                const index = (y * pixelsPerRow + x) * 3; // 3 values per pixel (RGB)
+        
+                // Set the pixel's color in the buffer
+                imageBuffer[index] = r;
+                imageBuffer[index + 1] = g;
+                imageBuffer[index + 2] = b;
             }
         
-            return canvas.toBuffer();
+            // Use sharp to create an image from the buffer, resizing is not needed
+            return sharp(imageBuffer, {
+                raw: {
+                    width: pixelsPerRow,
+                    height: pixelsPerRow,
+                    channels: 3,
+                },
+            })
+                .resize({ width: canvasSize, height: canvasSize, kernel: sharp.kernel.nearest }) // Use nearest neighbor for sharp pixel effect
+                .png() // Convert the image to PNG format
+                .toBuffer(); // Return the buffer
         }
     },
 };
