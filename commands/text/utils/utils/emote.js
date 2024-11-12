@@ -1,5 +1,5 @@
+const sharp = require("sharp");
 const { PermissionsBitField } = require("discord.js");
-const { createCanvas, loadImage } = require("canvas");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
@@ -13,7 +13,7 @@ module.exports = {
         optional: {
             "emote|e": {
                 hasValue: false,
-                description: "Generate a emote. Either -e or -s has to be passed",
+                description: "Generate an emote. Either -e or -s has to be passed",
             },
             "sticker|s": {
                 hasValue: false,
@@ -37,14 +37,12 @@ module.exports = {
         const imageAttachment = message.attachments.first();
         if (!imageAttachment || !imageAttachment.attachment) return await message.reply({ embeds: [embedGenerator.warning("Invalid attachment")] });
 
-        const canvas = createCanvas(128, 128); 
-        const ctx = canvas.getContext("2d");
-        const img = await loadImage(imageAttachment.url);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        const buffer = canvas.toBuffer();
-        
         try {
+            // Resize and prepare image for emote/sticker using Sharp
+            const buffer = await sharp(await fetch(imageAttachment.url).then(res => res.buffer()))
+                .resize(128, 128)
+                .toBuffer();
+
             if (emoteArg) {
                 const emoji = await message.guild.emojis.create({ attachment: buffer, name: name });
                 await message.reply({ content: `Emote added: **${emoji.name}**` });
