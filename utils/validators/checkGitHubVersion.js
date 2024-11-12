@@ -22,7 +22,6 @@ const checkGitHubVersion = async function() {
         logger.warning("Please consider updating the application with 'git pull'.");
     }
 
-
     logger.info("Successfully checked application version.");
 };
 

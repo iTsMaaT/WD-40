@@ -7,32 +7,31 @@ const util = require("util");
 
 /**
  * Get the current date in the format DD-MM-YYYY.
- * @returns {string} The formatted date.
+ * @returns {string} The formatted date in EDT/EST.
  */
 function getDate() {
-    // Récupère la date
-    const today = new Date();
-    // Récupère le jour
-    const dd = String(today.getDate()).padStart(2, "0");
-    // Récupère le mois (Att! Janvier est 0)
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    // Récupère l'année
-    const yyyy = today.getFullYear();
-    // Retourne la date formatté
-    return dd + "-" + mm + "-" + yyyy;
+    return new Date().toLocaleDateString("en-GB", { timeZone: "America/New_York" }).replace(/\//g, "-");
 }
-
 
 /**
  * Get the current date and time in the format DD-MM-YYYY HH:MM:SS.mmm.
- * @returns {string} The formatted date and time.
+ * @returns {string} The formatted date and time in EDT/EST.
  */
 function getDateTime() {
-    const d = new Date();
-    const time = String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") + ":" + String(d.getSeconds()).padStart(2, "0") + "." + String(d.getMilliseconds()).padStart(3, "0");
+    const now = new Date();
+    const date = now.toLocaleDateString("en-GB", { timeZone: "America/New_York" }).replace(/\//g, "-");
+    const time = now.toLocaleTimeString("en-GB", {
+        timeZone: "America/New_York",
+        hour12: false,
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+    });
+    const milliseconds = String(now.getMilliseconds()).padStart(3, "0");
 
-    return getDate() + " " + time;
+    return `${date} ${time}.${milliseconds}`;
 }
+
 
 class Logger {
 
