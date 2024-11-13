@@ -77,6 +77,7 @@ const player = new Player(client, {
             streamOptions: {
                 useClient: config.get("discordPlayerConf")?.usePoToken ? "WEB" : undefined,
                 highWaterMark: config.get("discordPlayerConf")?.highWaterMark || 1024 * 1024,
+                // overrideBridgeMode: "ytmusic",
             }, 
         });
 

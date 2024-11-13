@@ -1,7 +1,9 @@
+const config = require("@utils/config/configUtils");
+
 module.exports = {
     name: "debug",
     once: false,
     execute(client, logger, log) {
-        // logger.debug(log);
+        if (config.get("discordPlayerConf").log) logger.debug(log);
     },
 };
