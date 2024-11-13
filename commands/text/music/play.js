@@ -33,6 +33,7 @@ module.exports = {
         const player = useMainPlayer();
         const queue = useQueue(message.guild.id);
         let res, research, specificSearch;
+        
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
 
         const attachment = message.attachments.first()?.attachment;
