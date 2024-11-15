@@ -1,5 +1,5 @@
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const GuildManager = require("@root/utils/GuildManager");
+const GuildManager = require("@root/utils/guildManager");
 
 module.exports = {
     name: "prefix",

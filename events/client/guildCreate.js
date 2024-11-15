@@ -1,6 +1,6 @@
 const { Events } = require("discord.js");
 const config = require("@utils/config/configUtils");
-const GuildManager = require("@root/utils/GuildManager");
+const GuildManager = require("@root/utils/guildManager");
 
 module.exports = {
     name: Events.GuildCreate,

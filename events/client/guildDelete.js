@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-const GuildManager = require("@root/utils/GuildManager");
+const GuildManager = require("@root/utils/guildManager");
 const { repositories } = require("@utils/db/tableManager.js");
 
 module.exports = {

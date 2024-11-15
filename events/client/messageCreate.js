@@ -1,5 +1,5 @@
 const { Events, PermissionsBitField } = require("discord.js");
-const GuildManager = require("@root/utils/GuildManager");
+const GuildManager = require("@root/utils/guildManager");
 const { repositories } = require("@utils/db/tableManager.js");
 const getExactDate = require("@functions/getExactDate");
 const embedGenerator = require("@utils/helpers/embedGenerator");
