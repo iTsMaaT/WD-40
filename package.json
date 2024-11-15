@@ -60,6 +60,7 @@
     "@root": ".",
     "@functions": "./utils/functions",
     "@utils": "./utils",
-    "@config": "./utils/config"
+    "@config": "./utils/config",
+    "@guildManager": "./utils/guildManager/guildManager.js"
   }
 }

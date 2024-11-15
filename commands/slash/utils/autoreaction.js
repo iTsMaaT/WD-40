@@ -2,7 +2,7 @@ const { ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, 
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const emoteList = require("@utils/emojis.json");
 const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
-const GuildManager = require("@root/utils/guildManager");
+const GuildManager = require("@guildManager");
 
 module.exports = {
     name: "autoreaction",

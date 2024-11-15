@@ -1,5 +1,5 @@
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const GuildManager = require("@root/utils/guildManager.js");
+const GuildManager = require("@guildManager.js");
 const { fetchGeminiResponse } = require("@utils/helpers/fetchGeminiResponse");
 
 module.exports = {

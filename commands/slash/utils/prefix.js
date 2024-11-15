@@ -1,6 +1,6 @@
 const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
-const GuildManager = require("@root/utils/guildManager");
+const GuildManager = require("@guildManager");
 
 module.exports = {
     name: "prefix",

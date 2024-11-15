@@ -1,5 +1,5 @@
 const { Events, PermissionsBitField } = require("discord.js");
-const GuildManager = require("@root/utils/guildManager");
+const GuildManager = require("@guildManager");
 const { repositories } = require("@utils/db/tableManager.js");
 const getExactDate = require("@functions/getExactDate");
 const RandomMinMax = require("@root/utils/functions/randomMinMax");

@@ -1,5 +1,5 @@
 const changelog = require("@root/changelogs.json");
-const GuildManager = require("@root/utils/guildManager.js");
+const GuildManager = require("@guildManager.js");
 
 module.exports = {
     name: "changelog",

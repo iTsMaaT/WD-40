@@ -5,7 +5,7 @@ const embedGenerator = require("@utils/helpers/embedGenerator");
 const GetPterodactylInfo = require("@root/utils/functions/getPterodactylInfo");
 const { sql } = require("drizzle-orm");
 const DB = require("@root/utils/db/DatabaseManager");
-const GuildManager = require("@root/utils/guildManager");
+const GuildManager = require("@guildManager");
 const { useMainPlayer } = require("discord-player");
 
 module.exports = {
