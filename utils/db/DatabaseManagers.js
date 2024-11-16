@@ -59,6 +59,30 @@ class DatabaseManager {
     }
 
     /**
+     * Checks if the database is connected.
+     * 
+     * @returns {Promise<boolean>} Resolves to `true` if the database connection is successful, otherwise `false`.
+     */
+    async dbConnected() {
+        try {
+            await this.getConnection();
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    /** 
+     * Checks if the database connection is configured.
+     * 
+     * @returns {boolean} Returns `true` if the database connection is configured, otherwise `false`.
+     */
+    dbExists() {
+        if (process.env.DATABASE_URL) return true;
+        return false;
+    }
+
+    /**
      * Reconnects the database if the connection is lost.
      * @private
      */
