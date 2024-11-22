@@ -14,16 +14,7 @@ const validateEnvironmentVariables = async function() {
         "PTERODACTYL_API_KEY",
         "PTERODACTYL_URL",
         "PTERODACTYL_SERVER_ID",
-        "VIRUS_TOTAL_API_KEY",
-        "STEAM_API_KEY",
-        "REDDIT_CLIENT_SECRET",
-        "REDDIT_CLIENT_ID",
-        "REDDIT_REFRESH_TOKEN",
-        "YOUTUBE_ACCESS_STRING",
         "OWNER_ID",
-        "STATUS_CHANNEL_ID",
-        "MEMBERS_UPDATE_ID",
-        "SUGGESTION_CHANNEL_ID",
         "SERVER",
     ];
 
