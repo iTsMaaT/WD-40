@@ -7,6 +7,7 @@ const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch")
 const { initConfFile } = require("@utils/reddit/fetchRedditToken.js");
 const countCommonChars = require("@utils/functions/countCommonChars.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
+const dbManager = require("@root/utils/db/databaseManager");
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -27,6 +28,12 @@ module.exports = {
             if (blCategory || blCommand) 
                 return await interaction.editReply({ embeds: [embedGenerator.error(`You are blacklisted from executing ${blCategory ? `commands in the **${command.category}** category` : `the **${command.name}** command`}.`)] });
     
+            if (slash.dbNeeded && !dbManager.dbExists()) {
+                return await interaction.editReply({ embeds: [embedGenerator.error({
+                    title: "Cannot run command",
+                    description: "A database connection is required to run this command.",
+                })] });}
+
             // Check command cooldown
             if (SlashCooldowns.has(interaction.user.id)) {
                 const cooldown = SlashCooldowns.get(interaction.user.id);
@@ -43,13 +50,17 @@ module.exports = {
     
             try {
 
-                // Logging the command
-                logger.info(`
-            Executing [/${interaction.commandName}]
-            by    [${interaction.user.tag} (${interaction.user.id})]
-            in    [${interaction.channel.name} (${interaction.channel.id})]
-            from  [${interaction.guild.name} (${interaction.guild.id})]`
-                    .replace(/^\s+/gm, ""));
+                const maxLengths = {
+                    names: Math.max(interaction.user.tag.length, interaction.channel.name.length, interaction.guild.name.length),
+                    ids: Math.max(interaction.user.id.length, interaction.channel.id.length, interaction.guild.id.length),
+                };
+
+                // Logging every executed commands
+                logger.info(`Executing [/${interaction.commandName}]` + "\n" +
+                    `by    [${interaction.user.tag.padEnd(maxLengths.names)} (${interaction.user.id.padEnd(maxLengths.ids)})]` + "\n" +
+                    `in    [${interaction.channel.name.padEnd(maxLengths.names)} (${interaction.channel.id.padEnd(maxLengths.ids)})]` + "\n" +
+                    `from  [${interaction.guild.name.padEnd(maxLengths.names)} (${interaction.guild.id.padEnd(maxLengths.ids)})]`);
+
                                         
                 const botMember = interaction.guild.members.me;
                 if (!botMember) return;
