@@ -27,6 +27,7 @@ module.exports = {
     category: "music",
     examples: ["never gonna give you up"],
     permissions: [PermissionsBitField.Flags.Connect],
+    cooldown: 1,
     async execute(logger, client, message, args, optionalArgs) {
         const MAX_QUEUE_SIZE = 10000;
 
