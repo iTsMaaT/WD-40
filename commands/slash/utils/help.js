@@ -1,7 +1,7 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ApplicationCommandOptionType } = require("discord.js");
 const { prettyString } = require("@functions/formattingFunctions");
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const GuildManager = require("@guildManager.js");
+const GuildManager = require("@guildManager");
 
 module.exports = {
     name: "help",
