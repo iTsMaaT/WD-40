@@ -7,6 +7,7 @@ const GuildManager = require("@guildManager");
 module.exports = {
     name: "autoreaction",
     description: "Adds reactions to chosen messages in chosen channels",
+    dbNeeded: true,
     type: ApplicationCommandType.ChatInput,
     options: [
         {

@@ -1,4 +1,4 @@
-const DB = require("./DatabaseManager.js");
+const DB = require("./databaseManager");
 const fullSchema = require("../../schema/schema.js");
 
 /**

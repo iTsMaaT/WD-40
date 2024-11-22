@@ -2,6 +2,7 @@ const { repositories } = require("./db/tableManager.js");
 const { editOrSend } = require("./functions/discordFunctions.js");
 const { colorText, foregroundColor, backgroundColor, textStyle } = require("./functions/consoleColor.js");
 const Sentry = require("@sentry/node");
+const databaseManager = require("@root/utils/db/databaseManager");
 
 const util = require("util");
 
@@ -92,14 +93,16 @@ class Logger {
     
         if (type == "CONSOLE" || type == "EVENT") return;
     
-        try {
-            await repositories.logs.insert({
-                value: formattedLog,
-                type: type,
-            });
-        } catch (ex) {
-            console.logger(`\x1b[31m[${getDateTime()} - SEVERE] Unable to write to database\x1b[0m`);
-            console.logger(ex);
+        if (databaseManager.dbExists()) {
+            try {
+                await repositories.logs.insert({
+                    value: formattedLog,
+                    type: type,
+                });
+            } catch (ex) {
+                console.logger(`\x1b[31m[${getDateTime()} - SEVERE] Unable to write to database\x1b[0m`);
+                console.logger(ex);
+            }
         }
     }
 

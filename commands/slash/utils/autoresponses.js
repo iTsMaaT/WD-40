@@ -5,6 +5,7 @@ const GuildManager = require("@guildManager");
 module.exports = {
     name: "autoresponse",
     description: "Responds something to chosen messages in chosen channels",
+    dbNeeded: true,
     type: ApplicationCommandType.ChatInput,
     options: [
         {

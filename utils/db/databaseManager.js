@@ -16,6 +16,8 @@ class DatabaseManager {
         if (instance) throw new Error("Cannot instantiate multiple DB Managers");
         instance = this;
 
+        if (!this.dbExists()) return;
+          
         /**
          * The MySQL connection pool.
          * @type {mysql.Pool}
@@ -80,23 +82,6 @@ class DatabaseManager {
     dbExists() {
         if (process.env.DATABASE_URL) return true;
         return false;
-    }
-
-    /**
-     * Reconnects the database if the connection is lost.
-     * @private
-     */
-    _handleDisconnect() {
-        this._dbPool.on("connection", (connection) => {
-            connection.on("error", async (err) => {
-                if (err.code === "PROTOCOL_CONNECTION_LOST") {
-                    console.error("Database connection lost. Reconnecting...");
-                    await this.getConnection(); // Attempt to reconnect
-                } else {
-                    throw err;
-                }
-            });
-        });
     }
 }
 
