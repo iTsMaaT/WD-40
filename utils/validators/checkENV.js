@@ -20,7 +20,6 @@ const validateEnvironmentVariables = async function() {
         "REDDIT_CLIENT_ID",
         "REDDIT_REFRESH_TOKEN",
         "YOUTUBE_ACCESS_STRING",
-        "DATABASE_URL",
         "OWNER_ID",
         "STATUS_CHANNEL_ID",
         "MEMBERS_UPDATE_ID",
