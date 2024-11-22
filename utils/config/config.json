@@ -52,13 +52,48 @@
     "whitelist": [
         273587964334964737
     ],
+    
+    "withoutDatabseConfig": {
+        "prefix": ">",
+        "responses": 0,
+        "personality": "Answer as if you are annoying."
+    },
 
     "discordPlayerConf": {
         "removeYoutube": false,
         "skipLogin": true,
         "usePoToken": false,
+        "useCookie": false,
         "log": false,
-        "highWaterMark": 2097152
+        "highWaterMark": 2097152,
+        "skipFFmpeg": false,
+        "useSoundcloudBridge": false,
+        "extractors": {
+            "YouTubeExtractor": {
+                "enabled": false,
+                "options": {}
+            },
+            "SpotifyExtractor": {
+                "enabled": true,
+                "options": {}
+            },
+            "AppleMusicExtractor": {
+                "enabled": true,
+                "options": {}
+            },
+            "ReverbnationExtractor": {
+                "enabled": true,
+                "options": {}
+            },
+            "VimeoExtractor": {
+                "enabled": true,
+                "options": {}
+            },
+            "AttachmentExtractor": {
+                "enabled": true,
+                "options": {}
+            }
+        }
     },
 
     "defaultSuperuserState": false,
