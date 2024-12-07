@@ -18,11 +18,12 @@ module.exports = {
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.error("You must be in a voice channel.")] });
         
         let queue = useQueue(message.guild.id);
-        const loopMode = args[0]?.toLowerCase() || "queue";
+        let loopMode = args[0]?.toLowerCase() || "queue";
         const oldLoopMode = getLoopMode(queue);
 
         if (!queue || !queue.tracks) return await message.reply({ embeds: [embedGenerator.error("There is nothing playing.")] });
 
+        if (oldLoopMode === getLoopMode(loopMode)) loopMode = "off";
         switch (loopMode) {
             case "off":
                 queue.setRepeatMode(QueueRepeatMode.OFF);
