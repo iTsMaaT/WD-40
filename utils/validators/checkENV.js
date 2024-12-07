@@ -37,7 +37,7 @@ const validateEnvironmentVariables = async function() {
     // Check that SERVER is set to development or production
     if (process.env.SERVER !== "dev" && process.env.SERVER !== "prod") {
         logger.error("SERVER is not set to dev or prod. Please set it to either of these values. Exiting...");
-        process.exit(1);
+        process.exit(0);
     }
 
     logger.debug(`SERVER is set to ${process.env.SERVER}.`);

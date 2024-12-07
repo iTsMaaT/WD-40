@@ -11,7 +11,7 @@ const checkNodeJsVersion = async function() {
             if (error) {
                 logger.error("An error occurred while checking Node.js version. Exiting...");
                 reject(error);
-                process.exit(1);
+                process.exit(0);
             } else {
                 const nodeVersionString = stdout.trim();
                 const nodeVersionArray = nodeVersionString
