@@ -8,7 +8,6 @@ module.exports = {
     execute: async (logger, interaction, client) => {
         const LanguageCode = interaction.guild.preferredLocale.split("-")[0].toString().toLowerCase();
         const text = interaction.targetMessage.content;
-        console.log(text);
 
         try {
             const [enTr, localeTr] = await Promise.all([
