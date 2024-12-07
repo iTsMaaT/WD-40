@@ -59,17 +59,20 @@
     const { Player } = require("discord-player");
     const exts = require("@discord-player/extractor");
     const { YoutubeiExtractor, createYoutubeiStream, poTokenExtraction } = require("discord-player-youtubei");
+    const { DeezerExtractor } = require("discord-player-deezer");
 
     const player = new Player(client, {
         bridgeProvider: discordPlayerConfig.useSoundcloudBridge ? new exts.BridgeProvider(exts.BridgeSource.SoundCloud) : new exts.BridgeProvider(exts.BridgeSource.Auto),
         skipFFmpeg: discordPlayerConfig?.skipFFmpeg,
     });
 
+    const getPriority = (streamProvider) => 10 + discordPlayerConfig?.streamPriorities.length - discordPlayerConfig?.streamPriorities?.indexOf(streamProvider) ?? null;
+
 
     if (!discordPlayerConfig?.removeYoutube) {
         logger.info("Loading YoutubeiExtractor extractor...");
 
-        await player.extractors.register(YoutubeiExtractor, {
+        const ytExt = await player.extractors.register(YoutubeiExtractor, {
             authentication: discordPlayerConfig?.skipLogin ? undefined : process.env.YOUTUBE_ACCESS_STRING || "",
             cookie: discordPlayerConfig?.useCookie ? process.env.YOUTUBE_COOKIE || "" : undefined,
             streamOptions: {
@@ -79,21 +82,34 @@
             }, 
         });
 
-        if (discordPlayerConfig?.usePoToken) {
-            const ext = YoutubeiExtractor.getInstance();
-            const attrationToken = await poTokenExtraction(ext.innerTube);
+        ytExt.priority = getPriority("youtube") ?? ytExt.priority;
 
-            ext.setPoToken(attrationToken, ext.innerTube.session.context.client.visitorData);
+        if (discordPlayerConfig?.usePoToken) {
+            const attrationToken = await poTokenExtraction(ytExt.innerTube);
+
+            ytExt.setPoToken(attrationToken, ytExt.innerTube.session.context.client.visitorData);
         }
+    }
+
+    if (!discordPlayerConfig?.removeDeezer) {
+        const deezerExt = await player.extractors.register(DeezerExtractor, {
+            decryptionKey: process.env.DEEZER_MASTER_KEY,
+        });
+
+        deezerExt.priority = getPriority("deezer") ?? deezerExt.priority;
     }
 
     // await player.extractors.loadDefault((ext) => !["YouTubeExtractor"].includes(ext));
     for (const ext of Object.entries(discordPlayerConfig.extractors)) {
         if (ext[1].enabled) {
             logger.info(`Loading ${ext[0]} extractor...`);
-            await player.extractors.register(exts[ext[0]], ext[1].options);
+            const currentExt = await player.extractors.register(exts[ext[0]], ext[1].options);
+            console.log(ext);
+            for (const streamProvider of discordPlayerConfig.streamPriorities)
+                if (ext[0].toLowerCase().includes(streamProvider.toLowerCase())) currentExt.priority = getPriority(streamProvider) || currentExt.priority;
         }
     }
+
 
     console.log("Variables loaded");
 
