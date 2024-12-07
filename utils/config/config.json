@@ -61,6 +61,7 @@
 
     "discordPlayerConf": {
         "removeYoutube": false,
+        "removeDeezer": false,
         "skipLogin": true,
         "usePoToken": false,
         "useCookie": false,
@@ -68,9 +69,18 @@
         "highWaterMark": 2097152,
         "skipFFmpeg": false,
         "useSoundcloudBridge": false,
+        "streamPriorities": [
+            "youtube",
+            "deezer",
+            "soundcloud"
+        ],
         "extractors": {
             "YouTubeExtractor": {
                 "enabled": false,
+                "options": {}
+            },
+            "SoundCloudExtractor": {
+                "enabled": true,
                 "options": {}
             },
             "SpotifyExtractor": {
