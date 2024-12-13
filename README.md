@@ -90,5 +90,9 @@ CREATE DATABASE bot;
 
 If you need help, feel free to join the [support server](https://discord.gg/pqKE2QZrFM) and ask for help.
 
+# Known issues
+
+If you are hosting on a VPS and use Youtube for the music part, your IP might get blocked by YouTube as it systematically blocks IPs that are from a VPS, in this case, you can disable YouTube and use Deezer or SoundCloud instead by modifing the config in `utils/config/config.json`.
+
 [JavaScript-Badge]: https://img.shields.io/badge/JavaScript-%23323330.svg?style=flat&logo=javascript&logoColor=%23F7DF1E
 [JavaScript-Url]: https://en.wikipedia.org/wiki/JavaScript "JavaScript"
