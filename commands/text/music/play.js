@@ -4,6 +4,7 @@ const { getLoopMode } = require("@utils/helpers/playerHelpers");
 const { QueryType, useMainPlayer, useQueue, QueryResolver } = require("discord-player");
 const config = require("@utils/config/configUtils");
 const { parse } = require("node-html-parser");
+const { useStats } = require("@utils/helpers/playerHelpers");
 
 module.exports = {
     name: "play",
@@ -33,6 +34,7 @@ module.exports = {
 
         const player = useMainPlayer();
         const queue = useQueue(message.guild.id);
+        const playerConfig = config.get("discordPlayerConf");
         let res, research, specificSearch;
         
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
@@ -40,9 +42,25 @@ module.exports = {
         const attachment = message.attachments.first()?.attachment;
 
         let string = args.join(" ");
-        if (!string) string = config.get("discordPlayerConf").removeYoutube ? undefined : "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
-        // return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
+        if (!string) string = playerConfig.removeYoutube ? undefined : "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+        if (!string) return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
         const stringQueryType = QueryResolver.resolve(string).type;
+
+        const isYoutube = 
+        stringQueryType == QueryType.YOUTUBE_SEARCH ||
+        stringQueryType == QueryType.YOUTUBE || 
+        stringQueryType == QueryType.YOUTUBE_PLAYLIST || 
+        stringQueryType == QueryType.YOUTUBE_VIDEO;
+
+        if (stringQueryType === QueryType.YOUTUBE_VIDEO && playerConfig.removeYoutube && playerConfig.attemptYoutubeSearchEvenIfDisabled) {
+            const messageEmbeds = message.embeds || [];
+            for (const embed of messageEmbeds) {
+                if (embed.provider?.name === "YouTube") {
+                    string = `${embed.title} - ${embed.author.name}`;
+                    break;
+                }
+            }
+        }
 
         const sentMessage = await message.reply({ embeds: [embedGenerator.info({
             description: "Request received, fetching...",
@@ -66,18 +84,23 @@ module.exports = {
 
                 research = await player.search(specificSearch, {
                     requestedBy: message.member,
-                    searchEngine: config.get("discordPlayerConf")?.removeYoutube ? QueryType.SOUNDCLOUD_SEARCH : QueryType.YOUTUBE_SEARCH,
+                    searchEngine: QueryType.AUTO_SEARCH,
                 });
 
-                if (!research.hasTracks()) {return await sentMessage.edit({ embeds: [embedGenerator.warning({
-                    description: "No results found",
-                    footer: { 
-                        text: config.get("discordPlayerConf").removeYoutube && (
-                            stringQueryType == QueryType.YOUTUBE_SEARCH || stringQueryType == QueryType.YOUTUBE || 
-                            stringQueryType == QueryType.YOUTUBE_PLAYLIST || stringQueryType == QueryType.YOUTUBE_VIDEO
-                        ) ? "Youtube has been disabled, for more info, use the help command and go in the support server." : undefined,
-                    },
-                })] });}
+                if (!research.hasTracks()) {
+                    let footerText = "";
+                    
+                    if (playerConfig.removeYoutube && isYoutube) {
+                        footerText = "Youtube has been disabled, for more info, use the help command and go in the support server.";
+                        if (playerConfig.attemptYoutubeSearchEvenIfDisabled) 
+                            footerText = "YouTube extraction is disabled, to support YouTube links, the YouTube embed must be visible";
+                    }
+
+                    return await sentMessage.edit({ embeds: [embedGenerator.warning({
+                        description: "No results found",
+                        footer: { text: footerText || undefined },
+                    })] });
+                }
 
                 const choicesEmbed = embedGenerator.info({
                     title: "Type in chat the number you want to play",
@@ -107,16 +130,13 @@ module.exports = {
 
                 research = await player.search(string, {
                     requestedBy: message.member,
-                    searchEngine: QueryType.AUTO,
+                    searchEngine: !playerConfig.removeYoutube ? QueryType.YOUTUBE_SEARCH : QueryType.AUTO_SEARCH,
                 });
 
                 if (!research.hasTracks()) {return await sentMessage.edit({ embeds: [embedGenerator.warning({
                     description: "No results found",
                     footer: { 
-                        text: config.get("discordPlayerConf").removeYoutube && (
-                            stringQueryType == QueryType.YOUTUBE_SEARCH || stringQueryType == QueryType.YOUTUBE || 
-                            stringQueryType == QueryType.YOUTUBE_PLAYLIST || stringQueryType == QueryType.YOUTUBE_VIDEO
-                        ) ? "Youtube has been disabled, for more info, use the help command and go in the support server." : undefined,
+                        text: playerConfig.removeYoutube && isYoutube ? "Youtube has been disabled, for more info, use the help command and go in the support server." : undefined,
                     },
                 })] });}
             }
@@ -169,9 +189,9 @@ module.exports = {
             }).withAuthor(message.author);
 
             if (finalSearchResult?.playlist) embed.data.fields.push({ name: "Playlist", value: finalSearchResult.playlist.title });
-    
-            await sentMessage.edit({ embeds: [embed] });
 
+            await sentMessage.edit({ embeds: [embed] });
+            if (isYoutube && playerConfig.attemptYoutubeSearchEvenIfDisabled) await message.channel.send({ embeds: [embedGenerator.warning("Youtube links might not be accurate as YouTube extraction is disabled")] });
         } catch (err) {
             logger.error(err);
             return await sentMessage.edit({ embeds: [embedGenerator.error("Failed to fetch / play the requested track")] });
@@ -195,3 +215,35 @@ const getSoundgasmLink = async (link) => {
     const m4aLink = scriptContent.substring(startIndex + 1, endIndex);
     return m4aLink;
 };
+
+async function searchWithPriorities() {
+    for (const priority of config.streamPriorities) {
+        if ((priority === "youtube" && config.removeYoutube) ||
+            (priority === "deezer" && config.removeDeezer)) 
+            continue;
+        
+
+        let queryType;
+        try {
+            switch (priority) {
+                case "youtube":
+                    queryType = QueryType.YOUTUBE_SEARCH;
+                    break;
+                case "deezer":
+                    queryType = QueryType.DEEZER_SEARCH;
+                    break;
+                case "soundcloud":
+                    queryType = QueryType.SOUNDCLOUD_SEARCH;
+                    break;
+                default:
+                    return null;
+            }
+
+        } catch (err) {
+            return null;
+        }
+        return queryType;
+    }
+
+    return null;
+}
