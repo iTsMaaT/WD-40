@@ -1,0 +1,45 @@
+const { useStats } = require("@utils/helpers/playerHelpers");
+const { useQueue } = require("discord-player");
+const prettyMs = require("pretty-ms");
+const embedGenerator = require("@utils/helpers/embedGenerator");
+
+module.exports = {
+    name: "playerstats",
+    description: "Get the stats of the current queue",
+    category: "music",
+    async execute(logger, client, message, args, optionalArgs) {
+        const queue = useQueue(message.guild.id);
+        if (!queue) return await message.reply({ embeds: [embedGenerator.error("There is no queue.")] });
+
+        const stats = useStats(message.guild.id);
+        const embed = embedGenerator.info({
+            title: "Queue stats",
+            fields: [
+                { 
+                    name: "Status", 
+                    value: 
+                    `**Buffering:** ${stats.status.buffering ? "✅" : "❌"}\n` + 
+                    `**Playing:** ${stats.status.playing ? "✅" : "❌"}\n` + 
+                    `**Paused:** ${stats.status.paused ? "✅" : "❌"}\n` + 
+                    `**Idle:** ${stats.status.idle ? "✅" : "❌"}`,
+                },
+                {
+                    name: "Info",
+                    value:
+                    `**Tracks amount:** ${stats.tracksCount}\n` +
+                    `**History size:** ${stats.historySize}\n` +
+                    `**Extractors:** ${stats.extractors}\n` +
+                    `**Listeners:** ${stats.listeners}\n`,
+                },
+                {
+                    name: "Latencies",
+                    value:
+                    `**Event loop:** ${prettyMs(stats.latency.eventLoop)}\n` +
+                    `**Voice connection:** ${prettyMs(stats.latency.voiceConnection)}\n`,
+                },
+            ],
+        });
+
+        await message.reply({ embeds: [embed] });
+    },
+};
