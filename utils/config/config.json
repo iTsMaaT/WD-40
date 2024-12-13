@@ -53,14 +53,15 @@
         273587964334964737
     ],
     
-    "withoutDatabseConfig": {
+    "withoutDatabaseConfig": {
         "prefix": ">",
         "responses": 0,
         "personality": "Answer as if you are annoying."
     },
 
     "discordPlayerConf": {
-        "removeYoutube": false,
+        "removeYoutube": true,
+        "attemptYoutubeSearchEvenIfDisabled": true,
         "removeDeezer": false,
         "skipLogin": true,
         "usePoToken": false,
@@ -80,7 +81,7 @@
                 "options": {}
             },
             "SoundCloudExtractor": {
-                "enabled": true,
+                "enabled": false,
                 "options": {}
             },
             "SpotifyExtractor": {
