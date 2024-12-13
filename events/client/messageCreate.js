@@ -149,7 +149,7 @@ Step 5 - Send the downloaded media to your favorite social media!
                 
                 try {
                     const maxLengths = {
-                        names: Math.max(message.content.length, message.member.user.tag.length, message.channel.name.length, message.guild.name.length),
+                        names: Math.max(message.member.user.tag.length, message.channel.name.length, message.guild.name.length),
                         ids: Math.max(message.author.id.length, message.channel.id.length, message.guild.id.length),
                     };
     
