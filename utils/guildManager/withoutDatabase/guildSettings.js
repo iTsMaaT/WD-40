@@ -1,5 +1,5 @@
 const config = require("@utils/config/configUtils");
-const dbConfig = config.get("withoutDatabseConfig");
+const dbConfig = config.get("withoutDatabaseConfig");
 
 const prefixes = {};
 const responses = {};
