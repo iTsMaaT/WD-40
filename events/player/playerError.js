@@ -9,7 +9,7 @@ module.exports = {
             description: "An error occured, the following track might've been skipped.",
             fields: [{
                 name: "**Track title:**",
-                description: `[${queue.currentTrack.title}](${queue.currentTrack.url})`,
+                value: `[${queue.currentTrack.title}](${queue.currentTrack.url})`,
             }],
         }).withAuthor(queue.metadata.requestedBy)] });
         logger.info(`Queue: ${queue.metadata.guild.name} threw error on track ${queue.currentTrack.title}: \n ${error}`);
