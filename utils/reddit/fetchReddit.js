@@ -4,21 +4,21 @@ const { getRedditToken, makeRequest } = require("./fetchRedditToken.js");
 const FetchReddit = async function(ChannelNSFW, subreddits, limit, type = "sub") {
     try {
         const subreddit = subreddits[Math.floor(Math.random() * subreddits.length)];
-        if (!limit) limit = subreddit.length;
+        if (!limit) limit = subreddits.length;
         let PostImage = "";
         let embed;
         let count = 0;
         const { baseUrl, headers } = await getRedditToken();
+        let content;
+        if (type == "sub") 
+            content = await makeRequest(`${baseUrl}/r/${subreddit}/hot?limit=100`, headers);
+        else if (type == "user") 
+            content = await makeRequest(`${baseUrl}/user/${subreddit}/submitted?limit=100`, headers);
+        else  
+            logger.error("Wrong type");
+
         while (!/\.(jpg|png|gif|jpeg)$/.test(PostImage)) {
-            let content;
-            if (type == "sub") 
-                content = await makeRequest(`${baseUrl}/r/${subreddit}/random/.json`, headers);
-            else if (type == "user") 
-                content = [await makeRequest(`${baseUrl}/user/${subreddit}/submitted.json`, headers)];
-            else  
-                logger.error("Wrong type");
-            
-            const post = content[0].data.children.shuffle().filter((p) => p.data.post_hint === "image" && /\.(jpg|png|gif|jpeg)$/.test(p.data.url))[0];
+            const post = content.data.children.shuffle().filter((p) => p.data.post_hint === "image" && /\.(jpg|png|gif|jpeg)$/.test(p.data.url))[0];
             if (post == undefined || post.length == 0) {
                 count += 1;
                 if (count == limit) {
