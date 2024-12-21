@@ -349,5 +349,20 @@
             "Added >femboys (against my will)",
             "Multiple fixes"
         ]
+    },
+    {
+        "version": "5.8.0",
+        "date": "2024-12-21",
+        "changes": [
+            "No database mode: when selfhosting, you can now use the bot without a database",
+            "Fixed >loop: when re-executing the command, it turns the loop off if the mode is the same as the previous",
+            "Uptime alias to >ping",
+            "Fixed reddit-based commands",
+            "Added deezer support for music (deezer links don't yet work, but deezer can be used as a much better bridge then soundcloud)",
+            "Lowered >play and >skip cooldowns",
+            "Added proper SoundGasm extractor (<https://www.npmjs.com/package/soundgasm-extractor>)",
+            "Added >playerstats: get stats about the current queue and player",
+            "Multiple fixes"
+        ]
     }
 ]
