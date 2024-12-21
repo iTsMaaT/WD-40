@@ -60,6 +60,7 @@
     const exts = require("@discord-player/extractor");
     const { YoutubeiExtractor, createYoutubeiStream, poTokenExtraction } = require("discord-player-youtubei");
     const { DeezerExtractor } = require("discord-player-deezer");
+    const { SoundgasmExtractor } = require("soundgasm-extractor");
 
     const player = new Player(client, {
         bridgeProvider: discordPlayerConfig.useSoundcloudBridge ? new exts.BridgeProvider(exts.BridgeSource.SoundCloud) : new exts.BridgeProvider(exts.BridgeSource.Auto),
@@ -68,13 +69,18 @@
 
     const getPriority = (streamProvider) => 10 + discordPlayerConfig?.streamPriorities.length - discordPlayerConfig?.streamPriorities?.indexOf(streamProvider) ?? null;
 
+    logger.info("Loading SoundgasmExtractor extractor...");
+    await player.extractors.register(SoundgasmExtractor, {
+        skipProbing: true,
+        attemptAlternateProbing: true,
+    });
 
     if (!discordPlayerConfig?.removeYoutube) {
         logger.info("Loading YoutubeiExtractor extractor...");
 
         const ytExt = await player.extractors.register(YoutubeiExtractor, {
             authentication: discordPlayerConfig?.skipLogin ? undefined : process.env.YOUTUBE_ACCESS_STRING || "",
-            cookie: discordPlayerConfig?.useCookie ? process.env.YOUTUBE_COOKIE || "" : undefined,
+            cookie: discordPlayerConfig?.useCookie ? process.env.YOUTUBE_COOKIE || undefined : undefined,
             streamOptions: {
                 useClient: discordPlayerConfig?.usePoToken ? "WEB" : undefined,
                 highWaterMark: discordPlayerConfig?.highWaterMark || 1024 * 1024,
