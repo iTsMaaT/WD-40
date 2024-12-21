@@ -5,6 +5,9 @@ const { QueryType, useMainPlayer, useQueue, QueryResolver } = require("discord-p
 const config = require("@utils/config/configUtils");
 const { parse } = require("node-html-parser");
 const { useStats } = require("@utils/helpers/playerHelpers");
+const { SoundCloudExtractor } = require("@discord-player/extractor");
+const { YoutubeiExtractor } = require("discord-player-youtubei");
+const { DeezerExtractor } = require("discord-player-deezer");
 
 module.exports = {
     name: "play",
@@ -51,6 +54,8 @@ module.exports = {
         stringQueryType == QueryType.YOUTUBE || 
         stringQueryType == QueryType.YOUTUBE_PLAYLIST || 
         stringQueryType == QueryType.YOUTUBE_VIDEO;
+        
+        const needsBridge = stringQueryType === QueryType.AUTO_SEARCH || stringQueryType === QueryType.SPOTIFY_SONG;
 
         if (stringQueryType === QueryType.YOUTUBE_VIDEO && playerConfig.removeYoutube && playerConfig.attemptYoutubeSearchEvenIfDisabled) {
             const messageEmbeds = message.embeds || [];
@@ -66,10 +71,9 @@ module.exports = {
             description: "Request received, fetching...",
             footer: { text: "Age restricted videos might not work." },
         })] });
-        
+
         try {
-            if (stringQueryType === QueryType.AUTO_SEARCH || stringQueryType === QueryType.SPOTIFY_SONG) {
-                
+            if (needsBridge) {
                 if (stringQueryType === QueryType.SPOTIFY_SONG) {
                     research = await player.search(string, {
                         requestedBy: message.member,
@@ -84,7 +88,7 @@ module.exports = {
 
                 research = await player.search(specificSearch, {
                     requestedBy: message.member,
-                    searchEngine: QueryType.AUTO_SEARCH,
+                    searchEngine: "ext:" + searchWithPriorities(playerConfig), // !playerConfig.removeYoutube ? QueryType.YOUTUBE_SEARCH : QueryType.AUTO_SEARCH,
                 });
 
                 if (!research.hasTracks()) {
@@ -125,12 +129,9 @@ module.exports = {
                     })
                     .catch(() => research = choices[0]);
             } else {
-                const soundgasm = await getSoundgasmLink(args.join(" "));
-                if (soundgasm) string = soundgasm;
-
                 research = await player.search(string, {
                     requestedBy: message.member,
-                    searchEngine: !playerConfig.removeYoutube ? QueryType.YOUTUBE_SEARCH : QueryType.AUTO_SEARCH,
+                    // searchEngine: QueryType.ARBITRARY,
                 });
 
                 if (!research.hasTracks()) {return await sentMessage.edit({ embeds: [embedGenerator.warning({
@@ -158,6 +159,7 @@ module.exports = {
                             client: message.guild.members.me,
                             requestedBy: message.user,
                             guild: message.guild,
+                            probableBridgeSource: getProbableBridgeSource(playerConfig, !needsBridge),
                         },
                         volume: 50,
                         maxSize: MAX_QUEUE_SIZE,
@@ -184,6 +186,7 @@ module.exports = {
                 fields: [
                     { name: "Pre-shuffled", value: optionalArgs["shuffle|s"] ? "Yes" : "No" },
                     { name: "Will play next", value: optionalArgs["playnext|pn"] && queue ? "Yes" : "No" },
+                    { name: "Probable bridge source", value: getProbableBridgeSource(playerConfig, !needsBridge) },
                 ],
                 footer: { text: `Loop mode: ${getLoopMode(queue)}` },
             }).withAuthor(message.author);
@@ -191,7 +194,8 @@ module.exports = {
             if (finalSearchResult?.playlist) embed.data.fields.push({ name: "Playlist", value: finalSearchResult.playlist.title });
 
             await sentMessage.edit({ embeds: [embed] });
-            if (isYoutube && playerConfig.attemptYoutubeSearchEvenIfDisabled) await message.channel.send({ embeds: [embedGenerator.warning("Youtube links might not be accurate as YouTube extraction is disabled")] });
+            if (playerConfig.removeYoutube && isYoutube && playerConfig.attemptYoutubeSearchEvenIfDisabled) 
+                await message.channel.send({ embeds: [embedGenerator.warning("Youtube links might not be accurate as YouTube extraction is disabled")] });
         } catch (err) {
             logger.error(err);
             return await sentMessage.edit({ embeds: [embedGenerator.error("Failed to fetch / play the requested track")] });
@@ -199,41 +203,24 @@ module.exports = {
     },
 };
 
-const getSoundgasmLink = async (link) => {
-    const regex = /^https:\/\/soundgasm\.net\/.*/;
-    if (!regex.test(link)) return null;
-
-    const response = await fetch(link);
-    const html = await response.text();
-
-    const root = parse(html);
-    const scriptContent = root.querySelectorAll("script").pop().text;
-
-    const startIndex = scriptContent.indexOf("\"https://media.soundgasm.net/sounds/");
-    const endIndex = scriptContent.indexOf(".m4a\"", startIndex) + 4;
-
-    const m4aLink = scriptContent.substring(startIndex + 1, endIndex);
-    return m4aLink;
-};
-
-async function searchWithPriorities() {
-    for (const priority of config.streamPriorities) {
+function searchWithPriorities(playerConfig) {
+    for (const priority of playerConfig.streamPriorities) {
         if ((priority === "youtube" && config.removeYoutube) ||
-            (priority === "deezer" && config.removeDeezer)) 
+            (priority === "deezer" && config.removeDeezer))
             continue;
         
 
-        let queryType;
+        let ext;
         try {
             switch (priority) {
                 case "youtube":
-                    queryType = QueryType.YOUTUBE_SEARCH;
+                    ext = YoutubeiExtractor.identifier;
                     break;
                 case "deezer":
-                    queryType = QueryType.DEEZER_SEARCH;
+                    ext = DeezerExtractor.identifier;
                     break;
                 case "soundcloud":
-                    queryType = QueryType.SOUNDCLOUD_SEARCH;
+                    ext = SoundCloudExtractor.identifier;
                     break;
                 default:
                     return null;
@@ -242,8 +229,28 @@ async function searchWithPriorities() {
         } catch (err) {
             return null;
         }
-        return queryType;
+        return ext;
     }
 
     return null;
+}
+
+function getProbableBridgeSource(playerConfig, providesStream) {
+    if (providesStream) return "None";
+    for (const priority of playerConfig.streamPriorities) {
+        if ((priority === "youtube" && config.removeYoutube) ||
+            (priority === "deezer" && config.removeDeezer))
+            continue;
+
+        switch (priority) {
+            case "youtube":
+                return "YouTube";
+            case "deezer":
+                return "Deezer";
+            case "soundcloud":
+                return "Soundcloud";
+            default:
+                return "N/A";
+        }
+    }
 }
