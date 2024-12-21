@@ -14,7 +14,7 @@ const updateActivities = (client) => {
     const activities = config.get("activities");
     if (!activities || !Array.isArray(activities)) {
         logger.error("Activities configuration is missing or invalid.");
-        return;
+        throw new Error("Activities configuration is missing or invalid.");
     }
 
     const ipAddress = generateIpAddress();

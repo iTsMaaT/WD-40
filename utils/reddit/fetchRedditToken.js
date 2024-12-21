@@ -2,9 +2,8 @@ const fs = require("fs");
 const axios = require("axios");
 
 async function getRedditToken() {    
-    const changelogs = require("../../changelogs.json");
-    const version = changelogs[changelogs.length - 1].version;
-    const UserAgent = "WD-40 Discord Bot/v" + version + " by u/itsmath";
+    const { version, homepage } = require("@root/package.json");
+    const UserAgent = `web:${homepage}:${version} (by /u/${process.env.REDDIT_USERNAME || "unknown"})`;
     let baseUrl = "https://www.reddit.com";
     const headers = {
         "User-Agent": UserAgent,

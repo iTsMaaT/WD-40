@@ -17,32 +17,35 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.error("You must be in a voice channel.")] });
         
-        let queue = useQueue(message.guild.id);
+        const queue = useQueue(message.guild.id);
         const loopMode = args[0]?.toLowerCase() || "queue";
-        const oldLoopMode = getLoopMode(queue);
+
+        let newLoopMode;
+        const oldLoopMode = queue.repeatMode;
 
         if (!queue || !queue.tracks) return await message.reply({ embeds: [embedGenerator.error("There is nothing playing.")] });
 
         switch (loopMode) {
             case "off":
-                queue.setRepeatMode(QueueRepeatMode.OFF);
+                newLoopMode = QueueRepeatMode.OFF;
                 break;
             case "song":
             case "track":
-                queue.setRepeatMode(QueueRepeatMode.TRACK);
+                newLoopMode = QueueRepeatMode.TRACK;
                 break;
             case "queue":
-                queue.setRepeatMode(QueueRepeatMode.QUEUE);
+                newLoopMode = QueueRepeatMode.QUEUE;
                 break;
             case "autoplay":
-                queue.setRepeatMode(QueueRepeatMode.AUTOPLAY);
+                newLoopMode = QueueRepeatMode.AUTOPLAY;
                 break;
             default:
                 return await message.reply({ embeds: [embedGenerator.warning("Invalid loop type. (Needs to be: off, queue, song or autoplay)")] });
         }
+        
+        if (oldLoopMode === newLoopMode) newLoopMode = QueueRepeatMode.OFF;
+        queue.setRepeatMode(newLoopMode);
 
-        queue = useQueue(message.guild.id);
-
-        await message.reply({ embeds: [embedGenerator.info(`Loop mode set from [\`${oldLoopMode}\`] to [\`${getLoopMode(queue)}\`]`)] });
+        await message.reply({ embeds: [embedGenerator.info(`Loop mode set from [\`${getLoopMode({ repeatMode: oldLoopMode })}\`] to [\`${getLoopMode({ repeatMode: newLoopMode })}\`]`)] });
     },
 }; 

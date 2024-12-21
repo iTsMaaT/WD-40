@@ -1,5 +1,5 @@
 const { Events, PermissionsBitField } = require("discord.js");
-const GuildManager = require("@root/utils/GuildManager");
+const GuildManager = require("@guildManager");
 const { repositories } = require("@utils/db/tableManager.js");
 const getExactDate = require("@functions/getExactDate");
 const embedGenerator = require("@utils/helpers/embedGenerator");
@@ -8,6 +8,7 @@ const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch")
 const { initConfFile } = require("@utils/reddit/fetchRedditToken.js");
 const countCommonChars = require("@utils/functions/countCommonChars.js");
 const config = require("@utils/config/configUtils");
+const dbManager = require("@root/utils/db/databaseManager");
 
 module.exports = {
     name: Events.MessageCreate,
@@ -124,6 +125,12 @@ Step 5 - Send the downloaded media to your favorite social media!
                 if (blCategory || blCommand) 
                     return await message.reply({ embeds: [embedGenerator.error(`You are blacklisted from executing ${blCategory ? `commands in the **${command.category}** category` : `the **${command.name}** command`}.`)] });
     
+                if (command.dbNeeded && !dbManager.dbExists()) {
+                    return await message.reply({ embeds: [embedGenerator.error({
+                        title: "Cannot run command",
+                        description: "A database connection is required to run this command.",
+                    })] });
+                }
 
                 // Check command cooldown
                 if (TextCooldowns.has(message.author.id)) {
@@ -139,17 +146,18 @@ Step 5 - Send the downloaded media to your favorite social media!
                 // Set command cooldown
                 const cooldownTime = command.cooldown || 0;
                 TextCooldowns.set(message.author.id, Date.now() + cooldownTime);
-
-                // Logging every executed commands
-                logger.info(`
-    Executing [${message.content}]
-    by    [${message.member.user.tag} (${message.author.id})]
-    in    [${message.channel.name} (${message.channel.id})]
-    from  [${message.guild.name} (${message.guild.id})]`
-                    .replace(/^\s+/gm, ""));
-    
-                // Execute the command
+                
                 try {
+                    const maxLengths = {
+                        names: Math.max(message.member.user.tag.length, message.channel.name.length, message.guild.name.length),
+                        ids: Math.max(message.author.id.length, message.channel.id.length, message.guild.id.length),
+                    };
+    
+                    // Logging every executed commands
+                    logger.info(`Executing [${message.content}]` + "\n" +
+                        `by    [${message.member.user.tag.padEnd(maxLengths.names)} (${message.author.id.padEnd(maxLengths.ids)})]` + "\n" +
+                        `in    [${message.channel.name.padEnd(maxLengths.names)} (${message.channel.id.padEnd(maxLengths.ids)})]` + "\n" +
+                        `from  [${message.guild.name.padEnd(maxLengths.names)} (${message.guild.id.padEnd(maxLengths.ids)})]`);
 
                     const startTime = Date.now();
 

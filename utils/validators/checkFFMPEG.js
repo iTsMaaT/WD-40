@@ -14,7 +14,7 @@ const checkFFmpegInstalled = async function() {
                 logger.warning("If you are using Windows, make sure to add FFmpeg to your PATH.");
                 logger.warning("Exiting...");
                 reject(error);
-                process.exit(1);
+                process.exit(0);
             }
 
             logger.debug("FFmpeg is installed.");

@@ -16,6 +16,7 @@ module.exports = {
         if (args[0] === "-t" || !args[0] || !tableList.includes(args[0])) return message.reply(`Tables: ${tableList.join(", ")}`);
 
         const tableName = args[0];
+        const previousDate = Date.now();
         const sent = await message.reply({ content: "Fetching the DB..." });
 
         try {
@@ -55,7 +56,8 @@ module.exports = {
             // Create a text file
             const fileName = `./${tableName}_data.txt`;
             await fs.writeFile(fileName, table, { encoding: "utf8" });
-            await sent.edit({ content: `Operation took ${prettyMilliseconds(parseInt(Date.now())) - parseInt(sent.createdTimestamp)}`, files: [fileName] });
+            const duration = Date.now() - previousDate;
+            await sent.edit({ content: `Operation took ${prettyMilliseconds(duration)}`, files: [fileName] });
             await fs.unlink(fileName);
         } catch (error) {
             logger.error(error);

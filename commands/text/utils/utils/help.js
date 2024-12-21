@@ -1,7 +1,7 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder } = require("discord.js");
 const { prettyString } = require("@functions/formattingFunctions");
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const GuildManager = require("@root/utils/GuildManager.js");
+const GuildManager = require("@guildManager");
 
 module.exports = {
     name: "help",
@@ -17,9 +17,9 @@ module.exports = {
         const prefix = GuildManager.GetPrefix(message.guild);
 
         // Function to generate the full help embed for a command
-        const generateFullCommandEmbed = (command) => {
+        const generateFullCommandEmbed = (command, pref) => {
             const CommandEmbed = {
-                title: `**${prefix}${command.name}**`,
+                title: `**${pref}${command.name}**`,
                 color: 0xffffff,
                 fields: [{ name: "Description", value: command.description }],
                 timestamp: new Date(),
@@ -164,12 +164,16 @@ module.exports = {
         let embed = categoryEmbed;
         collector.on("collect", async (interaction) => {
             try {
+                let commandPrefix = prefix;
                 if (interaction.customId === "command_select") {
                     const commandName = interaction.values[0].replace(/[*:[\] ]/g, ""); // Retrieve selected command
-                    const command = client.commands.get(commandName) || client.slashcommands.get(commandName);
+                    
+                    const command = categories[counter - 1].includes("slash") ? client.slashcommands.get(commandName) : client.commands.get(commandName);
+                    if (categories[counter - 1].includes("slash")) commandPrefix = "/";
+                    
                     
                     if (command) {
-                        const fullCommandEmbed = generateFullCommandEmbed(command);
+                        const fullCommandEmbed = generateFullCommandEmbed(command, commandPrefix);
                         await interaction.deferReply({ ephemeral: true });
                         await interaction.followUp({
                             embeds: [fullCommandEmbed],
@@ -254,7 +258,7 @@ module.exports = {
                     });
                 }
             } catch (error) {
-                console.error("Error during interaction:", error);
+                logger.error("Error during interaction:", error);
             }
         });
 

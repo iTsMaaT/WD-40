@@ -1,6 +1,6 @@
 const { Events, ActivityType } = require("discord.js");
 const config = require("@utils/config/configUtils");
-const GuildManager = require("@root/utils/GuildManager");
+const GuildManager = require("@guildManager");
 const RandomMinMax = require("@root/utils/functions/randomMinMax");
 const { initConfFile } = require("@root/utils/reddit/fetchRedditToken.js");
 const { useMainPlayer } = require("discord-player");
@@ -13,6 +13,11 @@ module.exports = {
     log: true,
     async execute(client, logger) {
         console.log(player.scanDeps());
+        console.log("Use YouTube extractor: " + config.get("discordPlayerConf")?.removeYoutube);
+        console.log("Use Po token: " + config.get("discordPlayerConf")?.usePoToken);
+        console.log("Skip login: " + config.get("discordPlayerConf")?.skipLogin);
+        console.log("High water mark: " + config.get("discordPlayerConf")?.highWaterMark);
+        console.logger("--------------------------------------------------");
        
         if (process.env.SERVER != "dev") client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");
 

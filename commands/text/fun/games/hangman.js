@@ -1,5 +1,5 @@
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const GuildManager = require("@root/utils/GuildManager.js");
+const GuildManager = require("@guildManager");
 const words = require("./hangman words.js").words;
 
 module.exports = {

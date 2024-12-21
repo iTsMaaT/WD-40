@@ -4,8 +4,8 @@ const changelogs = require("@root/changelogs.json");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const GetPterodactylInfo = require("@root/utils/functions/getPterodactylInfo");
 const { sql } = require("drizzle-orm");
-const DB = require("@root/utils/db/DatabaseManager");
-const GuildManager = require("@root/utils/GuildManager");
+const DB = require("@root/utils/db/databaseManager");
+const GuildManager = require("@guildManager");
 const { useMainPlayer } = require("discord-player");
 
 module.exports = {
@@ -36,7 +36,12 @@ module.exports = {
         const uptime = prettyMilliseconds(client.uptime);
         const ping = client.ws.ping + "ms";
         const botAge = prettyMilliseconds(Date.now() - client.user.createdAt);
-        const totalExecutedCommands = (await DB.drizzle.execute(sql`SELECT COUNT(m.ID) AS count FROM Logs m WHERE m.Value LIKE "Executing [%"`))[0][0].count;
+        let totalExecutedCommands;
+        try {
+            totalExecutedCommands = (await DB.drizzle.execute(sql`SELECT COUNT(m.ID) AS count FROM Logs m WHERE m.Value LIKE "Executing [%"`))[0][0].count;
+        } catch (ex) {
+            totalExecutedCommands = "N/A (DB not connected)";
+        }
         const VoicesPlaying = client.voice.adapters.size;
         const playerStatitics = player.generateStatistics();
         let totalTracks = 0;

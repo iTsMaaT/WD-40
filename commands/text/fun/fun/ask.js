@@ -1,5 +1,5 @@
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const GuildManager = require("@root/utils/GuildManager.js");
+const GuildManager = require("@guildManager");
 const { fetchGeminiResponse } = require("@utils/helpers/fetchGeminiResponse");
 
 module.exports = {
@@ -65,11 +65,11 @@ module.exports = {
 
         } catch (err) {
             logger.error(err);
-            if (err.message.includes("API key is invalid")) {
+            if (err.message.includes("API key is invalid")) 
                 return await message.reply({ embeds: [embedGenerator.error("Invalid API key. Please check your configuration.")] });
-            } else {
+            else 
                 return await message.reply({ embeds: [embedGenerator.error("An error occurred.")] });
-            }
+            
         }
 
         function limitString(string, limit) {

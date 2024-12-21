@@ -6,6 +6,7 @@ module.exports = {
     description: "Skip a currently playing song",
     category: "music",
     aliases: ["next"],
+    cooldown: 1,
     async execute(logger, client, message, args, optionalArgs) {
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
 

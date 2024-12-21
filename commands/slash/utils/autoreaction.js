@@ -2,11 +2,12 @@ const { ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, 
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const emoteList = require("@utils/emojis.json");
 const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
-const GuildManager = require("@utils/GuildManager");
+const GuildManager = require("@guildManager");
 
 module.exports = {
     name: "autoreaction",
     description: "Adds reactions to chosen messages in chosen channels",
+    dbNeeded: true,
     type: ApplicationCommandType.ChatInput,
     options: [
         {
