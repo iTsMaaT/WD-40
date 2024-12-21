@@ -60,7 +60,7 @@
     },
 
     "discordPlayerConf": {
-        "removeYoutube": true,
+        "removeYoutube": false,
         "attemptYoutubeSearchEvenIfDisabled": true,
         "removeDeezer": false,
         "skipLogin": true,
@@ -81,7 +81,7 @@
                 "options": {}
             },
             "SoundCloudExtractor": {
-                "enabled": false,
+                "enabled": true,
                 "options": {}
             },
             "SpotifyExtractor": {
