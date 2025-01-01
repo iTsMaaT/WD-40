@@ -110,7 +110,6 @@
         if (ext[1].enabled) {
             logger.info(`Loading ${ext[0]} extractor...`);
             const currentExt = await player.extractors.register(exts[ext[0]], ext[1].options);
-            console.log(ext);
             for (const streamProvider of discordPlayerConfig.streamPriorities)
                 if (ext[0].toLowerCase().includes(streamProvider.toLowerCase())) currentExt.priority = getPriority(streamProvider) || currentExt.priority;
         }
