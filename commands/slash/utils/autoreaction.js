@@ -89,7 +89,7 @@ module.exports = {
 
         switch (subcommand) {
             case "list": {
-                if (Object.keys(reactions).length === 0) return await interaction.reply({ embeds: [embedGenerator.warning("There are no auto-reactions in this guild")], ephemeral: true });
+                if (Object.keys(reactions).length === 0) return await interaction.editReply({ embeds: [embedGenerator.warning("There are no auto-reactions in this guild")], ephemeral: true });
             
                 const embed = {
                     title: "List of auto-reactions",
