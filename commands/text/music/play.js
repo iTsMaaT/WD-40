@@ -31,10 +31,8 @@ module.exports = {
     category: "music",
     examples: ["never gonna give you up"],
     permissions: [PermissionsBitField.Flags.Connect],
-    cooldown: 1,
+    cooldown: 1000,
     async execute(logger, client, message, args, optionalArgs) {
-        const MAX_QUEUE_SIZE = 10000;
-
         const player = useMainPlayer();
         const queue = useQueue(message.guild.id);
         const playerConfig = config.get("discordPlayerConf");
@@ -56,6 +54,7 @@ module.exports = {
         stringQueryType == QueryType.YOUTUBE_VIDEO;
         
         const needsBridge = stringQueryType === QueryType.AUTO_SEARCH || stringQueryType === QueryType.SPOTIFY_SONG;
+        const doesntNeedBridge = isYoutube || stringQueryType === QueryType.ARBITRARY;
 
         if (stringQueryType === QueryType.YOUTUBE_VIDEO && playerConfig.removeYoutube && playerConfig.attemptYoutubeSearchEvenIfDisabled) {
             const messageEmbeds = message.embeds || [];
@@ -73,7 +72,7 @@ module.exports = {
         })] });
 
         try {
-            if (needsBridge) {
+            if (needsBridge && !playerConfig.removeYoutube) {
                 if (stringQueryType === QueryType.SPOTIFY_SONG) {
                     research = await player.search(string, {
                         requestedBy: message.member,
@@ -125,7 +124,9 @@ module.exports = {
                     .then((collected) => {
                         const responseMessage = collected.first();
                         research = choices[parseInt(responseMessage.content) - 1];
-                        responseMessage.delete();
+                        try {
+                            responseMessage.delete();
+                        } catch {/**/}
                     })
                     .catch(() => research = choices[0]);
             } else {
@@ -142,7 +143,7 @@ module.exports = {
                 })] });}
             }
 
-            if (research?.tracks?.length + (queue?.size ?? 0) > MAX_QUEUE_SIZE) return await sentMessage.edit({ embeds: [embedGenerator.error(`Cannot enqueue more than ${MAX_QUEUE_SIZE} tracks.`)] });
+            if (research?.tracks?.length + (queue?.size ?? 0) > playerConfig.maxQueueSize) return await sentMessage.edit({ embeds: [embedGenerator.error(`Cannot enqueue more than ${MAX_QUEUE_SIZE} tracks.`)] });
 
             let finalTrack, finalSearchResult;
             if (optionalArgs["shuffle|s"]) await research?.tracks?.shuffle();
@@ -159,18 +160,18 @@ module.exports = {
                             client: message.guild.members.me,
                             requestedBy: message.user,
                             guild: message.guild,
-                            probableBridgeSource: getProbableBridgeSource(playerConfig, !needsBridge),
+                            probableBridgeSource: getProbableBridgeSource(playerConfig, !needsBridge && doesntNeedBridge),
                         },
                         volume: 50,
-                        maxSize: MAX_QUEUE_SIZE,
-                        bufferingTimeout: 15000,
-                        leaveOnStop: true,
-                        leaveOnStopCooldown: 0,
-                        leaveOnEnd: true,
-                        leaveOnEndCooldown: 15000,
-                        leaveOnEmpty: true,
-                        leaveOnEmptyCooldown: 300000,
-                        skipOnNoStream: true,
+                        maxSize: playerConfig.maxQueueSize,
+                        bufferingTimeout: playerConfig.bufferingTimeout,
+                        leaveOnStop: playerConfig.leaveOnStop,
+                        leaveOnStopCooldown: playerConfig.leaveOnStopCooldown,
+                        leaveOnEnd: playerConfig.leaveOnEnd,
+                        leaveOnEndCooldown: playerConfig.leaveOnEndCooldown,
+                        leaveOnEmpty: playerConfig.leaveOnEmpty,
+                        leaveOnEmptyCooldown: playerConfig.leaveOnEmptyCooldown,
+                        skipOnNoStream: playerConfig.skipOnNoStream,
                     },
                 });
                 finalTrack = playResult.track;
@@ -186,7 +187,7 @@ module.exports = {
                 fields: [
                     { name: "Pre-shuffled", value: optionalArgs["shuffle|s"] ? "Yes" : "No" },
                     { name: "Will play next", value: optionalArgs["playnext|pn"] && queue ? "Yes" : "No" },
-                    { name: "Probable bridge source", value: getProbableBridgeSource(playerConfig, !needsBridge) },
+                    { name: "Probable bridge source ( -> = if fails)", value: getProbableBridgeSource(playerConfig, !needsBridge && doesntNeedBridge) },
                 ],
                 footer: { text: `Loop mode: ${getLoopMode(queue)}` },
             }).withAuthor(message.author);
@@ -205,8 +206,8 @@ module.exports = {
 
 function searchWithPriorities(playerConfig) {
     for (const priority of playerConfig.streamPriorities) {
-        if ((priority === "youtube" && config.removeYoutube) ||
-            (priority === "deezer" && config.removeDeezer))
+        if ((priority === "youtube" && playerConfig.removeYoutube) ||
+            (priority === "deezer" && playerConfig.removeDeezer))
             continue;
         
 
@@ -236,21 +237,26 @@ function searchWithPriorities(playerConfig) {
 }
 
 function getProbableBridgeSource(playerConfig, providesStream) {
-    if (providesStream) return "None";
+    if (providesStream) return "None / Unknown";
+    const streamProviders = [];
     for (const priority of playerConfig.streamPriorities) {
-        if ((priority === "youtube" && config.removeYoutube) ||
-            (priority === "deezer" && config.removeDeezer))
+        if ((priority === "youtube" && playerConfig.removeYoutube) ||
+            (priority === "deezer" && playerConfig.removeDeezer))
             continue;
 
         switch (priority) {
             case "youtube":
-                return "YouTube";
+                streamProviders.push("YouTube");
+                break;
             case "deezer":
-                return "Deezer";
+                streamProviders.push("Deezer");
+                break;
             case "soundcloud":
-                return "Soundcloud";
+                streamProviders.push("Soundcloud");
+                break;
             default:
                 return "N/A";
         }
     }
+    return streamProviders.join(" -> ");
 }

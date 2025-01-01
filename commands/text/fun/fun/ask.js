@@ -12,7 +12,7 @@ module.exports = {
     },
     category: "fun",
     examples: ["what are you used for?"],
-    cooldown: 10000,
+    cooldown: 30000,
     execute: async (logger, client, message, args, optionalArgs) => {
         try {
             const apiKey = process.env.GEMINI_API_KEY; // Replace with your API key
