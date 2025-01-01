@@ -13,26 +13,41 @@ module.exports = {
     },
     examples: ["76561198868461949"],
     async execute(logger, client, message, args, optionalArgs) {
-        if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You must provide a steam ID")] });
+        if (!args[0]) {
+            return await message.reply({
+                embeds: [embedGenerator.warning("You must provide a Steam ID.")],
+            });
+        }
+
         const steamID = args[0];
         let steamInfo;
         try {
             steamInfo = await getSteamInfo(steamID);
         } catch (err) {
             logger.error(err);
-            return await message.reply({ embeds: [embedGenerator.error("Couldn't fetch steam info")] });
+            return await message.reply({
+                embeds: [embedGenerator.error("Couldn't fetch Steam info.")],
+            });
         }
 
-        const formattedGames = steamInfo.threeRecentGames.games.map((game, index) => `
-        Game${index + 1}: **${game.name}**
-        Total playtime: ${prettyMilliseconds(game.playtime_forever * 1000 * 60)}
-        Playtime last 2 weeks: ${prettyMilliseconds(game.playtime_2weeks * 1000 * 60)}
-        -
-            `.replace(/^\s+/gm, "")).join("\n");
+        if (!steamInfo.userProfile) {
+            return await message.reply({
+                embeds: [embedGenerator.warning("No profile found for the provided Steam ID. Ensure the profile is public.")],
+            });
+        }
 
-        let currentlyPlaying = "";
-        if (steamInfo.userProfile.gameextrainfo) 
-            currentlyPlaying = steamInfo.userProfile.gameextrainfo;
+        const formattedGames = steamInfo.threeRecentGames.games
+            ? steamInfo.threeRecentGames.games.map((game, index) => `
+                Game${index + 1}: **${game.name}**
+                Total playtime: ${prettyMilliseconds(game.playtime_forever * 1000 * 60)}
+                Playtime last 2 weeks: ${prettyMilliseconds(game.playtime_2weeks * 1000 * 60)}
+                -
+            `.replace(/^\s+/gm, "")).join("\n")
+            : "No recent games found.";
+
+        const currentlyPlaying = steamInfo.userProfile.gameextrainfo 
+            ? `Currently playing: **${steamInfo.userProfile.gameextrainfo}**` 
+            : "";
 
         const embed = {
             color: 0xffffff,
@@ -43,20 +58,20 @@ module.exports = {
             description: `
                 **Profile**
                 Real name: ${steamInfo.userProfile.realname || "-"}
-                Created: <t:${steamInfo.userProfile.timecreated}:R>
-                Profile URL: ${steamInfo.userProfile.profileurl}
+                Created: ${steamInfo.userProfile.timecreated ? `<t:${steamInfo.userProfile.timecreated}:R>` : "-"}
+                Profile URL: ${steamInfo.userProfile.profileurl || "-"}
                 ---
                 **Games**
-                Owned games count: ${steamInfo.gameCount}
-                Games played in the last 2 weeks: ${steamInfo.threeRecentGames.twoWeeksCount}
+                Owned games count: ${steamInfo.gameCount || 0}
+                Games played in the last 2 weeks: ${steamInfo.threeRecentGames.twoWeeksCount || 0}
                 ---
                 **Three games last played** 
                 ${formattedGames}
-                ${currentlyPlaying ? `Currently playing : **${currentlyPlaying}**` : ""}
-                `.replace(/^\s+/gm, ""),
+                ${currentlyPlaying}
+            `.replace(/^\s+/gm, ""),
             timestamp: new Date(),
         };
-        
+
         message.reply({ embeds: [embed] });
     },
 };
@@ -69,12 +84,17 @@ const getSteamInfo = async (steamID) => {
         await (await fetch(`${baseURL}ISteamUser/GetPlayerSummaries/v0002/?key=${process.env.STEAM_API_KEY}&steamids=${steamID}&format=json`)).json(),
     ]);
 
-    const gameCount = allGames.response.game_count;
+    const gameCount = allGames.response?.game_count || 0;
     const threeRecentGames = {
-        twoWeeksCount: recentGames.response.total_count,
-        games: recentGames.response.games,
-    }; 
-    const userProfile = profile.response.players[0];
+        twoWeeksCount: recentGames.response?.total_count || 0,
+        games: recentGames.response?.games || null,
+    };
+
+    const userProfile = profile.response?.players?.[0] || null;
+
+    if (!userProfile) 
+        throw new Error("No profile found or profile is private.");
+    
 
     return {
         gameCount,
