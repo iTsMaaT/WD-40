@@ -67,11 +67,12 @@ module.exports = {
 
                 const botPermissions = botMember.permissions;
                     
-                if (!botPermissions.has(PermissionsBitField.Flags.SendMessages)) return;
+                if (!botPermissions.has(PermissionsBitField.Flags.SendMessages || !botPermissions.has(PermissionsBitField.Flags.ViewChannel))) return;
 
                 const requiredPermissions = slash.permissions || [];
+                requiredPermissions.push(PermissionsBitField.Flags.ReadMessageHistory);
 
-                if (requiredPermissions.length > 0 && !botPermissions.has(PermissionsBitField.Flags.Administrator)) {
+                if (requiredPermissions.length > 1 && !botPermissions.has(PermissionsBitField.Flags.Administrator)) {
                     const missingPermissions = requiredPermissions.filter(permission => !botPermissions.has(permission));
                     if (missingPermissions.length > 0) 
                         return await message.editReply({ embeds: [embedGenerator.error(`The bot is missing the following permissions: ${missingPermissions.join(", ")}`)] });

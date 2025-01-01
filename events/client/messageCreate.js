@@ -167,12 +167,13 @@ Step 5 - Send the downloaded media to your favorite social media!
                     
                     const botPermissions = botMember.permissions;
                     
-                    if (!botPermissions.has(PermissionsBitField.Flags.SendMessages)) return;
+                    if (!botPermissions.has(PermissionsBitField.Flags.SendMessages || !botPermissions.has(PermissionsBitField.Flags.ViewChannel))) return;
                     if (command.lastExecutionTime >= 1000) await message.channel.sendTyping();
 
                     const requiredPermissions = command.permissions || [];
+                    requiredPermissions.push(PermissionsBitField.Flags.ReadMessageHistory);
 
-                    if (requiredPermissions.length > 0 && !botPermissions.has(PermissionsBitField.Flags.Administrator)) {
+                    if (requiredPermissions.length > 1 && !botPermissions.has(PermissionsBitField.Flags.Administrator)) {
                         const missingPermissions = requiredPermissions.filter(permission => !botPermissions.has(permission));
                         if (missingPermissions.length > 0) 
                             return await message.reply({ embeds: [embedGenerator.error(`The bot is missing the following permissions: ${missingPermissions.join(", ")}`)] });
