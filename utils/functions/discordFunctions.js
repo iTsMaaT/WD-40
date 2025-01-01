@@ -8,19 +8,34 @@ const { prettyString } = require("@functions/formattingFunctions");
  * @returns {webhook} The webhook
  */
 const CreateOrUseWebhook = async function(message, name) {
-    const webhooks = await message.channel.fetchWebhooks();
-    
-    if (webhooks.size > 12) 
-        for (const wh in webhooks) await wh.delete();
-    
-    let webhook = webhooks.find(wh => wh.name == name);
+    try {
+        const webhooks = await message.channel.fetchWebhooks();
 
-    if (!webhook) {
-        webhook = await message.channel.createWebhook({
-            name: name,
-        });
+        if (webhooks.size > 12) {
+            const webhookArray = Array.from(webhooks.values())
+                .sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+
+            for (let i = 0; i < 3; i++) {
+                if (webhookArray[i]) 
+                    await webhookArray[i].delete("Deleting oldest webhook to stay within limits.");
+                
+            }
+        }
+
+        let webhook = webhooks.find(wh => wh.name === name);
+
+        if (!webhook) {
+            webhook = await message.channel.createWebhook({
+                name: name,
+                reason: "Webhook creation requested",
+            });
+        }
+
+        return webhook;
+    } catch (error) {
+        logger.error(error);
+        throw new Error("Failed to create or retrieve the webhook.");
     }
-    return webhook;
 };
 
 /**
