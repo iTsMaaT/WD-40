@@ -105,7 +105,6 @@
         deezerExt.priority = getPriority("deezer") ?? deezerExt.priority;
     }
 
-    // await player.extractors.loadDefault((ext) => !["YouTubeExtractor"].includes(ext));
     for (const ext of Object.entries(discordPlayerConfig.extractors)) {
         if (ext[1].enabled) {
             logger.info(`Loading ${ext[0]} extractor...`);

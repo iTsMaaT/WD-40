@@ -1,4 +1,5 @@
 const { Events, PermissionsBitField } = require("discord.js");
+const { useMainPlayer } = require("discord-player");
 const GuildManager = require("@guildManager");
 const { repositories } = require("@utils/db/tableManager.js");
 const getExactDate = require("@functions/getExactDate");
@@ -200,7 +201,9 @@ Step 5 - Send the downloaded media to your favorite social media!
                         }
                     }
 
-                    await command.execute(logger, client, message, args, optionalArgs);
+                    const player = useMainPlayer();
+                    await player.context.provide({ guild: message.guild }, () => command.execute(logger, client, message, args, optionalArgs));
+
                     command.lastExecutionTime = parseInt(Date.now() - startTime);
 
                 } catch (error) {

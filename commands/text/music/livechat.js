@@ -9,7 +9,7 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.error("You must be in a voice channel.")] });
 
-        const queue = useQueue(message.guild.id);
+        const queue = useQueue();
         if (!queue || !queue.tracks || !queue.currentTrack) return await message.reply({ embeds: [embedGenerator.error("There is nothing playing.")] });
 
         const currentTrack = queue.currentTrack;

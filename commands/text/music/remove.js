@@ -16,7 +16,7 @@ module.exports = {
     examples: ["3", "\"Never Gonna Give You Up\""],
     async execute(logger, client, message, args, optionalArgs) {
         try {
-            const queue = useQueue(message.guild.id);
+            const queue = useQueue();
 
             if (!queue || !queue.tracks || !queue.currentTrack) 
                 return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue / currently playing.")] });

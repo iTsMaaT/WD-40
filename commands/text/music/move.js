@@ -14,10 +14,10 @@ module.exports = {
         },
     },
     category: "music",
-    examples: ["3 5"],
+    examples: ["3 5", "\"Never Gonna Give You Up\" 5", "\"toto africa\" \"Never Gonna Give You Up\""],
     inVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
-        const queue = useQueue(message.guild.id);
+        const queue = useQueue();
         if (!queue || !queue.tracks) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue.")] });
 
         const fullQuery = args.join(" ");

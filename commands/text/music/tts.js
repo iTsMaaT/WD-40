@@ -16,7 +16,7 @@ module.exports = {
     examples: ["i love eating baguettes"],
     permissions: [PermissionsBitField.Flags.Connect],
     async execute(logger, client, message, args, optionalArgs) {
-        const queue = useQueue(message.guild.id);
+        const queue = useQueue();
         let connection;
 
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });

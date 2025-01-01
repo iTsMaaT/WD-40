@@ -75,7 +75,7 @@
         "skipLogin": true,
         "usePoToken": false,
         "useCookie": false,
-        "log": true,
+        "log": false,
         "highWaterMark": 2097152,
         "skipFFmpeg": false,
         "useSoundcloudBridge": false,
@@ -85,10 +85,6 @@
             "soundcloud"
         ],
         "extractors": {
-            "YouTubeExtractor": {
-                "enabled": false,
-                "options": {}
-            },
             "SoundCloudExtractor": {
                 "enabled": true,
                 "options": {}

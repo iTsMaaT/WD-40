@@ -14,6 +14,8 @@ module.exports = {
     once: false,
     log: false,
     async execute(client, logger, interaction) {
+        const player = useMainPlayer();
+
         if (interaction.isChatInputCommand()) {
             await interaction.deferReply();
             const SlashCooldowns = client.SlashCooldowns;
@@ -79,7 +81,7 @@ module.exports = {
                 }
 
                 // execute the slash command
-                await slash.execute(logger, interaction, client);
+                await player.context.provide({ guild: interaction.guild }, () => slash.execute(logger, interaction, client));
     
             } catch (error) {
                 await interaction.editReply({
@@ -97,7 +99,7 @@ module.exports = {
             if (!context) return logger.error(`No command matching ${interaction.commandName} was found.`);
     
             try {
-                await context.execute(logger, interaction, client);
+                await player.context.provide({ guild: interaction.guild }, () => context.execute(logger, interaction, client));
     
                 logger.info(`
                 Executing [${interaction.commandName} (${context.type === 2 ? "User" : "Message"})]

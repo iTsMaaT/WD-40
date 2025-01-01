@@ -7,7 +7,7 @@ module.exports = {
     category: "music",
     async execute(logger, client, message, args, optionalArgs) {
         try {
-            const queue = useQueue(message.guild.id);
+            const queue = useQueue();
             if (!queue) return message.guild?.me?.voice?.setChannel(null).catch(() => null);
             
             queue.delete();

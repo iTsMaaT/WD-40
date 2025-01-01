@@ -10,7 +10,7 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
 
-        let queue = useQueue(message.guild.id);
+        let queue = useQueue();
         if (!queue || !queue.currentTrack) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue right now.")] });
 
         try {
@@ -22,7 +22,7 @@ module.exports = {
                 description: `[${queue.currentTrack.title}](${queue.currentTrack.url})`,
             }).withAuthor(message.author)] });
 
-            queue = useQueue(message.guild.id);
+            queue = useQueue();
             if (!queue || !queue.currentTrack) {
                 if (queue.repeatMode !== QueueRepeatMode.AUTOPLAY) return await message.channel.send({ embeds: [embedGenerator.error("There is nothing left to play.")] });
                 else return await message.channel.send({ embeds: [embedGenerator.warning("Autoplay is enabled, a song will start playing shortly.")] });

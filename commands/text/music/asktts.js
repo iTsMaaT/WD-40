@@ -19,7 +19,7 @@ module.exports = {
     cooldown: 10000,
     async execute(logger, client, message, args) {
         let connection, sent;
-        const queue = useQueue(message.guild.id);
+        const queue = useQueue();
         const embed = {
             title: "",
             color: 0xffffff,

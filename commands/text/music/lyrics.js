@@ -8,7 +8,7 @@ module.exports = {
     description: "Gives lyrics for the currently playing song",
     category: "music",
     async execute(logger, client, message, args, optionalArgs) {
-        const queue = useQueue(message.guild.id);
+        const queue = useQueue();
         const player = useMainPlayer();
 
         if (!queue || !queue.tracks || !queue.currentTrack) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue / currently playing.")] });

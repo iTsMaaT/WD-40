@@ -17,7 +17,7 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.error("You must be in a voice channel.")] });
         
-        const queue = useQueue(message.guild.id);
+        const queue = useQueue();
         const loopMode = args[0]?.toLowerCase() || "queue";
 
         let newLoopMode;

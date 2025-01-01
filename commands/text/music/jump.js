@@ -17,7 +17,7 @@ module.exports = {
     examples: ["3", "\"Never Gonna Give You Up\""],
     inVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
-        const queue = useQueue(message.guild.id);
+        const queue = useQueue();
 
         if (!message.member.voice.channel) 
             return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });

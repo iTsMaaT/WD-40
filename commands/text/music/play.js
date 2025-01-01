@@ -34,7 +34,7 @@ module.exports = {
     cooldown: 1000,
     async execute(logger, client, message, args, optionalArgs) {
         const player = useMainPlayer();
-        const queue = useQueue(message.guild.id);
+        const queue = useQueue();
         const playerConfig = config.get("discordPlayerConf");
         let res, research, specificSearch;
         

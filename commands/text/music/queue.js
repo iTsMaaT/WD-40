@@ -17,8 +17,8 @@ module.exports = {
     category: "music",
     aliases: ["q"],
     async execute(logger, client, message, args, optionalArgs) {
-        const queue = useQueue(message.guild.id);
-        const history = useHistory(message.guild.id);
+        const queue = useQueue();
+        const history = useHistory();
 
         if (!queue || !queue.tracks || !queue.currentTrack || queue.tracks.data.length === 0) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue / currently playing.")] });
         const tracks = queue.tracks ? queue.tracks.data : [];

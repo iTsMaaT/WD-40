@@ -10,7 +10,7 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
 
-        const history = useHistory(message.guild.id);
+        const history = useHistory();
         if (!history) return await message.reply({ embeds: [embedGenerator.error("There is no history to go back to.")] });
 
         try {

@@ -8,10 +8,10 @@ module.exports = {
     description: "Get the stats of the current queue",
     category: "music",
     async execute(logger, client, message, args, optionalArgs) {
-        const queue = useQueue(message.guild.id);
+        const queue = useQueue();
         if (!queue) return await message.reply({ embeds: [embedGenerator.error("There is no queue.")] });
 
-        const stats = useStats(message.guild.id);
+        const stats = useStats();
         const embed = embedGenerator.info({
             title: "Queue stats",
             fields: [
