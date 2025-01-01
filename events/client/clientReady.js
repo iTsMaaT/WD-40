@@ -13,7 +13,7 @@ module.exports = {
     log: true,
     async execute(client, logger) {
         console.log(player.scanDeps());
-        console.log("Use YouTube extractor: " + config.get("discordPlayerConf")?.removeYoutube);
+        console.log("Use YouTube extractor: " + !config.get("discordPlayerConf")?.removeYoutube);
         console.log("Use Po token: " + config.get("discordPlayerConf")?.usePoToken);
         console.log("Skip login: " + config.get("discordPlayerConf")?.skipLogin);
         console.log("High water mark: " + config.get("discordPlayerConf")?.highWaterMark);
