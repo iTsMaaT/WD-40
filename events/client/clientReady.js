@@ -6,6 +6,7 @@ const { initConfFile } = require("@root/utils/reddit/fetchRedditToken.js");
 const { useMainPlayer } = require("discord-player");
 const { activateRotator } = require("@utils/helpers/activityStatusRotator");
 const player = useMainPlayer();
+const { toEngineerNotation } = require("@utils/functions/formattingFunctions");
 
 module.exports = {
     name: Events.ClientReady,
@@ -13,10 +14,10 @@ module.exports = {
     log: true,
     async execute(client, logger) {
         console.log(player.scanDeps());
-        console.log("Use YouTube extractor: " + !config.get("discordPlayerConf")?.removeYoutube);
-        console.log("Use Po token: " + config.get("discordPlayerConf")?.usePoToken);
-        console.log("Skip login: " + config.get("discordPlayerConf")?.skipLogin);
-        console.log("High water mark: " + config.get("discordPlayerConf")?.highWaterMark);
+        console.logger("Use YouTube extractor: " + !config.get("discordPlayerConf")?.removeYoutube);
+        console.logger("Use Po token: " + config.get("discordPlayerConf")?.usePoToken);
+        console.logger("Skip login: " + config.get("discordPlayerConf")?.skipLogin);
+        console.logger("High water mark: " + config.get("discordPlayerConf")?.highWaterMark);
         console.logger("--------------------------------------------------");
        
         if (process.env.SERVER != "dev") client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");
