@@ -56,24 +56,35 @@
     Log.setLevel(Log.Level.NONE);
 
     const discordPlayerConfig = config.get("discordPlayerConf");
-    const { Player } = require("discord-player");
+    const { Player, AudioFilters } = require("discord-player");
     const exts = require("@discord-player/extractor");
     const { YoutubeiExtractor, createYoutubeiStream, poTokenExtraction } = require("discord-player-youtubei");
     const { DeezerExtractor } = require("discord-player-deezer");
     const { SoundgasmExtractor } = require("soundgasm-extractor");
+    const { TTSExtractor } = require("tts-extractor");
 
     const player = new Player(client, {
-        bridgeProvider: discordPlayerConfig.useSoundcloudBridge ? new exts.BridgeProvider(exts.BridgeSource.SoundCloud) : new exts.BridgeProvider(exts.BridgeSource.Auto),
+        // bridgeProvider: discordPlayerConfig.useSoundcloudBridge ? new exts.BridgeProvider(exts.BridgeSource.SoundCloud) : new exts.BridgeProvider(exts.BridgeSource.Auto),
         skipFFmpeg: discordPlayerConfig?.skipFFmpeg,
     });
+
+    logger.info("Loading TTSExtractor extractor...");
+    await player.extractors.register(TTSExtractor, {
+        language: "fr",
+        slow: true,
+    });
+
+    const ffmpegFilters = config.get("discordPlayerConf")?.ffmpegFilters || {};
+    for (const filter of Object.entries(ffmpegFilters)) AudioFilters.define(filter[0], filter[1]);
 
     const getPriority = (streamProvider) => 10 + discordPlayerConfig?.streamPriorities.length - discordPlayerConfig?.streamPriorities?.indexOf(streamProvider) ?? null;
 
     logger.info("Loading SoundgasmExtractor extractor...");
-    await player.extractors.register(SoundgasmExtractor, {
+    const TTSExt = await player.extractors.register(SoundgasmExtractor, {
         skipProbing: true,
         attemptAlternateProbing: true,
     });
+    TTSExt.priority = 0;
 
     if (!discordPlayerConfig?.removeYoutube) {
         logger.info("Loading YoutubeiExtractor extractor...");
@@ -229,12 +240,14 @@ ${getPermissionArrayNames(permissionBitFields).join("\n")}
     });
 
     loadFiles("./events/player/", (event) => {
-        player.events.on(event.name, async (...args) => {
+        player.on(event.name, async (...args) => {
             if (event.log) logger.event(`Event: [${event.name}] fired.`);
             await event.execute(client, logger, ...args);
         });
+    });
 
-        player.on(event.name, async (...args) => {
+    loadFiles("./events/playerEvents/", (event) => {
+        player.events.on(event.name, async (...args) => {
             if (event.log) logger.event(`Event: [${event.name}] fired.`);
             await event.execute(client, logger, ...args);
         });
