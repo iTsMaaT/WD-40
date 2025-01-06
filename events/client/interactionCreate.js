@@ -8,6 +8,7 @@ const { initConfFile } = require("@utils/reddit/fetchRedditToken.js");
 const countCommonChars = require("@utils/functions/countCommonChars.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const dbManager = require("@root/utils/db/databaseManager");
+const { useMainPlayer } = require("discord-player");
 
 module.exports = {
     name: Events.InteractionCreate,
