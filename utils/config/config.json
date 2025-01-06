@@ -60,22 +60,26 @@
     },
 
     "discordPlayerConf": {
-        "maxQueueSize": 10000,
-        "bufferingTimeout": 15000,
-        "leaveOnStop": true,
-        "leaveOnStopCooldown": 0,
-        "leaveOnEnd": true,
-        "leaveOnEndCooldown": 15000,
-        "leaveOnEmpty": true,
-        "leaveOnEmptyCooldown": 300000,
-        "skipOnNoStream": true,
+        "globalPlayerNodeOptions": {
+            "volume": 50,
+            "maxSize": 10000,
+            "bufferingTimeout": 15000,
+            "leaveOnStop": true,
+            "leaveOnStopCooldown": 0,
+            "leaveOnEnd": true,
+            "leaveOnEndCooldown": 15000,
+            "leaveOnEmpty": true,
+            "leaveOnEmptyCooldown": 300000,
+            "skipOnNoStream": true
+        },
         "removeYoutube": false,
         "attemptYoutubeSearchEvenIfDisabled": true,
         "removeDeezer": false,
         "skipLogin": true,
         "usePoToken": false,
         "useCookie": false,
-        "log": false,
+        "log": true,
+        "logEvent": false,
         "highWaterMark": 2097152,
         "skipFFmpeg": false,
         "useSoundcloudBridge": false,
@@ -109,7 +113,16 @@
                 "enabled": true,
                 "options": {}
             }
+        },
+        "ffmpegFilters": {
+            "earrape": "earwax,equalizer=f=1000:t=q:w=1:g=48,bass=g=40,dynaudnorm=f=400",
+            "rickroll": "bass=g=33,apulsator=hz=0.06,vibrato=f=2.5,tremolo,asetrate=48000*0.8",
+            "8bit": "asetrate=22050*1.5,aresample=22050,volume=1.5",
+            "chipmunk": "atempo=1.5,asetrate=44100*1.25",
+            "lofi": "aecho=0.8:0.88:60:0.4,volume=0.5,asetrate=22050",
+            "8D": "apulsator=hz=0.08"
         }
+
     },
 
     "defaultSuperuserState": false,
