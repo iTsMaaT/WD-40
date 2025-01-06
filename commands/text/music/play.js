@@ -43,6 +43,7 @@ module.exports = {
         const attachment = message.attachments.first()?.attachment;
 
         let string = args.join(" ");
+        if (string.startsWith("tts:")) return await message.reply({ embeds: [embedGenerator.warning("Please use the TTS command to play text-to-speech messages.")] });
         if (!string) string = playerConfig.removeYoutube ? undefined : "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
         if (!string) return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
         const stringQueryType = QueryResolver.resolve(string).type;
@@ -162,16 +163,7 @@ module.exports = {
                             guild: message.guild,
                             probableBridgeSource: getProbableBridgeSource(playerConfig, !needsBridge && doesntNeedBridge),
                         },
-                        volume: 50,
-                        maxSize: playerConfig.maxQueueSize,
-                        bufferingTimeout: playerConfig.bufferingTimeout,
-                        leaveOnStop: playerConfig.leaveOnStop,
-                        leaveOnStopCooldown: playerConfig.leaveOnStopCooldown,
-                        leaveOnEnd: playerConfig.leaveOnEnd,
-                        leaveOnEndCooldown: playerConfig.leaveOnEndCooldown,
-                        leaveOnEmpty: playerConfig.leaveOnEmpty,
-                        leaveOnEmptyCooldown: playerConfig.leaveOnEmptyCooldown,
-                        skipOnNoStream: playerConfig.skipOnNoStream,
+                        ...playerConfig.globalPlayerNodeOptions,
                     },
                 });
                 finalTrack = playResult.track;
@@ -183,7 +175,7 @@ module.exports = {
             embed = embedGenerator.info({
                 title: `${finalSearchResult.hasPlaylist() ? "Playlist" : "Track"} ${!queue?.currentTrack ? "now playing!" : "enqueued!"}`,
                 thumbnail: { url: finalTrack.thumbnail },
-                description: `[${finalTrack.title}](${finalTrack.url})`,
+                description: finalTrack.url ? `[${finalTrack.title}](${finalTrack.url})` : finalTrack.title,
                 fields: [
                     { name: "Pre-shuffled", value: optionalArgs["shuffle|s"] ? "Yes" : "No" },
                     { name: "Will play next", value: optionalArgs["playnext|pn"] && queue ? "Yes" : "No" },

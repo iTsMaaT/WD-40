@@ -17,7 +17,9 @@ module.exports = {
 
         const embed = embedGenerator.info({
             title: "Now Playing",
-            description: `[${track.title}](${track.url})\nResquested by: ${track.requestedBy?.displayName || "N/A"}`,
+            description: 
+                `${track.url ? `[${track.title}](${track.url})` : track.title}\n` +
+                `Resquested by: ${track.requestedBy?.displayName || "N/A"}`,
             thumbnail: { url: track.thumbnail },
             fields: [
                 { name: "Author", value: track.author },

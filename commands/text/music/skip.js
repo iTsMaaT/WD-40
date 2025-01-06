@@ -19,7 +19,7 @@ module.exports = {
             await message.reply({ embeds: [embedGenerator.info({
                 title: "Skipped",
                 thumbnail: { url: queue.currentTrack.thumbnail },
-                description: `[${queue.currentTrack.title}](${queue.currentTrack.url})`,
+                description: queue.currentTrack.url ? `[${queue.currentTrack.title}](${queue.currentTrack.url})` : queue.currentTrack.title,
             }).withAuthor(message.author)] });
 
             queue = useQueue();
@@ -31,7 +31,7 @@ module.exports = {
             await message.channel.send({ embeds: [embedGenerator.info({
                 title: "Now playing",
                 thumbnail: { url: queue.currentTrack.thumbnail },
-                description: `[${queue.currentTrack.title}](${queue.currentTrack.url})`,
+                description: queue.currentTrack.url ? `[${queue.currentTrack.title}](${queue.currentTrack.url})` : queue.currentTrack.title,
             })] });
         } catch (e) {
             logger.error(e);
