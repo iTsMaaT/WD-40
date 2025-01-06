@@ -5,7 +5,7 @@ module.exports = {
     name: "roulette",
     description: "Play a game of Casino Roulette! Bet on a number (0-36) or color (Red or Black).",
     category: "games",
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, optionalArgs) {
 
         const rouletteNumbers = [
             { number: 0, color: "Green" },
