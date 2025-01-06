@@ -1,9 +1,11 @@
 const { PermissionsBitField } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const { useQueue } = require("discord-player");
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("@discordjs/voice");
-const googleTTS = require("google-tts-api");
+const { useQueue, useMainPlayer } = require("discord-player");
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("discord-voip");
+const { Readable } = require("stream");
+const { getAllAudioUrls } = require("google-tts-api");
 const { fetchGeminiResponse } = require("@utils/helpers/fetchGeminiResponse");
+const config = require("@utils/config/configUtils");
 
 module.exports = {
     name: "asktts",
@@ -16,28 +18,26 @@ module.exports = {
     category: "music",
     examples: ["what is the skull emoji used for"],
     permissions: [PermissionsBitField.Flags.Connect],
-    cooldown: 10000,
+    cooldown: 30000,
     async execute(logger, client, message, args) {
-        let connection, sent;
+        let geminiResponse, sent;
+        const player = useMainPlayer();
         const queue = useQueue();
-        const embed = {
-            title: "",
-            color: 0xffffff,
-            timestamp: new Date(),
-        };
+        const playerConfig = config.get("discordPlayerConf");
 
         // Validation checks
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.error("You must provide a prompt.")] });
         if (queue || queue?.tracks || queue?.currentTrack) return await message.reply({ embeds: [embedGenerator.warning("You must stop the music before playing TTS.")] });
 
-        embed.title = "Requesting a response from Gemini.";
 
         try {
             const apiKey = process.env.GEMINI_API_KEY; // Replace with your API key
             const prompt = args.join(" ");
             if (!prompt) return await message.reply({ embeds: [embedGenerator.warning("Please provide a prompt.")] });
             const owner = await message.guild.fetchOwner();
+
+            sent = await message.reply({ embeds: [embedGenerator.info("Asking Gemini...")] });
 
             const environmentInfo = {
                 guildName: message.guild.name,
@@ -52,7 +52,7 @@ module.exports = {
             };
 
             // Fetch Gemini's response using the helper function
-            response = await fetchGeminiResponse(
+            geminiResponse = await fetchGeminiResponse(
                 `Consider the following in your responses:
                 - Be conversational
                 - Do not use emojis nor markdown, as you will be heard in a discord voice chat.
@@ -82,60 +82,35 @@ module.exports = {
                 return await message.reply({ embeds: [embedGenerator.warning("I do not wish to answer that question. (Request timed out)")] });
             else 
                 return await message.reply({ embeds: [embedGenerator.error("An error occurred.")] });
-            
         }
 
-        // Joining the Voice Channel
         try {
-            embed.title = "Joining the VC.";
-            sent = await message.reply({ embeds: [embed] });
+            await sent.edit({ embeds: [embedGenerator.info("Getting the TTS...")] });
 
-            connection = joinVoiceChannel({
-                channelId: message.member.voice.channel.id,
-                guildId: message.guild.id,
-                adapterCreator: message.guild.voiceAdapterCreator,
-            });
+            const track = (await player.search(`tts:${geminiResponse.substring(0, 1000)}`)).tracks[0];
+
+            if (queue && queue.currentTrack) {
+                queue.insertTrack(track, 0);
+                queue.node.skip();
+            } else {
+                await player.play(message.member.voice.channel.id, track, {
+                    nodeOptions: {
+                        metadata: {
+                            channel: message.channel,
+                            client: message.guild.members.me,
+                            requestedBy: message.user,
+                            guild: message.guild,
+                            probableBridgeSource: "TTS",
+                        },
+                        ...playerConfig.globalPlayerNodeOptions,
+                    },
+                });
+            }
+
+            return await sent.edit({ embeds: [embedGenerator.info("TTS started!")] });
         } catch (err) {
             logger.error(err);
-            return await message.reply({ embeds: [embedGenerator.error("Connection to the voice channel failed")] });
-        }
-
-        const audioUrls = googleTTS.getAllAudioUrls(response, {
-            lang: "en", // Change this if you need a different language
-            slow: false, // Change this to true if you want the TTS to be slower
-            host: "https://translate.google.com",
-            splitPunct: "-",
-        });
-
-        // Play the TTS response in the VC
-        try {
-            embed.title = "Playing Gemini's response.";
-            await sent.edit({ embeds: [embed] });
-
-            const resources = audioUrls.map(audio => audio.url);
-            let currentIndex = 0;
-
-            const playNextAudio = () => {
-                if (currentIndex < resources.length) {
-                    const resource = createAudioResource(resources[currentIndex]);
-                    const vcPlayer = createAudioPlayer();
-                    connection.subscribe(vcPlayer);
-                    vcPlayer.play(resource);
-
-                    vcPlayer.on(AudioPlayerStatus.Idle, () => {
-                        vcPlayer.stop();
-                        currentIndex++;
-                        playNextAudio();
-                    });
-                } else {
-                    connection.destroy();
-                }
-            };
-
-            playNextAudio();
-        } catch (err) {
-            logger.error(err);
-            return await message.reply({ embeds: [embedGenerator.error("Error while trying to play the TTS")] });
+            return await sent.edit({ embeds: [embedGenerator.error("An error occurred.")] });
         }
     },
 };
