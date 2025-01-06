@@ -1,4 +1,4 @@
-const { createHook } = require("discord-player");
+const { useQueue } = require("discord-player");
 const { toggleLiveChat } = require("./playerLiveChat");
 
 /**
@@ -91,14 +91,11 @@ const getFormattedSource = function(queue) {
  * @param {Queue} queue - The queue to get the stats from.
  * @returns {object} The stats of the queue.
  */
-const useStats = createHook((context) => {
-    return (node) => {
-        const queue = context.getQueue(node);
-        if (!queue) return null;
-
-        return queue.stats.generate();
-    };
-});
+const useStats = () => {
+    const queue = useQueue();
+    if (!queue) return null;
+    return queue.stats.generate();
+};
 
 module.exports = {
     getLoopMode,
