@@ -12,7 +12,7 @@ module.exports = {
         },
     },
     category: "music",
-    examples: ["What's the title of the song with the guy that never gives you up?"],
+    examples: ["What's the title of the rickroll song?"],
     permissions: [PermissionsBitField.Flags.Connect],
     cooldown: 30000,
     async execute(logger, client, message, args, optionalArgs) {
