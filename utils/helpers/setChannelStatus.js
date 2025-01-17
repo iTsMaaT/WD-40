@@ -1,5 +1,4 @@
-const { REST } = require("discord.js");
-const { Routes } = require("discord.js");
+const { Routes, REST } = require("discord.js");
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
 
