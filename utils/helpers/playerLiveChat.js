@@ -1,4 +1,5 @@
 const { getLiveChat, LiveChatEvents, ChatMessageType } = require("discord-player-youtubei");
+const { useQueue } = require("discord-player");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 
 const liveChatEnabled = new Set();
@@ -20,6 +21,7 @@ const flushBuffer = async (channel) => {
         await channel.send({ embeds: [embedGenerator.info({
             title: "Live Chat",
             description: "```" + buffer.join("\n") + "```",
+            footer: { text: "{} = Premium message" },
         })] });
         messageBuffers.set(channel.id, { buffer: [], bufferSize: 0, timer: null });
     }
@@ -57,8 +59,19 @@ const addMessageToBuffer = (channel, message) => {
  * @returns {Promise<void>} A promise that resolves when the message is handled.
  */
 const handleMessageCreate = async (channel, message) => {
+    const queue = useQueue(channel.guild.id);
+    if (!queue || !queue.currentTrack?.raw?.live) {
+        channel.send({ embeds: [embedGenerator.warning("Live chat got disabled automatically")] });
+        await disableLiveChat(channel);
+        return;
+    }
+
+    let formattedMessage;
     if (message.type === ChatMessageType.Regular || message.type === ChatMessageType.Premium) {
-        const formattedMessage = `[${message.author.username}] ${message.content}`;
+        if (message.type === ChatMessageType.Premium) 
+            formattedMessage = `[{ ${message.author.username} }] ${message.content}`;
+        else 
+            formattedMessage = `[${message.author.username}] ${message.content}`;
 
         if (formattedMessage.length > MAX_MESSAGE_SIZE) {
             const chunks = formattedMessage.match(new RegExp(`.{1,${MAX_MESSAGE_SIZE}}`, "g"));
@@ -85,7 +98,6 @@ const handleMessageCreate = async (channel, message) => {
  */
 const enableLiveChat = async (url, channel) => {
     liveChatEnabled.add(channel.id);
-    console.log(`Live chat enabled for ${channel.name}`);
 
     try {
         const chat = await getLiveChat(url); // must be live video. or else it will throw an error
@@ -97,11 +109,12 @@ const enableLiveChat = async (url, channel) => {
         };
 
         chat.on(LiveChatEvents.MessageCreate, messageListener);
+        chat.on(LiveChatEvents.StreamEnd, () => disableLiveChat(channel));
 
         // Store the listener function so it can be removed later
         activeChats.set(channel.id, { chat, messageListener });
     } catch (error) {
-        console.error(`Failed to enable live chat for ${channel.name}: ${error.message}`);
+        logger.error(`Failed to enable live chat for ${channel.name}: ${error.message}`);
         liveChatEnabled.delete(channel.id);
     }
 };
@@ -118,13 +131,11 @@ const disableLiveChat = async (channel) => {
 
     if (chatData) {
         const { chat, messageListener } = chatData;
-        chat.off(LiveChatEvents.MessageCreate, messageListener); // Remove the event listener
+        await chat.destroy();
         activeChats.delete(channel.id);
     }
 
-    await flushBuffer(channel); // Send any remaining messages in the buffer
     messageBuffers.delete(channel.id);
-    console.log(`Live chat disabled for ${channel.name}`);
 };
 
 /**
@@ -149,4 +160,5 @@ const toggleLiveChat = async function(url, channel) {
 
 module.exports = {
     toggleLiveChat,
+    disableLiveChat,
 };
