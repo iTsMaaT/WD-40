@@ -80,11 +80,10 @@
     const getPriority = (streamProvider) => 10 + discordPlayerConfig?.streamPriorities.length - discordPlayerConfig?.streamPriorities?.indexOf(streamProvider) ?? null;
 
     logger.info("Loading SoundgasmExtractor extractor...");
-    const TTSExt = await player.extractors.register(SoundgasmExtractor, {
+    await player.extractors.register(SoundgasmExtractor, {
         skipProbing: true,
         attemptAlternateProbing: true,
     });
-    TTSExt.priority = 0;
 
     if (!discordPlayerConfig?.removeYoutube) {
         logger.info("Loading YoutubeiExtractor extractor...");
