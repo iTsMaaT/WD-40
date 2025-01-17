@@ -20,6 +20,7 @@ module.exports = {
         try { 
             livechatEnabled = await toggleLiveChat(currentTrack.url, message.channel);
         } catch (error) {
+            logger.error(error);
             return await message.reply({ embeds: [embedGenerator.error("Failed to enable livechat.")] });
         }
 
