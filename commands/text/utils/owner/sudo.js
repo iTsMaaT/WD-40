@@ -1,4 +1,4 @@
-const { InfoFromMessageLink } = require("@functions/discordFunctions");
+const { extractMessageInfo } = require("@functions/discordFunctions");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
@@ -38,7 +38,7 @@ module.exports = {
         try {
             const messageLink = args.shift();
             const sudoMessage = args.join(" ");
-            const [guildID, channelID, messageID] = InfoFromMessageLink(messageLink);
+            const [guildID, channelID, messageID] = extractMessageInfo(messageLink);
 
             if (!optionalArgs["send|s"] && !optionalArgs["reply|r"] && !optionalArgs["emote|e"] && !optionalArgs["clear|c"] && !optionalArgs["dm|d"]) {
                 await message.reply({ embed : [embedGenerator.error({ title: "Missing parameter", description: "You must specify a parameter" })] });
