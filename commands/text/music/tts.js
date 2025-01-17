@@ -1,11 +1,12 @@
 const { PermissionsBitField } = require("discord.js");
 const { Readable } = require("stream");
-const { useQueue, useMainPlayer } = require("discord-player");
+const { useQueue, useMainPlayer, QueryType, Track } = require("discord-player");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("discord-voip");
 const { getAllAudioBase64 } = require("google-tts-api");
 const config = require("@utils/config/configUtils");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { probeStream } = require("mediaplex");
+const { TTSExtractor } = require("tts-extractor");
 
 module.exports = {
     name: "tts",
@@ -21,7 +22,6 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         let sent;
         const player = useMainPlayer();
-        const queue = useQueue();
         const playerConfig = config.get("discordPlayerConf");
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You must provide a prompt.")] });
@@ -33,14 +33,16 @@ module.exports = {
         try {
             sent = await message.reply({ embeds: [embedGenerator.info("Getting the TTS...")] });
         
-            const track = (await player.search(`tts:${text}`)).tracks[0];
+            const res = await player.search(`tts:${text}`);
 
+            const queue = useQueue();
             if (queue && queue.currentTrack) {
-                queue.insertTrack(track, 0);
+                queue.prepend(res.tracks[0], 0);
                 queue.node.skip();
             } else {
-                await player.play(message.member.voice.channel.id, track, {
+                await player.play(message.member.voice.channel.id, res, {
                     nodeOptions: {
+                        verifyFallbackStream: true,
                         metadata: {
                             channel: message.channel,
                             client: message.guild.members.me,
