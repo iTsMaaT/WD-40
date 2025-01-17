@@ -54,10 +54,10 @@ module.exports = {
             } else if (interaction.customId === "no") {
                 embed.description = "Shutdown cancelled";
                 embed.color = 0xffffff;
-                row.components.forEach((component) => component.setDisabled(true));
                 await ConfirmationMessage.edit({ embeds: [embed], components: [row] });
             }
-
+            
+            row.components.forEach((component) => component.setDisabled(true));
             await interaction.update({ components: [row] });
         } catch (error) {
             row.components.forEach((component) => component.setDisabled(true));
