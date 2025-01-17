@@ -79,11 +79,14 @@ module.exports = {
                     queue.filters.ffmpeg.toggle(ffmpegFilters[selectedFilter]);
                     await interaction.update({
                         embeds: [
-                            embedGenerator.info(
-                                !queue.filters.ffmpeg.filters.includes(selectedFilter)
-                                    ? `The [\`${selectedFilter}\`] filter has been applied.`
-                                    : `The [\`${selectedFilter}\`] filter has been removed.`,
-                            ),
+                            embedGenerator.info({
+                                title: prettyString(selectedFilter, "first", false),
+                                description: 
+                                    `The [\`${selectedFilter}\`] filter has been ${
+                                        !queue.filters.ffmpeg.filters.includes(selectedFilter) ? "applied" : "removed"
+                                    }.`,
+                                footer: { text: "Filters can take some time before changing" },
+                            }),
                         ],
                         components: [],
                     });
@@ -127,11 +130,14 @@ module.exports = {
 
         return await message.reply({
             embeds: [
-                embedGenerator.info(
-                    !queue.filters.ffmpeg.filters.includes(filter)
-                        ? `The [\`${filter}\`] filter has been applied.`
-                        : `The [\`${filter}\`] filter has been removed.`,
-                ),
+                embedGenerator.info({
+                    title: prettyString(selectedFilter, "first", false),
+                    description: 
+                        `The [\`${selectedFilter}\`] filter has been ${
+                            !queue.filters.ffmpeg.filters.includes(selectedFilter) ? "applied" : "removed"
+                        }.`,
+                    footer: { text: "Filters can take some time before changing" },
+                }),
             ],
         });
     },
