@@ -33,8 +33,6 @@ class DatabaseManager {
          * The Drizzle ORM instance for the database.
          */
         this._drizzle = drizzle(this._dbPool);
-
-        // this._handleDisconnect();
     }
 
     /**
