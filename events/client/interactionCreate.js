@@ -100,13 +100,18 @@ module.exports = {
             if (!context) return logger.error(`No command matching ${interaction.commandName} was found.`);
     
             try {
-                await player.context.provide({ guild: interaction.guild }, () => context.execute(logger, interaction, client));
+                await player.context.provide({ guild: interaction.guild }, async () => await context.execute(logger, interaction, client));
     
+                const maxLengths = {
+                    names: Math.max(interaction.user.tag.length, interaction.channel.name.length, interaction.guild.name.length),
+                    ids: Math.max(interaction.user.id.length, interaction.channel.id.length, interaction.guild.id.length),
+                };
+
                 logger.info(`
                 Executing [${interaction.commandName} (${context.type === 2 ? "User" : "Message"})]
-                by   [${interaction.user.tag} (${interaction.user.id})]
-                in   [${interaction.channel.name} (${interaction.channel.id})]
-                from [${interaction.guild.name} (${interaction.guild.id})]`
+                by   [${interaction.user.tag.padEnd(maxLengths.names)} (${interaction.user.id.padEnd(maxLengths.ids)})]
+                in   [${interaction.channel.name.padEnd(maxLengths.names)} (${interaction.channel.id.padEnd(maxLengths.ids)})]
+                from [${interaction.guild.name.padEnd(maxLengths.names)} (${interaction.guild.id.padEnd(maxLengths.ids)})]`
                     .replace(/^\s+/gm, ""));
     
             } catch (error) {

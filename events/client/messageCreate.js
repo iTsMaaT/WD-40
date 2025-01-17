@@ -202,7 +202,7 @@ Step 5 - Send the downloaded media to your favorite social media!
                     }
 
                     const player = useMainPlayer();
-                    await player.context.provide({ guild: message.guild }, () => command.execute(logger, client, message, args, optionalArgs));
+                    await player.context.provide({ guild: message.guild }, async () => await command.execute(logger, client, message, args, optionalArgs));
 
                     command.lastExecutionTime = parseInt(Date.now() - startTime);
 
