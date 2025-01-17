@@ -45,29 +45,8 @@ const CreateOrUseWebhook = async function(message, name) {
  */
 const id = function(mention) {
     const cleanId = mention.replace(/[<!@>]/g, "");
-    if (!cleanId.match(/^\d+$/)) return null;
+    if (!/^\d+$/.test(cleanId)) return null;
     return cleanId;
-};
-
-/**
- * Sends an error embed
- * @param {Message} message The message object
- * @param {string} string The error message
- * @param {string} color The color of the embed
- * @param {boolean} isSlash Whether the message is a slash command
- */
-const SendErrorEmbed = async function(message, string, color) {
-    const embed = {
-        title: prettyString(string.toString(), false, true),
-        timestamp: new Date(),
-        color: 0xffffff,
-    };
-    if (color == "red") embed.color = 0xff0000;
-    else if (color == "yellow") embed.color = 0xffff00;
-    if (message.deferred)
-        await message.editReply({ embeds: [embed] });
-    else
-        await message.reply({ embeds: [embed] });
 };
 
 /**
@@ -77,7 +56,7 @@ const SendErrorEmbed = async function(message, string, color) {
  * @param {string} MessageID The message ID
  * @param {string} string The string to react
  */
-const StringReact = function(client, ChannelID, MessageID, string) {
+const stringReact = function(client, ChannelID, MessageID, string) {
     const letters = string.toUpperCase().toString();
 
     for (i = 0; i < letters.length; i++) {
@@ -86,65 +65,72 @@ const StringReact = function(client, ChannelID, MessageID, string) {
         client.channels.cache.get(ChannelID).messages.fetch({ cache: false, message: MessageID })
             .then(m => {
                 m.react(String.fromCodePoint(letter.codePointAt(0) - 65 + 0x1f1e6));
-            }).catch((err) => Logger.error("Error while reacting: " + err));
+            }).catch(() => null);
     }
 };
 
 /**
- * Extracts the information from a message link
- * @param {string} link The message link
- * @returns {Array} The information array
+ * Extracts information from a Discord message link
+ * @param {string} link The Discord message link
+ * @returns {Object} An object containing guildId, channelId, and messageId
  */
-const InfoFromMessageLink = function(link) {
-    InfoArray = link.replace("https://discord.com/channels/", "").split("/");
-    return InfoArray;
-    /*
-    [0]: Guild ID
-    [1]: Channel ID
-    [2]: Message ID
-    */
+const extractMessageInfo = function(link) {
+    if (typeof link !== "string" || !link.startsWith("https://discord.com/channels/")) 
+        throw new Error("Invalid Discord message link.");
+    
+
+    const parts = link.replace("https://discord.com/channels/", "").split("/");
+    if (parts.length !== 3) 
+        throw new Error("Message link must contain guildId, channelId, and messageId.");
+    
+
+    const [guildId, channelId, messageId] = parts;
+
+    return {
+        guildId,
+        channelId,
+        messageId,
+    };
 };
 
 /**
- * Edits or sends a message
+ * Edits the latest message in a channel or sends a new one.
  * @param {Channel} channel The channel object
- * @param {string|object} messageOptions The message options
- * @param {boolean} add Whether to add or edit
+ * @param {string|object} messageOptions The message options (string or object with `content`)
+ * @param {boolean} add Whether to add new content to the existing message
  */
 async function editOrSend(channel, messageOptions, add) {
-    if (!channel.id) throw new Error("Invalid channel");
+    if (!channel?.id) throw new Error("Invalid channel");
 
     try {
-        const messages = await channel.messages.fetch();
+        const messages = await channel.messages.fetch({ limit: 1 });
         const message = messages.first();
-        let fullNewContent;
-        let newContent = typeof messageOptions == "object" ? messageOptions.content : messageOptions;
-        let oldContent = message.content.trim();
-        const wasCodeBlock = (oldContent.startsWith("```") && oldContent.endsWith("```"));
-        const isCodeBlock = (oldContent.startsWith("```") && oldContent.endsWith("```"));
-        console.log(wasCodeBlock);
-        if (wasCodeBlock) oldContent = oldContent.replaceAll("```", "");
-        if (isCodeBlock) newContent = newContent.replaceAll("```", "");
-        console.log(oldContent);
 
-        console.log(message.content);
-        console.log(isCodeBlock);
-        console.log(wasCodeBlock);
+        const newContent = typeof messageOptions === "object" ? messageOptions.content : messageOptions;
+        let updatedContent;
 
-        if (add) {
-            if (wasCodeBlock && isCodeBlock) 
-                fullNewContent = `\`\`\`${oldContent}\n${typeof messageOptions == "object" ? messageOptions.content : messageOptions}`;
-            else
-                fullNewContent = `${wasCodeBlock ? "```\n" : "" }${oldContent}${wasCodeBlock ? "\n```" : "" }${wasCodeBlock && isCodeBlock ? "\n" : "" }${isCodeBlock ? "```\n" : "" }${oldContent}\n${typeof messageOptions == "object" ? messageOptions.content : messageOptions}${isCodeBlock ? "\n```" : "" }`;
+        if (message) {
+            let oldContent = message.content.trim();
+            const wasCodeBlock = oldContent.startsWith("```") && oldContent.endsWith("```");
+            const isCodeBlock = newContent.startsWith("```") && newContent.endsWith("```");
+
+            if (wasCodeBlock) oldContent = oldContent.slice(3, -3).trim();
+            let cleanNewContent = newContent;
+            if (isCodeBlock) cleanNewContent = newContent.slice(3, -3).trim();
+
+            if (add) 
+                updatedContent = `${wasCodeBlock ? "```\n" : ""}${oldContent}\n${cleanNewContent}${wasCodeBlock ? "\n```" : ""}`;
+            else 
+                updatedContent = `${wasCodeBlock ? "```\n" : ""}${cleanNewContent}${wasCodeBlock ? "\n```" : ""}`;
+            
+
+            await message.edit(updatedContent);
         } else {
-            fullNewContent = `${wasCodeBlock ? "```" : "" }${typeof messageOptions == "object" ? messageOptions.content : messageOptions}${wasCodeBlock ? "```" : "" }`;
+            await channel.send(newContent);
         }
-        console.log(fullNewContent);
-        message.edit(fullNewContent);
-
     } catch (err) {
-        console.log(err);
-        await channel.send(typeof messageOptions == "object" ? messageOptions.content : messageOptions);
+        const fallbackContent = typeof messageOptions === "object" ? messageOptions.content : messageOptions;
+        await channel.send(fallbackContent);
     }
 }
 
@@ -189,9 +175,8 @@ function getPermissionArrayNames(flags) {
 module.exports = { 
     CreateOrUseWebhook,
     id,
-    // SendErrorEmbed,
-    StringReact,
-    InfoFromMessageLink,
+    stringReact,
+    extractMessageInfo,
     editOrSend, 
     multipleImageEmbed,
     getPermissionArrayNames,
