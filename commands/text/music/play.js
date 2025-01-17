@@ -1,13 +1,14 @@
-const { PermissionsBitField } = require("discord.js");
+const { PermissionsBitField, Attachment } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { getLoopMode } = require("@utils/helpers/playerHelpers");
-const { QueryType, useMainPlayer, useQueue, QueryResolver } = require("discord-player");
+const { QueryType, useMainPlayer, useQueue, QueryResolver, Track } = require("discord-player");
 const config = require("@utils/config/configUtils");
 const { parse } = require("node-html-parser");
 const { useStats } = require("@utils/helpers/playerHelpers");
-const { SoundCloudExtractor } = require("@discord-player/extractor");
-const { YoutubeiExtractor } = require("discord-player-youtubei");
+const { SoundCloudExtractor, AttachmentExtractor } = require("@discord-player/extractor");
+const { YoutubeiExtractor, stream } = require("discord-player-youtubei");
 const { DeezerExtractor } = require("discord-player-deezer");
+const { TTSExtractor } = require("tts-extractor");
 
 module.exports = {
     name: "play",
@@ -36,14 +37,14 @@ module.exports = {
         const player = useMainPlayer();
         const queue = useQueue();
         const playerConfig = config.get("discordPlayerConf");
-        let res, research, specificSearch;
+        let res, research, specificSearch, choice = null;
         
         if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
 
         const attachment = message.attachments.first()?.attachment;
 
         let string = args.join(" ");
-        if (string.startsWith("tts:")) return await message.reply({ embeds: [embedGenerator.warning("Please use the TTS command to play text-to-speech messages.")] });
+        // if (string.startsWith("tts:")) return await message.reply({ embeds: [embedGenerator.warning("Please use the TTS command to play text-to-speech messages.")] });
         if (!string) string = playerConfig.removeYoutube ? undefined : "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
         if (!string) return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
         const stringQueryType = QueryResolver.resolve(string).type;
@@ -53,9 +54,15 @@ module.exports = {
         stringQueryType == QueryType.YOUTUBE || 
         stringQueryType == QueryType.YOUTUBE_PLAYLIST || 
         stringQueryType == QueryType.YOUTUBE_VIDEO;
+
+        const isSoundcloud = 
+        stringQueryType == QueryType.SOUNDCLOUD_SEARCH ||
+        stringQueryType == QueryType.SOUNDCLOUD || 
+        stringQueryType == QueryType.SOUNDCLOUD_PLAYLIST || 
+        stringQueryType == QueryType.SOUNDCLOUD_TRACK;
         
         const needsBridge = stringQueryType === QueryType.AUTO_SEARCH || stringQueryType === QueryType.SPOTIFY_SONG;
-        const doesntNeedBridge = isYoutube || stringQueryType === QueryType.ARBITRARY;
+        const doesntNeedBridge = isYoutube || isSoundcloud || stringQueryType === QueryType.ARBITRARY;
 
         if (stringQueryType === QueryType.YOUTUBE_VIDEO && playerConfig.removeYoutube && playerConfig.attemptYoutubeSearchEvenIfDisabled) {
             const messageEmbeds = message.embeds || [];
@@ -124,12 +131,12 @@ module.exports = {
                 await message.channel.awaitMessages({ filter, max: 1, time: 10000, errors: ["time"] })
                     .then((collected) => {
                         const responseMessage = collected.first();
-                        research = choices[parseInt(responseMessage.content) - 1];
+                        choice = parseInt(responseMessage.content) - 1;
                         try {
                             responseMessage.delete();
                         } catch {/**/}
                     })
-                    .catch(() => research = choices[0]);
+                    .catch(() => choice = 0);
             } else {
                 research = await player.search(string, {
                     requestedBy: message.member,
@@ -150,8 +157,13 @@ module.exports = {
             if (optionalArgs["shuffle|s"]) await research?.tracks?.shuffle();
 
             if (optionalArgs["playnext|pn"] && queue) {
-                for (const track of research.tracks.reverse()) queue.insertTrack(track, 0);
-                finalTrack = research.tracks[0];
+                if (choice !== null) {
+                    finalTrack = research.tracks[choice];
+                    queue.insertTrack(finalTrack, 0);
+                } else {
+                    for (const track of research.tracks.reverse()) queue.insertTrack(track, 0);
+                    finalTrack = research.tracks[0];
+                }
                 finalSearchResult = research;
             } else {
                 const playResult = await player.play(message.member.voice.channel.id, attachment ?? research, {
@@ -163,6 +175,7 @@ module.exports = {
                             guild: message.guild,
                             probableBridgeSource: getProbableBridgeSource(playerConfig, !needsBridge && doesntNeedBridge),
                         },
+                        verifyFallbackStream: true,
                         ...playerConfig.globalPlayerNodeOptions,
                     },
                 });
@@ -179,12 +192,12 @@ module.exports = {
                 fields: [
                     { name: "Pre-shuffled", value: optionalArgs["shuffle|s"] ? "Yes" : "No" },
                     { name: "Will play next", value: optionalArgs["playnext|pn"] && queue ? "Yes" : "No" },
-                    { name: "Probable bridge source ( -> = if fails)", value: getProbableBridgeSource(playerConfig, !needsBridge && doesntNeedBridge) },
+                    { name: "Probable bridge source ( [->] = upon fail, falls back to...)", value: getProbableBridgeSource(playerConfig, !needsBridge && doesntNeedBridge) },
                 ],
                 footer: { text: `Loop mode: ${getLoopMode(queue)}` },
             }).withAuthor(message.author);
 
-            if (finalSearchResult?.playlist) embed.data.fields.push({ name: "Playlist", value: finalSearchResult.playlist.title });
+            if (finalSearchResult?.playlist) embed.data.fields.push({ name: "Playlist", value: `[${finalSearchResult.playlist.title}](${finalSearchResult.playlist.url})` });
 
             await sentMessage.edit({ embeds: [embed] });
             if (playerConfig.removeYoutube && isYoutube && playerConfig.attemptYoutubeSearchEvenIfDisabled) 
@@ -229,26 +242,29 @@ function searchWithPriorities(playerConfig) {
 }
 
 function getProbableBridgeSource(playerConfig, providesStream) {
-    if (providesStream) return "None / Unknown";
-    const streamProviders = [];
-    for (const priority of playerConfig.streamPriorities) {
-        if ((priority === "youtube" && playerConfig.removeYoutube) ||
-            (priority === "deezer" && playerConfig.removeDeezer))
-            continue;
+    if (providesStream) return "Itself";
 
-        switch (priority) {
+    const streamProviders = playerConfig.streamPriorities.filter(priority => {
+        return !(priority === "youtube" && playerConfig.removeYoutube || 
+                 priority === "deezer" && playerConfig.removeDeezer);
+    });
+
+    for (const sp of streamProviders) {
+        switch (sp) {
+            case "soundcloud":
+                streamProviders[sp] = "SoundCloud";
+                break;
             case "youtube":
-                streamProviders.push("YouTube");
+                streamProviders[sp] = "YouTube";
                 break;
             case "deezer":
-                streamProviders.push("Deezer");
-                break;
-            case "soundcloud":
-                streamProviders.push("Soundcloud");
+                streamProviders[sp] = "Deezer";
                 break;
             default:
-                return "N/A";
+                streamProviders[sp] = sp;
+                break;
         }
     }
-    return streamProviders.join(" -> ");
+
+    return streamProviders.length > 0 ? streamProviders.join(" -> ") : "N/A";
 }
