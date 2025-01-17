@@ -21,7 +21,7 @@ const updateActivities = (client) => {
     
     activities.forEach(activity => {
         activity.name = activity.name
-            .replace("{statusChance}", Math.floor(Math.random() * 100))
+            .replace("{statusChance}", 1 / activities.length * 100)
             .replace("{statusCount}", activities.length - 1)
             .replace("{ipAddress}", ipAddress)
             .replace("{guildCount}", client.guilds.cache.size);
