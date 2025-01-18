@@ -20,6 +20,17 @@ class Config {
     }
 
     /**
+     * Reload the configuration from the file.
+     * @returns {Config}
+     */
+    reload() {
+        delete require.cache[require.resolve(this.configFilePath)];
+    
+        this.loadBaseConfig();
+        return this;
+    }
+
+    /**
      * Get the value of a specific configuration key.
      * @param {keyof BaseConfig} key
      * @returns {any}
@@ -100,6 +111,7 @@ class Config {
      */
     save() {
         fs.writeFileSync(this.configFilePath, JSON.stringify(this.config, null, 2), "utf-8");
+        this.reload();
         return this;
     }
 }
