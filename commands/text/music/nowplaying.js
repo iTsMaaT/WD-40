@@ -19,7 +19,7 @@ module.exports = {
             title: "Now Playing",
             description: 
                 `${track.url ? `[${track.title}](${track.url})` : track.title}\n` +
-                `Resquested by: ${track.requestedBy?.displayName || "N/A"}`,
+                `Requested by: ${track.requestedBy?.displayName || "N/A"}`,
             thumbnail: { url: track.thumbnail },
             fields: [
                 { name: "Author", value: track.author },
