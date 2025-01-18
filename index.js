@@ -89,13 +89,13 @@
         logger.info("Loading YoutubeiExtractor extractor...");
 
         const ytExt = await player.extractors.register(YoutubeiExtractor, {
-            authentication: discordPlayerConfig?.skipLogin ? undefined : process.env.YOUTUBE_ACCESS_STRING || "",
+            authentication: discordPlayerConfig?.skipLogin ? undefined : process.env.YOUTUBE_ACCESS_STRING || undefined,
             cookie: discordPlayerConfig?.useCookie ? process.env.YOUTUBE_COOKIE || undefined : undefined,
             streamOptions: {
                 useClient: discordPlayerConfig?.usePoToken ? "WEB" : undefined,
                 highWaterMark: discordPlayerConfig?.highWaterMark || 1024 * 1024,
                 // overrideBridgeMode: "ytmusic",
-            }, 
+            },
         });
 
         ytExt.priority = getPriority("youtube") ?? ytExt.priority;
