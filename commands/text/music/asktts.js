@@ -90,7 +90,7 @@ module.exports = {
             const track = (await player.search(`tts:${geminiResponse.substring(0, 1000)}`)).tracks[0];
 
             if (queue && queue.currentTrack) {
-                queue.insertTrack(track, 0);
+                queue.prepend(track, 0);
                 queue.node.skip();
             } else {
                 await player.play(message.member.voice.channel.id, track, {
