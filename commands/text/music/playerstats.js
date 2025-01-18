@@ -13,7 +13,7 @@ module.exports = {
         if (!queue) return await message.reply({ embeds: [embedGenerator.error("There is no queue.")] });
 
         const stats = useStats();
-        if (!stats) return await message.reply({ embeds: [embedGenerator.error("There is no queue.")] });
+        if (!stats) return await message.reply({ embeds: [embedGenerator.error("There is no stats.")] });
         const embed = embedGenerator.info({
             title: "Queue stats",
             fields: [
