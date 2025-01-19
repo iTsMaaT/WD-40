@@ -91,8 +91,8 @@ const getFormattedSource = function(queue) {
  * @param {Queue} queue - The queue to get the stats from.
  * @returns {object} The stats of the queue.
  */
-const useStats = () => {
-    const queue = useQueue();
+const useStats = (guild) => {
+    const queue = useQueue(guild);
     if (!queue) return null;
     return queue.stats.generate();
 };
