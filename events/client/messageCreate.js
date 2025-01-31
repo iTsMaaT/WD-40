@@ -17,8 +17,8 @@ module.exports = {
     log: false,
     async execute(client, logger, msg) {
         const TextCooldowns = client.TextCooldowns;
-        handleCommand(msg);
-        handleAutoResponses(msg);
+        await handleCommand(msg);
+        await handleAutoResponses(msg);
 
         async function handleAutoResponses(message) {
             if (message.author.bot) return;
@@ -118,7 +118,8 @@ Step 5 - Send the downloaded media to your favorite social media!
                 if (command.private && message.author.id !== process.env.OWNER_ID) return;
                 // Admin commands checking
                 if (command.admin && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return await message.reply({ embeds: [embedGenerator.error("You are not administrator")] });
-                if (command.inVoiceChannel && !message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.error("You must be in a voice channel.")] });
+                if (command.inVoiceChannel && !message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
+                if (command.inSameVoiceChannel && message.guild.me?.voice?.channel && message.member?.voice?.channel?.id !== message.guild.me?.voice?.channel?.id) return await message.reply({ embeds: [embedGenerator.warning("You must be in the same voice channel as me.")] });
 
                 const userBlacklist = await GuildManager.GetBlacklist(message.guild.id);
                 const blCategory = !userBlacklist.CheckPermission(message.author.id, command.category);
