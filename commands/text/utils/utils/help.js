@@ -283,5 +283,9 @@ module.exports = {
                 allowedMentions: { repliedUser: false },
             });
         });
+
+        collector.on("ignore", (interaction) => {
+            interaction.reply({ embeds: [embedGenerator.warning("Execute the command yourself to use the buttons")], ephemeral: true });
+        });
     },
 };
