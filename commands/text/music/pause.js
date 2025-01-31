@@ -7,9 +7,9 @@ module.exports = {
     name: "pause",
     description: "Pauses / Resumes currently playing music",
     category: "music",
+    inVoiceChannel: true,
+    inSameVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
-        if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
-
         const queue = useQueue();
         const timeline = useTimeline();
 

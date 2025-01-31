@@ -15,6 +15,8 @@ module.exports = {
     examples: ["What's the title of the rickroll song?"],
     permissions: [PermissionsBitField.Flags.Connect],
     cooldown: 30000,
+    inVoiceChannel: true,
+    inSameVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
         if (!args.length)
             return message.reply({ embeds: [embedGenerator.warning("Please provide a song description.")] });

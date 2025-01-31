@@ -6,6 +6,8 @@ module.exports = {
     description: "Removes duplicate tracks from the queue",
     aliases: ["dd"],
     category: "music",
+    inVoiceChannel: true,
+    inSameVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
         const queue = useQueue();
 

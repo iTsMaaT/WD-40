@@ -1,6 +1,7 @@
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { getLoopMode, getPauseMode } = require("@utils/helpers/playerHelpers");
 const { useQueue, useTimeline, useMainPlayer } = require("discord-player");
+const isURL = require("@utils/functions/isURL");
 
 module.exports = {
     name: "nowplaying",
@@ -18,7 +19,7 @@ module.exports = {
         const embed = embedGenerator.info({
             title: "Now Playing",
             description: 
-                `${track.url ? `[${track.title}](${track.url})` : track.title}\n` +
+                `${isURL(track.url) ? `[${track.title}](${track.url})` : track.title}\n` +
                 `Requested by: ${track.requestedBy?.displayName || "N/A"}`,
             thumbnail: { url: track.thumbnail },
             fields: [

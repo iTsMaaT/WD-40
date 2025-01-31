@@ -19,17 +19,16 @@ module.exports = {
     examples: ["what is the skull emoji used for"],
     permissions: [PermissionsBitField.Flags.Connect],
     cooldown: 30000,
+    inVoiceChannel: true,
+    inSameVoiceChannel: true,
     async execute(logger, client, message, args) {
         let geminiResponse, sent;
         const player = useMainPlayer();
         const queue = useQueue();
         const playerConfig = config.get("discordPlayerConf");
 
-        // Validation checks
-        if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.error("You must provide a prompt.")] });
         if (queue || queue?.tracks || queue?.currentTrack) return await message.reply({ embeds: [embedGenerator.warning("You must stop the music before playing TTS.")] });
-
 
         try {
             const apiKey = process.env.GEMINI_API_KEY; // Replace with your API key

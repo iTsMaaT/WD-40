@@ -14,9 +14,9 @@ module.exports = {
     },
     category: "music",
     examples: ["track"],
+    inVoiceChannel: true,
+    inSameVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
-        if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.error("You must be in a voice channel.")] });
-        
         const queue = useQueue();
         const loopMode = args[0]?.toLowerCase() || "queue";
 

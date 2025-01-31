@@ -6,9 +6,10 @@ module.exports = {
     name: "livechat",
     description: "Enables or disables livechat",
     category: "music",
+    aliases: ["lc"],
+    inVoiceChannel: true,
+    inSameVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
-        if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.error("You must be in a voice channel.")] });
-
         const queue = useQueue();
         if (!queue || !queue.tracks || !queue.currentTrack) return await message.reply({ embeds: [embedGenerator.error("There is nothing playing.")] });
 

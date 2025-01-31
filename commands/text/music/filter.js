@@ -9,11 +9,10 @@ module.exports = {
     description: "Apply or clear audio filters",
     category: "music",
     private: false,
+    inVoiceChannel: true,
+    inSameVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
         const ffmpegFilters = config.get("discordPlayerConf")?.ffmpegFilters || {};
-
-        if (!message.member.voice.channel) 
-            return await message.reply({ embeds: [embedGenerator.error("You must be in a voice channel.")] });
 
         const queue = useQueue();
         const filter = args[0]?.toLowerCase();

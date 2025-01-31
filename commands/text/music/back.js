@@ -6,11 +6,9 @@ module.exports = {
     description: "Go back to the last played song",
     category: "music",
     aliases: ["previous"],
-    async execute(logger, client, message, args, optionalArgs) {
-        if (!message.member.voice.channel) 
-            return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
-        
-
+    inVoiceChannel: true,
+    inSameVoiceChannel: true,
+    async execute(logger, client, message, args, optionalArgs) {        
         const queue = useQueue();
         if (!queue) 
             return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue right now.")] });

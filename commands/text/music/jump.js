@@ -16,11 +16,9 @@ module.exports = {
     aliases: ["skipto"],
     examples: ["3", "\"Never Gonna Give You Up\""],
     inVoiceChannel: true,
+    inSameVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
         const queue = useQueue();
-
-        if (!message.member.voice.channel) 
-            return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
         if (!args[0]) 
             return await message.reply({ embeds: [embedGenerator.error("Please enter a number or title to skip to.")] });
         if (!queue || !queue.tracks) 
