@@ -93,15 +93,13 @@ module.exports = {
                 logger.error(error);
             }
         } else if (interaction.isContextMenuCommand()) {
-            await interaction.deferReply({ ephemeral: true });
+            // await interaction.deferReply();
             
             const context = client.contextCommands.get(interaction.commandName);
     
             if (!context) return logger.error(`No command matching ${interaction.commandName} was found.`);
     
             try {
-                await player.context.provide({ guild: interaction.guild }, async () => await context.execute(logger, interaction, client));
-    
                 const maxLengths = {
                     names: Math.max(interaction.user.tag.length, interaction.channel.name.length, interaction.guild.name.length),
                     ids: Math.max(interaction.user.id.length, interaction.channel.id.length, interaction.guild.id.length),
@@ -113,7 +111,11 @@ module.exports = {
                 in   [${interaction.channel.name.padEnd(maxLengths.names)} (${interaction.channel.id.padEnd(maxLengths.ids)})]
                 from [${interaction.guild.name.padEnd(maxLengths.names)} (${interaction.guild.id.padEnd(maxLengths.ids)})]`
                     .replace(/^\s+/gm, ""));
-    
+
+                if (context.ephemeral) await interaction.deferReply({ ephemeral: true });
+                else await interaction.deferReply();
+
+                await player.context.provide({ guild: interaction.guild }, async () => await context.execute(logger, interaction, client));
             } catch (error) {
                 await interaction.editReply({
                     embeds: [embedGenerator.error("An error occured while executing the command")],
