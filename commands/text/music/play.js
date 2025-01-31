@@ -1,14 +1,12 @@
-const { PermissionsBitField, Attachment } = require("discord.js");
+const { PermissionsBitField } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { getLoopMode } = require("@utils/helpers/playerHelpers");
-const { QueryType, useMainPlayer, useQueue, QueryResolver, Track } = require("discord-player");
+const { QueryType, useMainPlayer, useQueue, QueryResolver } = require("discord-player");
 const config = require("@utils/config/configUtils");
-const { parse } = require("node-html-parser");
-const { useStats } = require("@utils/helpers/playerHelpers");
-const { SoundCloudExtractor, AttachmentExtractor } = require("@discord-player/extractor");
-const { YoutubeiExtractor, stream } = require("discord-player-youtubei");
-const { DeezerExtractor } = require("discord-player-deezer");
-const { TTSExtractor } = require("tts-extractor");
+const { searchWithPriorities, getProbableBridgeSource } = require("@utils/helpers/playerHelpers");
+const fs = require("fs");
+const isURL = require("@utils/functions/isURL");
+const { simpleFolderSearch } = require("simple-folder-search");
 
 module.exports = {
     name: "play",
@@ -33,34 +31,21 @@ module.exports = {
     examples: ["never gonna give you up"],
     permissions: [PermissionsBitField.Flags.Connect],
     cooldown: 1000,
+    inVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
         const player = useMainPlayer();
         const queue = useQueue();
         const playerConfig = config.get("discordPlayerConf");
-        let res, research, specificSearch, choice = null;
-        
-        if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
-
         const attachment = message.attachments.first()?.attachment;
+        let string = args.join(" ") || (playerConfig.removeYoutube ? undefined : "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
 
-        let string = args.join(" ");
-        // if (string.startsWith("tts:")) return await message.reply({ embeds: [embedGenerator.warning("Please use the TTS command to play text-to-speech messages.")] });
-        if (!string) string = playerConfig.removeYoutube ? undefined : "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
-        if (!string) return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
-        const stringQueryType = QueryResolver.resolve(string).type;
-
-        const isYoutube = 
-        stringQueryType == QueryType.YOUTUBE_SEARCH ||
-        stringQueryType == QueryType.YOUTUBE || 
-        stringQueryType == QueryType.YOUTUBE_PLAYLIST || 
-        stringQueryType == QueryType.YOUTUBE_VIDEO;
-
-        const isSoundcloud = 
-        stringQueryType == QueryType.SOUNDCLOUD_SEARCH ||
-        stringQueryType == QueryType.SOUNDCLOUD || 
-        stringQueryType == QueryType.SOUNDCLOUD_PLAYLIST || 
-        stringQueryType == QueryType.SOUNDCLOUD_TRACK;
+        if (!string) 
+            return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
         
+
+        const stringQueryType = QueryResolver.resolve(string).type;
+        const isYoutube = [QueryType.YOUTUBE_SEARCH, QueryType.YOUTUBE, QueryType.YOUTUBE_PLAYLIST, QueryType.YOUTUBE_VIDEO].includes(stringQueryType);
+        const isSoundcloud = [QueryType.SOUNDCLOUD_SEARCH, QueryType.SOUNDCLOUD, QueryType.SOUNDCLOUD_PLAYLIST, QueryType.SOUNDCLOUD_TRACK].includes(stringQueryType);
         const needsBridge = stringQueryType === QueryType.AUTO_SEARCH || stringQueryType === QueryType.SPOTIFY_SONG;
         const doesntNeedBridge = isYoutube || isSoundcloud || stringQueryType === QueryType.ARBITRARY;
 
@@ -80,6 +65,8 @@ module.exports = {
         })] });
 
         try {
+            let research, specificSearch, choice = null;
+
             if (needsBridge && !playerConfig.removeYoutube) {
                 if (stringQueryType === QueryType.SPOTIFY_SONG) {
                     research = await player.search(string, {
@@ -87,30 +74,43 @@ module.exports = {
                         searchEngine: QueryType.SPOTIFY_SONG,
                     });
                     if (!research.hasTracks()) return await sentMessage.edit({ embeds: [embedGenerator.warning("No results found")] });
-                    if (research && research.hasTracks()) specificSearch = `${research.tracks[0].title} - ${research.tracks[0].author}`;
-                    else if (!linkRegex.test(string)) specificSearch = string;
+                    specificSearch = research.tracks[0]?.title ? `${research.tracks[0].title} - ${research.tracks[0].author}` : string;
                 } else {
                     specificSearch = string;
                 }
 
                 research = await player.search(specificSearch, {
                     requestedBy: message.member,
-                    searchEngine: "ext:" + searchWithPriorities(playerConfig), // !playerConfig.removeYoutube ? QueryType.YOUTUBE_SEARCH : QueryType.AUTO_SEARCH,
+                    searchEngine: "ext:" + searchWithPriorities(playerConfig),
                 });
 
                 if (!research.hasTracks()) {
                     let footerText = "";
-                    
                     if (playerConfig.removeYoutube && isYoutube) {
-                        footerText = "Youtube has been disabled, for more info, use the help command and go in the support server.";
-                        if (playerConfig.attemptYoutubeSearchEvenIfDisabled) 
-                            footerText = "YouTube extraction is disabled, to support YouTube links, the YouTube embed must be visible";
+                        footerText = playerConfig.attemptYoutubeSearchEvenIfDisabled
+                            ? "YouTube extraction is disabled, to support YouTube links, the YouTube embed must be visible"
+                            : "Youtube has been disabled, for more info, use the help command and go in the support server.";
                     }
-
                     return await sentMessage.edit({ embeds: [embedGenerator.warning({
                         description: "No results found",
                         footer: { text: footerText || undefined },
                     })] });
+                }
+
+                const musicPath = process.cwd() + "/music";
+                let fileTrack = null;
+                if (fs.existsSync(musicPath)) {
+                    const files = simpleFolderSearch(musicPath, playerConfig.supportedFileExtensions, string, 0.4);
+                    if (files.length) {
+                        try {
+                            fileTrack = await player.search(files[0], { 
+                                requestedBy: message.member,
+                                searchEngine: QueryType.FILE,
+                            });
+                        } catch {
+                            fileTrack = null;
+                        }
+                    }
                 }
 
                 const choicesEmbed = embedGenerator.info({
@@ -120,8 +120,12 @@ module.exports = {
                     timestamp: new Date(),
                 });
 
-                const choices = research.tracks.slice(0, 10);
-                choices.map((track, index) => {
+                if (fileTrack) {
+                    fileTrack.tracks[0].title = "[Local file] " + fileTrack.tracks[0].title;
+                    research.tracks.unshift(fileTrack.tracks[0]);
+                }
+
+                research.tracks.slice(0, 10).forEach((track, index) => {
                     choicesEmbed.data.fields.push({ name: `${index + 1} - ${track.title}`, value: `By ${track.author}` });
                 });
 
@@ -132,139 +136,121 @@ module.exports = {
                     .then((collected) => {
                         const responseMessage = collected.first();
                         choice = parseInt(responseMessage.content) - 1;
-                        try {
-                            responseMessage.delete();
-                        } catch {/**/}
+                        responseMessage.delete().catch(() => null);
                     })
                     .catch(() => choice = 0);
             } else {
-                research = await player.search(string, {
-                    requestedBy: message.member,
-                    // searchEngine: QueryType.ARBITRARY,
-                });
-
-                if (!research.hasTracks()) {return await sentMessage.edit({ embeds: [embedGenerator.warning({
-                    description: "No results found",
-                    footer: { 
-                        text: playerConfig.removeYoutube && isYoutube ? "Youtube has been disabled, for more info, use the help command and go in the support server." : undefined,
-                    },
-                })] });}
+                research = await player.search(string, { requestedBy: message.member });
+                if (!research.hasTracks()) {
+                    return await sentMessage.edit({ embeds: [embedGenerator.warning({
+                        description: "No results found",
+                        footer: { 
+                            text: playerConfig.removeYoutube && isYoutube ? "Youtube has been disabled, for more info, use the help command and go in the support server." : undefined,
+                        },
+                    })] });
+                }
             }
 
-            if (research?.tracks?.length + (queue?.size ?? 0) > playerConfig.maxQueueSize) return await sentMessage.edit({ embeds: [embedGenerator.error(`Cannot enqueue more than ${MAX_QUEUE_SIZE} tracks.`)] });
+            if (research?.tracks?.length + (queue?.size ?? 0) > playerConfig.maxQueueSize) 
+                return await sentMessage.edit({ embeds: [embedGenerator.error(`Cannot enqueue more than ${playerConfig.maxQueueSize} tracks.`)] });
+            
+
+            if (optionalArgs["shuffle|s"] && !choice) await research?.tracks?.shuffle();
 
             let finalTrack, finalSearchResult;
-            if (optionalArgs["shuffle|s"]) await research?.tracks?.shuffle();
-
             if (optionalArgs["playnext|pn"] && queue) {
-                if (choice !== null) {
-                    finalTrack = research.tracks[choice];
-                    queue.insertTrack(finalTrack, 0);
-                } else {
-                    for (const track of research.tracks.reverse()) queue.insertTrack(track, 0);
-                    finalTrack = research.tracks[0];
-                }
+                const tracksToInsert = choice !== null ? [research.tracks[choice]] : research.tracks.reverse();
+                for (const track of tracksToInsert) 
+                    queue.insertTrack(track, 0);
+                
+                finalTrack = research.tracks[choice ?? 0];
                 finalSearchResult = research;
             } else {
-                const playResult = await player.play(message.member.voice.channel.id, attachment ?? research, {
-                    nodeOptions: {
-                        metadata: {
-                            channel: message.channel,
-                            client: message.guild.members.me,
-                            requestedBy: message.user,
-                            guild: message.guild,
-                            probableBridgeSource: getProbableBridgeSource(playerConfig, !needsBridge && doesntNeedBridge),
+                const playResult = await player.play(
+                    message.member.voice.channel.id,
+                    attachment ?? (choice !== null ? research.tracks[choice] : research),
+                    {
+                        nodeOptions: {
+                            metadata: {
+                                channel: message.channel,
+                                client: message.guild.members.me,
+                                requestedBy: message.user,
+                                guild: message.guild,
+                                probableBridgeSource: getProbableBridgeSource(playerConfig, !needsBridge && doesntNeedBridge),
+                            },
+                            verifyFallbackStream: true,
+                            ...playerConfig.globalPlayerNodeOptions,
                         },
-                        verifyFallbackStream: true,
-                        ...playerConfig.globalPlayerNodeOptions,
                     },
-                });
+                );
                 finalTrack = playResult.track;
                 finalSearchResult = playResult.searchResult;
             }
-            
+
             logger.music(`Playing [${finalTrack.title}] in [${message.member.voice.channel.name}]`);
 
             embed = embedGenerator.info({
                 title: `${finalSearchResult.hasPlaylist() ? "Playlist" : "Track"} ${!queue?.currentTrack ? "now playing!" : "enqueued!"}`,
                 thumbnail: { url: finalTrack.thumbnail },
-                description: finalTrack.url ? `[${finalTrack.title}](${finalTrack.url})` : finalTrack.title,
+                description: isURL(finalTrack.url) ? `[${finalTrack.title}](${finalTrack.url})` : finalTrack.title,
                 fields: [
-                    { name: "Pre-shuffled", value: optionalArgs["shuffle|s"] ? "Yes" : "No" },
-                    { name: "Will play next", value: optionalArgs["playnext|pn"] && queue ? "Yes" : "No" },
+                    { name: "Pre-shuffled", value: optionalArgs["shuffle|s"] ? "Yes" : "No", inline: true },
+                    { name: "Will play next", value: optionalArgs["playnext|pn"] && queue ? "Yes" : "No", inline: true },
+                    { name: "Extractor", value: `\`${finalTrack.extractor?.identifier || "N/A"}\`` },
                     { name: "Probable bridge source ( [->] = upon fail, falls back to...)", value: getProbableBridgeSource(playerConfig, !needsBridge && doesntNeedBridge) },
                 ],
                 footer: { text: `Loop mode: ${getLoopMode(queue)}` },
             }).withAuthor(message.author);
 
-            if (finalSearchResult?.playlist) embed.data.fields.push({ name: "Playlist", value: `[${finalSearchResult.playlist.title}](${finalSearchResult.playlist.url})` });
+            if (finalSearchResult?.playlist) 
+                embed.data.fields.push({ name: "Playlist", value: `[${finalSearchResult.playlist.title}](${finalSearchResult.playlist.url})` });
+            
 
             await sentMessage.edit({ embeds: [embed] });
             if (playerConfig.removeYoutube && isYoutube && playerConfig.attemptYoutubeSearchEvenIfDisabled) 
                 await message.channel.send({ embeds: [embedGenerator.warning("Youtube links might not be accurate as YouTube extraction is disabled")] });
+            
         } catch (err) {
             logger.error(err);
-            return await sentMessage.edit({ embeds: [embedGenerator.error("Failed to fetch / play the requested track")] });
+            await sentMessage.edit({ embeds: [embedGenerator.error("Failed to fetch / play the requested track")] });
         }
     },
 };
 
-function searchWithPriorities(playerConfig) {
-    for (const priority of playerConfig.streamPriorities) {
-        if ((priority === "youtube" && playerConfig.removeYoutube) ||
-            (priority === "deezer" && playerConfig.removeDeezer))
-            continue;
-        
+/**
+ * Attempts to find an extractor and type for a given query
+ * 
+ * @param {string} query 
+ * @param {Player} player 
+ * @returns {Promise<{ extractor: Extractor | null, type: string }>}
+ */
+async function awareQueryResolver(query, player) {
+    const extractors = player.extractors.store;
+    const result = { extractor: null, type: null };
 
-        let ext;
+    if (!query || !extractors || !extractors.size) return result;
+
+    const maybeTrack = ["track", "song", "music", "audio", "video", "watch"];
+    const maybePlaylist = ["playlist", "album", "mix", "compilation", "set", "queue", "list"];
+    const maybeSearch = ["search", "find", "look", "query", "get", "play"];
+
+    if (maybeTrack.some(word => query.includes(word))) result.type = "track";
+    else if (maybePlaylist.some(word => query.includes(word))) result.type = "playlist";
+    else if (maybeSearch.some(word => query.includes(word))) result.type = "search";
+
+    const sortedExtractors = Array.from(extractors.values()).sort((a, b) => b.priority - a.priority);
+
+    for (const extractor of sortedExtractors) {
         try {
-            switch (priority) {
-                case "youtube":
-                    ext = YoutubeiExtractor.identifier;
-                    break;
-                case "deezer":
-                    ext = DeezerExtractor.identifier;
-                    break;
-                case "soundcloud":
-                    ext = SoundCloudExtractor.identifier;
-                    break;
-                default:
-                    return null;
+            if (await extractor.validate(query, QueryResolver.resolve(query).type)) {
+                result.extractor = extractor;
+                break;
             }
-
-        } catch (err) {
-            return null;
-        }
-        return ext;
-    }
-
-    return null;
-}
-
-function getProbableBridgeSource(playerConfig, providesStream) {
-    if (providesStream) return "Itself";
-
-    const streamProviders = playerConfig.streamPriorities.filter(priority => {
-        return !(priority === "youtube" && playerConfig.removeYoutube || 
-                 priority === "deezer" && playerConfig.removeDeezer);
-    });
-
-    for (const sp of streamProviders) {
-        switch (sp) {
-            case "soundcloud":
-                streamProviders[sp] = "SoundCloud";
-                break;
-            case "youtube":
-                streamProviders[sp] = "YouTube";
-                break;
-            case "deezer":
-                streamProviders[sp] = "Deezer";
-                break;
-            default:
-                streamProviders[sp] = sp;
-                break;
+        } catch {
+            result.extractor = null;
+            break;
         }
     }
 
-    return streamProviders.length > 0 ? streamProviders.join(" -> ") : "N/A";
+    return result;
 }
