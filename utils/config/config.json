@@ -51,16 +51,18 @@
     "blacklist": [],
 
     "whitelist": [
-        273587964334964737
+        "273587964334964737",
+        "670078966110879766"
     ],
     
     "withoutDatabaseConfig": {
         "prefix": ">",
         "responses": 0,
-        "personality": "Answer as if you are annoying."
+        "personality": "Neutral"
     },
 
     "discordPlayerConf": {
+        "supportedFileExtensions": ["mp3"],
         "globalPlayerNodeOptions": {
             "volume": 50,
             "maxSize": 10000,

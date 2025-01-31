@@ -58,7 +58,8 @@
     const discordPlayerConfig = config.get("discordPlayerConf");
     const { Player, AudioFilters } = require("discord-player");
     const exts = require("@discord-player/extractor");
-    const { YoutubeiExtractor, createYoutubeiStream, poTokenExtraction } = require("discord-player-youtubei");
+    const { YoutubeiExtractor } = require("discord-player-youtubei");
+    const { createServerAbrStream, poTokenExtraction } = await import("discord-player-youtubei/experimental");
     const { DeezerExtractor } = require("discord-player-deezer");
     const { SoundgasmExtractor } = require("soundgasm-extractor");
     const { TTSExtractor } = require("tts-extractor");
@@ -88,22 +89,36 @@
     if (!discordPlayerConfig?.removeYoutube) {
         logger.info("Loading YoutubeiExtractor extractor...");
 
+        const ytExtOptions = { streamOptions: {} };
+        if (!discordPlayerConfig?.skipLogin) ytExtOptions.authentication = process.env.YOUTUBE_ACCESS_STRING;
+        if (discordPlayerConfig?.useCookie) ytExtOptions.cookie = process.env.YOUTUBE_COOKIE;
+        if (discordPlayerConfig?.usePoToken) {
+            ytExtOptions.streamOptions.useClient = "WEB";
+            ytExtOptions.createStream = (track, ext) => createServerAbrStream(track, ext, (err) => console.log(err));
+        }
+        ytExtOptions.streamOptions.highWaterMark = discordPlayerConfig?.highWaterMark || 1024 * 1024;
+
         const ytExt = await player.extractors.register(YoutubeiExtractor, {
-            authentication: discordPlayerConfig?.skipLogin ? undefined : process.env.YOUTUBE_ACCESS_STRING || undefined,
-            cookie: discordPlayerConfig?.useCookie ? process.env.YOUTUBE_COOKIE || undefined : undefined,
-            streamOptions: {
-                useClient: discordPlayerConfig?.usePoToken ? "WEB" : undefined,
-                highWaterMark: discordPlayerConfig?.highWaterMark || 1024 * 1024,
-                // overrideBridgeMode: "ytmusic",
-            },
+            ...ytExtOptions,
         });
 
         ytExt.priority = getPriority("youtube") ?? ytExt.priority;
 
         if (discordPlayerConfig?.usePoToken) {
-            const attrationToken = await poTokenExtraction(ytExt.innerTube);
+            const innertube = ytExt.innerTube;
+            const potoken = await poTokenExtraction(innertube);
+            const visitorData = innertube.session.context.client.visitorData;
+            ytExt.setPoToken(potoken, visitorData);
 
-            ytExt.setPoToken(attrationToken, ytExt.innerTube.session.context.client.visitorData);
+            setInterval(async () => {
+                // eslint-disable-next-line no-shadow
+                const innertube = ytExt.innerTube;
+                // eslint-disable-next-line no-shadow
+                const potoken = await poTokenExtraction(innertube);
+                // eslint-disable-next-line no-shadow
+                const visitorData = innertube.session.context.client.visitorData;
+                ytExt.setPoToken(potoken, visitorData);
+            }, 6.048e+8).unref();
         }
     }
 
