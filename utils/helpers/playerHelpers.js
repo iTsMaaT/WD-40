@@ -1,5 +1,8 @@
 const { useQueue } = require("discord-player");
 const { toggleLiveChat } = require("./playerLiveChat");
+const { SoundCloudExtractor, AttachmentExtractor } = require("@discord-player/extractor");
+const { YoutubeiExtractor, stream } = require("discord-player-youtubei");
+const { DeezerExtractor } = require("discord-player-deezer");
 
 /**
  * Get the loop mode of the queue.
@@ -97,10 +100,85 @@ const useStats = (guild) => {
     return queue.stats.generate();
 };
 
+/**
+ * Search for a valid extractor based on the stream priorities.
+ * 
+ * @param {PlayerConfig} playerConfig - The player configuration.
+ * @returns {Extractor} The extractor to use.
+ */
+const searchWithPriorities = function(playerConfig) {
+    for (const priority of playerConfig.streamPriorities) {
+        if ((priority === "youtube" && playerConfig.removeYoutube) ||
+            (priority === "deezer" && playerConfig.removeDeezer))
+            continue;
+        
+
+        let ext;
+        try {
+            switch (priority) {
+                case "youtube":
+                    ext = YoutubeiExtractor.identifier;
+                    break;
+                case "deezer":
+                    ext = DeezerExtractor.identifier;
+                    break;
+                case "soundcloud":
+                    ext = SoundCloudExtractor.identifier;
+                    break;
+                default:
+                    return null;
+            }
+
+        } catch (err) {
+            return null;
+        }
+        return ext;
+    }
+
+    return null;
+};
+
+/**
+ * Get the probable bridge source based on the player configuration.
+ * 
+ * @param {PlayerConfig} playerConfig - The player configuration.
+ * @param {boolean} providesStream - Whether the source provides a stream.
+ * @returns {string} The probable bridge source.
+ */
+const getProbableBridgeSource = function(playerConfig, providesStream) {
+    if (providesStream) return "Itself";
+
+    const streamProviders = playerConfig.streamPriorities.filter(priority => {
+        return !(priority === "youtube" && playerConfig.removeYoutube || 
+                 priority === "deezer" && playerConfig.removeDeezer);
+    });
+
+    for (const sp of streamProviders) {
+        switch (sp) {
+            case "soundcloud":
+                streamProviders[sp] = "SoundCloud";
+                break;
+            case "youtube":
+                streamProviders[sp] = "YouTube";
+                break;
+            case "deezer":
+                streamProviders[sp] = "Deezer";
+                break;
+            default:
+                streamProviders[sp] = sp;
+                break;
+        }
+    }
+
+    return streamProviders.length > 0 ? streamProviders.join(" -> ") : "N/A";
+};
+
 module.exports = {
     getLoopMode,
     getPauseMode,
     getFormattedSource,
     toggleLiveChat,
     useStats,
+    searchWithPriorities,
+    getProbableBridgeSource,
 };
