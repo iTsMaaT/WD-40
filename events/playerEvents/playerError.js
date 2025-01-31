@@ -17,8 +17,12 @@ module.exports = {
         } catch (err) {
             embed.data.description = "An error occured, a track might've been skipped";
         }
-
-        await queue.metadata.channel.send({ embeds: [embed] });
+        
+        try {
+            await queue.metadata.channel.send({ embeds: [embed] });
+        } catch (err) {
+            //
+        }
         logger.info(`Queue: ${queue.metadata.guild.name} threw error on track ${queue?.currentTrack?.title || "N/A"}: \n ${error}`);
     },
 };
