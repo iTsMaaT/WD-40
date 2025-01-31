@@ -159,7 +159,6 @@ module.exports = {
         };
 
         const collector = helpMessage.createMessageComponentCollector({
-            filter,
             time: 120000,
             dispose: true,
         });
