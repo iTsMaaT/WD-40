@@ -53,6 +53,16 @@ class Logger {
             "music": "MUSIC",
             "event": "EVENT",
         };
+        this.logCounts = {
+            "severe": 0,
+            "error": 0,
+            "warning": 0,
+            "info": 0,
+            "debug": 0,
+            "event": 0,
+            "music": 0,
+            "console": 0,
+        };
     }
 
     /**
@@ -125,17 +135,21 @@ class Logger {
 
     debug(message) {
         this.writeLogToFile(message, this.types.debug);
+        this.logCounts.debug++;
     }
 
     info(message) {
         this.writeLogToFile(message, this.types.info);
+        this.logCounts.info++;
     }
 
     console(message) {
         this.writeLogToFile(message, this.types.console);
+        this.logCounts.console++;
     }
 
     warning(message) {
+        this.logCounts.warning++;
         if (process.env.SERVER == "prod" && process.env.SENTRY_DSN) {
             Sentry.withScope((scope) => {
                 scope.setLevel("warning");
@@ -146,6 +160,7 @@ class Logger {
     }
 
     severe(message) {
+        this.logCounts.severe++;
         if (process.env.SERVER == "prod" && process.env.SENTRY_DSN) {
             let sError;
             if (message.stack) 
@@ -163,11 +178,28 @@ class Logger {
     }
 
     music(message) {
+        this.logCounts.music++;
         this.writeLogToFile(message, this.types.music);
     }
 
     event(message) {
+        this.logCounts.event++;
         this.writeLogToFile(message, this.types.event);
+    }
+
+    async getAllTimeLogCount(type) {
+        try {
+            const allTimeLogs = await repositories.logs.select();
+            if (!type) return allTimeLogs.length;
+            return allTimeLogs.filter(log => log.type == type.toUpperCase()).length;
+        } catch (ex) {
+            this.error(ex);
+            return -1;
+        }
+    }
+
+    getTotalLogCount() {
+        return Object.values(this.logCounts).reduce((acc, count) => acc + count, 0);
     }
 }
 
@@ -185,5 +217,4 @@ class Logger {
  * @property {function} event - Log an event-related message.
  */
 const logger = new Logger();
-Object.freeze(logger);
 module.exports = logger;
