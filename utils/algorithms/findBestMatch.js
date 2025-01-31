@@ -20,6 +20,14 @@ const findBestMatch = (algorithm, input, values) => {
     if (!Object.values(algorithms).includes(algorithm))
         throw new Error("Invalid algorithm provided");
 
+    if (!input || !values || !Array.isArray(values) || values.length === 0) {
+        return {
+            match: "",
+            score: 0,
+            matches: [],
+        };
+    }
+
     switch (algorithm) {
         case algorithms.LEVENSHTEIN_DISTANCE:
             return levenshteinDistanceAlgorithm(input, values);
@@ -68,12 +76,18 @@ function levenshteinDistance(s1, s2) {
  * @returns {{match: string, score: number, matches: Array<{value: string, score: number}>}} An object containing the best match, its score, and a sorted array of matches.
  */
 function levenshteinDistanceAlgorithm(input, values) {
-    const matches = values.map(value => ({
-        value,
-        score: levenshteinDistance(input, value),
-    }));
+    const matches = values.map(value => {
+        const maxLen = Math.max(input.length, value.length);
+        const rawDistance = levenshteinDistance(input, value);
+        const normalizedScore = 1 - rawDistance / maxLen;
 
-    matches.sort((a, b) => a.score - b.score);
+        return {
+            value,
+            score: normalizedScore,
+        };
+    });
+
+    matches.sort((a, b) => b.score - a.score);
 
     return {
         match: matches[0].value,
@@ -89,7 +103,12 @@ function levenshteinDistanceAlgorithm(input, values) {
  * @returns {string[]} An array of tokens.
  */
 function tokenize(str) {
-    return str.toLowerCase().split(/\s+/).filter(Boolean);
+    return str
+        .toLowerCase() // Convert to lowercase for case-insensitive matching
+        .replace(/[^\w\s'-]+/g, "") // Remove non-word characters except spaces, hyphens, and apostrophes
+        .trim() // Remove leading/trailing whitespace
+        .split(/\s+/) // Split by any whitespace
+        .filter(Boolean); // Remove empty tokens
 }
 
 /**
@@ -137,7 +156,7 @@ function fuzzyMatchAlgorithm(searchString, listOfStrings) {
 
         return {
             value: target,
-            score,
+            score: Math.min(score / searchTokens.length, 1), // Normalize score between 0 and 1
         };
     });
 
