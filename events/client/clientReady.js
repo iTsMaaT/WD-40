@@ -70,7 +70,7 @@ module.exports = {
         console.log(`Whitelisted users: ${config.get("whitelist").join(", ")}`);
         if (process.env.SERVER == "dev") config.set("defaultSuperuserState", true);
         console.log(`Debug is ${config.get("DefaultDebugState") ? "en" : "dis"}abled`);
-        console.log(`Superuser is ${config.get("DefaultSuperuserState") ? "en" : "dis"}abled`);
+        console.log(`Superuser is ${config.get("defaultSuperuserState") ? "en" : "dis"}abled`);
 
         console.log("Waiting for websocket to report sensical ping (> -1ms)");
         console.logger(`
