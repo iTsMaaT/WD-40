@@ -1,6 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 
+/**
+ * Represents the base configuration object.
+ * 
+ * @typedef {Object} BaseConfig
+ */
 class Config {
     constructor() {
         this.configFilePath = path.resolve(__dirname, "config.json");
