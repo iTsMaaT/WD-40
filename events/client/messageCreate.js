@@ -10,6 +10,7 @@ const { initConfFile } = require("@utils/reddit/fetchRedditToken.js");
 const countCommonChars = require("@utils/functions/countCommonChars.js");
 const config = require("@utils/config/configUtils");
 const dbManager = require("@root/utils/db/databaseManager");
+const { getPermissionArrayNames } = require("@functions/discordFunctions");
 
 module.exports = {
     name: Events.MessageCreate,
@@ -80,137 +81,165 @@ Step 5 - Send the downloaded media to your favorite social media!
         async function handleCommand(message) {
             if (message.author.bot) return;
             if (config.get("defaultSuperuserState") && !config.get("whitelist").includes(message.author.id)) return;
-            if (!message.guild) return message.reply("Commands cannot be executed inside DMs.");
+            if (!message.guild) return;
             if (config.get("blacklist").includes(message.author.id)) return;
-
-            // Text command executing
+        
             const prefix = GuildManager.GetPrefix(message.guild);
-            if (message.content.startsWith(prefix) || message.content.startsWith(`<@${client.user.id}>`)) {
-                let args, commandName;
-                if (!message.content.startsWith(`<@${client.user.id}> `)) {
-                    args = message.content.slice(prefix.length).split(/ +/);
-                    commandName = args.shift().toLowerCase();
-                } else {
-                    args = message.content.slice().split(/ +/);
-                    args.shift();
-                    commandName = args.shift().toLowerCase();
+            if (!message.content.startsWith(prefix) && !message.content.startsWith(`<@${client.user.id}>`)) return;
+        
+            let args, commandName;
+            if (!message.content.startsWith(`<@${client.user.id}> `)) {
+                args = message.content.slice(prefix.length).trim().split(/ +/);
+                commandName = args.shift()?.toLowerCase();
+            } else {
+                args = message.content.split(/ +/).slice(1);
+                commandName = args.shift()?.toLowerCase();
+            }
+        
+            // Bot's Channel-Specific Permissions Check
+            const botMember = message.guild.members.me;
+            if (!botMember) return;
+        
+            const botPermissions = botMember.permissionsIn(message.channel);
+        
+            if (!botPermissions.has(PermissionsBitField.Flags.ViewChannel)) return;
+            if (!botPermissions.has(PermissionsBitField.Flags.SendMessages)) {
+                try {
+                    await message.author.send(`I don't have permission to send messages in <#${message.channel.id}>.`);
+                } catch (dmError) {
+                    logger.warning("Failed to notify user of missing permissions.");
                 }
-
-                // Command auto-correction
-                let command = client.commands.get(commandName);
-                if (!command && config.get("autoCommandMatch")) {
-                    const commandSet = new Set(client.commands.filter(cmd => !cmd.private).map(cmd => cmd.name));
-                    const commandArray = Array.from(commandSet);
-                    const closeMatch = findBestMatch(algorithms.LEVENSHTEIN_DISTANCE, commandName, commandArray);
-                    if (closeMatch.score <= 2 && countCommonChars(commandName, closeMatch.match) != 0) {
-                        // command = client.commands.get(closeMatch.closestMatch);
-                        await message.reply(`Did you mean \`${prefix}${closeMatch.match}\`?`);
-                        const filter = (m) => m.author.id === message.author.id;
-                        await message.channel.awaitMessages({ filter, max: 1, time: 5000, errors: ["time"] })
-                            .then((collected) => {
-                                const responseMessage = collected.first();
-                                if (responseMessage.content.toLowerCase().startsWith("yes")) command = client.commands.get(closeMatch.match);
-                            }).catch(() => null);
-                    }
-                }
-
-                if (!command) return;
-                if (command.private && message.author.id !== process.env.OWNER_ID) return;
-                // Admin commands checking
-                if (command.admin && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return await message.reply({ embeds: [embedGenerator.error("You are not administrator")] });
-                if (command.inVoiceChannel && !message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
-                if (command.inSameVoiceChannel && message.guild.me?.voice?.channel && message.member?.voice?.channel?.id !== message.guild.me?.voice?.channel?.id) return await message.reply({ embeds: [embedGenerator.warning("You must be in the same voice channel as me.")] });
-
-                const userBlacklist = await GuildManager.GetBlacklist(message.guild.id);
-                const blCategory = !userBlacklist.CheckPermission(message.author.id, command.category);
-                const blCommand = !userBlacklist.CheckPermission(message.author.id, command.name);
-                if (blCategory || blCommand) 
-                    return await message.reply({ embeds: [embedGenerator.error(`You are blacklisted from executing ${blCategory ? `commands in the **${command.category}** category` : `the **${command.name}** command`}.`)] });
-    
-                if (command.dbNeeded && !dbManager.dbExists()) {
-                    return await message.reply({ embeds: [embedGenerator.error({
-                        title: "Cannot run command",
-                        description: "A database connection is required to run this command.",
-                    })] });
-                }
-
-                // Check command cooldown
-                if (TextCooldowns.has(message.author.id)) {
-                    const cooldown = TextCooldowns.get(message.author.id);
-                    let timeLeft = cooldown - Date.now();
-                    if (config.get("defaultSuperuserState") && config.get("whitelist").includes(message.author.id)) timeLeft = 0;
-                    if (timeLeft > 0) {
-                        message.reply({ embeds: [embedGenerator.warning(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before using that command again.`)] });
+                return;
+            }
+        
+            let command = client.commands.get(commandName);
+        
+            // Auto-Correction AFTER permission checks
+            if (!command && config.get("autoCommandMatch")) {
+                const commandSet = new Set(client.commands.filter(cmd => !cmd.private).map(cmd => cmd.name));
+                const commandArray = Array.from(commandSet);
+                const closeMatch = findBestMatch(algorithms.LEVENSHTEIN_DISTANCE, commandName, commandArray);
+                
+                if (closeMatch.score <= 2 && countCommonChars(commandName, closeMatch.match) !== 0) {
+                    await message.reply(`Did you mean \`${prefix}${closeMatch.match}\`?`);
+                    const filter = (m) => m.author.id === message.author.id;
+                    try {
+                        const collected = await message.channel.awaitMessages({ filter, max: 1, time: 5000, errors: ["time"] });
+                        if (collected.first()?.content.toLowerCase().startsWith("yes")) 
+                            command = client.commands.get(closeMatch.match);
+                        
+                    } catch {
                         return;
                     }
                 }
-
-                // Set command cooldown
-                const cooldownTime = command.cooldown || 0;
-                TextCooldowns.set(message.author.id, Date.now() + cooldownTime);
+            }
+        
+            if (!command) return;
+        
+            // User-based Restrictions
+            if (command.private && message.author.id !== process.env.OWNER_ID) return;
+            if (command.admin && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) 
+                return await message.reply({ embeds: [embedGenerator.error("You are not an administrator.")] });
+        
+            if (command.inVoiceChannel && !message.member.voice.channel) 
+                return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
+        
+            if (command.inSameVoiceChannel && message.guild.me?.voice?.channel && message.member?.voice?.channel?.id !== message.guild.me?.voice?.channel?.id) 
+                return await message.reply({ embeds: [embedGenerator.warning("You must be in the same voice channel as me.")] });
+        
+            // Blacklist Check
+            const userBlacklist = await GuildManager.GetBlacklist(message.guild.id);
+            if (!userBlacklist.CheckPermission(message.author.id, command.category) || !userBlacklist.CheckPermission(message.author.id, command.name)) {
+                return await message.reply({
+                    embeds: [embedGenerator.error("You are blacklisted from executing this command.")],
+                });
+            }
+        
+            // Database Dependency Check
+            if (command.dbNeeded && !dbManager.dbExists()) {
+                return await message.reply({ embeds: [embedGenerator.error({
+                    title: "Cannot run command",
+                    description: "A database connection is required to run this command.",
+                })] });
+            }
+        
+            // Cooldown Check
+            if (TextCooldowns.has(message.author.id)) {
+                const cooldown = TextCooldowns.get(message.author.id);
+                let timeLeft = cooldown - Date.now();
+                if (config.get("defaultSuperuserState") && config.get("whitelist").includes(message.author.id)) timeLeft = 0;
+                if (timeLeft > 0) 
+                    return await message.reply({ embeds: [embedGenerator.warning(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before using that command again.`)] });
                 
-                try {
-                    const maxLengths = {
-                        names: Math.max(message.member.user.tag.length, message.channel.name.length, message.guild.name.length),
-                        ids: Math.max(message.author.id.length, message.channel.id.length, message.guild.id.length),
-                    };
-    
-                    // Logging every executed commands
-                    logger.info(`Executing [${message.content}]` + "\n" +
-                        `by    [${message.member.user.tag.padEnd(maxLengths.names)} (${message.author.id.padEnd(maxLengths.ids)})]` + "\n" +
-                        `in    [${message.channel.name.padEnd(maxLengths.names)} (${message.channel.id.padEnd(maxLengths.ids)})]` + "\n" +
-                        `from  [${message.guild.name.padEnd(maxLengths.names)} (${message.guild.id.padEnd(maxLengths.ids)})]`);
-
-                    const startTime = Date.now();
-
-                    // Check if the bot has the required permissions
-                    const botMember = message.guild.members.me;
-                    if (!botMember) return;
-                    
-                    const botPermissions = botMember.permissions;
-                    
-                    if (!botPermissions.has(PermissionsBitField.Flags.SendMessages || !botPermissions.has(PermissionsBitField.Flags.ViewChannel))) return;
-                    if (command.lastExecutionTime >= 1000) await message.channel.sendTyping();
-
-                    const requiredPermissions = command.permissions || [];
-                    requiredPermissions.push(PermissionsBitField.Flags.ReadMessageHistory);
-
-                    if (requiredPermissions.length > 1 && !botPermissions.has(PermissionsBitField.Flags.Administrator)) {
-                        const missingPermissions = requiredPermissions.filter(permission => !botPermissions.has(permission));
-                        if (missingPermissions.length > 0) 
-                            return await message.reply({ embeds: [embedGenerator.error(`The bot is missing the following permissions: ${missingPermissions.join(", ")}`)] });
+            }
+        
+            try {
+                // Logging
+                const maxLengths = {
+                    names: Math.max(message.member.user.tag.length, message.channel.name.length, message.guild.name.length),
+                    ids: Math.max(message.author.id.length, message.channel.id.length, message.guild.id.length),
+                };
+        
+                // Logging every executed command
+                logger.info(`Executing [${message.content}]` + "\n" +
+                    `by    [${message.member.user.tag.padEnd(maxLengths.names)} (${message.author.id.padEnd(maxLengths.ids)})]` + "\n" +
+                    `in    [${message.channel.name.padEnd(maxLengths.names)} (${message.channel.id.padEnd(maxLengths.ids)})]` + "\n" +
+                    `from  [${message.guild.name.padEnd(maxLengths.names)} (${message.guild.id.padEnd(maxLengths.ids)})]`);
+        
+                const startTime = Date.now();
+        
+                // Additional Bot Permission Check (Required for Specific Commands)
+                const requiredPermissions = command.permissions || [];
+                requiredPermissions.push(PermissionsBitField.Flags.ReadMessageHistory);
+        
+                if (!botPermissions.has(PermissionsBitField.Flags.Administrator)) {
+                    const missingPermissions = requiredPermissions.filter(permission => !botPermissions.has(permission));
+                    if (missingPermissions.length > 0) {
+                        const readablePermissions = getPermissionArrayNames(missingPermissions);
+                        return await message.reply({
+                            embeds: [embedGenerator.error(`I am missing the following permissions: ${readablePermissions.map(p => `\`${p}\``).join(", ")}`)],
+                        });
                     }
-
-
-                    const optionalArgs = {};
-                    if (typeof command.usage === "object") {
-                        const usage = command.usage;
-                        const optionalKeys = Object.keys(usage.optional ?? {});
-
-                        for (let part = args.length - 1; part >= 0; part--) {
-                            for (const k of optionalKeys) {
-                                if (k.toLowerCase().split("|").map(s => "-" + s).includes(args[part]?.toLowerCase())) {
-                                    if (usage.optional[k].hasValue) {
-                                        optionalArgs[k] = args[parseInt(part) + 1];
-                                        args.splice(part, 2);
-                                    } else {
-                                        optionalArgs[k] = true;
-                                        args.splice(part, 1);
-                                    }
+                }
+        
+                if (command.lastExecutionTime >= 1000) await message.channel.sendTyping();
+        
+                // Process Optional Arguments
+                const optionalArgs = {};
+                if (typeof command.usage === "object") {
+                    const usage = command.usage;
+                    const optionalKeys = Object.keys(usage.optional ?? {});
+            
+                    for (let part = args.length - 1; part >= 0; part--) {
+                        for (const k of optionalKeys) {
+                            if (k.toLowerCase().split("|").map(s => "-" + s).includes(args[part]?.toLowerCase())) {
+                                if (usage.optional[k].hasValue) {
+                                    optionalArgs[k] = args[parseInt(part) + 1];
+                                    args.splice(part, 2);
+                                } else {
+                                    optionalArgs[k] = true;
+                                    args.splice(part, 1);
                                 }
                             }
                         }
                     }
-
-                    const player = useMainPlayer();
-                    await player.context.provide({ guild: message.guild }, async () => await command.execute(logger, client, message, args, optionalArgs));
-
-                    command.lastExecutionTime = parseInt(Date.now() - startTime);
-
-                } catch (error) {
-                    logger.error(error.stack);
-                    return await message.reply({ embeds: [embedGenerator.error("An error occured while executing the command")] });
                 }
+        
+                const player = useMainPlayer();
+        
+                // Execute Command
+                await player.context.provide({ guild: message.guild }, async () => {
+                    await command.execute(logger, client, message, args, optionalArgs);
+                });
+        
+                // Set Command Cooldown AFTER Successful Execution
+                TextCooldowns.set(message.author.id, Date.now() + (command.cooldown || 0));
+        
+                command.lastExecutionTime = Date.now() - startTime;
+        
+            } catch (error) {
+                logger.error(error);
+                return await message.reply({ embeds: [embedGenerator.error("An error occurred while executing the command.")] });
             }
         }
     },
