@@ -1,42 +1,48 @@
 const { PermissionsBitField } = require("discord.js");
 const { prettyString } = require("@functions/formattingFunctions");
+const { WebhookClient } = require("discord.js");
 
 /**
- * Creates a webhook if it doesn't exist, or returns the existing one
+ * Creates a webhook if it doesn't exist, or returns a new one with a valid token.
  * @param {Message} message The message object
  * @param {string} name The name of the webhook
- * @returns {webhook} The webhook
+ * @returns {WebhookClient} The webhook client with token
  */
-const CreateOrUseWebhook = async function(message, name) {
-    try {
-        const webhooks = await message.channel.fetchWebhooks();
+async function createOrUseWebhook(message, name) {
+    const webhooks = await message.channel.fetchWebhooks();
+        
+    // Delete oldest webhooks if there are too many
+    if (webhooks.size >= 10) {
+        const oldestWebhooks = Array.from(webhooks.values())
+            .sort((a, b) => a.createdTimestamp - b.createdTimestamp)
+            .slice(0, 3); // Delete the 3 oldest
 
-        if (webhooks.size > 12) {
-            const webhookArray = Array.from(webhooks.values())
-                .sort((a, b) => a.createdTimestamp - b.createdTimestamp);
-
-            for (let i = 0; i < 3; i++) {
-                if (webhookArray[i]) 
-                    await webhookArray[i].delete("Deleting oldest webhook to stay within limits.");
-                
-            }
-        }
-
-        let webhook = webhooks.find(wh => wh.name === name);
-
-        if (!webhook) {
-            webhook = await message.channel.createWebhook({
-                name: name,
-                reason: "Webhook creation requested",
-            });
-        }
-
-        return webhook;
-    } catch (error) {
-        logger.error(error);
-        throw new Error("Failed to create or retrieve the webhook.");
+        for (const webhook of oldestWebhooks) 
+            await webhook.delete("Deleting old webhooks to stay within limits.");
+            
     }
-};
+
+    // Attempt to find an existing webhook with a known token
+    let webhook = webhooks.find(wh => wh.name === name);
+
+    // If no existing webhook is found, create a new one
+    if (!webhook) {
+        webhook = await message.channel.createWebhook({
+            name: name,
+            reason: "Webhook creation requested",
+        });
+    } else {
+        // If an existing webhook is found, delete and recreate it (since it lacks a token)
+        await webhook.delete("Recreating webhook to ensure token availability.");
+        webhook = await message.channel.createWebhook({
+            name: name,
+            reason: "Recreated webhook to retrieve token.",
+        });
+    }
+
+    return new WebhookClient({ id: webhook.id, token: webhook.token });
+}
+
 
 /**
  * Extracts the ID from a mention
@@ -173,7 +179,7 @@ function getPermissionArrayNames(flags) {
 }
 
 module.exports = { 
-    CreateOrUseWebhook,
+    createOrUseWebhook,
     id,
     stringReact,
     extractMessageInfo,
