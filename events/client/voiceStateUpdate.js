@@ -1,115 +1,91 @@
-const { Events } = require("discord.js");
+const { Events, AuditLogEvent } = require("discord.js");
 
 module.exports = {
     name: Events.VoiceStateUpdate,
     once: false,
     async execute(client, logger, oldState, newState) {
-        const userVoiceStateEvents = {
-            userMuted: false,
-            userUnmuted: false,
-            userDeafened: false,
-            userUndeafened: false,
-            userServerMuted: false,
-            userServerUnmuted: false,
-            userServerDeafened: false,
-            userServerUndeafened: false,
-            userCameraON: false,
-            userCameraOFF: false,
-            userStreamingON: false,
-            userStreamingOFF: false,
-            userJoinedChannel: false,
-            userLeftChannel: false,
-            userMovedChannel: false,
-            userSupressed: false,
-            userUnsupressed: false,
-            userAfkKicked: false,
-        };
+        const userVoiceStateEvents = {};
 
-        if (!oldState.channelId && newState.channelId) {
-            // User joins channel
-            userVoiceStateEvents.userJoinedChannel = true;
-        } else if (oldState.channelId && !newState.channelId) {
-            // User leaves channel
-            userVoiceStateEvents.userLeftChannel = true;
-        } else if (oldState.channelId && newState.channelId && oldState.channelId != newState.channelId) {
-            // User moves channel
-            userVoiceStateEvents.userMovedChannel = true;
-        }
+        const setEvent = (key) => (userVoiceStateEvents[key] = true);
 
-        if (!oldState.selfDeaf && newState.selfDeaf) {
-            // User deafens
-            userVoiceStateEvents.userDeafened = true;
+        const user = newState.member?.nickname || newState.member?.user.username || "Unknown User";
 
-        } else if (oldState.selfDeaf && !newState.selfDeaf) {
-            // User undeafens
-            userVoiceStateEvents.userUndeafened = true;
-
-        }
-
-        if (!oldState.selfMute && newState.selfMute) {
-            // User mutes
-            userVoiceStateEvents.userMuted = true;
-        } else if (oldState.selfMute && !newState.selfMute) {
-            // User unmutes
-            userVoiceStateEvents.userUnmuted = true;
-        }
-
-        if (!oldState.selfVideo && newState.selfVideo) {
-            // User enables camera
-            userVoiceStateEvents.userCameraON = true;
-        } else if (oldState.selfVideo && !newState.selfVideo) {
-            // User disables camera
-            userVoiceStateEvents.userCameraOFF = true;
-        }
+        // Primary actions
+        if (!oldState.channelId && newState.channelId) 
+            setEvent("userJoinedChannel");
+        else if (oldState.channelId && !newState.channelId) 
+            setEvent("userLeftChannel");
+        else if (oldState.channelId !== newState.channelId) 
+            setEvent("userMovedChannel");
         
-        if (!oldState.serverDeaf && newState.serverDeaf) {
-            // User gets server deafened
-            userVoiceStateEvents.userServerDeafened = true;
-        } else if (oldState.serverDeaf && !newState.serverDeaf) {
-            // User gets server undeafened
-            userVoiceStateEvents.userServerUndeafened = true;
-        }
 
-        if (!oldState.serverMute && newState.serverMute) {
-            // User gets server muted
-            userVoiceStateEvents.userServerMuted = true;
-        } else if (oldState.serverMute && !newState.serverMute) {
-            // User gets server unmuted
-            userVoiceStateEvents.userServerUnmuted = true;
-        }
+        // Secondary actions
+        if (oldState.selfMute !== newState.selfMute) setEvent(newState.selfMute ? "userMuted" : "userUnmuted");
+        if (oldState.selfDeaf !== newState.selfDeaf) setEvent(newState.selfDeaf ? "userDeafened" : "userUndeafened");
+        if (oldState.serverMute !== newState.serverMute) setEvent(newState.serverMute ? "userServerMuted" : "userServerUnmuted");
+        if (oldState.serverDeaf !== newState.serverDeaf) setEvent(newState.serverDeaf ? "userServerDeafened" : "userServerUndeafened");
+        if (oldState.streaming !== newState.streaming) setEvent(newState.streaming ? "userStreamingON" : "userStreamingOFF");
+        if (oldState.selfVideo !== newState.selfVideo) setEvent(newState.selfVideo ? "userCameraON" : "userCameraOFF");
+        if (oldState.suppress !== newState.suppress) setEvent(newState.suppress ? "userSuppressed" : "userUnsuppressed");
 
-        if (!oldState.streaming && newState.streaming) {
-            // User started streaming
-            userVoiceStateEvents.userStreamingON = true;
-        } else if (oldState.streaming && !newState.streaming) {
-            // User stopped streaming
-            userVoiceStateEvents.userStreamingOFF = true;
-        }
+        // AFK kick detection
+        if (userVoiceStateEvents.userMovedChannel && newState.channelId === newState.guild.afkChannelId) 
+            setEvent("userAfkKicked");
+        
 
-        // Stage channels
-        if (!oldState.suppress && newState.suppress) {
-            // User gets suppressed
-            userVoiceStateEvents.userSupressed = true;
-        } else if (oldState.suppress && !newState.suppress) {
-            // User gets unsupressed
-            userVoiceStateEvents.userUnsupressed = true;
-        }
+        // Kicked due to VC deletion
+        if (oldState.channelId && !newState.channelId && !oldState.channel) 
+            setEvent("userKickedDeletedVC");
+        
 
-        if (userVoiceStateEvents.userSupressed && userVoiceStateEvents.userMovedChannel && newState.channel.id == newState.guild.afkChannelId)
-            userVoiceStateEvents.userAfkKicked = true;
+        // Check if user was moved by an admin using audit logs
+        if (userVoiceStateEvents.userMovedChannel) {
+            try {
+                const logs = await newState.guild.fetchAuditLogs({ type: AuditLogEvent.MemberMove, limit: 5 });
+                const entry = logs.entries.find(e => 
+                    e.extra?.channel?.id === newState.channelId && // Check if moved into this channel
+                    Date.now() - e.createdTimestamp < 5000,
+                );
 
-        // kicked because deleted vc event
-        // moved by server admin
-        // kicked by server admin
-
-        /* console.log(`Updates for ${newState.member.nickname}`);
-
-        for (const [event, value] of Object.entries(userVoiceStateEvents)) {
-            if (value) {
-                console.log(event);
+                if (entry) {
+                    setEvent("userMovedByAdmin");
+                    userVoiceStateEvents.adminWhoMoved = entry.executor.username;
+                }
+            } catch (err) {
+                logger.warn(`Failed to fetch audit logs: ${err.message}`);
             }
         }
-        console.log("\n");*/
-            
+
+        // Kicked by an admin
+        if (oldState.channelId && !newState.channelId && oldState.channel) {
+            try {
+                const logs = await newState.guild.fetchAuditLogs({ type: AuditLogEvent.MemberDisconnect, limit: 5 });
+                const entry = logs.entries.find(e => 
+                    e.extra?.channel?.id === oldState.channelId && // Check if kicked from this channel
+                    Date.now() - e.createdTimestamp < 5000,
+                );
+
+                if (entry) {
+                    setEvent("userKickedByAdmin");
+                    userVoiceStateEvents.adminWhoKicked = entry.executor.username;
+                }
+            } catch (err) {
+                logger.warn(`Failed to fetch audit logs: ${err.message}`);
+            }
+        }
+
+        // Final logging (log primary action first, then secondary actions)
+        if (Object.keys(userVoiceStateEvents).length > 0) {
+            logger.debug(`Voice state update for ${user}:`);
+            for (const [event, value] of Object.entries(userVoiceStateEvents)) {
+                if (value) {
+                    if (event === "adminWhoMoved" || event === "adminWhoKicked") 
+                        logger.debug(`  - ${event}: ${value}`);
+                    else 
+                        logger.debug(`  - ${event}`);
+                    
+                }
+            }
+        }
     },
 };
