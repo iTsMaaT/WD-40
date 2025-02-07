@@ -74,18 +74,18 @@ module.exports = {
             }
         }
 
-        // Final logging (log primary action first, then secondary actions)
-        if (Object.keys(userVoiceStateEvents).length > 0) {
-            logger.debug(`Voice state update for ${user}:`);
-            for (const [event, value] of Object.entries(userVoiceStateEvents)) {
-                if (value) {
-                    if (event === "adminWhoMoved" || event === "adminWhoKicked") 
-                        logger.debug(`  - ${event}: ${value}`);
-                    else 
-                        logger.debug(`  - ${event}`);
-                    
-                }
-            }
-        }
+        // // Final logging (log primary action first, then secondary actions)
+        // if (Object.keys(userVoiceStateEvents).length > 0) {
+        //    logger.debug(`Voice state update for ${user}:`);
+        //    for (const [event, value] of Object.entries(userVoiceStateEvents)) {
+        //        if (value) {
+        //            if (event === "adminWhoMoved" || event === "adminWhoKicked") 
+        //                logger.debug(`  - ${event}: ${value}`);
+        //            else 
+        //                logger.debug(`  - ${event}`);
+        //            
+        //        }
+        //    }
+        // }
     },
 };
