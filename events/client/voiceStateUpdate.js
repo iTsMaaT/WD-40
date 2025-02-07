@@ -3,7 +3,9 @@ const { Events, AuditLogEvent } = require("discord.js");
 module.exports = {
     name: Events.VoiceStateUpdate,
     once: false,
+    disabled: true,
     async execute(client, logger, oldState, newState) {
+        if (this.disabled) return;
         const userVoiceStateEvents = {};
 
         const setEvent = (key) => (userVoiceStateEvents[key] = true);
