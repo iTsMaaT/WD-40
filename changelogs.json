@@ -364,5 +364,22 @@
             "Added >playerstats: get stats about the current queue and player",
             "Multiple fixes"
         ]
+    },
+    {
+        "version": "5.9.0",
+        "date": "2025-02-07",
+        "changes": [
+            "Fixed some permission checks issues",
+            "The bot now tries to send a DM if it doesnt have permissions to send a message in a channel",
+            "Added >leave alias to >stop",
+            "New Add / Play Links message context menu command: right click a message > apps > Add / Play Links to play the links in the message",
+            "Better bridge extractor indications in the play command: Will tell you the extractor used for bridging, and the fallback extractors if the first fails",
+            "Ability to search using deezer, just add `deezer:` before the search query",
+            "Added a TTS extractor (<https://www.npmjs.com/package/tts-extractor>), used for the >tts and >asktts commands",
+            ">tts and >asktts now don't have a character and word limit",
+            "Fixed typo in >play",
+            ">help's first page now properly explains how to use commands and parameters",
+            "Fixed >help's slash commands showing undefined instead of / before the command name"
+        ]
     }
 ]
