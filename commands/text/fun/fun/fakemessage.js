@@ -1,4 +1,4 @@
-const { CreateOrUseWebhook, id } = require("@functions/discordFunctions");
+const { createOrUseWebhook, id } = require("@functions/discordFunctions");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { PermissionsBitField } = require("discord.js");
 
@@ -12,8 +12,9 @@ module.exports = {
     },
     category: "fun",
     examples: ["1081004946872352958 You are weird looking"],
-    permission: [PermissionsBitField.Flags.ManageWebhooks, PermissionsBitField.Flags.ManageMessages],
+    permissions: [PermissionsBitField.Flags.ManageWebhooks, PermissionsBitField.Flags.ManageMessages],
     aliases: ["fmsg"],
+    cooldown: 5000,
     async execute(logger, client, message, args, optionalArgs) {
         let UserID;
 
@@ -34,7 +35,7 @@ module.exports = {
         message.delete();
         
         // Create a webhook in the target channel
-        const webhook = await CreateOrUseWebhook(message, "FakeMessage");
+        const webhook = await createOrUseWebhook(message, "FakeMessage");
 
         // Send the fake message using the webhook
         await webhook.send({

@@ -1,4 +1,4 @@
-const { ApplicationCommandType } = require("discord.js");
+const { ApplicationCommandType, MessageFlags } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { useMainPlayer } = require("discord-player");
 const getURLs = require("@functions/getURLs");
@@ -19,10 +19,10 @@ module.exports = {
         
 
         if (!interaction.member.voice.channel) 
-            return await interaction.editReply({ embeds: [embedGenerator.error("You must be in a voice channel to use this command.")], ephemeral: true });
+            return await interaction.editReply({ embeds: [embedGenerator.error("You must be in a voice channel to use this command.")], flags: MessageFlags.Ephemeral });
         
 
-        await interaction.editReply({ embeds: [embedGenerator.info("Processing links...")], ephemeral: true });
+        await interaction.editReply({ embeds: [embedGenerator.info("Processing links...")], flags: MessageFlags.Ephemeral });
 
         try {
             for (const link of queries) {
