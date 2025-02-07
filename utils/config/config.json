@@ -81,7 +81,7 @@
         "skipLogin": true,
         "usePoToken": false,
         "useCookie": false,
-        "log": true,
+        "log": false,
         "logEvent": false,
         "highWaterMark": 2097152,
         "skipFFmpeg": false,
