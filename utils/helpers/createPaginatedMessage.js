@@ -1,4 +1,5 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const embedGenerator = require("./embedGenerator");
 
 /**
  * Creates a paginated message with buttons for pagination
@@ -17,6 +18,8 @@ const createPaginatedMessage = async function(message, options) {
         firstPageOverride,
         embed,
         fields,
+        filter = (interaction) => interaction.user.id === message.author.id,
+        filterEmbed = embedGenerator.warning("You are not allowed to interact with this message."),
         fieldsPerPage = 10,
         timeout = 120000,
         buttonLabels = {
@@ -107,7 +110,7 @@ const createPaginatedMessage = async function(message, options) {
     });
 
     const collector = await sentMessage.createMessageComponentCollector({
-        filter: interaction => interaction.user.id === message.author.id,
+        filter,
         time: timeout,
         dispose: true,
     });
@@ -153,6 +156,10 @@ const createPaginatedMessage = async function(message, options) {
             embeds: [embed],
             components: [row],
         });
+    });
+
+    collector.on("ignore", (interaction) => {
+        interaction.reply({ embeds: [filterEmbed], ephemeral: true });
     });
 };
 

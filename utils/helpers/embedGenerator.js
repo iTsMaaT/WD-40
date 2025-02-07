@@ -4,6 +4,16 @@ const { client } = require("@root/index");
 /**
  * Generates different types of embedded messages.
  */
+
+/**
+ * Represents an EmbedGenerator object.
+ * @typedef {Object} EmbedGenerator
+ * @property {function} error - Create an error embed.
+ * @property {function} success - Create a success embed.
+ * @property {function} warning - Create a warning embed.
+ * @property {function} info - Create an info embed.
+ * @property {function} withAuthor - Set the author of the embed.
+ */
 class EmbedGenerator extends EmbedBuilder {
     /**
      * Create an error embed.

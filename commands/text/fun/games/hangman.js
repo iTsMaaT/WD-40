@@ -6,7 +6,7 @@ module.exports = {
     name: "hangman",
     description: "Play a game of Hangman!",
     category: "games",
-    async execute(logger, client, message, args) {
+    async execute(logger, client, message, args, optionalArgs) {
         const prefix = GuildManager.GetPrefix(message.guild);
 
         // List of words for the game

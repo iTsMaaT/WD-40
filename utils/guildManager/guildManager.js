@@ -1,3 +1,6 @@
+const withDbManager = require("./withDatabase/withDbGuildManager");
+const withoutDbManager = require("./withoutDatabase/withoutDbGuildManager");
+
 /**
  * The guildManager module exports a manager for guild-related operations,
  * dynamically selected based on the presence of a database configuration.
@@ -6,14 +9,6 @@
  * are attached to indicate database status.
  * 
  * @module guildManager
- */
-
-const withDbManager = require("./withDatabase/withDbGuildManager");
-const withoutDbManager = require("./withoutDatabase/withoutDbGuildManager");
-
-/**
- * Dynamically selected guild manager based on the environment.
- * @type {object}
  */
 const guildManager = process.env.DATABASE_URL ? withDbManager : withoutDbManager;
 

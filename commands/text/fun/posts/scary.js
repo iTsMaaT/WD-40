@@ -1,6 +1,5 @@
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const { getRedditToken, makeRequest } = require("@root/utils/reddit/fetchRedditToken.js");
-const axios = require("axios");
+const fetchReddit = require("@root/utils/reddit/fetchReddit.js");
 
 module.exports = {
     name: "scary",
@@ -8,23 +7,21 @@ module.exports = {
     category: "posts",
     aliases: ["twosentencehorror"],
     async execute(logger, client, message, args, optionalArgs) {
-        let RedditDesc, RedditTitle, tries;
+        try {
+            const embed = await fetchReddit(true, ["2sentence2horror"], 20, "sub", "text");
+            if (!embed || embed.title === "Couldn't fetch a post after **20** tries") 
+                return await message.reply({ embeds: [embedGenerator.error("Failed to find post after 20 tries.")] });
+            
+            const enhancedEmbed = embedGenerator.info({
+                title: embed.title,
+                description: embed.description || "",
+                color: 0x6b8a70,
+            }).withAuthor(message.author);
 
-        const { baseUrl, headers } = await getRedditToken();
-        while (!RedditDesc) {
-            const content = await makeRequest(`${baseUrl}/r/2sentence2horror/random/.json`, headers);
-            RedditTitle = content[0].data.children[0].data.title || "";
-            RedditDesc = content[0].data.children[0].data.selftext || "";
-            tries++;
-            if (tries > 20) return await message.reply({ embeds: [embedGenerator.error("Failed to find post after 20 tries.")] });
+            await message.reply({ embeds: [enhancedEmbed] });
+        } catch (error) {
+            logger.error(`Error executing the scary command: ${error.stack}`);
+            await message.reply({ embeds: [embedGenerator.error("An unexpected error occurred.")] });
         }
-
-        const embed = embedGenerator.info({
-            title: RedditTitle,
-            description: RedditDesc,
-            color: 0x6b8a70,
-        }).withAuthor(message.author);
-
-        message.reply({ embeds: [embed] });
     },
 };

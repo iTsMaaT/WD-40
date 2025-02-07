@@ -1,6 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 
+/**
+ * Represents the base configuration object.
+ * 
+ * @typedef {Object} BaseConfig
+ */
 class Config {
     constructor() {
         this.configFilePath = path.resolve(__dirname, "config.json");
@@ -17,6 +22,17 @@ class Config {
      */
         this.baseConfig = require(this.configFilePath);  // Load the base config using require
         this.config = { ...this.baseConfig };            // Create a copy of the base config
+    }
+
+    /**
+     * Reload the configuration from the file.
+     * @returns {Config}
+     */
+    reload() {
+        delete require.cache[require.resolve(this.configFilePath)];
+    
+        this.loadBaseConfig();
+        return this;
     }
 
     /**
@@ -100,6 +116,7 @@ class Config {
      */
     save() {
         fs.writeFileSync(this.configFilePath, JSON.stringify(this.config, null, 2), "utf-8");
+        this.reload();
         return this;
     }
 }

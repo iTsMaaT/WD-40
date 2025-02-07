@@ -1,3 +1,9 @@
+/**
+ * Get URLs from a string.
+ * @param {string} str The string to get URLs from.
+ * @param {boolean} lower If the URLs should be lowercased.
+ * @returns {string[] | null} An array of URLs or null if no URLs were found.
+ */
 const getURLs = (str, lower = false) => {
     const regexp = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])/igm;
     const bracketsRegexp = /[()]/g;

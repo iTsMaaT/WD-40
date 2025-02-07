@@ -32,12 +32,12 @@ module.exports = {
                 let optionalString = "";
                 let usageString = "";
                 if (Object.keys(command.usage.required ?? {}).length) 
-                    requiredString += `__Required__:\n${Object.keys(command.usage.required).map(key => `${key.toLowerCase()}: ${prettyString(command.usage.required[key], "first", false)}`).join("\n")}`;
+                    requiredString += `__Parameters__:\n${Object.keys(command.usage.required).map(key => `${key.toLowerCase()}: ${prettyString(command.usage.required[key], "first", false)}`).join("\n")}`;
                 if (Object.keys(command.usage.optional ?? {}).length) 
-                    optionalString += `__Optional__:\n${Object.keys(command.usage.optional).map(key => `-${key.split("|")[0].toLowerCase()}${key.split("|").slice(1).length > 0 ? `[${key.split("|").slice(1).join(",").toLowerCase()}]` : ""}${(command.usage.optional[key].hasValue ?? false) ? " <value>" : ""}: ${prettyString(command.usage.optional[key].description, "first", false)}`).join("\n")}`;
+                    optionalString += `__Flags__:\n${Object.keys(command.usage.optional).map(key => `-${key.split("|")[0].toLowerCase()}${key.split("|").slice(1).length > 0 ? `[${key.split("|").slice(1).join(",").toLowerCase()}]` : ""}${(command.usage.optional[key].hasValue ?? false) ? " <value>" : ""}: ${prettyString(command.usage.optional[key].description, "first", false)}`).join("\n")}`;
                 usageString = `${requiredString}${requiredString.length > 0 && optionalString.length > 0 ? "\n" : ""}${optionalString}`;
                 CommandEmbed.fields.push({ name: "Options", value: usageString });
-                CommandEmbed.footer = { text: "Optional options explanation: -parameterName[parameterAliases]: parameterDescription" };
+                CommandEmbed.footer = { text: "Flags usage explanation: -FlagName[FlagAliase(s)]: FlagDescription" };
             }
 
             if (command.aliases) CommandEmbed.fields.push({ name: "Aliases", value: command.aliases.join(", ") });
@@ -55,7 +55,7 @@ module.exports = {
             const CommandName = client.commands.get(args[0]);
             if (!CommandName || (CommandName.private && !message.author.id == process.env.OWNER_ID)) return await message.reply({ embeds: [embedGenerator.error("This command doesn't exist.")] });
 
-            const CommandEmbed = generateFullCommandEmbed(CommandName);
+            const CommandEmbed = generateFullCommandEmbed(CommandName, prefix);
             return message.reply({ embeds: [CommandEmbed] });
         }
 
@@ -137,7 +137,18 @@ module.exports = {
 
         const categoryEmbed = {
             title: "Command categories",
-            description: `**The prefix is:** \`${prefix}\`\nSupport server: https://discord.gg/pqKE2QZrFM\n\nTotal commands: ${addedCommands.size}\n${pages.join("\n")}`,
+            description: 
+            `**The prefix is:** \`${prefix}\`\n` +
+            "Support server: https://discord.gg/pqKE2QZrFM\n\n" + 
+            "**Commands usage:**\n" +
+            "Parameters are the arguments you pass to the command, flags are the options you can pass to the command.\n" +
+            "Paramters are somtimes required, flags are always optional.\n\n" +
+            "To pass a parameter, you must type it after the command name, for example:\n" +
+            `\`${prefix}play https://www.youtube.com/watch?v=dQw4w9WgXcQ\`\n\n` +
+            "To pass a flag, you must type it after the command name, and prefix it with a dash (-), for example:\n" +
+            `\`${prefix}play https://www.youtube.com/watch?v=dQw4w9WgXcQ -shuffle\`\n\n` +
+            `Certain flags need a value, it is explained in the commands help page. (like ${prefix}help play)\n\n` +
+            `Total commands: ${addedCommands.size}\n${pages.join("\n")}`,
             color: 0xffffff,
             footer: { text: "Buttons expire after 2 minutes." },
         };
@@ -271,6 +282,10 @@ module.exports = {
                 components: [row],
                 allowedMentions: { repliedUser: false },
             });
+        });
+
+        collector.on("ignore", (interaction) => {
+            interaction.reply({ embeds: [embedGenerator.warning("Execute the command yourself to use the buttons")], ephemeral: true });
         });
     },
 };

@@ -6,11 +6,11 @@ module.exports = {
     description: "Skip a currently playing song",
     category: "music",
     aliases: ["next"],
-    cooldown: 1,
+    cooldown: 1000,
+    inVoiceChannel: true,
+    inSameVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
-        if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
-
-        let queue = useQueue(message.guild.id);
+        let queue = useQueue();
         if (!queue || !queue.currentTrack) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue right now.")] });
 
         try {
@@ -19,10 +19,10 @@ module.exports = {
             await message.reply({ embeds: [embedGenerator.info({
                 title: "Skipped",
                 thumbnail: { url: queue.currentTrack.thumbnail },
-                description: `[${queue.currentTrack.title}](${queue.currentTrack.url})`,
+                description: queue.currentTrack.url ? `[${queue.currentTrack.title}](${queue.currentTrack.url})` : queue.currentTrack.title,
             }).withAuthor(message.author)] });
 
-            queue = useQueue(message.guild.id);
+            queue = useQueue();
             if (!queue || !queue.currentTrack) {
                 if (queue.repeatMode !== QueueRepeatMode.AUTOPLAY) return await message.channel.send({ embeds: [embedGenerator.error("There is nothing left to play.")] });
                 else return await message.channel.send({ embeds: [embedGenerator.warning("Autoplay is enabled, a song will start playing shortly.")] });
@@ -31,7 +31,7 @@ module.exports = {
             await message.channel.send({ embeds: [embedGenerator.info({
                 title: "Now playing",
                 thumbnail: { url: queue.currentTrack.thumbnail },
-                description: `[${queue.currentTrack.title}](${queue.currentTrack.url})`,
+                description: queue.currentTrack.url ? `[${queue.currentTrack.title}](${queue.currentTrack.url})` : queue.currentTrack.title,
             })] });
         } catch (e) {
             logger.error(e);

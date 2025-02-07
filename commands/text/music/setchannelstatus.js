@@ -7,8 +7,9 @@ module.exports = {
     category: "music",
     examples: ["among us"],
     private: true,
+    inVoiceChannel: true,
+    inSameVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
-        if (!message.member.voice.channel) return await message.reply({ embeds: [embedGenerator.error("You must be in a voice channel.")] });
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.error("Please provide a status.")] });
 
         const status = args.join(" ").toLowerCase();

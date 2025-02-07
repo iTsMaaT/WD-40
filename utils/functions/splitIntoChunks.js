@@ -1,12 +1,10 @@
-const SplitIntoChunks = function(code) {
-    const MAX_CHUNK_LENGTH = 1900; // Account for the code block formatting characters
-  
+const SplitIntoChunks = function(code, chunkSize = 1900) {
     const chunks = [];
     let currentChunk = "";
   
     const lines = code.split("\n");
     for (const line of lines) {
-        if (currentChunk.length + line.length + 1 <= MAX_CHUNK_LENGTH) {
+        if (currentChunk.length + line.length + 1 <= chunkSize) {
         // Append line to the current chunk
             currentChunk += line + "\n";
         } else {

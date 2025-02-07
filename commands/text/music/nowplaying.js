@@ -1,6 +1,7 @@
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { getLoopMode, getPauseMode } = require("@utils/helpers/playerHelpers");
 const { useQueue, useTimeline, useMainPlayer } = require("discord-player");
+const isURL = require("@utils/functions/isURL");
 
 module.exports = {
     name: "nowplaying",
@@ -8,8 +9,8 @@ module.exports = {
     category: "music",
     aliases: ["np", "playing"],
     async execute(logger, client, message, args, optionalArgs) {
-        const queue = useQueue(message.guild.id);
-        const timeline = useTimeline(message.guild.id);
+        const queue = useQueue();
+        const timeline = useTimeline();
 
         if (!queue || !queue.currentTrack) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue right now.")] });
 
@@ -17,7 +18,9 @@ module.exports = {
 
         const embed = embedGenerator.info({
             title: "Now Playing",
-            description: `[${track.title}](${track.url})\nResquested by: ${track.requestedBy?.displayName || "N/A"}`,
+            description: 
+                `${isURL(track.url) ? `[${track.title}](${track.url})` : track.title}\n` +
+                `Requested by: ${track.requestedBy?.displayName || "N/A"}`,
             thumbnail: { url: track.thumbnail },
             fields: [
                 { name: "Author", value: track.author },

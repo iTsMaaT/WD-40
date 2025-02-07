@@ -6,7 +6,7 @@ const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch")
 
 module.exports = {
     name: "queue",
-    description: "Shows the current queue for songs",
+    description: "Shows the current queue and / or history",
     usage: {
         optional: {
             "search|s": {
@@ -17,8 +17,8 @@ module.exports = {
     category: "music",
     aliases: ["q"],
     async execute(logger, client, message, args, optionalArgs) {
-        const queue = useQueue(message.guild.id);
-        const history = useHistory(message.guild.id);
+        const queue = useQueue();
+        const history = useHistory();
 
         if (!queue || !queue.tracks || !queue.currentTrack || queue.tracks.data.length === 0) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue / currently playing.")] });
         const tracks = queue.tracks ? queue.tracks.data : [];
@@ -35,19 +35,21 @@ module.exports = {
         if (optionalArgs["search|s"]) {
             const search = args.join(" ");
             const bestMatch = findBestMatch(algorithms.FUZZY_MATCH, search, tracks.map(track => track.title));
-            const matches = bestMatch.matches.slice(0, 5); // Get the first 5 matches
+            const matches = bestMatch.matches.slice(0, 5);
         
             if (matches.length === 0) 
                 return await message.reply({ embeds: [embedGenerator.error("No results found")] });
-            
         
-            // Find the length of the largest index for padding
             const maxIndexLength = tracks.length.toString().length;
         
             const description = matches.map(match => {
                 const arrayPosition = tracks.findIndex(t => t.title === match.value);
                 const paddedIndex = (arrayPosition + 1).toString().padStart(maxIndexLength, " ");
-                return `[\`${paddedIndex}\`] - [${tracks[arrayPosition].title} - ${tracks[arrayPosition].author}](${tracks[arrayPosition].url})`;
+                const trackTitle = tracks[arrayPosition].title;
+        
+                const boldedTitle = trackTitle.replace(new RegExp(`(${search})`, "gi"), "**$1**");
+        
+                return `[\`${paddedIndex}\`] - ${boldedTitle} - ${tracks[arrayPosition].author}`;
             }).join("\n");
         
             return await message.reply({
@@ -71,7 +73,7 @@ module.exports = {
         });
 
         historyTracks.map((track, index) => {
-            const paddedIndex = (-1 * (index + 1)).toString().padStart(maxHistoryIndexLength + 1, " "); // +1 for the negative sign
+            const paddedIndex = (-1 * (index + 1)).toString().padStart(maxHistoryIndexLength + 1, " ");
             historyFields.push({
                 name: `[${paddedIndex}] - ${track.title} - ${track.author}`,
                 value: `requested by : ${track.requestedBy?.displayName ?? "N/A"}`,
@@ -157,7 +159,6 @@ module.exports = {
         };
 
         const collector = helpMessage.createMessageComponentCollector({
-            filter,
             time: 120000,
             dispose: true,
         });

@@ -1,4 +1,3 @@
-const CreateUniqueSeed = require("@utils/functions/createUniqueSeed.js");
 const RandomMinMax = require("@utils/functions/randomMinMax.js");
 const getExactDate = require("@functions/getExactDate.js");
 const { prettyString } = require("@functions/formattingFunctions");
@@ -14,7 +13,6 @@ module.exports = {
     category: "fun",
     private: true,
     async execute(logger, client, message, args, optionalArgs) {
-        const msg = await message.reply("https://youtu.be/dQw4w9WgXcQ");
-        console.log(msg.embeds[0].data);
+        //
     },
 };

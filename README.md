@@ -76,6 +76,12 @@ Good luck.
 
 > Reddit client secret, ID and token are optional, as it will use the normal API instead of going trough OAUTH if not specified.
 
+## Add your own music library
+
+If you wish to add your own library, make a music folder in the root of the project and add your files there, they will be used for query and spotify search and will be given as the first choice in the 10 choices list.
+
+You can also configure the file extensions in the config file.
+
 4. Set up the database.
 
 # Database

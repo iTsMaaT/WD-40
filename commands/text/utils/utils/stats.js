@@ -100,7 +100,9 @@ module.exports = {
                 }, {
                     name: "Hosting",
                     value: 
-                    `Host: **${os.platform()} ${os.release()}**\n` + 
+                    `Host: **${os.platform().replace(/win32/g, "Windows")} ${os.release()}**\n` + 
+                    `Architecture: **${os.arch()}**\n` +
+                    `cores: **${os.cpus().length}**\n` +
                     `Shard count: **${Shards}**\n` + 
                     `NodeJS version: **${nodeVersion}**\n` + 
                     `Ram usage: **${RamUsageFormatted}**`,

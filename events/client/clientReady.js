@@ -6,6 +6,7 @@ const { initConfFile } = require("@root/utils/reddit/fetchRedditToken.js");
 const { useMainPlayer } = require("discord-player");
 const { activateRotator } = require("@utils/helpers/activityStatusRotator");
 const player = useMainPlayer();
+const { ToEngineerNotation } = require("@utils/functions/formattingFunctions");
 
 module.exports = {
     name: Events.ClientReady,
@@ -13,10 +14,29 @@ module.exports = {
     log: true,
     async execute(client, logger) {
         console.log(player.scanDeps());
-        console.log("Use YouTube extractor: " + config.get("discordPlayerConf")?.removeYoutube);
-        console.log("Use Po token: " + config.get("discordPlayerConf")?.usePoToken);
-        console.log("Skip login: " + config.get("discordPlayerConf")?.skipLogin);
-        console.log("High water mark: " + config.get("discordPlayerConf")?.highWaterMark);
+        console.log("Extractors ordered by priority:");
+
+        // Sort extractors by priority in descending order
+        const sortedExtractors = [...player.extractors.store.values()].sort((a, b) => b.priority - a.priority);
+
+        // Calculate lengths for alignment
+        const maxNameLength = Math.max(...sortedExtractors.map(e => e.constructor.name.replace(/^_/, "").length));
+        const maxPriorityLength = Math.max(...sortedExtractors.map(e => e.priority.toString().length));
+
+        // Log the extractors with aligned formatting
+        for (const extractor of sortedExtractors) {
+            const name = extractor.constructor.name.replace(/^_/, ""); // Remove leading underscore
+
+            console.logger(`- ${name.padEnd(maxNameLength)} (${extractor.priority.toString().padStart(maxPriorityLength)})`);
+        }
+
+        console.logger("--------------------------------------------------");
+
+
+        console.logger("Use YouTube extractor: " + !config.get("discordPlayerConf")?.removeYoutube);
+        console.logger("Use Po token: " + config.get("discordPlayerConf")?.usePoToken);
+        console.logger("Skip login: " + config.get("discordPlayerConf")?.skipLogin);
+        console.logger("High water mark: " + ToEngineerNotation(parseInt(config.get("discordPlayerConf")?.highWaterMark)) + "B");
         console.logger("--------------------------------------------------");
        
         if (process.env.SERVER != "dev") client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");
@@ -47,9 +67,10 @@ module.exports = {
         console.log("Discord.js version: " + require("discord.js").version);
         console.log(`There is ${client.options.shardCount} shard${client.options.shardCount > 1 ? "s" : ""} spawned`);
         config.set("whitelist", [...config.get("whitelist"), process.env.OWNER_ID]);
+        console.log(`Whitelisted users: ${config.get("whitelist").join(", ")}`);
         if (process.env.SERVER == "dev") config.set("defaultSuperuserState", true);
         console.log(`Debug is ${config.get("DefaultDebugState") ? "en" : "dis"}abled`);
-        console.log(`Superuser is ${config.get("DefaultSuperuserState") ? "en" : "dis"}abled`);
+        console.log(`Superuser is ${config.get("defaultSuperuserState") ? "en" : "dis"}abled`);
 
         console.log("Waiting for websocket to report sensical ping (> -1ms)");
         console.logger(`

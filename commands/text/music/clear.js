@@ -6,8 +6,10 @@ module.exports = {
     name: "clear",
     description: "Clear currently playing queue",
     category: "music",
+    inVoiceChannel: true,
+    inSameVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
-        const queue = useQueue(message.guild.id);
+        const queue = useQueue();
         if (!queue) return await message.reply({ embeds: [embedGenerator.error("There is no queue to clear.")] });
 
         queue.tracks.clear();

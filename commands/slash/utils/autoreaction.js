@@ -29,7 +29,7 @@ module.exports = {
                     max_length: 100,
                 }, {
                     name: "emotes",
-                    description: "The reactions (unicode emotes are preferred)",
+                    description: "The reactions",
                     type: ApplicationCommandOptionType.String,
                     required: true,
                 },
@@ -89,7 +89,7 @@ module.exports = {
 
         switch (subcommand) {
             case "list": {
-                if (Object.keys(reactions).length === 0) return await interaction.reply({ embeds: [embedGenerator.warning("There are no auto-reactions in this guild")], ephemeral: true });
+                if (Object.keys(reactions).length === 0) return await interaction.editReply({ embeds: [embedGenerator.warning("There are no auto-reactions in this guild")], ephemeral: true });
             
                 const embed = {
                     title: "List of auto-reactions",
@@ -140,8 +140,6 @@ module.exports = {
                 break;
             }
             case "add": {
-                console.log("executed");
-
                 if (Object.keys(reactions).length >= 20) return await interaction.editReply({ embeds: [embedGenerator.warning("You cannot have more than 20 auto-reactions")], ephemeral: true });
 
                 if (reactions[ChannelPromptInput]) {
