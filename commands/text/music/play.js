@@ -67,7 +67,7 @@ module.exports = {
         try {
             let research, specificSearch, choice = null;
 
-            if (needsBridge && !playerConfig.removeYoutube) {
+            if (needsBridge) {
                 if (stringQueryType === QueryType.SPOTIFY_SONG) {
                     research = await player.search(string, {
                         requestedBy: message.member,
