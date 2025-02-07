@@ -1,8 +1,10 @@
 module.exports = {
     name: "unhandledRejection",
     async execute(client, logger, err, promise) {
-        if (err.includes("DiscordAPIError[50013]: Missing Permissions")) 
-            return logger.warning("Missing permissions error occured, igoring stack.");
+        if (err.code == 50013) 
+            return logger.warning("Missing access error occured, igoring stack.");
+        else if (err.code == 50035)
+            return logger.warning("Invalid form body error occured, igoring stack.");
         logger.event("Unhandled Promise Rejection:");
         logger.severe(err);
     },
