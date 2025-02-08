@@ -20,7 +20,11 @@ module.exports = {
         const TextCooldowns = client.TextCooldowns;
         const autoCorrectCooldowns = new Map();
         await handleCommand(msg);
-        await handleAutoResponses(msg);
+        try {
+            await handleAutoResponses(msg);
+        } catch (error) {
+            logger.error(error);
+        }
 
         async function handleAutoResponses(message) {
             if (message.author.bot) return;
@@ -105,7 +109,6 @@ Step 5 - Send the downloaded media to your favorite social media!
 
             // Get effective permissions (combines role permissions and channel overrides)
             const effectivePermissions = botMember.permissionsIn(message.channel);
-            const basePermissions = botMember.permissions;
 
             // Check for basic messaging permissions
             const requiredBasePerms = [
