@@ -4,7 +4,7 @@
  * @param {Array|Object} input - The input array or object.
  * @returns {Array} An array of unique values.
  */
-const GetUniqueValues = function(input) {
+const getUniqueValues = function(input) {
     const uniqueValues = [];
     const valueCounts = new Map();
 
@@ -33,4 +33,4 @@ const GetUniqueValues = function(input) {
 
     return uniqueValues;
 };
-module.exports = GetUniqueValues;
+module.exports = getUniqueValues;

@@ -1,6 +1,6 @@
-const GetPterodactylInfo = require("@root/utils/functions/getPterodactylInfo");
+const getPterodactylInfo = require("@root/utils/functions/getPterodactylInfo");
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const { ToEngineerNotation } = require("@functions/formattingFunctions");
+const { toEngineerNotation } = require("@functions/formattingFunctions");
 
 module.exports = {
     name: "botinfo",
@@ -9,14 +9,14 @@ module.exports = {
     aliases: ["binfo"],
     async execute(logger, client, message, args, optionalArgs) {
         try {
-            const PteroInfo = await GetPterodactylInfo();
+            const PteroInfo = await getPterodactylInfo();
             const memoryUsage = process.memoryUsage();
             let memoryUsageString = "";
-            const rss = ToEngineerNotation(memoryUsage.rss) + "B";
-            const heapTotal = ToEngineerNotation(memoryUsage.heapTotal) + "B";
-            const heapUsed = ToEngineerNotation(memoryUsage.heapUsed) + "B";
-            const external = ToEngineerNotation(memoryUsage.external) + "B";
-            const arrayBuffers = ToEngineerNotation(memoryUsage.arrayBuffers) + "B";
+            const rss = toEngineerNotation(memoryUsage.rss) + "B";
+            const heapTotal = toEngineerNotation(memoryUsage.heapTotal) + "B";
+            const heapUsed = toEngineerNotation(memoryUsage.heapUsed) + "B";
+            const external = toEngineerNotation(memoryUsage.external) + "B";
+            const arrayBuffers = toEngineerNotation(memoryUsage.arrayBuffers) + "B";
 
             memoryUsageString += `RSS: ${rss}\n`;
             memoryUsageString += `Heap Total: ${heapTotal}\n`;

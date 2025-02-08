@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder, MessageFlags } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { useQueue, useTimeline, useHistory, QueueRepeatMode } = require("discord-player");
 const { getLoopMode, getPauseMode } = require("@utils/helpers/playerHelpers");
@@ -183,7 +183,7 @@ module.exports = {
         });
 
         collector.on("ignore", (interaction) => {
-            interaction.reply({ embeds: [embedGenerator.warning("You are not in the same voice channel as me.")], ephemeral: true });
+            interaction.reply({ embeds: [embedGenerator.warning("You are not in the same voice channel as me.")], flags: MessageFlags.Ephemeral });
         });
     },
 };

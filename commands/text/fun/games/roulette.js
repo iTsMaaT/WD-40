@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
@@ -53,7 +53,7 @@ module.exports = {
 
         collector.on("collect", async interaction => {
             if (interaction.user.id !== message.author.id) 
-                return interaction.reply({ content: "This game isn't for you!", ephemeral: true });
+                return interaction.reply({ content: "This game isn't for you!", flags: MessageFlags.Ephemeral });
             
 
             if (interaction.customId === "bet_red") {
@@ -66,7 +66,7 @@ module.exports = {
                 collector.stop();
             } else if (interaction.customId === "bet_number") {
                 await interaction.deferUpdate();
-                await interaction.followUp({ content: "Please type a number between 0 and 36 as your bet.", ephemeral: true });
+                await interaction.followUp({ content: "Please type a number between 0 and 36 as your bet.", flags: MessageFlags.Ephemeral });
 
                 const filter = msg => msg.author.id === interaction.user.id && !isNaN(msg.content) && Number(msg.content) >= 0 && Number(msg.content) <= 36;
 
@@ -78,7 +78,7 @@ module.exports = {
                         collector.stop();
                     })
                     .catch(() => {
-                        interaction.followUp({ content: "Time's up! You didn't pick a valid number.", ephemeral: true });
+                        interaction.followUp({ content: "Time's up! You didn't pick a valid number.", flags: MessageFlags.Ephemeral });
                     });
             }
         });

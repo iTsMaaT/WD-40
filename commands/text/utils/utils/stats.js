@@ -2,7 +2,7 @@ const prettyMilliseconds = require("pretty-ms");
 const os = require("os");
 const changelogs = require("@root/changelogs.json");
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const GetPterodactylInfo = require("@root/utils/functions/getPterodactylInfo");
+const getPterodactylInfo = require("@root/utils/functions/getPterodactylInfo");
 const { sql } = require("drizzle-orm");
 const DB = require("@root/utils/db/databaseManager");
 const GuildManager = require("@guildManager");
@@ -18,7 +18,7 @@ module.exports = {
         const addedCommands = new Set();
         client.commands.each((val) => {if (!val.private && !addedCommands.has(val.name))  addedCommands.add(val.name); });
         
-        const PteroInfo = await GetPterodactylInfo();
+        const PteroInfo = await getPterodactylInfo();
         const RamUsageFormatted = `${PteroInfo.ram.usage.clean} / ${PteroInfo.ram.limit.clean} (${PteroInfo.ram.pourcentage.clean})`;
         const prefix = GuildManager.GetPrefix(message.guild);
         let lastCommandTimeSinceNow = "";

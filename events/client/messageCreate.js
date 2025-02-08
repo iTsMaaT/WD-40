@@ -4,7 +4,7 @@ const GuildManager = require("@guildManager");
 const { repositories } = require("@utils/db/tableManager.js");
 const getExactDate = require("@functions/getExactDate");
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const RandomMinMax = require("@root/utils/functions/randomMinMax");
+const randomMinMax = require("@root/utils/functions/randomMinMax");
 const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
 const { initConfFile } = require("@utils/reddit/fetchRedditToken.js");
 const countCommonChars = require("@utils/functions/countCommonChars.js");
@@ -18,8 +18,13 @@ module.exports = {
     log: false,
     async execute(client, logger, msg) {
         const TextCooldowns = client.TextCooldowns;
+        const autoCorrectCooldowns = new Map();
         await handleCommand(msg);
-        await handleAutoResponses(msg);
+        try {
+            await handleAutoResponses(msg);
+        } catch (error) {
+            logger.error(error);
+        }
 
         async function handleAutoResponses(message) {
             if (message.author.bot) return;
@@ -83,10 +88,10 @@ Step 5 - Send the downloaded media to your favorite social media!
             if (config.get("defaultSuperuserState") && !config.get("whitelist").includes(message.author.id)) return;
             if (!message.guild) return;
             if (config.get("blacklist").includes(message.author.id)) return;
-        
+            
             const prefix = GuildManager.GetPrefix(message.guild);
             if (!message.content.startsWith(prefix) && !message.content.startsWith(`<@${client.user.id}>`)) return;
-        
+            
             let args, commandName;
             if (!message.content.startsWith(`<@${client.user.id}> `)) {
                 args = message.content.slice(prefix.length).trim().split(/ +/);
@@ -95,39 +100,79 @@ Step 5 - Send the downloaded media to your favorite social media!
                 args = message.content.split(/ +/).slice(1);
                 commandName = args.shift()?.toLowerCase();
             }
+
+            let command = client.commands.get(commandName);
         
             // Bot's Channel-Specific Permissions Check
             const botMember = message.guild.members.me;
             if (!botMember) return;
-        
-            const botPermissions = botMember.permissionsIn(message.channel);
-        
-            if (!botPermissions.has(PermissionsBitField.Flags.ViewChannel)) return;
-            if (!botPermissions.has(PermissionsBitField.Flags.SendMessages)) {
+
+            // Get effective permissions (combines role permissions and channel overrides)
+            const effectivePermissions = botMember.permissionsIn(message.channel);
+
+            // Check for basic messaging permissions
+            const requiredBasePerms = [
+                PermissionsBitField.Flags.ViewChannel,
+                PermissionsBitField.Flags.SendMessages,
+            ];
+
+            const missingBasePerms = requiredBasePerms.filter(perm => !effectivePermissions.has(perm));
+
+
+            if (missingBasePerms.length > 0) {
                 try {
-                    await message.author.send(`I don't have permission to send messages in <#${message.channel.id}>.`);
+                    await message.author.send(
+                        `I don't have the required permissions in <#${message.channel.id}>: ${
+                            getPermissionArrayNames(missingBasePerms).join(", ")
+                        }`,
+                    );
                 } catch (dmError) {
                     logger.warning("Failed to notify user of missing permissions.");
                 }
                 return;
             }
+
+            if (command?.inVoiceChannel || command?.inSameVoiceChannel) {
+                const voiceChannel = message.member.voice.channel;
+                if (voiceChannel) {
+                    const voicePermissions = botMember.permissionsIn(voiceChannel);
+                    const requiredVoicePerms = [
+                        PermissionsBitField.Flags.Connect,
+                        PermissionsBitField.Flags.Speak,
+                        PermissionsBitField.Flags.ViewChannel,
+                    ];
+            
+                    const missingVoicePerms = requiredVoicePerms.filter(perm => !voicePermissions.has(perm));
+                    if (missingVoicePerms.length > 0) {
+                        return await message.reply({
+                            embeds: [embedGenerator.error(
+                                `I don't have the required permissions in voice channel ${voiceChannel}: ${getPermissionArrayNames(missingVoicePerms).join(", ")}`,
+                            )],
+                        });
+                    }
+                }
+            }
         
-            let command = client.commands.get(commandName);
         
             // Auto-Correction AFTER permission checks
             if (!command && config.get("autoCommandMatch")) {
+                const lastCorrection = autoCorrectCooldowns.get(message.author.id) || 0;
+                if (Date.now() - lastCorrection < 10000) return; // 10-second cooldown
+            
+                autoCorrectCooldowns.set(message.author.id, Date.now());
+                
                 const commandSet = new Set(client.commands.filter(cmd => !cmd.private).map(cmd => cmd.name));
                 const commandArray = Array.from(commandSet);
                 const closeMatch = findBestMatch(algorithms.LEVENSHTEIN_DISTANCE, commandName, commandArray);
                 
                 if (closeMatch.score <= 2 && countCommonChars(commandName, closeMatch.match) !== 0) {
                     await message.reply(`Did you mean \`${prefix}${closeMatch.match}\`?`);
+                    
                     const filter = (m) => m.author.id === message.author.id;
                     try {
                         const collected = await message.channel.awaitMessages({ filter, max: 1, time: 5000, errors: ["time"] });
                         if (collected.first()?.content.toLowerCase().startsWith("yes")) 
                             command = client.commands.get(closeMatch.match);
-                        
                     } catch {
                         return;
                     }
@@ -144,7 +189,7 @@ Step 5 - Send the downloaded media to your favorite social media!
             if (command.inVoiceChannel && !message.member.voice.channel) 
                 return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
         
-            if (command.inSameVoiceChannel && message.guild.me?.voice?.channel && message.member?.voice?.channel?.id !== message.guild.me?.voice?.channel?.id) 
+            if (command.inSameVoiceChannel && botMember?.voice?.channel && message.member?.voice?.channel?.id !== botMember?.voice?.channel?.id) 
                 return await message.reply({ embeds: [embedGenerator.warning("You must be in the same voice channel as me.")] });
         
             // Blacklist Check
@@ -164,14 +209,15 @@ Step 5 - Send the downloaded media to your favorite social media!
             }
         
             // Cooldown Check
-            if (TextCooldowns.has(message.author.id)) {
+            if (config.get("defaultSuperuserState") && config.get("whitelist").includes(message.author.id)) {
+                TextCooldowns.delete(message.author.id); // Remove cooldown for superuser
+            } else if (TextCooldowns.has(message.author.id)) {
                 const cooldown = TextCooldowns.get(message.author.id);
-                let timeLeft = cooldown - Date.now();
-                if (config.get("defaultSuperuserState") && config.get("whitelist").includes(message.author.id)) timeLeft = 0;
+                const timeLeft = cooldown - Date.now();
                 if (timeLeft > 0) 
                     return await message.reply({ embeds: [embedGenerator.warning(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before using that command again.`)] });
-                
             }
+
         
             try {
                 // Logging
@@ -192,12 +238,20 @@ Step 5 - Send the downloaded media to your favorite social media!
                 const requiredPermissions = command.permissions || [];
                 requiredPermissions.push(PermissionsBitField.Flags.ReadMessageHistory);
         
-                if (!botPermissions.has(PermissionsBitField.Flags.Administrator)) {
-                    const missingPermissions = requiredPermissions.filter(permission => !botPermissions.has(permission));
+                if (!botMember.permissions.has(PermissionsBitField.Flags.Administrator)) {
+                    const commandPerms = [...(command.permissions ?? []), PermissionsBitField.Flags.ReadMessageHistory];
+
+                    const missingPermissions = commandPerms.filter(permission => !effectivePermissions.has(permission));
+
+                
                     if (missingPermissions.length > 0) {
                         const readablePermissions = getPermissionArrayNames(missingPermissions);
                         return await message.reply({
-                            embeds: [embedGenerator.error(`I am missing the following permissions: ${readablePermissions.map(p => `\`${p}\``).join(", ")}`)],
+                            embeds: [embedGenerator.error(
+                                `I'm missing the following permissions: ${
+                                    readablePermissions.map(p => `\`${p}\``).join(", ")
+                                }`,
+                            )],
                         });
                     }
                 }

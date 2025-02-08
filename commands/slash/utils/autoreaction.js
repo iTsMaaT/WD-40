@@ -1,4 +1,4 @@
-const { ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField } = require("discord.js");
+const { ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField, MessageFlags } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const emoteList = require("@utils/emojis.json");
 const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
@@ -85,11 +85,11 @@ module.exports = {
         const reactions = await autoreactions.getReactions();
 
         if ((subcommand == "add" || subcommand == "remove" || subcommand == "removeall") && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) 
-            return await interaction.reply({ embeds: [embedGenerator.warning("You must be a administrator to execute this action")], ephemeral: true });
+            return await interaction.reply({ embeds: [embedGenerator.warning("You must be a administrator to execute this action")], flags: MessageFlags.Ephemeral });
 
         switch (subcommand) {
             case "list": {
-                if (Object.keys(reactions).length === 0) return await interaction.editReply({ embeds: [embedGenerator.warning("There are no auto-reactions in this guild")], ephemeral: true });
+                if (Object.keys(reactions).length === 0) return await interaction.editReply({ embeds: [embedGenerator.warning("There are no auto-reactions in this guild")], flags: MessageFlags.Ephemeral });
             
                 const embed = {
                     title: "List of auto-reactions",
@@ -114,7 +114,7 @@ module.exports = {
             }
             
             case "remove": {
-                if (!reactions[ChannelPromptInput]) return await interaction.editReply({ embeds: [embedGenerator.warning("There is no entry for that channel prompt")], ephemeral: true });
+                if (!reactions[ChannelPromptInput]) return await interaction.editReply({ embeds: [embedGenerator.warning("There is no entry for that channel prompt")], flags: MessageFlags.Ephemeral });
 
                 autoreactions.removeReaction(ChannelPromptInput, StringInput);
                 const embed = {
@@ -127,7 +127,7 @@ module.exports = {
                 break;
             }
             case "removeall": {
-                if (!reactions[ChannelPromptInput]) return await interaction.editReply({ embeds: [embedGenerator.warning("There is no entry for that channel prompt")], ephemeral: true });
+                if (!reactions[ChannelPromptInput]) return await interaction.editReply({ embeds: [embedGenerator.warning("There is no entry for that channel prompt")], flags: MessageFlags.Ephemeral });
 
                 autoreactions.removeReaction(ChannelPromptInput);
                 const embed = {
@@ -140,11 +140,11 @@ module.exports = {
                 break;
             }
             case "add": {
-                if (Object.keys(reactions).length >= 20) return await interaction.editReply({ embeds: [embedGenerator.warning("You cannot have more than 20 auto-reactions")], ephemeral: true });
+                if (Object.keys(reactions).length >= 20) return await interaction.editReply({ embeds: [embedGenerator.warning("You cannot have more than 20 auto-reactions")], flags: MessageFlags.Ephemeral });
 
                 if (reactions[ChannelPromptInput]) {
                     const existingEntry = reactions[ChannelPromptInput].find(entry => entry.string === StringInput);
-                    if (existingEntry) return await interaction.editReply({ embeds: [embedGenerator.warning("An entry for that channel prompt and string combination already exists.")], ephemeral: true });
+                    if (existingEntry) return await interaction.editReply({ embeds: [embedGenerator.warning("An entry for that channel prompt and string combination already exists.")], flags: MessageFlags.Ephemeral });
                 }
 
                 let emotes = [];
@@ -162,7 +162,7 @@ module.exports = {
                     }, []);
                 }
 
-                if (emotes.length == 0) return await interaction.editReply({ embeds: [embedGenerator.warning("No compatible emotes found")], ephemeral: true });
+                if (emotes.length == 0) return await interaction.editReply({ embeds: [embedGenerator.warning("No compatible emotes found")], flags: MessageFlags.Ephemeral });
                 const embed = {
                     color: 0xffff00,
                     title: "Auto-reactions",

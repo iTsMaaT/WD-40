@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, MessageFlags } = require("discord.js");
 const { prettyString } = require("@functions/formattingFunctions");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const GuildManager = require("@guildManager");
@@ -185,10 +185,10 @@ module.exports = {
                     
                     if (command) {
                         const fullCommandEmbed = generateFullCommandEmbed(command, commandPrefix);
-                        await interaction.deferReply({ ephemeral: true });
+                        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
                         await interaction.followUp({
                             embeds: [fullCommandEmbed],
-                            ephemeral: true,
+                            flags: MessageFlags.Ephemeral,
                         });
                         return;
                     }
@@ -285,7 +285,7 @@ module.exports = {
         });
 
         collector.on("ignore", (interaction) => {
-            interaction.reply({ embeds: [embedGenerator.warning("Execute the command yourself to use the buttons")], ephemeral: true });
+            interaction.reply({ embeds: [embedGenerator.warning("Execute the command yourself to use the buttons")], flags: MessageFlags.Ephemeral });
         });
     },
 };

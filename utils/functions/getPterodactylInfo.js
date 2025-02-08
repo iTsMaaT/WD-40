@@ -1,8 +1,8 @@
-const { ToEngineerNotation } = require("@functions/formattingFunctions");
+const { toEngineerNotation } = require("@functions/formattingFunctions");
 const logger = require("@utils/log");
 const prettyMilliseconds = require("pretty-ms");
 
-const GetPterodactylInfo = async function() {
+const getPterodactylInfo = async function() {
     let serverName = "";
     let RAMlimit = "";
     let CPUlimit = "";
@@ -60,11 +60,11 @@ const GetPterodactylInfo = async function() {
         ram: {
             limit: {
                 raw: parseInt(RAMlimit) * 1024 * 1024,
-                clean: `${ToEngineerNotation(parseInt(RAMlimit) * 1024 * 1024)}b`,
+                clean: `${toEngineerNotation(parseInt(RAMlimit) * 1024 * 1024)}b`,
             },
             usage: {
                 raw: parseInt(RAMusage),
-                clean: `${ToEngineerNotation(parseInt(RAMusage))}b`,
+                clean: `${toEngineerNotation(parseInt(RAMusage))}b`,
             },
             pourcentage: {
                 raw: parseInt(RAMusage) / (parseInt(RAMlimit) * 1024 * 1024) * 100,
@@ -74,11 +74,11 @@ const GetPterodactylInfo = async function() {
         disk: {
             limit: {
                 raw: parseInt(DISKlimit) * 1024 * 1024,
-                clean: `${ToEngineerNotation(parseInt(DISKlimit) * 1024 * 1024)}b`,
+                clean: `${toEngineerNotation(parseInt(DISKlimit) * 1024 * 1024)}b`,
             },
             usage: {
                 raw: parseInt(DISKusage),
-                clean: `${ToEngineerNotation(parseInt(DISKusage))}b`,
+                clean: `${toEngineerNotation(parseInt(DISKusage))}b`,
             },
             pourcentage: {
                 raw: parseInt(DISKusage) / (parseInt(DISKlimit) * 1024 * 1024) * 100,
@@ -97,11 +97,11 @@ const GetPterodactylInfo = async function() {
         network: {
             download: {
                 raw: NETWORKin,
-                clean: `${ToEngineerNotation(parseInt(NETWORKin))}b`,
+                clean: `${toEngineerNotation(parseInt(NETWORKin))}b`,
             },
             upload: {
                 raw: NETWORKout,
-                clean: `${ToEngineerNotation(parseInt(NETWORKout))}b`,
+                clean: `${toEngineerNotation(parseInt(NETWORKout))}b`,
             },
         },
         uptime: {
@@ -117,4 +117,4 @@ const GetPterodactylInfo = async function() {
     // console.log(info)
     return info;
 };
-module.exports = GetPterodactylInfo;
+module.exports = getPterodactylInfo;

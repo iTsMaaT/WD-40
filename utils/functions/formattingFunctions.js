@@ -1,4 +1,4 @@
-const ToEngineerNotation = function(number, sizes = ["", "Ki", "Mi", "Gi", "Ti", "Pi"], k = 1024, decimals = 2) {
+const toEngineerNotation = function(number, sizes = ["", "Ki", "Mi", "Gi", "Ti", "Pi"], k = 1024, decimals = 2) {
     if (number === 0) return "0";
 
     // Calculate the logarithm of the value in base 'k' (1024)
@@ -11,7 +11,7 @@ const ToEngineerNotation = function(number, sizes = ["", "Ki", "Mi", "Gi", "Ti",
     return formattedValue + " " + sizes[i];
 };
 
-const TimeFormatToMS = function(timeString) {
+const timeFormatToMS = function(timeString) {
 
     // Validation
     if (!timeString || !/^(\d+[dhms])+ms$/.test(timeString) || /(\D)\1/.test(timeString) || timeString.match(/\d+/g).map(Number).map(parseInt).some(Number.isNaN)) return null;
@@ -142,7 +142,7 @@ function generateProgressBar(options) {
 module.exports = { 
     numberToWord, 
     prettyString, 
-    TimeFormatToMS, 
-    ToEngineerNotation, 
+    timeFormatToMS, 
+    toEngineerNotation, 
     generateProgressBar,
 };

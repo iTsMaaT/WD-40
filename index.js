@@ -29,6 +29,33 @@
 
     const fs = require("fs");
 
+
+    const neededIntents = {
+        intents: [
+            GatewayIntentBits.Guilds,
+            GatewayIntentBits.GuildMembers,
+            GatewayIntentBits.GuildModeration,
+            GatewayIntentBits.GuildExpressions,
+            GatewayIntentBits.GuildIntegrations,
+            GatewayIntentBits.GuildWebhooks,
+            GatewayIntentBits.GuildInvites,
+            GatewayIntentBits.GuildVoiceStates,
+            GatewayIntentBits.GuildPresences,
+            GatewayIntentBits.GuildMessages,
+            GatewayIntentBits.GuildMessageReactions,
+            GatewayIntentBits.GuildMessageTyping,
+            GatewayIntentBits.DirectMessages,
+            GatewayIntentBits.DirectMessageReactions,
+            GatewayIntentBits.DirectMessageTyping,
+            GatewayIntentBits.MessageContent,
+        ],
+        partials: [
+            Partials.Message,
+            Partials.Channel,
+            Partials.Reaction,
+        ],
+    };
+    
     const client = new Client({
         intents: Object.keys(GatewayIntentBits),
         partials: Object.keys(Partials),

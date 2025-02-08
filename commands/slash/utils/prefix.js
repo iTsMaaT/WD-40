@@ -1,4 +1,4 @@
-const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
+const { ApplicationCommandType, ApplicationCommandOptionType, MessageFlags } = require("discord.js");
 const { SendErrorEmbed } = require("@functions/discordFunctions");
 const GuildManager = require("@guildManager");
 const dbManager = require("@root/utils/db/databaseManager");
@@ -20,7 +20,7 @@ module.exports = {
     async execute(logger, interaction, client) {
         // set or deletes the prefix, if a custom one was already applied
         const prefix = interaction.options.get("prefix")?.value?.replace(/\s/g, "") || "";
-        if (prefix.length > 3) return await interaction.reply({ embeds: [embedGenerator.warning("Prefix can't have more than 3 characters")], ephemeral: true });
+        if (prefix.length > 3) return await interaction.reply({ embeds: [embedGenerator.warning("Prefix can't have more than 3 characters")], flags: MessageFlags.Ephemeral });
         if (prefix.length === 0) return await interaction.reply({ embeds: [embedGenerator.info(`The prefix is \`${GuildManager.GetPrefix(interaction.guild)}\``)] });
 
         if (!dbManager.dbExists()) {

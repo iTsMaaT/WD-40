@@ -48,7 +48,7 @@ module.exports = {
                 embed.color = 0xff0000;
                 await ConfirmationMessage.edit({ embeds: [embed], components: [row] });
 
-                logger.severe("Restart requested from discord");
+                logger.warning("Restart requested from discord");
 
                 setTimeout(() => process.exit(1), 3000);
             } else if (interaction.customId === "no") {
