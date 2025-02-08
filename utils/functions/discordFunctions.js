@@ -159,24 +159,13 @@ function multipleImageEmbed(embedOBJ, ...links) {
 
 /**
  * Gets the permission array names from a permission bitfield
- * @param {number} flags The permission bitfield
- * @returns {Array} The permission array names
+ * @param {Array<number>} flags The permission bitfield array
+ * @returns {Array<string>} The permission array names
  */
 function getPermissionArrayNames(flags) {
-    const array = [];
-    const set = new Set(); // Use a Set to store unique values
-
-    for (const flag of flags) {
-        for (const [key, value] of Object.entries(PermissionsBitField.Flags)) {
-            if (value === flag && !set.has(key)) {
-                array.push(key);
-                set.add(key); // Add the key to the set to track uniqueness
-            }
-        }
-    }
-
-    return array;
+    return new PermissionsBitField(flags).toArray();
 }
+
 
 module.exports = { 
     createOrUseWebhook,
