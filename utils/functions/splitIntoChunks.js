@@ -1,4 +1,4 @@
-const SplitIntoChunks = function(code, chunkSize = 1900) {
+const splitIntoChunks = function(code, chunkSize = 1900) {
     const chunks = [];
     let currentChunk = "";
   
@@ -21,4 +21,4 @@ const SplitIntoChunks = function(code, chunkSize = 1900) {
   
     return chunks;
 };
-module.exports = SplitIntoChunks;
+module.exports = splitIntoChunks;

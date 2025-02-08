@@ -1,12 +1,12 @@
 const { Events, ActivityType } = require("discord.js");
 const config = require("@utils/config/configUtils");
 const GuildManager = require("@guildManager");
-const RandomMinMax = require("@root/utils/functions/randomMinMax");
+const randomMinMax = require("@root/utils/functions/randomMinMax");
 const { initConfFile } = require("@root/utils/reddit/fetchRedditToken.js");
 const { useMainPlayer } = require("discord-player");
 const { activateRotator } = require("@utils/helpers/activityStatusRotator");
 const player = useMainPlayer();
-const { ToEngineerNotation } = require("@utils/functions/formattingFunctions");
+const { toEngineerNotation } = require("@utils/functions/formattingFunctions");
 
 module.exports = {
     name: Events.ClientReady,
@@ -36,7 +36,7 @@ module.exports = {
         console.logger("Use YouTube extractor: " + !config.get("discordPlayerConf")?.removeYoutube);
         console.logger("Use Po token: " + config.get("discordPlayerConf")?.usePoToken);
         console.logger("Skip login: " + config.get("discordPlayerConf")?.skipLogin);
-        console.logger("High water mark: " + ToEngineerNotation(parseInt(config.get("discordPlayerConf")?.highWaterMark)) + "B");
+        console.logger("High water mark: " + toEngineerNotation(parseInt(config.get("discordPlayerConf")?.highWaterMark)) + "B");
         console.logger("--------------------------------------------------");
        
         if (process.env.SERVER != "dev") client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");

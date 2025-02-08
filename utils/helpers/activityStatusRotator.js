@@ -1,12 +1,12 @@
 const cron = require("cron");
-const RandomMinMax = require("@root/utils/functions/randomMinMax");
+const randomMinMax = require("@root/utils/functions/randomMinMax");
 const config = require("@utils/config/configUtils");
 const { ActivityType } = require("discord.js");
 const logger = require("@utils/log");
 
 const generateIpAddress = () => {
-    const parts = Array.from({ length: 4 }, () => RandomMinMax(1, 255));
-    const port = RandomMinMax(100, 65530);
+    const parts = Array.from({ length: 4 }, () => randomMinMax(1, 255));
+    const port = randomMinMax(100, 65530);
     return `${parts.join(".")}:${port}`;
 };
 

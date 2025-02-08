@@ -1,4 +1,4 @@
-const CombineCollections = function(col1, col2) {
+const combineCollections = function(col1, col2) {
     const combinedArray = [];
 
     // Add elements from the first collection
@@ -17,4 +17,4 @@ const CombineCollections = function(col1, col2) {
   
     return combinedArray;
 };
-module.exports = CombineCollections;
+module.exports = combineCollections;

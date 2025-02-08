@@ -1,4 +1,4 @@
-const SplitIntoChunks = require("@root/utils/functions/splitIntoChunks");
+const splitIntoChunks = require("@root/utils/functions/splitIntoChunks");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { repository } = require("@root/package.json");
 
