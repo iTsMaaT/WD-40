@@ -186,7 +186,7 @@ Step 5 - Send the downloaded media to your favorite social media!
             if (command.admin && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) 
                 return await message.reply({ embeds: [embedGenerator.error("You are not an administrator.")] });
         
-            if (command.inVoiceChannel && !message.member.voice.channel) 
+            if (command.inVoiceChannel && !message.member?.voice?.channel) 
                 return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
         
             if (command.inSameVoiceChannel && botMember?.voice?.channel && message.member?.voice?.channel?.id !== botMember?.voice?.channel?.id) 
