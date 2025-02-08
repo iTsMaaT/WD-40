@@ -48,7 +48,7 @@ module.exports = {
                 embed.color = 0xff0000;
                 await ConfirmationMessage.edit({ embeds: [embed], components: [row] });
 
-                logger.severe("Shutdown requested from discord");
+                logger.warning("Shutdown requested from discord");
 
                 setTimeout(() => process.exit(0), 3000);
             } else if (interaction.customId === "no") {
