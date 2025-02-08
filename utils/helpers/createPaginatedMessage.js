@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require("discord.js");
 const embedGenerator = require("./embedGenerator");
 
 /**
@@ -159,7 +159,7 @@ const createPaginatedMessage = async function(message, options) {
     });
 
     collector.on("ignore", (interaction) => {
-        interaction.reply({ embeds: [filterEmbed], ephemeral: true });
+        interaction.reply({ embeds: [filterEmbed], flags: MessageFlags.Ephemeral });
     });
 };
 
