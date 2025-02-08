@@ -1,3 +1,4 @@
+const { MessageFlags } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const GuildManager = require("@guildManager");
 const words = require("./hangman words.js").words;
@@ -69,7 +70,7 @@ module.exports = {
             // Ignore non-alphabet characters or previously guessed letters
             if (!/^[A-Z]$/.test(letter) || guessedLetters.includes(letter) || incorrectGuesses.includes(letter)) {
                 await msg.delete();
-                return message.channel.send({ content: "Please enter a new letter that hasn't been guessed.", ephemeral: true });
+                return message.channel.send({ content: "Please enter a new letter that hasn't been guessed.", flags: MessageFlags.Ephemeral });
             }
 
             // If the letter is in the word

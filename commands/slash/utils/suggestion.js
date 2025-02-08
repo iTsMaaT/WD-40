@@ -1,4 +1,4 @@
-const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
+const { ApplicationCommandType, ApplicationCommandOptionType, MessageFlags } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
@@ -15,7 +15,7 @@ module.exports = {
     ],
     async execute(logger, interaction, client) {
 
-        if (!process.env.SUGGESTION_CHANNEL_ID) return await interaction.reply({ embeds: [embedGenerator.error("No suggestion channel has been set by the owner.")], ephemeral: true });
+        if (!process.env.SUGGESTION_CHANNEL_ID) return await interaction.reply({ embeds: [embedGenerator.error("No suggestion channel has been set by the owner.")], flags: MessageFlags.Ephemeral });
         
         const suggestion = interaction.options.get("suggestion").value;
         const channel = await client.channels.fetch(process.env.SUGGESTION_CHANNEL_ID);
@@ -24,7 +24,7 @@ module.exports = {
         await sent.react("🔴");
         await sent.react("🟢");
         await sent.react("✅");
-        interaction.editReply({ embeds: [embedGenerator.info("Your suggestion has been sent.\nFor a bug report, you can join the support server by doing >help")], ephemeral: true });
+        interaction.editReply({ embeds: [embedGenerator.info("Your suggestion has been sent.\nFor a bug report, you can join the support server by doing >help")], flags: MessageFlags.Ephemeral });
         logger.info("Suggestion received");
     },
 };

@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
@@ -68,7 +68,7 @@ module.exports = {
 
         collector.on("collect", async interaction => {
             if (interaction.user.id !== message.author.id) 
-                return interaction.reply({ content: "This game isn't for you!", ephemeral: true });
+                return interaction.reply({ content: "This game isn't for you!", flags: MessageFlags.Ephemeral });
             
 
             if (interaction.customId === "hit" && playerTurn) {
