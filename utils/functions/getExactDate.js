@@ -1,3 +1,7 @@
+/**
+ * Get the exact date and time
+ * @returns {string} The exact date and time
+ */
 const getExactDate = function() {
     const today = new Date();
     const dd = String(today.getDate()).padStart(2, "0");

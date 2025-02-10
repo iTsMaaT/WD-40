@@ -2,6 +2,10 @@ const { toEngineerNotation } = require("@functions/formattingFunctions");
 const logger = require("@utils/log");
 const prettyMilliseconds = require("pretty-ms");
 
+/**
+ * Get Pterodactyl server info
+ * @returns {Promise<Object>} Object containing server info
+ */
 const getPterodactylInfo = async function() {
     let serverName = "";
     let RAMlimit = "";

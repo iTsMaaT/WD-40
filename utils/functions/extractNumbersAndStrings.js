@@ -1,3 +1,8 @@
+/**
+ * Extract numbers and strings from a string.
+ * @param {string} input - The input string.
+ * @returns {number[] | string[]} An array of numbers and strings.
+ */
 const extractNumbersAndStrings = (input) => {
     const regex = /(\d+)|"([^"]*)"/g;
     const result = [];

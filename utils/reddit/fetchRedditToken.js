@@ -1,6 +1,11 @@
 const fs = require("fs");
 const axios = require("axios");
 
+/**
+ * Fetches the Reddit token from the Reddit API
+ *
+ * @returns {Promise<{baseUrl: string, headers: {User-Agent: string, Accept: string, Accept-Encoding: string, Authorization: string}}>} The base URL and headers
+ */
 async function getRedditToken() {    
     const { version, homepage } = require("@root/package.json");
     const UserAgent = `web:${homepage}:${version} (by /u/${process.env.REDDIT_USERNAME || "unknown"})`;
@@ -55,6 +60,11 @@ async function getRedditToken() {
     return { baseUrl, headers };
 }
 
+/**
+ * Initializes the Reddit configuration file
+ * 
+ * @returns {Promise<void>}
+ */
 async function initConfFile() {    
     const confFile = process.cwd() + "/utils/reddit/redditConf.json";
     if (!fs.existsSync(confFile)) {
@@ -66,6 +76,15 @@ async function initConfFile() {
     }
 }
 
+/**
+ * Makes a request to a URL
+ * 
+ * @param {string} url The URL to request
+ * @param {Object} headers The headers to use
+ * @param {number} attempt The number of attempts
+ * 
+ * @returns {Promise<any>}
+ */
 async function makeRequest(url, headers, attempt = 0) {
     const response = await axios.request({
         method: "GET",

@@ -1,6 +1,17 @@
 const logger = require("@utils/log");
 const { getRedditToken, makeRequest } = require("./fetchRedditToken.js");
 
+/**
+ * Fetch a post from Reddit
+ * 
+ * @param {boolean} ChannelNSFW - If the channel is NSFW
+ * @param {string[]} subreddits - The subreddits to fetch from
+ * @param {number} limit - The number of tries to fetch a post
+ * @param {string} type - The type of fetch (sub or user)
+ * @param {string} postType - The type of post (image or text)
+ * 
+ * @returns {Promise<object>}
+ */
 const fetchReddit = async function(ChannelNSFW, subreddits, limit, type = "sub", postType = "image") {
     try {
         const subreddit = subreddits[Math.floor(Math.random() * subreddits.length)];

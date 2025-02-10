@@ -1,3 +1,11 @@
+/**
+ * Convert a number to engineer notation
+ * @param {number} number - The number to convert
+ * @param {string[]} [sizes=["","Ki","Mi","Gi","Ti","Pi"]] - The sizes to use for the engineer notation
+ * @param {number} [k=1024] - The base for the engineer notation
+ * @param {number} [decimals=2] - The number of decimals to round to
+ * @returns {string} The engineer notation string
+ */
 const toEngineerNotation = function(number, sizes = ["", "Ki", "Mi", "Gi", "Ti", "Pi"], k = 1024, decimals = 2) {
     if (number === 0) return "0";
 
@@ -11,6 +19,11 @@ const toEngineerNotation = function(number, sizes = ["", "Ki", "Mi", "Gi", "Ti",
     return formattedValue + " " + sizes[i];
 };
 
+/**
+ * Convert a time string to milliseconds
+ * @param {string} timeString - The time string to convert
+ * @returns {number | null} The time in milliseconds, or null if the input is invalid
+ */
 const timeFormatToMS = function(timeString) {
 
     // Validation
@@ -38,6 +51,13 @@ const timeFormatToMS = function(timeString) {
     
 };
 
+/**
+ * Prettify a string
+ * @param {string} inputString - The input string to prettify
+ * @param {string} [type="all"] - The type of prettifying to do
+ * @param {boolean} [addDot=false] - Whether to add a dot at the end of the string
+ * @returns {string} The prettified string
+ */
 const prettyString = function(inputString, type, addDot = false) {
     const punctuationMarks = ["!", "?", ".", ",", ";", ")", ":", "}", "]", ">"];
     let modifiedString = "";
@@ -60,6 +80,11 @@ const prettyString = function(inputString, type, addDot = false) {
     return modifiedString;
 };
 
+/**
+ * Convert a number to a word
+ * @param {string} numberString - The number string to convert
+ * @returns {string} The word representation of the number
+ */
 const numberToWord = function(numberString) {
     const thousands = ["", "thousand", "million", "billion", "trillion"];
     // Uncomment this line for the English Number System
@@ -121,6 +146,15 @@ const numberToWord = function(numberString) {
     return wordString.trim();
 };
 
+/**
+ * Generate a progress bar
+ * @param {Object} options - The options for the progress bar
+ * @param {number} options.current - The current value
+ * @param {number} options.max - The maximum value
+ * @param {number} [options.totalCount=20] - The total count of the progress bar
+ * @param {boolean} [options.withPercentage=false] - Whether to include the percentage in the progress bar
+ * @returns {string} The progress bar string
+ */
 function generateProgressBar(options) {
     const current = options.current;
     const max = options.max;

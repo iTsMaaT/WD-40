@@ -4,6 +4,11 @@ const logger = require("@utils/log");
 const { repositories } = require("../../db/tableManager.js");
 const schema = require("../../../schema/schema.js");
 
+/**
+ * Initializes the auto response system for a guild.
+ * @param {string} guildId - The guild ID to initialize the auto response system for.
+ * @returns {Promise<AutoResponseSystem>} Object containing auto response management functions.
+ */
 async function autoResponseFn(guildId) {
     const cache = {};
 
@@ -31,6 +36,13 @@ async function autoResponseFn(guildId) {
         logger.error("Silently failing auto response init for guild " + guildId + ", " + e.stack);
     }
 
+    /**
+     * Adds a new response rule to the specified channel.
+     * @param {string} ChannelPrompt - The channel identifier or pattern to match.
+     * @param {string} string - The trigger string or special pattern (<all>, <media>, <link>, etc.).
+     * @param {string} response - Semicolon-separated list of possible responses.
+     * @returns {Promise<void>}
+     */
     async function addResponse(ChannelPrompt, string, response) {
         if (!cache[ChannelPrompt])
             cache[ChannelPrompt] = [];
@@ -42,6 +54,12 @@ async function autoResponseFn(guildId) {
         await updateResponseDB(guildId, ChannelPrompt, string);
     }
 
+    /**
+     * Removes a response rule from the specified channel.
+     * @param {string} ChannelPrompt - The channel identifier to remove responses from.
+     * @param {string} [string=null] - The specific trigger string to remove. If null, removes all rules for the channel.
+     * @returns {Promise<void>}
+     */
     async function removeResponse(ChannelPrompt, string = null) {
         if (!string) delete cache[ChannelPrompt];
         if (cache[ChannelPrompt]) {
@@ -52,6 +70,13 @@ async function autoResponseFn(guildId) {
         await updateResponseDB(guildId, ChannelPrompt, string);
     }
 
+    /**
+     * Matches message content against response rules and returns applicable responses.
+     * @param {string} ChannelPrompt - The channel identifier to check rules for.
+     * @param {string} String - The message content to match against.
+     * @param {boolean} [hasAttachment=false] - Whether the message contains an attachment.
+     * @returns {Promise<string[]>} Array of possible responses.
+     */
     async function matchResponses(ChannelPrompt, String, hasAttachment = false) {
         const matchedResponses = [];
 
@@ -94,10 +119,22 @@ async function autoResponseFn(guildId) {
     }
 
 
+    /**
+     * Returns the current response rules cache.
+     * @returns {Promise<Object>} The response rules cache object.
+     */
     async function getResponses() {
         return cache;
     }
 
+    /**
+     * Updates the response rules in the database.
+     * @private
+     * @param {string} guildId - The ID of the guild to update.
+     * @param {string} ChannelPrompt - The channel identifier.
+     * @param {string} String - The trigger string.
+     * @returns {Promise<void>}
+     */
     async function updateResponseDB(guildId, ChannelPrompt, String) {
         const responsesRepository = repositories.responses;
 
@@ -134,6 +171,11 @@ async function autoResponseFn(guildId) {
 
 const autoResponses = {};
 
+/**
+ * Gets or creates an auto response system for a guild.
+ * @param {string} guildId - The ID of the guild to get responses for.
+ * @returns {Promise<AutoResponseSystem>} The auto response system for the guild.
+ */
 async function getAutoResponses(guildId) {
     if (!autoResponses[guildId])
         autoResponses[guildId] = await autoResponseFn(guildId);

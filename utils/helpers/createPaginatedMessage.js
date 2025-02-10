@@ -89,10 +89,16 @@ const createPaginatedMessage = async function(message, options) {
     const row = new ActionRowBuilder()
         .addComponents(...buttons);
 
+    /**
+     * Updates the page number
+     */
     const updatePageNumber = () => {
         row.components.find(component => component.data.custom_id === "page")?.setLabel(`${currentPage + 1}/${pages.length}`);
     };
 
+    /**
+     * Updates the buttons
+     */
     const updateButtons = () => {
         row.components.find(component => component.data.custom_id === "first")?.setDisabled(currentPage === 0);
         row.components.find(component => component.data.custom_id === "previous")?.setDisabled(currentPage === 0);

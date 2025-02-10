@@ -1,3 +1,9 @@
+/**
+ * Combines two collections into a single array.
+ * @param {Array|Object} col1 - The first collection.
+ * @param {Array|Object} col2 - The second collection.
+ * @returns {Array} The combined array.
+ */
 const combineCollections = function(col1, col2) {
     const combinedArray = [];
 

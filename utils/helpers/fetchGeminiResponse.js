@@ -1,5 +1,15 @@
 const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai");
 
+/**
+ * Fetches a response from the Gemini API.
+ * 
+ * @param {string} prompt - The prompt to generate a response from.
+ * @param {string} apiKey - The API key to use for the request.
+ * @param {string} model - The model to use for the request.
+ * @param {Array} safetySettings - The safety settings to use for the request.
+ * 
+ * @returns {Promise<string>} The response from the Gemini API.
+ */
 async function fetchGeminiResponse(prompt, apiKey, model = "gemini-pro", safetySettings = null) {
     try {
         if (!safetySettings) {
