@@ -20,8 +20,8 @@ module.exports = {
     async execute(logger, interaction, client) {
         // set or deletes the prefix, if a custom one was already applied
         const prefix = interaction.options.get("prefix")?.value?.replace(/\s/g, "") || "";
-        if (prefix.length > 3) return await interaction.reply({ embeds: [embedGenerator.warning("Prefix can't have more than 3 characters")], flags: MessageFlags.Ephemeral });
-        if (prefix.length === 0) return await interaction.reply({ embeds: [embedGenerator.info(`The prefix is \`${GuildManager.GetPrefix(interaction.guild)}\``)] });
+        if (prefix.length > 3) return await interaction.editReply({ embeds: [embedGenerator.warning("Prefix can't have more than 3 characters")], flags: MessageFlags.Ephemeral });
+        if (prefix.length === 0) return await interaction.editReply({ embeds: [embedGenerator.info(`The prefix is \`${GuildManager.GetPrefix(interaction.guild)}\``)] });
 
         if (!dbManager.dbExists()) {
             return await interaction.editReply({ embeds: [embedGenerator.error({
@@ -38,7 +38,7 @@ module.exports = {
             description: `The new prefix is \`${newPrefix}\` in \`${interaction.member.guild.name}\``,
             timestamp: new Date(),
         };
-        interaction.reply({ embeds: [responseEmbed]  });
+        interaction.editReply({ embeds: [responseEmbed]  });
         logger.info(`Prefix changed to ${newPrefix} in \`${interaction.member.guild.name}\``);
     },
 };
