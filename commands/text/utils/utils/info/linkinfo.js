@@ -34,7 +34,7 @@ module.exports = {
                 title: "Link Analysis",
                 fields: [
                     { name: "Unshortened URL", value: truncateText(result.unshortenedURL, MAX_FIELD_LENGTH) ?? "-" },
-                    { name: "Redirects (without search params)", value: result.redirects.length !== 1 ? truncateText(result.redirects.join(" ->\n")) : "None" ?? "-" },
+                    { name: "Redirects (without search params)", value: result.redirects.length !== 1 ? truncateText(result.redirects.join(" ->\n")) : "None" },
                     { name: "Response Status", value: truncateText(result.responseStatus, MAX_FIELD_LENGTH) ?? "-" },
                     { name: "IP Address", value: truncateText(result.ip, MAX_FIELD_LENGTH) ?? "-" },
                     { name: "Type", value: truncateText(result.type, MAX_FIELD_LENGTH) },
@@ -267,6 +267,7 @@ module.exports = {
 
         async function getVirusTotalAnalysis(url) {
             try {
+                if (!process.env.VIRUS_TOTAL_API_KEY) return null;
                 const id = Buffer.from(url).toString("base64").replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
                 const response = await fetch(`https://www.virustotal.com/api/v3/urls/${id}`, {
                     method: "GET",
