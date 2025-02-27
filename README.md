@@ -25,11 +25,14 @@
 
 # Features
 
-- Easy to use
-- Music playing ability
-- Quick fixes upon finding bugs
-- Slash commands
-- and more!
+- Music playback from multiple sources (Spotify, Deezer, Youtube, and more)
+- Text manipulation commands
+- Fun games (Blackjack, Hangman, etc.)
+- Auto-reactions and auto-responses
+- Reddit integration
+- AI features with Gemini
+- Moderation tools
+- Customizable per server
 
 # Adding to your server
 
@@ -42,39 +45,47 @@
 # Self-hosting
 
 Good luck. 
-4. Add a bot app in the [Discord Developer Portal](https://discord.com/developers/applications) and get the token and client ID.
-5. Make sure to enable all privileged intents in the bot app if you want full functionality.
-1. Install [Node.js](https://nodejs.org/en/download/) v20.x LTS and latest version of [FFmpeg](https://ffmpeg.org/download.html).
-2. Clone this repository and run `npm install` (use `npm install --legacy-peer-deps` if errors occur).
-3. Configure `.env` file in the root directory with your bot token and client id (details in `.env.example`).
+
+1. Add a bot app in the [Discord Developer Portal](https://discord.com/developers/applications) and get the token and client ID.
+2. Make sure to enable all privileged intents in the bot app if you want full functionality.
+3. Install [Node.js](https://nodejs.org/en/download/) v20.x LTS and latest version of [FFmpeg](https://ffmpeg.org/download.html).
+4. Clone this repository and run `npm install` (use `npm install --legacy-peer-deps` if errors occur).
+5. Configure `.env` file in the root directory with your bot token and client id (details in `.env.example`).
 
 | Variable | Description |
 | - | - |
+| | |
+| Required | - |
 | TOKEN | The bot token, which you can get from the [Discord Developer Portal](https://discord.com/developers/applications). |
+| DEV_TOKEN | The development bot token, which you can get from the [Discord Developer Portal](https://discord.com/developers/applications). |
 | CLIENT_ID | The client ID of the bot, which you can get from the [Discord Developer Portal](https://discord.com/developers/applications). |
-| GEMINI_TOKEN | The token for the Gemini AI API, which you can get from the [Gemini API](https://ai.google.dev/gemini-api/docs) website. |
-| GEMINI_API_PROXY_URL | The URL for a US proxy, as Gemini API keys only work in the US. |
+| SERVER | Either `prod` or `dev`, will make the bot only react to its owner on dev. |
+| OWNER_ID | The ID of the owner of the bot. |
+| | |
+| Optional | - |
+| GEMINI_API_KEY | The token for the Gemini AI API, which you can get from the [Gemini API](https://ai.google.dev/gemini-api/docs) website. |
 | PTERODACTYL_API_KEY | If hosting on Pterodactyl, the API key for your panel. |
 | PTERODACTYL_URL | The URL for your panel. |
-| PTERODACTYL_SERVER_ID | The ID of the server on your panel.
+| PTERODACTYL_SERVER_ID | The ID of the server on your panel. |
 | VIRUS_TOTAL_API_KEY | The API key for the VirusTotal API, which you can get from the [VirusTotal](https://www.virustotal.com/) website. |
 | STEAM_API_KEY | The API key for the Steam API, which you can get from the [Steam](https://steamcommunity.com/dev) website. |
 | REDDIT_CLIENT_SECRET | The client secret for the Reddit API, which you can get from the [Reddit](https://www.reddit.com/prefs/apps) website. |
 | REDDIT_CLIENT_ID | The client ID for the Reddit API, which you can get from the [Reddit](https://www.reddit.com/prefs/apps) website. |
-| REDDIT_CLIENT_TOKEN | The refresh token for the Reddit API, which you can get from the [Reddit](https://www.reddit.com/prefs/apps) website. |
-| YOUTUBE_ACCESS_STRING | The access string for the YouTube API, which you can get from executing `npx --no discord-player-youtubei` in your terminal ([more info](https://github.com/retrouser955/discord-player-youtubei)). |
-| DATABASE_URL | The URL for the database, to create the DB, please refer to [DATABASE](#database) below.
-| | |
-| OWNER_ID | The ID of the owner of the bot. |
+| REDDIT_REFRESH_TOKEN | The refresh token for the Reddit API, which you can get from the [Reddit](https://www.reddit.com/prefs/apps) website. |
+| YOUTUBE_COOKIE | The cookie for the YouTube API, which you can get from executing `npx --no discord-player-youtubei` in your terminal ([more info](https://github.com/retrouser955/discord-player-youtubei)). |
+| DEEZER_MASTER_KEY | The master key for the Deezer API. |
+| DATABASE_URL | The URL for the database, to create the DB, please refer to [DATABASE](#database) below. |
+| SENTRY_DSN | Sentry DSN to enable Sentry logging of ERROR/SEVERE/WARNING |
+| - | - |
 | STATUS_CHANNEL_ID | The ID of the channel where the bot will post status updates. |
 | MEMBERS_UPDATE_ID | The ID of the channel where the bot will post member updates. |
 | SUGGESTION_CHANNEL_ID | The ID of the channel where the bot will post suggestions from the `/suggestion` (`>suggestion`) command. |
-| | |
-| SENTRY_DSN | (optional) Sentry DSN to enable Sentry logging of ERROR/SEVERE/WARNING |
-| | |
-| SERVER | Either `prod` or `dev`, will make the bot only react to it's owner on dev. |
+| GUILD_UPDATE_ID | The ID of the channel where the bot will post guild updates. |
+| GUILD_BLACKLIST | A comma-separated list of guild IDs that the bot should leave immediately upon joining. |
+| GLOBAL_BLACKLIST | A comma-separated list of user IDs that are globally blacklisted from using the bot. |
+| SUPERUSER_WHITELIST | A comma-separated list of user IDs that have superuser permissions. |
 
-> Reddit client secret, ID and token are optional, as it will use the normal API instead of going trough OAUTH if not specified.
+> If eddit client secret, ID, and token are not configured, it will use the normal API instead of going through OAUTH if not specified.
 
 ## Add your own music library
 
@@ -91,6 +102,9 @@ The bot uses a MySQL database to store data. You can create a database by runnin
 ```sql
 CREATE DATABASE bot;
 ```
+
+## No Database Mode
+As of version 5.8.0, you can run the bot without a database. Simply don't provide the `DATABASE_URL` in your `.env` file. Note that some features requiring persistence will be disabled in this mode.
 
 # Help and support
 
