@@ -8,12 +8,8 @@ const validateEnvironmentVariables = async function() {
     logger.debug("Validating environment variables...");
     const requiredEnvironmentVariables = [
         "TOKEN",
+        "SERVER",
         "CLIENT_ID",
-        "GEMINI_API_PROXY_URL",
-        "GEMINI_API_KEY",
-        "PTERODACTYL_API_KEY",
-        "PTERODACTYL_URL",
-        "PTERODACTYL_SERVER_ID",
         "OWNER_ID",
         "SERVER",
     ];
@@ -22,7 +18,6 @@ const validateEnvironmentVariables = async function() {
     for (const requiredEnvironmentVariable of requiredEnvironmentVariables) {
         if (!process.env[requiredEnvironmentVariable] || process.env[requiredEnvironmentVariable].length === 0) 
             missingEnvironmentVariables.push(requiredEnvironmentVariable);
-        
     }
 
     if (missingEnvironmentVariables.length > 0) {
