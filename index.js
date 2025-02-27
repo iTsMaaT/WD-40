@@ -131,7 +131,7 @@
         if (!discordPlayerConfig?.skipLogin) ytExtOptions.authentication = process.env.YOUTUBE_ACCESS_STRING;
         if (discordPlayerConfig?.useCookie) ytExtOptions.cookie = process.env.YOUTUBE_COOKIE;
         if (discordPlayerConfig?.usePoToken) {
-            ytExtOptions.streamOptions.useClient = "WEB";
+            ytExtOptions.streamOptions.useClient = discordPlayerConfig?.youtubeClient || "IOS";
             ytExtOptions.createStream = (track, ext) => createServerAbrStream(track, ext, (err) => console.log(err));
         }
         ytExtOptions.streamOptions.highWaterMark = discordPlayerConfig?.highWaterMark || 1024 * 1024;

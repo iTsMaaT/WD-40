@@ -277,15 +277,10 @@ Step 5 - Send the downloaded media to your favorite social media!
 
                 const startTime = Date.now();
 
-                // Additional Bot Permission Check (Required for Specific Commands)
-                const requiredPermissions = command.permissions || [];
-                requiredPermissions.push(PermissionsBitField.Flags.ReadMessageHistory);
-
                 if (!botMember.permissions.has(PermissionsBitField.Flags.Administrator)) {
                     const commandPerms = [...(command.permissions ?? []), PermissionsBitField.Flags.ReadMessageHistory];
 
                     const missingPermissions = commandPerms.filter(permission => !effectivePermissions.has(permission));
-
 
                     if (missingPermissions.length > 0) {
                         const readablePermissions = getPermissionArrayNames(missingPermissions);

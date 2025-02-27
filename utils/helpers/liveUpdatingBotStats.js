@@ -24,11 +24,12 @@ class LiveUpdatingBotStats {
     }
 
     /**
-     * Starts the live updating bot stats.
+     * Starts the live updating bot stats (unless in dev).
      * 
      * @returns {Promise<void>}
      */
     async start() {
+        if (process.env.SERVER === "dev") return;
         const jobExecution = async () => {
             const embed = await this.generateStatsEmbed();
             this.handleMessage({ embeds: [embed] });
