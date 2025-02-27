@@ -9,6 +9,17 @@ const path = require("path");
 class Config {
     constructor() {
         this.configFilePath = path.resolve(__dirname, "config.json");
+        this.envConfig = {
+            OWNER_ID: process.env.OWNER_ID,
+            STATUS_CHANNEL_ID: process.env.STATUS_CHANNEL_ID,
+            MEMBERS_UPDATE_ID: process.env.MEMBERS_UPDATE_ID,
+            SUGGESTION_CHANNEL_ID: process.env.SUGGESTION_CHANNEL_ID,
+            GUILD_UPDATE_ID: process.env.GUILD_UPDATE_ID,
+            LIVE_UPDATE_CHANNEL_ID: process.env.LIVE_UPDATE_CHANNEL_ID,
+            GUILD_BLACKLIST: process.env.GUILD_BLACKLIST?.split(",").map(s => s.trim()) || [],
+            GLOBAL_BLACKLIST: process.env.GLOBAL_BLACKLIST?.split(",").map(s => s.trim()) || [],
+            SUPERUSER_WHITELIST: process.env.SUPERUSER_WHITELIST?.split(",").map(s => s.trim()) || [],
+        };
         this.loadBaseConfig();
     }
 
@@ -20,9 +31,9 @@ class Config {
     /**
      * @type {BaseConfig}
      */
-        this.baseConfig = require(this.configFilePath);  // Load the base config using require
-        this.config = { ...this.baseConfig };            // Create a copy of the base config
-    }
+        this.baseConfig = require(this.configFilePath);
+        this.config = { ...this.baseConfig, ...this.envConfig };
+    }   
 
     /**
      * Reload the configuration from the file.
@@ -52,6 +63,7 @@ class Config {
      */
     set(key, value) {
         this.config[key] = value;
+        // this.reload();
         return this;
     }
 
