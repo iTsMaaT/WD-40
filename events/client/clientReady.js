@@ -76,8 +76,6 @@ module.exports = {
 
         console.log("Starting LiveUpdatingBotStats...");
         const liveUpdatingBotStats = new LiveUpdatingBotStats(client, client.channels.cache.get(config.get("LIVE_UPDATE_CHANNEL_ID")));
-        console.log(client.channels.cache.get(config.get("LIVE_UPDATE_CHANNEL_ID")));
-        console.log(config.get("LIVE_UPDATE_CHANNEL_ID"));
         liveUpdatingBotStats.start();
         console.log("LiveUpdatingBotStats started.");
 
