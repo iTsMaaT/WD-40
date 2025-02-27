@@ -1,5 +1,5 @@
 const { ApplicationCommandType } = require("discord.js");
-const prettyMilliseconds = require("pretty-ms");
+const formatDuration = require("@utils/functions/formatDuration");
 
 module.exports = {
     name: "ping",
@@ -13,7 +13,7 @@ module.exports = {
             color: 0xffffff, 
             fields: [
                 { name: "Bot's Ping", value: `\`${client.ws.ping}ms\`` },
-                { name: "Uptime", value: `\`${prettyMilliseconds(client.uptime)}\`` },
+                { name: "Uptime", value: `\`${formatDuration(client.uptime)}\`` },
                 { name: "Round Trip Latency", value: `\`${sent.createdTimestamp - interaction.createdTimestamp}ms\`` },
                 { name: "Bot's Age", value: `<t:${Math.floor(client.user.createdTimestamp / 1000)}:R>` },
             ],
