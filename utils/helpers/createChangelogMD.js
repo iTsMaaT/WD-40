@@ -3,7 +3,11 @@ const fs = require("fs");
 const path = require("path");
 const changelog = require("@root/changelogs.json");
 
-// Helper function to format the date
+/**
+ * Formats the date string to a readable format.
+ * @param {string} dateString - The date string to format.
+ * @returns {string} The formatted date string.
+ */
 const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);

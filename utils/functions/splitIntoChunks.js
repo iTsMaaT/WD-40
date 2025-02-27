@@ -1,3 +1,9 @@
+/**
+ * Splits the given code into chunks of the specified size (default: 1900 characters).
+ * @param {string} code - The code to split.
+ * @param {number} [chunkSize=1900] - The size of each chunk, in characters (default: 1900).
+ * @returns {string[]} An array of chunks of the specified size.
+ */
 const splitIntoChunks = function(code, chunkSize = 1900) {
     const chunks = [];
     let currentChunk = "";

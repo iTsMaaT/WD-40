@@ -1,6 +1,8 @@
 const getPterodactylInfo = require("@root/utils/functions/getPterodactylInfo");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { toEngineerNotation } = require("@functions/formattingFunctions");
+const formatDuration = require("@utils/functions/formatDuration");
+const { name } = require("@root/package.json");
 
 module.exports = {
     name: "botinfo",
@@ -25,10 +27,10 @@ module.exports = {
             memoryUsageString += `Array Buffers: ${arrayBuffers}`;
             
             const embed = {
-                title: `${process.env.SERVER == "prod" ? "Pterodactyl and" : ""} Process info for ${PteroInfo.main.name}`,
+                title: `${process.env.SERVER == "prod" && PteroInfo ? "Pterodactyl and" : ""} Process info for ${PteroInfo?.main?.name ?? name}`,
                 color: 0xffffff,
-                description: `Uptime: ${PteroInfo.uptime.clean}`,
-                fields: process.env.SERVER == "prod" ?
+                description: `Uptime: ${PteroInfo?.uptime?.clean ?? formatDuration(process.uptime())}`,
+                fields: process.env.SERVER == "prod" && PteroInfo ?
                     [{
                         name: "RAM usage",
                         value: `${PteroInfo.ram.usage.clean} / ${PteroInfo.ram.limit.clean} (${PteroInfo.ram.pourcentage.clean})`,

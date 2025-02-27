@@ -7,6 +7,8 @@ const { useMainPlayer } = require("discord-player");
 const { activateRotator } = require("@utils/helpers/activityStatusRotator");
 const player = useMainPlayer();
 const { toEngineerNotation } = require("@utils/functions/formattingFunctions");
+const { updateCommands } = require("@utils/helpers/deployCommands");
+const LiveUpdatingBotStats = require("@utils/helpers/liveUpdatingBotStats");
 
 module.exports = {
     name: Events.ClientReady,
@@ -57,20 +59,27 @@ module.exports = {
         console.log("Guild manager initiation done.");
 
         console.log("Setting up commands...");
-        await client.application.commands.set(client.discoveredCommands);
+        await updateCommands(client, logger);
         client.discoveredCommands = undefined;
         console.log(`${client.slashcommands.size} (/) commands`);
-        console.log(`${client.contextCommands.size} (ctx) commands`);
+        console.log(`${client.contextcommands.size} (ctx) commands`);
         console.log(`${client.commands.size} (text) commands (including aliases)`);
         console.log("commands setup done.");
 
         console.log("Discord.js version: " + require("discord.js").version);
         console.log(`There is ${client.options.shardCount} shard${client.options.shardCount > 1 ? "s" : ""} spawned`);
-        config.set("whitelist", [...config.get("whitelist"), process.env.OWNER_ID]);
-        console.log(`Whitelisted users: ${config.get("whitelist").join(", ")}`);
+        config.set("SUPERUSER_WHITELIST", [...config.get("SUPERUSER_WHITELIST"), process.env.OWNER_ID]);
+        console.log(`Whitelisted users: ${config.get("SUPERUSER_WHITELIST").join(", ")}`);
         if (process.env.SERVER == "dev") config.set("defaultSuperuserState", true);
         console.log(`Debug is ${config.get("DefaultDebugState") ? "en" : "dis"}abled`);
         console.log(`Superuser is ${config.get("defaultSuperuserState") ? "en" : "dis"}abled`);
+
+        console.log("Starting LiveUpdatingBotStats...");
+        const liveUpdatingBotStats = new LiveUpdatingBotStats(client, client.channels.cache.get(config.get("LIVE_UPDATE_CHANNEL_ID")));
+        console.log(client.channels.cache.get(config.get("LIVE_UPDATE_CHANNEL_ID")));
+        console.log(config.get("LIVE_UPDATE_CHANNEL_ID"));
+        liveUpdatingBotStats.start();
+        console.log("LiveUpdatingBotStats started.");
 
         console.log("Waiting for websocket to report sensical ping (> -1ms)");
         console.logger(`

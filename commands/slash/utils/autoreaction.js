@@ -136,7 +136,7 @@ module.exports = {
                     timestamp: new Date(),
                 };
 
-                interaction.reply({ embeds: [embed] });
+                interaction.editReply({ embeds: [embed] });
                 break;
             }
             case "add": {

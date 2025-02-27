@@ -22,17 +22,14 @@ async function createOrUseWebhook(message, name) {
             
     }
 
-    // Attempt to find an existing webhook with a known token
     let webhook = webhooks.find(wh => wh.name === name);
 
-    // If no existing webhook is found, create a new one
     if (!webhook) {
         webhook = await message.channel.createWebhook({
             name: name,
             reason: "Webhook creation requested",
         });
     } else {
-        // If an existing webhook is found, delete and recreate it (since it lacks a token)
         await webhook.delete("Recreating webhook to ensure token availability.");
         webhook = await message.channel.createWebhook({
             name: name,
@@ -165,7 +162,6 @@ function multipleImageEmbed(embedOBJ, ...links) {
 function getPermissionArrayNames(flags) {
     return new PermissionsBitField(flags).toArray();
 }
-
 
 module.exports = { 
     createOrUseWebhook,

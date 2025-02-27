@@ -170,7 +170,7 @@ const getProbableBridgeSource = function(playerConfig, providesStream) {
         }
     }
 
-    return streamProviders.length > 0 ? streamProviders.join(" -> ") : "N/A";
+    return streamProviders.length > 0 ? streamProviders.join(" \\▶ ") : "N/A";
 };
 
 module.exports = {

@@ -46,20 +46,18 @@
         { "type": 4, "name": "CDUjkju9sy" }
     ],
     
-    "guildBlacklist": [],
-
-    "blacklist": [],
-
-    "whitelist": [
-        "273587964334964737",
-        "670078966110879766"
-    ],
-    
     "withoutDatabaseConfig": {
         "prefix": ">",
         "responses": 0,
         "personality": "Neutral"
     },
+
+    "defaultSuperuserState": false,
+    "defaultDebugState": false,
+    "autoCommandMatch": true,
+    "baseCommandCooldown": 3000,
+
+    "defaultGeminiModel": "gemini-2.0-flash-lite",
 
     "discordPlayerConf": {
         "supportedFileExtensions": ["mp3"],
@@ -126,9 +124,5 @@
             "8D": "apulsator=hz=0.08"
         }
 
-    },
-
-    "defaultSuperuserState": false,
-    "defaultDebugState": false,
-    "autoCommandMatch": true
+    }
 }

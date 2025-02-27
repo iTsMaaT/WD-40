@@ -1,4 +1,4 @@
-const prettyMilliseconds = require("pretty-ms");
+const formatDuration = require("@utils/functions/formatDuration");
 const os = require("os");
 const changelogs = require("@root/changelogs.json");
 const embedGenerator = require("@utils/helpers/embedGenerator");
@@ -7,6 +7,7 @@ const { sql } = require("drizzle-orm");
 const DB = require("@root/utils/db/databaseManager");
 const GuildManager = require("@guildManager");
 const { useMainPlayer } = require("discord-player");
+const { toEngineerNotation } = require("@functions/formattingFunctions");
 
 module.exports = {
     name: "stats",
@@ -19,7 +20,7 @@ module.exports = {
         client.commands.each((val) => {if (!val.private && !addedCommands.has(val.name))  addedCommands.add(val.name); });
         
         const PteroInfo = await getPterodactylInfo();
-        const RamUsageFormatted = `${PteroInfo.ram.usage.clean} / ${PteroInfo.ram.limit.clean} (${PteroInfo.ram.pourcentage.clean})`;
+        const RamUsageFormatted = `${PteroInfo?.ram.usage.clean || (toEngineerNotation(process.memoryUsage().rss) + "B rss")} / ${PteroInfo?.ram.limit.clean || (toEngineerNotation(process.memoryUsage().heapTotal) + "B heap")} (${PteroInfo?.ram.pourcentage.clean || "N/A"})`;
         const prefix = GuildManager.GetPrefix(message.guild);
         let lastCommandTimeSinceNow = "";
         let lastExecutedCommand = "";
@@ -33,9 +34,9 @@ module.exports = {
         const userHere = message.guild.memberCount;
         const totalGuilds = client.guilds.cache.size;
         const totalChannels = client.channels.cache.size;
-        const uptime = prettyMilliseconds(client.uptime);
+        const uptime = formatDuration(client.uptime);
         const ping = client.ws.ping + "ms";
-        const botAge = prettyMilliseconds(Date.now() - client.user.createdAt);
+        const botAge = formatDuration(Date.now() - client.user.createdAt);
         let totalExecutedCommands;
         try {
             totalExecutedCommands = (await DB.drizzle.execute(sql`SELECT COUNT(m.ID) AS count FROM Logs m WHERE m.Value LIKE "Executing [%"`))[0][0].count;
@@ -67,7 +68,7 @@ module.exports = {
         const lastCommandContent = lastExecutedCommand?.content;
         if (lastExecutedCommand) {
             lastCommandLink = `https://discord.com/channels/${lastExecutedCommand.guild.id}/${lastExecutedCommand.channel.id}/${lastExecutedCommand.id}`;
-            lastCommandTimeSinceNow = prettyMilliseconds(Date.now() - lastExecutedCommand.createdTimestamp);
+            lastCommandTimeSinceNow = formatDuration(Date.now() - lastExecutedCommand.createdTimestamp);
         }
 
         const embed = {

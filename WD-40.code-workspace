@@ -11,10 +11,20 @@
         },
         "eslint.format.enable": true,
         "editor.codeActionsOnSave": {
-            "source.fixAll": "explicit"
+            "source.fixAll.eslint": "explicit"
         },
         "eslint.options": {
-            "overrideConfigFile": ".eslintrc"
-        }
+            "overrideConfigFile": "eslint.config.mjs"
+        },
+        "eslint.lintTask.enable": true,
+        "eslint.codeActionsOnSave.rules": [
+            "explicit"
+        ],
+        "github.copilot.editor.enableAutoCompletions": false,
+        "terminal.integrated.suggest.builtinCompletions": {
+
+            "pwshCode": true,
+            "pwshGit": true
+        },
     }
 }

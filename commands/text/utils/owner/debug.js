@@ -6,15 +6,16 @@ module.exports = {
     category: "utils",
     usage: {
         required: {
-            "server": "server to make superuser",
+            "server": "server to enable debug",
         },
     },
     private: true,
     async execute(logger, client, message, args, optionalArgs) {
-        // Superuser command (Only iTsMaaT can execute commands)
-        process.env.CURRENT_DEBUG_STATE = !process.env.CURRENT_DEBUG_STATE;
-        return await message.reply({ embeds: [
-            embedGenerator.success(`Superuser state set to ${process.env.CURRENT_DEBUG_STATE ? "enabled" : "disabled"}`),
-        ] });
+        config.set("defaultDebugState", !config.get("defaultDebugState"));
+        return await message.reply({
+            embeds: [
+                embedGenerator.success(`Debug state set to ${config.get("defaultDebugState") ? "enabled" : "disabled"}`),
+            ],
+        });
     },
 };

@@ -27,6 +27,8 @@
     const { getPermissionArrayNames } = require("@functions/discordFunctions");
     const config = require("@utils/config/configUtils");
 
+    if (!process.env.DEEZER_MASTER_KEY) config.set("removeDeezer", true);
+
     const fs = require("fs");
 
 
@@ -55,7 +57,7 @@
             Partials.Reaction,
         ],
     };
-    
+
     const client = new Client({
         intents: Object.keys(GatewayIntentBits),
         partials: Object.keys(Partials),
@@ -105,7 +107,16 @@
     const ffmpegFilters = config.get("discordPlayerConf")?.ffmpegFilters || {};
     for (const filter of Object.entries(ffmpegFilters)) AudioFilters.define(filter[0], filter[1]);
 
-    const getPriority = (streamProvider) => 10 + discordPlayerConfig?.streamPriorities.length - discordPlayerConfig?.streamPriorities?.indexOf(streamProvider) ?? null;
+    /**
+     * Get the priority of a stream provider
+     * 
+     * @param {string} streamProvider The stream provider
+     * @returns {number} The priority
+     */
+    const getPriority = (streamProvider) => {
+        const index = discordPlayerConfig?.streamPriorities?.indexOf(streamProvider);
+        return index !== -1 ? 10 + discordPlayerConfig?.streamPriorities.length - index : null;
+    };
 
     logger.info("Loading SoundgasmExtractor extractor...");
     await player.extractors.register(SoundgasmExtractor, {
@@ -176,13 +187,20 @@
     // Collections creation
     client.commands = new Discord.Collection();
     client.slashcommands = new Discord.Collection();
-    client.contextCommands = new Discord.Collection();
+    client.contextcommands = new Discord.Collection();
     client.consoleCommands = new Discord.Collection();
     client.TextCooldowns = new Map();
     client.SlashCooldowns = new Map();
     const permissionBitFields = [];
 
-    // File finder/loader
+    /**
+     * Load files from a folder
+     * 
+     * @param {string} folder The folder to load files from
+     * @param {Function} callback The callback function
+     * 
+     * @returns {void}
+     */
     function loadFiles(folder, callback) {
         const commandFiles = fs.readdirSync(folder);
         while (commandFiles.length > 0) {
@@ -205,7 +223,14 @@
             logger.severe(`Validator [${validator.filePath}] is missing an execute function`);
             process.exit(0);
         }
-        await validator.execute();
+
+        try {
+            await validator.execute();
+        } catch (error) {
+            logger.severe(`Validator [${validator.filePath}] failed to execute`);
+            logger.error(error);
+            process.exit(0);
+        }
     });
 
     // Slash command handler
@@ -226,7 +251,7 @@
         command.lastExecutionTime = 1000;
         if (client.commands.get(command.name)) throw new Error(`Text command [${command.name}] already exists\n${command.filePath}`);
         client.commands.set(command.name, command);
-        if (!command.cooldown) command.cooldown = 3000;
+        if (!command.cooldown) command.cooldown = config.get("baseCommandCooldown") || 3000;
 
         if (command.aliases && Array.isArray(command.aliases)) {
             command.isAlias = true;
@@ -239,19 +264,19 @@
         if (command.permissions) permissionBitFields.push(...command.permissions);
     });
 
-    console.log(`
---------------------------------------------------
-Required permissions:
---------------------------------------------------
-${getPermissionArrayNames(permissionBitFields).join("\n")}
---------------------------------------------------
-`);
+    console.logger([
+        "--------------------------------------------------",
+        "Required permissions:",
+        "--------------------------------------------------",
+        `${getPermissionArrayNames(permissionBitFields).join("\n")}`,
+        "--------------------------------------------------",
+    ].join("\n"));
 
     // Context menu command handler
     loadFiles("./commands/context/", (contextcommand, fileName) => {
         if ("name" in contextcommand && "execute" in contextcommand && "type" in contextcommand) {
-            if (client.contextCommands.get(contextcommand.name)) throw new Error(`Context command or alias [${contextcommand.name}] already exists`);
-            client.contextCommands.set(contextcommand.name, contextcommand);
+            if (client.contextcommands.get(contextcommand.name)) throw new Error(`Context command or alias [${contextcommand.name}] already exists`);
+            client.contextcommands.set(contextcommand.name, contextcommand);
             client.discoveredCommands.push(contextcommand);
         } else {
             logger.error(`[WARNING] The (ctx) command ${fileName} is missing a required "name", "execute", or "type" property.`);
@@ -317,5 +342,5 @@ ${getPermissionArrayNames(permissionBitFields).join("\n")}
     });
 
     // Logins with the token
-    client.login(process.env.SERVER === "dev" ? process.env.DEV_TOKEN : process.env.TOKEN);
+    client.login(process.env.SERVER === "dev" && process.env.DEV_TOKEN ? process.env.DEV_TOKEN : process.env.TOKEN);
 })();

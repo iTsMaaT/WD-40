@@ -1,6 +1,6 @@
 const { useStats } = require("@utils/helpers/playerHelpers");
 const { useQueue } = require("discord-player");
-const prettyMs = require("pretty-ms");
+const formatDuration = require("@utils/functions/formatDuration");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 
 module.exports = {
@@ -36,8 +36,8 @@ module.exports = {
                 {
                     name: "Latencies",
                     value:
-                    `**Event loop:** ${prettyMs(stats.latency.eventLoop)}\n` +
-                    `**Voice connection:** ${prettyMs(stats.latency.voiceConnection)}\n`,
+                    `**Event loop:** ${formatDuration(stats.latency.eventLoop)}\n` +
+                    `**Voice connection:** ${formatDuration(stats.latency.voiceConnection)}\n`,
                 },
             ],
         });

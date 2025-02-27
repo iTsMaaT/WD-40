@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder, MessageFlags } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { useQueue, useTimeline, useHistory, QueueRepeatMode } = require("discord-player");
 const { getLoopMode, getPauseMode } = require("@utils/helpers/playerHelpers");
@@ -17,17 +17,17 @@ module.exports = {
         const timeline = useTimeline();
         const history = useHistory();
 
-        if (!queue || !queue.currentTrack) 
+        if (!queue || !queue.currentTrack)
             return await message.reply({ embeds: [embedGenerator.error("There is nothing playing right now.")] });
-        
+
 
         const track = queue.currentTrack;
 
         const embed = embedGenerator.info({
             title: "Now Playing",
-            description: 
-                        `${track.url ? `[${track.title}](${track.url})` : track.title}\n` +
-                        `Requested by: ${track.requestedBy?.displayName || "N/A"}`,
+            description:
+                `${track.url ? `[${track.title}](${track.url})` : track.title}\n` +
+                `Requested by: ${track.requestedBy?.displayName || "N/A"}`,
             thumbnail: { url: track.thumbnail },
             fields: [
                 { name: "Author", value: track.author },
@@ -96,9 +96,9 @@ module.exports = {
         const collector = sentMessage.createMessageComponentCollector({ filter, time: 60000 });
 
         collector.on("collect", async (interaction) => {
-            if (!queue || !queue.currentTrack) 
+            if (!queue || !queue.currentTrack)
                 return await interaction.update({ embeds: [embedGenerator.error("There is nothing playing right now.")], components: [] });
-            
+
 
             try {
                 switch (interaction.customId) {
@@ -134,9 +134,9 @@ module.exports = {
             const updatedTrack = queue.currentTrack;
             const updatedEmbed = embedGenerator.info({
                 title: "Now Playing",
-                description: 
-                            `${updatedTrack.url ? `[${updatedTrack.title}](${updatedTrack.url})` : updatedTrack.title}\n` +
-                            `Requested by: ${updatedTrack.requestedBy?.displayName || "N/A"}`,
+                description:
+                    `${updatedTrack.url ? `[${updatedTrack.title}](${updatedTrack.url})` : updatedTrack.title}\n` +
+                    `Requested by: ${updatedTrack.requestedBy?.displayName || "N/A"}`,
                 thumbnail: { url: updatedTrack.thumbnail },
                 fields: [
                     { name: "Author", value: updatedTrack.author },
@@ -163,9 +163,9 @@ module.exports = {
             const updatedTrack = queue.currentTrack;
             const updatedEmbed = embedGenerator.info({
                 title: "Now Playing",
-                description: 
-                            `${updatedTrack.url ? `[${updatedTrack.title}](${updatedTrack.url})` : updatedTrack.title}\n` +
-                            `Requested by: ${updatedTrack.requestedBy?.displayName || "N/A"}`,
+                description:
+                    `${updatedTrack.url ? `[${updatedTrack.title}](${updatedTrack.url})` : updatedTrack.title}\n` +
+                    `Requested by: ${updatedTrack.requestedBy?.displayName || "N/A"}`,
                 thumbnail: { url: updatedTrack.thumbnail },
                 fields: [
                     { name: "Author", value: updatedTrack.author },
@@ -183,7 +183,7 @@ module.exports = {
         });
 
         collector.on("ignore", (interaction) => {
-            interaction.reply({ embeds: [embedGenerator.warning("You are not in the same voice channel as me.")], flags: MessageFlags.Ephemeral });
+            interaction.reply({ embeds: [embedGenerator.warning("You are not in the same voice channel as me.")], ephemeral: true });
         });
     },
 };

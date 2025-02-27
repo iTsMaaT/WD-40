@@ -1,24 +1,21 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, EmbedBuilder } = require("discord.js");
 const embedGenerator = require("./embedGenerator");
 
 /**
  * Creates a paginated message with buttons for pagination
- * @param {Message} message The message to reply to
+ * @param {Message|CommandInteraction} messageOrInteraction The message or interaction to reply to
  * @param {Object} options The options for the pagination
- * @param {Object} options.firstPageOverride The fields to use for the first page
- * @param {Object} options.embed The embed to use for the message
- * @param {Array<Object>} options.fields The fields to use for the message
- * @param {Number} options.fieldsPerPage The number of fields per page
- * @param {Number} options.timeout The timeout for the collector
- * @param {Object} options.buttonLabels The labels for the buttons
  * @returns {Promise<Message>} The message that was sent
  */
-const createPaginatedMessage = async function(message, options) {
+const createPaginatedMessage = async function(messageOrInteraction, options) {
     const {
         firstPageOverride,
         embed,
         fields,
-        filter = (interaction) => interaction.user.id === message.author.id,
+        filter = (interaction) => {
+            const authorId = messageOrInteraction.author?.id || messageOrInteraction.user?.id;
+            return interaction.user.id === authorId;
+        },     
         filterEmbed = embedGenerator.warning("You are not allowed to interact with this message."),
         fieldsPerPage = 10,
         timeout = 120000,
@@ -29,11 +26,21 @@ const createPaginatedMessage = async function(message, options) {
             last: "▶▶",
         },
     } = options;
-    if (!embed) throw new Error("Embed is missing");
+
+    let workingEmbed;
+    if (embed instanceof EmbedBuilder) 
+        workingEmbed = embed;
+    else 
+        workingEmbed = embedGenerator.create(embed, embed.color || 0xffffff);
+    
+
+    if (!workingEmbed) throw new Error("Embed is missing");
     if (!fields) throw new Error("Fields are missing");
     if (isNaN(fieldsPerPage)) throw new Error("Fields per page is not a number");
     if (isNaN(timeout)) throw new Error("Timeout is not a number");
     if (fieldsPerPage < 0) throw new Error("Fields per page cannot be negative");
+    if (!Array.isArray(fields)) throw new Error("Fields must be an array");
+
         
     const pages = [];
     if (firstPageOverride) pages.push(firstPageOverride);
@@ -89,10 +96,16 @@ const createPaginatedMessage = async function(message, options) {
     const row = new ActionRowBuilder()
         .addComponents(...buttons);
 
+    /**
+     * Updates the page number
+     */
     const updatePageNumber = () => {
         row.components.find(component => component.data.custom_id === "page")?.setLabel(`${currentPage + 1}/${pages.length}`);
     };
 
+    /**
+     * Updates the buttons
+     */
     const updateButtons = () => {
         row.components.find(component => component.data.custom_id === "first")?.setDisabled(currentPage === 0);
         row.components.find(component => component.data.custom_id === "previous")?.setDisabled(currentPage === 0);
@@ -102,49 +115,69 @@ const createPaginatedMessage = async function(message, options) {
 
     updateButtons();
 
-    embed.fields = pages[currentPage];
+    workingEmbed.setFields(pages[currentPage] || []);
 
-    const sentMessage = await message.reply({
-        embeds: [embed],
-        components: [row],
-    });
+    const sentMessage = await (async () => {
+        const payload = {
+            embeds: [workingEmbed],
+            components: [row],
+        };
+
+        if (messageOrInteraction.replied || messageOrInteraction.deferred) 
+            return await messageOrInteraction.editReply(payload);
+        else if (messageOrInteraction.reply) 
+            return await messageOrInteraction.reply(payload);
+        else 
+            return await messageOrInteraction.channel.send(payload);
+        
+    })();
 
     const collector = await sentMessage.createMessageComponentCollector({
-        filter,
+        filter: (interaction) => {
+            const authorId = messageOrInteraction.author?.id || messageOrInteraction.user.id;
+            return interaction.user.id === authorId && filter(interaction);
+        },
         time: timeout,
         dispose: true,
     });
 
     collector.on("collect", async interaction => {
-        switch (interaction.customId) {
-            case "first":
-                currentPage = 0;
-                break;
-            case "previous":
-                currentPage--;
-                break;
-            case "next":
-                currentPage++;
-                break;
-            case "last":
-                currentPage = pages.length - 1;
-                break;
+        try {
+            switch (interaction.customId) {
+                case "first":
+                    currentPage = 0;
+                    break;
+                case "previous":
+                    currentPage--;
+                    break;
+                case "next":
+                    currentPage++;
+                    break;
+                case "last":
+                    currentPage = pages.length - 1;
+                    break;
+            }
+
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= pages.length) currentPage = pages.length - 1;
+
+            updatePageNumber();
+            updateButtons();
+
+            workingEmbed.fields = pages[currentPage];
+
+            await interaction.update({
+                embeds: [workingEmbed],
+                components: [row],
+            });
+        } catch (error) {
+            if (error.code === 50035) { // Invalid Form Body error
+                await interaction.followUp({
+                    content: "Failed to update the message. Please try again.",
+                    ephemeral: true,
+                });
+            }
         }
-
-        console.log(currentPage);
-
-        if (currentPage < 0) currentPage = 0;
-        if (currentPage >= pages.length) currentPage = pages.length - 1;
-
-        updatePageNumber();
-        updateButtons();
-
-        embed.fields = pages[currentPage];
-
-        await interaction.update({
-            embeds: [embed],
-            components: [row],
-        });
     });
   
     collector.on("end", async () => {
@@ -153,7 +186,7 @@ const createPaginatedMessage = async function(message, options) {
         });
   
         await sentMessage.edit({
-            embeds: [embed],
+            embeds: [workingEmbed],
             components: [row],
         });
     });

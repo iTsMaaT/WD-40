@@ -40,8 +40,8 @@ module.exports = {
                 message.reply({ embeds: [embed] });
             }
 
-            if (config.get("defaultSuperuserState") && (message.author.id != process.env.OWNER_ID && config.get("whitelist").includes(message.author.id))) return;
-            if (config.get("blacklist").includes(message.author.id)) return;
+            if (config.get("defaultSuperuserState") && (message.author.id != process.env.OWNER_ID && config.get("SUPERUSER_WHITELIST").includes(message.author.id))) return;
+            if (config.get("GLOBAL_BLACKLIST").includes(message.author.id)) return;
 
             const autoreactions = await GuildManager.getAutoReactions(message.guild.id);
             const reactions = await autoreactions.matchReactions(message.channel.name, message.content, message.attachments.size > 0);
@@ -70,28 +70,29 @@ Step 2 - Go to this URL (https://snapinsta.app/)
 Step 3 - Paste the link in the "Paste URL Instagram" box
 Step 4 - Click download
 Step 5 - Send the downloaded media to your favorite social media!
-    `);}
+    `);
+                }
 
                 // skull reaction to skull emoji
-                if (message.content.toLowerCase() == "💀") 
+                if (message.content.toLowerCase() == "💀")
                     message.react("💀");
-            
+
 
                 // Ping fail if doesnt have @everyone perm
-                if (message.member && !message.member.permissions.has("MentionEveryone") && (message.content.includes("@everyone") || message.content.includes("@here"))) 
+                if (message.member && !message.member.permissions.has("MentionEveryone") && (message.content.includes("@everyone") || message.content.includes("@here")))
                     message.reply("Ping fail L");
             }
         }
 
         async function handleCommand(message) {
             if (message.author.bot) return;
-            if (config.get("defaultSuperuserState") && !config.get("whitelist").includes(message.author.id)) return;
+            if (config.get("defaultSuperuserState") && !config.get("SUPERUSER_WHITELIST").includes(message.author.id)) return;
             if (!message.guild) return;
-            if (config.get("blacklist").includes(message.author.id)) return;
-            
+            if (config.get("GLOBAL_BLACKLIST").includes(message.author.id)) return;
+
             const prefix = GuildManager.GetPrefix(message.guild);
             if (!message.content.startsWith(prefix) && !message.content.startsWith(`<@${client.user.id}>`)) return;
-            
+
             let args, commandName;
             if (!message.content.startsWith(`<@${client.user.id}> `)) {
                 args = message.content.slice(prefix.length).trim().split(/ +/);
@@ -102,7 +103,7 @@ Step 5 - Send the downloaded media to your favorite social media!
             }
 
             let command = client.commands.get(commandName);
-        
+
             // Bot's Channel-Specific Permissions Check
             const botMember = message.guild.members.me;
             if (!botMember) return;
@@ -122,8 +123,7 @@ Step 5 - Send the downloaded media to your favorite social media!
             if (missingBasePerms.length > 0) {
                 try {
                     await message.author.send(
-                        `I don't have the required permissions in <#${message.channel.id}>: ${
-                            getPermissionArrayNames(missingBasePerms).join(", ")
+                        `I don't have the required permissions in <#${message.channel.id}>: ${getPermissionArrayNames(missingBasePerms).join(", ")
                         }`,
                     );
                 } catch (dmError) {
@@ -141,7 +141,7 @@ Step 5 - Send the downloaded media to your favorite social media!
                         PermissionsBitField.Flags.Speak,
                         PermissionsBitField.Flags.ViewChannel,
                     ];
-            
+
                     const missingVoicePerms = requiredVoicePerms.filter(perm => !voicePermissions.has(perm));
                     if (missingVoicePerms.length > 0) {
                         return await message.reply({
@@ -152,118 +152,160 @@ Step 5 - Send the downloaded media to your favorite social media!
                     }
                 }
             }
-        
-        
+
+
             // Auto-Correction AFTER permission checks
             if (!command && config.get("autoCommandMatch")) {
                 const lastCorrection = autoCorrectCooldowns.get(message.author.id) || 0;
                 if (Date.now() - lastCorrection < 10000) return; // 10-second cooldown
-            
+
                 autoCorrectCooldowns.set(message.author.id, Date.now());
-                
+
                 const commandSet = new Set(client.commands.filter(cmd => !cmd.private).map(cmd => cmd.name));
                 const commandArray = Array.from(commandSet);
                 const closeMatch = findBestMatch(algorithms.LEVENSHTEIN_DISTANCE, commandName, commandArray);
-                
+
                 if (closeMatch.score <= 2 && countCommonChars(commandName, closeMatch.match) !== 0) {
                     await message.reply(`Did you mean \`${prefix}${closeMatch.match}\`?`);
-                    
+
                     const filter = (m) => m.author.id === message.author.id;
                     try {
                         const collected = await message.channel.awaitMessages({ filter, max: 1, time: 5000, errors: ["time"] });
-                        if (collected.first()?.content.toLowerCase().startsWith("yes")) 
+                        if (collected.first()?.content.toLowerCase().startsWith("yes"))
                             command = client.commands.get(closeMatch.match);
                     } catch {
                         return;
                     }
                 }
             }
-        
+
             if (!command) return;
-        
+
             // User-based Restrictions
             if (command.private && message.author.id !== process.env.OWNER_ID) return;
-            if (command.admin && !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) 
+            if (command.admin && !message.member.permissions.has(PermissionsBitField.Flags.Administrator))
                 return await message.reply({ embeds: [embedGenerator.error("You are not an administrator.")] });
-        
-            if (command.inVoiceChannel && !message.member?.voice?.channel) 
+
+            if (command.inVoiceChannel && !message.member?.voice?.channel)
                 return await message.reply({ embeds: [embedGenerator.warning("You must be in a voice channel.")] });
-        
-            if (command.inSameVoiceChannel && botMember?.voice?.channel && message.member?.voice?.channel?.id !== botMember?.voice?.channel?.id) 
+
+            if (command.inSameVoiceChannel && botMember?.voice?.channel && message.member?.voice?.channel?.id !== botMember?.voice?.channel?.id)
                 return await message.reply({ embeds: [embedGenerator.warning("You must be in the same voice channel as me.")] });
-        
+
             // Blacklist Check
             const userBlacklist = await GuildManager.GetBlacklist(message.guild.id);
-            if (!userBlacklist.CheckPermission(message.author.id, command.category) || !userBlacklist.CheckPermission(message.author.id, command.name)) {
+            if (!userBlacklist.CheckPermission(message.author.id, "cat:text", command.category)) {
                 return await message.reply({
-                    embeds: [embedGenerator.error("You are blacklisted from executing this command.")],
+                    embeds: [embedGenerator.error(`You are blacklisted from executing commands in the **${command.category}** category.`)],
                 });
             }
-        
-            // Database Dependency Check
-            if (command.dbNeeded && !dbManager.dbExists()) {
-                return await message.reply({ embeds: [embedGenerator.error({
-                    title: "Cannot run command",
-                    description: "A database connection is required to run this command.",
-                })] });
-            }
-        
-            // Cooldown Check
-            if (config.get("defaultSuperuserState") && config.get("whitelist").includes(message.author.id)) {
-                TextCooldowns.delete(message.author.id); // Remove cooldown for superuser
-            } else if (TextCooldowns.has(message.author.id)) {
-                const cooldown = TextCooldowns.get(message.author.id);
-                const timeLeft = cooldown - Date.now();
-                if (timeLeft > 0) 
-                    return await message.reply({ embeds: [embedGenerator.warning(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before using that command again.`)] });
+
+            if (!userBlacklist.CheckPermission(message.author.id, "cmd:text", command.name)) {
+                return await message.reply({
+                    embeds: [embedGenerator.error(`You are blacklisted from executing the **${command.name}** command.`)],
+                });
             }
 
-        
+            // Database Dependency Check
+            if (command.dbNeeded && !dbManager.dbExists()) {
+                return await message.reply({
+                    embeds: [embedGenerator.error({
+                        title: "Cannot run command",
+                        description: "A database connection is required to run this command.",
+                    })],
+                });
+            }
+
+            for (const envVariable of command.requiredENVs || []) {
+                if (!process.env[envVariable]) 
+                {
+                    logger.warning(`The required environment variable "${envVariable}" is not set for the command ${command.name}.`);
+                    return await message.reply({
+                        embeds: [embedGenerator.error({
+                            title: "Cannot run command",
+                            description: "The command misses a required environment variable",
+                        })],
+                    });
+                }
+            }
+
+            if (!config.get("defaultSuperuserState") || !config.get("SUPERUSER_WHITELIST").includes(message.author.id)) {
+                // Get or create user cooldowns
+                const userCooldowns = TextCooldowns.get(message.author.id) || {};
+
+                // Check command group cooldown FIRST
+                if (command.cooldownGroup) {
+                    const groupCooldown = userCooldowns[`group:${command.cooldownGroup}`];
+                    if (groupCooldown) {
+                        const timeLeft = groupCooldown - Date.now();
+                        if (timeLeft > 0) {
+                            return await message.reply({
+                                embeds: [embedGenerator.warning(
+                                    `Please wait ${Math.ceil(timeLeft / 1000)} seconds before using commands from the **${command.cooldownGroup}** group.`,
+                                )],
+                            });
+                        }
+                    }
+                }
+
+                // Then check command-specific cooldown
+                const commandCooldown = userCooldowns[command.name];
+                if (commandCooldown) {
+                    const timeLeft = commandCooldown - Date.now();
+                    if (timeLeft > 0) {
+                        return await message.reply({
+                            embeds: [embedGenerator.warning(
+                                `Please wait ${Math.ceil(timeLeft / 1000)} seconds before using ${command.name} again.`,
+                            )],
+                        });
+                    }
+                }
+            }
+
             try {
                 // Logging
                 const maxLengths = {
                     names: Math.max(message.member.user.tag.length, message.channel.name.length, message.guild.name.length),
                     ids: Math.max(message.author.id.length, message.channel.id.length, message.guild.id.length),
                 };
-        
+
                 // Logging every executed command
                 logger.info(`Executing [${message.content}]` + "\n" +
                     `by    [${message.member.user.tag.padEnd(maxLengths.names)} (${message.author.id.padEnd(maxLengths.ids)})]` + "\n" +
                     `in    [${message.channel.name.padEnd(maxLengths.names)} (${message.channel.id.padEnd(maxLengths.ids)})]` + "\n" +
                     `from  [${message.guild.name.padEnd(maxLengths.names)} (${message.guild.id.padEnd(maxLengths.ids)})]`);
-        
+
                 const startTime = Date.now();
-        
+
                 // Additional Bot Permission Check (Required for Specific Commands)
                 const requiredPermissions = command.permissions || [];
                 requiredPermissions.push(PermissionsBitField.Flags.ReadMessageHistory);
-        
+
                 if (!botMember.permissions.has(PermissionsBitField.Flags.Administrator)) {
                     const commandPerms = [...(command.permissions ?? []), PermissionsBitField.Flags.ReadMessageHistory];
 
                     const missingPermissions = commandPerms.filter(permission => !effectivePermissions.has(permission));
 
-                
+
                     if (missingPermissions.length > 0) {
                         const readablePermissions = getPermissionArrayNames(missingPermissions);
                         return await message.reply({
                             embeds: [embedGenerator.error(
-                                `I'm missing the following permissions: ${
-                                    readablePermissions.map(p => `\`${p}\``).join(", ")
+                                `I'm missing the following permissions: ${readablePermissions.map(p => `\`${p}\``).join(", ")
                                 }`,
                             )],
                         });
                     }
                 }
-        
+
                 if (command.lastExecutionTime >= 1000) await message.channel.sendTyping();
-        
+
                 // Process Optional Arguments
                 const optionalArgs = {};
                 if (typeof command.usage === "object") {
                     const usage = command.usage;
                     const optionalKeys = Object.keys(usage.optional ?? {});
-            
+
                     for (let part = args.length - 1; part >= 0; part--) {
                         for (const k of optionalKeys) {
                             if (k.toLowerCase().split("|").map(s => "-" + s).includes(args[part]?.toLowerCase())) {
@@ -278,19 +320,27 @@ Step 5 - Send the downloaded media to your favorite social media!
                         }
                     }
                 }
-        
+
                 const player = useMainPlayer();
-        
-                // Execute Command
+
+                if (!config.get("defaultSuperuserState") || !config.get("SUPERUSER_WHITELIST").includes(message.author.id)) {
+                    const userCooldowns = TextCooldowns.get(message.author.id) || {};
+                    const cooldownDuration = command.cooldown || 0;
+
+                    userCooldowns[command.name] = Date.now() + cooldownDuration;
+                    if (command.cooldownGroup)
+                        userCooldowns[`group:${command.cooldownGroup}`] = Date.now() + cooldownDuration;
+
+
+                    TextCooldowns.set(message.author.id, userCooldowns);
+                }
+
                 await player.context.provide({ guild: message.guild }, async () => {
                     await command.execute(logger, client, message, args, optionalArgs);
                 });
-        
-                // Set Command Cooldown AFTER Successful Execution
-                TextCooldowns.set(message.author.id, Date.now() + (command.cooldown || 0));
-        
+
                 command.lastExecutionTime = Date.now() - startTime;
-        
+
             } catch (error) {
                 logger.error(error);
                 return await message.reply({ embeds: [embedGenerator.error("An error occurred while executing the command.")] });

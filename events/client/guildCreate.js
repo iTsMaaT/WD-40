@@ -7,7 +7,7 @@ module.exports = {
     once: false,
     log: true,
     async execute(client, logger, guild) {
-        const guildblacklist = config.get("guildBlacklist");
+        const guildblacklist = config.get("GUILD_BLACKLIST");
         await GuildManager.SetActiveOrCreate(guild);
         logger.info(`The bot has been added to \`${guild.name}\``);
         client.channels.cache.get(process.env.GUILD_UPDATE_ID)?.send(`The bot has been added to \`${guild.name}\``);

@@ -1,6 +1,6 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { useQueue, useMainPlayer, useHistory } = require("discord-player");
-const prettyMs = require("pretty-ms");
+const formatDuration = require("@utils/functions/formatDuration");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
 
@@ -130,7 +130,7 @@ module.exports = {
                 description: `Currently playing : **${currentTrack.title}** - ${currentTrack.author}`,
                 color: 0xffffff,
                 fields: alltracks[count],
-                footer: { text: `Estimated time left: ${prettyMs(queue.estimatedDuration)}` },
+                footer: { text: `Estimated time left: ${formatDuration(queue.estimatedDuration)}` },
             };
             if ((counter - historyPages.length) < 0) embed.title = "History for the current guild";
 

@@ -1,8 +1,14 @@
 const { toEngineerNotation } = require("@functions/formattingFunctions");
 const logger = require("@utils/log");
-const prettyMilliseconds = require("pretty-ms");
+const formatDuration = require("@utils/functions/formatDuration");
 
+/**
+ * Get Pterodactyl server info
+ * @returns {Promise<Object>} Object containing server info
+ */
 const getPterodactylInfo = async function() {
+    if (!process.env.PTERODACTYL_SERVER_ID || !process.env.PTERODACTYL_URL || !process.env.PTERODACTYL_API_KEY) 
+        return null;
     let serverName = "";
     let RAMlimit = "";
     let CPUlimit = "";
@@ -106,7 +112,7 @@ const getPterodactylInfo = async function() {
         },
         uptime: {
             raw: parseInt(BOTuptime),
-            clean: prettyMilliseconds(parseInt(BOTuptime)),
+            clean: formatDuration(parseInt(BOTuptime)),
         },
         main: {
             name: serverName,

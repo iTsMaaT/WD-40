@@ -1,4 +1,3 @@
-/* eslint-disable no-extra-boolean-cast */
 const { Events } = require("discord.js");
 
 module.exports = {

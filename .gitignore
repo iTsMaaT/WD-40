@@ -5,3 +5,5 @@ tinker.js
 pnpm-lock.yaml
 utils/reddit/redditConf.json
 ./music
+/utils/temp
+/utils/commandManifest.json

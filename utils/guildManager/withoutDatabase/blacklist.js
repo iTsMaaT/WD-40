@@ -59,7 +59,7 @@ async function blacklistFn(guildId) {
      * @returns {boolean} `true` if the user has the permission, otherwise `false`.
      */
     function CheckPermission(userId, permission) {
-        return bl[userId] === null || bl[userId] === undefined || !bl[userId].includes(permission?.toLowerCase());
+        return {};
     }
 
     

@@ -10,6 +10,7 @@ const embedGenerator = require("@utils/helpers/embedGenerator");
 const dbManager = require("@root/utils/db/databaseManager");
 const { useMainPlayer } = require("discord-player");
 const { getPermissionArrayNames } = require("@functions/discordFunctions");
+const config = require("@utils/config/configUtils");
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -30,7 +31,7 @@ module.exports = {
             // Bot's Channel-Specific Permissions Check
             const botMember = interaction.guild.members.me;
             if (!botMember) return;
-            
+
             // Get effective permissions (combines role permissions and channel overrides)
             const effectivePermissions = botMember.permissionsIn(interaction.channel);
 
@@ -45,8 +46,7 @@ module.exports = {
             if (missingBasePerms.length > 0) {
                 try {
                     await interaction.user.send(
-                        `I don't have the required permissions in <#${interaction.channel.id}>: ${
-                            getPermissionArrayNames(missingBasePerms).join(", ")
+                        `I don't have the required permissions in <#${interaction.channel.id}>: ${getPermissionArrayNames(missingBasePerms).join(", ")
                         }`,
                     );
                 } catch (dmError) {
@@ -69,12 +69,11 @@ module.exports = {
                     ];
 
                     const missingVoicePerms = requiredVoicePerms.filter(perm => !voicePermissions.has(perm));
-            
+
                     if (missingVoicePerms.length > 0) {
                         return await interaction.editReply({
                             embeds: [embedGenerator.error(
-                                `I don't have the required permissions in voice channel ${voiceChannel}: ${
-                                    getPermissionArrayNames(missingVoicePerms).join(", ")
+                                `I don't have the required permissions in voice channel ${voiceChannel}: ${getPermissionArrayNames(missingVoicePerms).join(", ")
                                 }`,
                             )],
                         });
@@ -84,9 +83,15 @@ module.exports = {
 
             // Blacklist Check
             const userBlacklist = await GuildManager.GetBlacklist(interaction.guild.id);
-            if (!userBlacklist.CheckPermission(interaction.user.id, slash.category) || !userBlacklist.CheckPermission(interaction.user.id, slash.name)) {
+            if (!userBlacklist.CheckPermission(interaction.user.id, "cat:text", slash.category)) {
                 return await interaction.editReply({
-                    embeds: [embedGenerator.error("You are blacklisted from executing this command.")],
+                    embeds: [embedGenerator.error(`You are blacklisted from executing commands in the **${slash.category}** category.`)],
+                });
+            }
+            
+            if (!userBlacklist.CheckPermission(interaction.user.id, "cmd:text", slash.name)) {
+                return await interaction.editReply({
+                    embeds: [embedGenerator.error(`You are blacklisted from executing the **${slash.name}** command.`)],
                 });
             }
 
@@ -100,19 +105,52 @@ module.exports = {
                 });
             }
 
-            // Cooldown Check
-            if (SlashCooldowns.has(interaction.user.id)) {
-                const cooldown = SlashCooldowns.get(interaction.user.id);
-                const timeLeft = cooldown - Date.now();
-                if (timeLeft > 0) {
+            for (const envVariable of slash.requiredENVs || []) {
+                if (!process.env[envVariable]) 
+                {
+                    logger.warning(`The required environment variable "${envVariable}" is not set for the command ${slash.name}.`);
                     return await interaction.editReply({
-                        embeds: [embedGenerator.warning(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before using that command again.`)],
+                        embeds: [embedGenerator.error({
+                            title: "Cannot run command",
+                            description: "The command misses a required environment variable",
+                        })],
                     });
                 }
             }
 
-            // Set command cooldown AFTER all checks pass
-            SlashCooldowns.set(interaction.user.id, Date.now() + (slash.cooldown || 0));
+            // Cooldown Check
+            if (!config.get("defaultSuperuserState") || !config.get("SUPERUSER_WHITELIST").includes(interaction.user.id)) {
+                // Get or create user cooldowns
+                const userCooldowns = SlashCooldowns.get(interaction.user.id) || {};
+
+                // Check command group cooldown FIRST
+                if (slash.cooldownGroup) {
+                    const groupCooldown = userCooldowns[`group:${slash.cooldownGroup}`];
+                    if (groupCooldown) {
+                        const timeLeft = groupCooldown - Date.now();
+                        if (timeLeft > 0) {
+                            return await interaction.editReply({
+                                embeds: [embedGenerator.warning(
+                                    `Please wait ${Math.ceil(timeLeft / 1000)} seconds before using commands from the **${slash.cooldownGroup}** group.`,
+                                )],
+                            });
+                        }
+                    }
+                }
+
+                // Then check command-specific cooldown
+                const commandCooldown = userCooldowns[slash.name];
+                if (commandCooldown) {
+                    const timeLeft = commandCooldown - Date.now();
+                    if (timeLeft > 0) {
+                        return await interaction.editReply({
+                            embeds: [embedGenerator.warning(
+                                `Please wait ${Math.ceil(timeLeft / 1000)} seconds before using ${slash.name} again.`,
+                            )],
+                        });
+                    }
+                }
+            }
 
             try {
                 const maxLengths = {
@@ -133,36 +171,44 @@ module.exports = {
                 if (!botMember.permissions.has(PermissionsBitField.Flags.Administrator)) {
                     const commandPerms = slash.permissions || [];
                     commandPerms.push(PermissionsBitField.Flags.ReadMessageHistory);
-            
+
                     const missingPermissions = commandPerms.filter(perm => !effectivePermissions.has(perm));
-            
+
                     if (missingPermissions.length > 0) {
                         const readablePermissions = getPermissionArrayNames(missingPermissions);
                         return await interaction.editReply({
                             embeds: [embedGenerator.error(
-                                `I'm missing the following permissions: ${
-                                    readablePermissions.map(p => `\`${p}\``).join(", ")
+                                `I'm missing the following permissions: ${readablePermissions.map(p => `\`${p}\``).join(", ")
                                 }`,
                             )],
                         });
                     }
                 }
 
-                // Execute the slash command
-                await player.context.provide({ guild: interaction.guild }, async () => await slash.execute(logger, interaction, client));
+                if (!config.get("defaultSuperuserState") || !config.get("SUPERUSER_WHITELIST").includes(interaction.user.id)) {
+                    const userCooldowns = SlashCooldowns.get(interaction.user.id) || {};
+                    const cooldownDuration = slash.cooldown || 0;
 
+                    userCooldowns[slash.name] = Date.now() + cooldownDuration;
+                    if (slash.cooldownGroup)
+                        userCooldowns[`group:${slash.cooldownGroup}`] = Date.now() + cooldownDuration;
+
+                    SlashCooldowns.set(interaction.user.id, userCooldowns);
+                }
+
+                await player.context.provide({ guild: interaction.guild }, async () => await slash.execute(logger, interaction, client));
             } catch (error) {
                 await interaction.editReply({
                     embeds: [embedGenerator.error("An error occurred while executing the command")],
                     flags: MessageFlags.Ephemeral,
                 });
-                logger.error(`Error executing slash command [${interaction.commandName}]:`, error);
+                logger.error(error);
             }
-        } 
+        }
 
         // Context Menu Command Handling
         else if (interaction.isContextMenuCommand()) {
-            const context = client.contextCommands.get(interaction.commandName);
+            const context = client.contextcommands.get(interaction.commandName);
             if (!context) return logger.error(`No command matching ${interaction.commandName} was found.`);
 
             try {
@@ -171,12 +217,11 @@ module.exports = {
                     ids: Math.max(interaction.user.id.length, interaction.channel.id.length, interaction.guild.id.length),
                 };
 
-                logger.info(`
-                Executing [${interaction.commandName} (${context.type === 2 ? "User" : "Message"})]
-                by   [${interaction.user.tag.padEnd(maxLengths.names)} (${interaction.user.id.padEnd(maxLengths.ids)})]
-                in   [${interaction.channel.name.padEnd(maxLengths.names)} (${interaction.channel.id.padEnd(maxLengths.ids)})]
-                from [${interaction.guild.name.padEnd(maxLengths.names)} (${interaction.guild.id.padEnd(maxLengths.ids)})]`
-                    .replace(/^\s+/gm, "")); // Removes leading whitespace from log lines
+                logger.info(
+                    `Executing [${interaction.commandName} (${context.type === 2 ? "User" : "Message"})]` + "\n" +
+                    `by    [${interaction.user.tag.padEnd(maxLengths.names)} (${interaction.user.id.padEnd(maxLengths.ids)})]` + "\n" +
+                    `in    [${interaction.channel.name.padEnd(maxLengths.names)} (${interaction.channel.id.padEnd(maxLengths.ids)})]` + "\n" +
+                    `from  [${interaction.guild.name.padEnd(maxLengths.names)} (${interaction.guild.id.padEnd(maxLengths.ids)})]`);
 
                 if (context.ephemeral) await interaction.deferReply({ flags: MessageFlags.Ephemeral });
                 else await interaction.deferReply();
@@ -188,7 +233,7 @@ module.exports = {
                     embeds: [embedGenerator.error("An error occurred while executing the command")],
                     flags: MessageFlags.Ephemeral,
                 });
-                logger.error(`Error executing context menu command [${interaction.commandName}]:`, error);
+                logger.error(error);
             }
         }
     },

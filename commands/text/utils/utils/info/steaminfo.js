@@ -1,5 +1,5 @@
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const prettyMilliseconds = require("pretty-ms");
+const formatDuration = require("@utils/functions/formatDuration");
 
 module.exports = {
     name: "steaminfo",
@@ -12,6 +12,7 @@ module.exports = {
         },
     },
     examples: ["76561198868461949"],
+    requiredENVs: ["STEAM_API_KEY"],
     async execute(logger, client, message, args, optionalArgs) {
         if (!args[0]) {
             return await message.reply({
@@ -39,8 +40,8 @@ module.exports = {
         const formattedGames = steamInfo.threeRecentGames.games
             ? steamInfo.threeRecentGames.games.map((game, index) => `
                 Game${index + 1}: **${game.name}**
-                Total playtime: ${prettyMilliseconds(game.playtime_forever * 1000 * 60)}
-                Playtime last 2 weeks: ${prettyMilliseconds(game.playtime_2weeks * 1000 * 60)}
+                Total playtime: ${formatDuration(game.playtime_forever * 1000 * 60)}
+                Playtime last 2 weeks: ${formatDuration(game.playtime_2weeks * 1000 * 60)}
                 -
             `.replace(/^\s+/gm, "")).join("\n")
             : "No recent games found.";
