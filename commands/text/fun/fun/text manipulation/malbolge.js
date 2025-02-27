@@ -17,7 +17,7 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.error("Please provide a string to translate")] });
 
-        /* eslint-disable no-constant-condition */
+         
         const mb = {};
 
         const xlat1 = "+b(29e*j1VMEKLyC})8&m#~W>qxdRp0wkrUo[D7,XTcA\"lI.v%{gJh4G\\-=O@5`_3i<?Z';FNQuY]szf$!BS/|t:Pn6^Ha";
