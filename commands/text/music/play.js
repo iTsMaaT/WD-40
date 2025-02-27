@@ -23,7 +23,7 @@ module.exports = {
             },
             "playnext|pn": {
                 hasValue: false,
-                description: "puts the song in top of the queue",
+                description: "puts the song(s) on top of the queue",
             },
         },
     },
@@ -42,7 +42,6 @@ module.exports = {
         if (!string) 
             return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
         
-
         const stringQueryType = QueryResolver.resolve(string).type;
         const isYoutube = [QueryType.YOUTUBE_SEARCH, QueryType.YOUTUBE, QueryType.YOUTUBE_PLAYLIST, QueryType.YOUTUBE_VIDEO].includes(stringQueryType);
         const isSoundcloud = [QueryType.SOUNDCLOUD_SEARCH, QueryType.SOUNDCLOUD, QueryType.SOUNDCLOUD_PLAYLIST, QueryType.SOUNDCLOUD_TRACK].includes(stringQueryType);
@@ -100,7 +99,7 @@ module.exports = {
                 const musicPath = process.cwd() + "/music";
                 let fileTrack = null;
                 if (fs.existsSync(musicPath)) {
-                    const files = simpleFolderSearch(musicPath, playerConfig.supportedFileExtensions, string, 0.4);
+                    const files = await simpleFolderSearch(musicPath, playerConfig.supportedFileExtensions, string, { minimumScore: 0.4 });
                     if (files.length) {
                         try {
                             fileTrack = await player.search(files[0], { 
@@ -197,7 +196,7 @@ module.exports = {
                     { name: "Pre-shuffled", value: optionalArgs["shuffle|s"] ? "Yes" : "No", inline: true },
                     { name: "Will play next", value: optionalArgs["playnext|pn"] && queue ? "Yes" : "No", inline: true },
                     { name: "Extractor", value: `\`${finalTrack.extractor?.identifier || "N/A"}\`` },
-                    { name: "Probable bridge source ( [->] = upon fail, falls back to...)", value: getProbableBridgeSource(playerConfig, !needsBridge && doesntNeedBridge) },
+                    { name: "Probable bridge source ( [\\▶] = upon fail, falls back to...)", value: getProbableBridgeSource(playerConfig, !needsBridge && doesntNeedBridge) },
                 ],
                 footer: { text: `Loop mode: ${getLoopMode(queue)}` },
             }).withAuthor(message.author);
