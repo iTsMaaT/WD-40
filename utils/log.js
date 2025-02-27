@@ -97,7 +97,8 @@ class Logger {
         const getLongestTypeLength = Object.keys(this.types).reduce((a, b) => a.length > b.length ? a : b).length;
         const header = `[${getDateTime()} - ${type.padStart(getLongestTypeLength, " ")}]`;
 
-        const formattedLog = util.format(message);
+        const cleanedMessage = typeof message == "string" ? message.replace(/^[^\S\n]+/gm, "") : message;
+        const formattedLog = util.format(cleanedMessage);
         // Adds color depending on log type, then the log header, then the log and finally a newline
         process.stdout.write(getColorByType(`${header} ${formattedLog}`, type) + "\n"); 
     
@@ -200,6 +201,22 @@ class Logger {
 
     getTotalLogCount() {
         return Object.values(this.logCounts).reduce((acc, count) => acc + count, 0);
+    }
+
+    format(error, excludedPaths = ["/node_modules/", "node:internal/modules"], maxLines = Infinity) {
+        if (!(error instanceof Error)) 
+            return String(error);
+    
+        if (!error.stack) 
+            return error.message || String(error);
+        
+        const formatted = error.stack;
+        
+        return formatted
+            .split("\n")
+            .filter(line => !excludedPaths.some(path => line.includes(path)))
+            .slice(0, maxLines)
+            .join("\n");
     }
 }
 
