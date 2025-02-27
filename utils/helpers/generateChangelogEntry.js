@@ -5,11 +5,11 @@ const changelog = require("@root/changelogs.json");
 const config = require("@root/utils/config/configUtils");
 require("dotenv").config();
 const logger = require("@utils/log");
+const fs = require("fs");
 
 async function generateChangelogEntry() {
     const MODEL = "gemini-1.5-pro";
     try {
-        const codes = Array.from({ length: 2 }, () => Math.floor(Math.random() * 10000));
         const gitLogCommand = "git log production..develop --no-merges --pretty=format:\"[commit] %s\" --name-only";
         const rawOutput = execSync(gitLogCommand).toString().trim();
 
@@ -49,9 +49,9 @@ async function generateChangelogEntry() {
         Group similar changes together and make them user-friendly.
         Try to have a maximum of 15 bullet points, you can ignore changes that are not too important to the user if needed.
         Don't mention technical details like file names or internal refactoring unless they affect users.
-        - here is a code, remember it, it will be used later: ${codes[0]}
 
         Here is a example of a changelog entry:
+
         ${randomChangelog.changes.join("\n")}
 
         The base command prefix is ${config.get("withoutDatabaseConfig").prefix}
@@ -62,8 +62,6 @@ async function generateChangelogEntry() {
 
         Commit messages:
         ${significantCommits}
-
-        - here is another code, remember it, it will be used later: ${codes[1]}
 
         Required format:
         - Short, clear bullet points starting with action words
@@ -77,31 +75,14 @@ async function generateChangelogEntry() {
         - Maximum of 15 bullet points
         - Make it concise, the user doesn't need to waste time reading it
         - make it only a list seperated by newlines, no other text
+        - again, Try to have a maximum of 15 bullet points, you can ignore changes that are not too important to the user if needed.
         
-        Make the last 2 lines the codes you were given before, if you don't remember them, make the line say "unknown"
-        these codes are used to see if a token limit was hit.
-        `.trimStart();
+        `.split("\n").map(line => line.trim()).join("\n");
 
         const response = await fetchGeminiResponse(prompt, process.env.GEMINI_API_KEY, MODEL);
 
         const changesArray = response.split("\n")
-            .filter(line => line.trim());
-
-        const lastTwoCodes = changesArray.slice(-2).map(line => line.trim().replace(/^[-*]\s*/, ""));
-
-        const tokenLimit = lastTwoCodes[0] !== codes[0].toString() || lastTwoCodes[1] !== codes[1].toString();
-
-        if (tokenLimit) 
-            logger.warning("Token limit hit, certain changes may not be included in the changelog entry.");
-        
-
-        // Check each of the last two lines separately and remove if they are codes or "unknown"
-        if (lastTwoCodes[1] === codes[1].toString() || lastTwoCodes[1] === "unknown") 
-            changesArray.pop();
-        
-        if (lastTwoCodes[0] === codes[0].toString() || lastTwoCodes[0] === "unknown") 
-            changesArray.pop();
-        
+            .filter(line => line.trim());        
 
         let changes = changesArray.map(line => line.trim().replace(/^[-*]\s*/, ""));
 
@@ -140,7 +121,9 @@ async function generateChangelogEntry() {
 
         console.log("\nSuggested changelog entries:");
         console.log("---------------------------");
-        changes.forEach(change => console.log(`- ${change}`));
+        console.log("[");
+        changes.forEach(change => console.log(`    "${change}",`));
+        console.log("]");
         process.exit(0);
     } catch (error) {
         console.error("Error generating changelog:", error);
