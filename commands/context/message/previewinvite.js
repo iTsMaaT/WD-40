@@ -9,7 +9,6 @@ module.exports = {
         const text = interaction.targetMessage.content;
         const invites = text.match(regex);
         if (!invites) return await interaction.editReply({ embeds: [embedGenerator.warning("Couldn't find invite code")], flags: MessageFlags.Ephemeral });
-        console.log(invites);
 
         const invitecodes = [];
         for (const invite of invites) {
