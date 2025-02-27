@@ -14,9 +14,11 @@ module.exports = {
     category: "music",
     examples: ["What's the title of the rickroll song?"],
     permissions: [PermissionsBitField.Flags.Connect],
-    cooldown: 30000,
+    cooldown: 20000,
+    cooldownGroup: "AI",
     inVoiceChannel: true,
     inSameVoiceChannel: true,
+    requiredENVs: ["GEMINI_API_KEY"],
     async execute(logger, client, message, args, optionalArgs) {
         if (!args.length)
             return message.reply({ embeds: [embedGenerator.warning("Please provide a song description.")] });
@@ -63,8 +65,8 @@ module.exports = {
                     prompt += `\n\nPrevious incorrect answers (this is a list of answers that the user already refuted as incorrect):\n${wrongSongs.join("\n")}`;
 
                 const aiResponse = await fetchGeminiResponse(prompt, process.env.GEMINI_API_KEY);
-                const regex = /^(.*) - (.*)$/;
-                const match = aiResponse.match(regex);
+                const regex = /^(.*?)\s*-\s*(.*?)$/;
+                const match = aiResponse.trim().replace(/\s+/g, " ").match(regex);
 
                 if (!match) {
                     retries++;

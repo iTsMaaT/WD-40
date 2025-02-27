@@ -18,9 +18,11 @@ module.exports = {
     category: "music",
     examples: ["what is the skull emoji used for"],
     permissions: [PermissionsBitField.Flags.Connect],
-    cooldown: 30000,
+    cooldown: 20000,
+    cooldownGroup: "AI",
     inVoiceChannel: true,
     inSameVoiceChannel: true,
+    requiredENVs: ["GEMINI_API_KEY"],
     async execute(logger, client, message, args) {
         let geminiResponse, sent;
         const player = useMainPlayer();
@@ -28,7 +30,6 @@ module.exports = {
         const playerConfig = config.get("discordPlayerConf");
 
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.error("You must provide a prompt.")] });
-        if (queue || queue?.tracks || queue?.currentTrack) return await message.reply({ embeds: [embedGenerator.warning("You must stop the music before playing TTS.")] });
 
         try {
             const apiKey = process.env.GEMINI_API_KEY; // Replace with your API key

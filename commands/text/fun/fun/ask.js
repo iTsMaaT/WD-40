@@ -2,6 +2,8 @@ const embedGenerator = require("@utils/helpers/embedGenerator");
 const GuildManager = require("@guildManager");
 const { fetchGeminiResponse } = require("@utils/helpers/fetchGeminiResponse");
 
+const MAX_REPLIES = 5;
+
 module.exports = {
     name: "ask",
     description: "Ask a question to Gemini",
@@ -12,7 +14,9 @@ module.exports = {
     },
     category: "fun",
     examples: ["what are you used for?"],
-    cooldown: 30000,
+    cooldown: 20000,
+    cooldownGroup: "AI",
+    requiredENVs: ["GEMINI_API_KEY"],
     execute: async (logger, client, message, args, optionalArgs) => {
         try {
             const apiKey = process.env.GEMINI_API_KEY; // Replace with your API key
@@ -80,30 +84,36 @@ module.exports = {
         }
 
         async function handleFollowup(firstReply, environmentInfo, apiKey) {
-            const filter = (m) => m.author.id === message.author.id;
-            const reply = (await message.channel.awaitMessages({ filter, max: 1, time: 30000, errors: [] })).first();
-            if (!reply || !reply.reference) return;
-
-            const reference = await message.channel.messages.fetch(reply.reference.messageId);
-            if (reference.id !== firstReply.id) return;
-
-            const prefix = GuildManager.GetPrefix(message.guild);
-            const replyContent = reply.content;
-            await reply.channel.sendTyping();
-
-            const newPrompt = `
-                You now are replying to someone's reply that he told you, the original thing the person asked is: ${message.content.replace(`${prefix}ask`, "")}
-                To which you replied: ${firstReply.content}
-                You then need to respond to this user's reply, which was: ${replyContent}
-                You will not be able to respond afterwards`;
-
-            const response = await fetchGeminiResponse(newPrompt, apiKey);
-
-            if (response) 
-                await reply.reply(limitString(response, 2000));
-            else 
-                throw new Error("Unexpected response from the API.");
+            let replyCount = 1;
+            let currentReply = firstReply;
             
+            while (replyCount < MAX_REPLIES) {
+                const filter = (m) => m.author.id === message.author.id;
+                const reply = (await message.channel.awaitMessages({ filter, max: 1, time: 30000, errors: [] })).first();
+                if (!reply || !reply.reference) return;
+
+                const reference = await message.channel.messages.fetch(reply.reference.messageId);
+                if (reference.id !== currentReply.id) return;
+
+                const prefix = GuildManager.GetPrefix(message.guild);
+                const replyContent = reply.content;
+                await reply.channel.sendTyping();
+
+                const newPrompt = `
+                    You now are replying to someone's reply that he told you, the original thing the person asked is: ${message.content.replace(`${prefix}ask`, "")}
+                    To which you replied: ${currentReply.content}
+                    You then need to respond to this user's reply, which was: ${replyContent}
+                    You will not be able to respond afterwards`;
+
+                const response = await fetchGeminiResponse(newPrompt, apiKey);
+
+                if (response) {
+                    currentReply = await reply.reply(limitString(response, 2000));
+                    replyCount++;
+                } else {
+                    throw new Error("Unexpected response from the API.");
+                }
+            }
         }
     },
 };
