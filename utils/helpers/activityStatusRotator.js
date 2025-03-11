@@ -47,7 +47,7 @@ const updateActivities = (client) => {
 const activateRotator = (client, server) => {
     if (server !== "dev") {
         updateActivities(client);
-        new cron.CronJob("0 3 * * *", () => updateActivities(client), null, true, "America/New_York");
+        new cron.CronJob("0 3 * * *", () => updateActivities(client), null, true, config.get("timeZone"));
     } else {
         client.user.setActivity("Under maintenance...", { type: ActivityType.Custom });
     }

@@ -10,6 +10,9 @@ const GuildManager = require("@guildManager");
 const { useMainPlayer } = require("discord-player");
 const cron = require("cron");
 const { toEngineerNotation } = require("@functions/formattingFunctions");
+const config = require("@utils/config/configUtils");
+const timeZone = config.get("timeZone");
+const getExactDate = require("@functions/getExactDate");
 
 /**
  * LiveUpdatingBotStats class.
@@ -36,7 +39,7 @@ class LiveUpdatingBotStats {
         };
 
         jobExecution();
-        new cron.CronJob(this.cronTime, jobExecution, null, true, "America/New_York");
+        new cron.CronJob(this.cronTime, jobExecution, null, true, timeZone);
     }
 
     /**
@@ -80,7 +83,7 @@ class LiveUpdatingBotStats {
 
         const embed = embedGenerator.info({
             title: `Live bot stats (v${WDVersion})`,
-            description: `Last updated at ${new Date().toLocaleString()}`,
+            description: `Last updated at ${getExactDate()}`,
             fields: [
                 {
                     name: "Server count",
