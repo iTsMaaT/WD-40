@@ -270,7 +270,7 @@ Step 5 - Send the downloaded media to your favorite social media!
                 };
 
                 // Logging every executed command
-                logger.info(`Executing [${message.content}]` + "\n" +
+                logger.command(`Executing [${message.content}]` + "\n" +
                     `by    [${message.member.user.tag.padEnd(maxLengths.names)} (${message.author.id.padEnd(maxLengths.ids)})]` + "\n" +
                     `in    [${message.channel.name.padEnd(maxLengths.names)} (${message.channel.id.padEnd(maxLengths.ids)})]` + "\n" +
                     `from  [${message.guild.name.padEnd(maxLengths.names)} (${message.guild.id.padEnd(maxLengths.ids)})]`);

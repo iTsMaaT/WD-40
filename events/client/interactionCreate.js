@@ -159,7 +159,7 @@ module.exports = {
                 };
 
                 // Logging every executed command
-                logger.info(`Executing [/${interaction.commandName}]` + "\n" +
+                logger.command(`Executing [/${interaction.commandName}]` + "\n" +
                     `by    [${interaction.user.tag.padEnd(maxLengths.names)} (${interaction.user.id.padEnd(maxLengths.ids)})]` + "\n" +
                     `in    [${interaction.channel.name.padEnd(maxLengths.names)} (${interaction.channel.id.padEnd(maxLengths.ids)})]` + "\n" +
                     `from  [${interaction.guild.name.padEnd(maxLengths.names)} (${interaction.guild.id.padEnd(maxLengths.ids)})]`);
@@ -217,7 +217,7 @@ module.exports = {
                     ids: Math.max(interaction.user.id.length, interaction.channel.id.length, interaction.guild.id.length),
                 };
 
-                logger.info(
+                logger.command(
                     `Executing [${interaction.commandName} (${context.type === 2 ? "User" : "Message"})]` + "\n" +
                     `by    [${interaction.user.tag.padEnd(maxLengths.names)} (${interaction.user.id.padEnd(maxLengths.ids)})]` + "\n" +
                     `in    [${interaction.channel.name.padEnd(maxLengths.names)} (${interaction.channel.id.padEnd(maxLengths.ids)})]` + "\n" +
