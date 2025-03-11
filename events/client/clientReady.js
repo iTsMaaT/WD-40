@@ -41,7 +41,7 @@ module.exports = {
         console.logger("High water mark: " + toEngineerNotation(parseInt(config.get("discordPlayerConf")?.highWaterMark)) + "B");
         console.logger("--------------------------------------------------");
        
-        if (process.env.SERVER != "dev") client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");
+        if (process.env.SERVER != "dev" && process.env.STATUS_CHANNEL_ID) client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");
 
         logger.info(`Bot starting on [${process.env.SERVER}]...`);
         
