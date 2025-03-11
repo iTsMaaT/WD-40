@@ -164,7 +164,7 @@ const createPaginatedMessage = async function(messageOrInteraction, options) {
             updatePageNumber();
             updateButtons();
 
-            workingEmbed.fields = pages[currentPage];
+            workingEmbed.setFields(pages[currentPage] || []);
 
             await interaction.update({
                 embeds: [workingEmbed],
