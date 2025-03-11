@@ -132,7 +132,7 @@ module.exports = {
             }
 
             gameMessage.edit({ embeds: [updateGameEmbed()] });
-        }, 2000);
+        }, 1000);
 
         collector.on("end", () => {
             gameActive = false;
