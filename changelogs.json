@@ -402,5 +402,17 @@
             "Made most ENV variables optional to make self-hosting easier.",
             "Updated README.md with more detailed instructions and information."
         ]
+    },
+    {
+        "version": "v5.11.0",
+        "date": "2025-03-10",
+        "changes": [
+            "Added a >config command (owner only).",
+            "Added configuration options for timezone and locale.",
+            "Fixed reddit-based commands (again).",
+            "Added more examples to the blacklist command.",
+            "Fixed a issue where STATUS_CHANNEL_ID was still needed in clientReady.",
+            "Many internal refactoring and dependency updates for better performance, stability, and error handling."
+        ]
     }
 ]
