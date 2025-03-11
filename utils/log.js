@@ -3,36 +3,8 @@ const { editOrSend } = require("./functions/discordFunctions.js");
 const { colorText, foregroundColor, backgroundColor, textStyle } = require("./functions/consoleColor.js");
 const Sentry = require("@sentry/node");
 const databaseManager = require("@root/utils/db/databaseManager");
-
 const util = require("util");
-
-/**
- * Get the current date in the format DD-MM-YYYY.
- * @returns {string} The formatted date in EDT/EST.
- */
-function getDate() {
-    return new Date().toLocaleDateString("en-GB", { timeZone: "America/New_York" }).replace(/\//g, "-");
-}
-
-/**
- * Get the current date and time in the format DD-MM-YYYY HH:MM:SS.mmm.
- * @returns {string} The formatted date and time in EDT/EST.
- */
-function getDateTime() {
-    const now = new Date();
-    const date = now.toLocaleDateString("en-GB", { timeZone: "America/New_York" }).replace(/\//g, "-");
-    const time = now.toLocaleTimeString("en-GB", {
-        timeZone: "America/New_York",
-        hour12: false,
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-    });
-    const milliseconds = String(now.getMilliseconds()).padStart(3, "0");
-
-    return `${date} ${time}.${milliseconds}`;
-}
-
+const getExactDate = require("@functions/getExactDate");
 
 class Logger {
 
@@ -52,6 +24,7 @@ class Logger {
             "severe": "SEVERE",
             "music": "MUSIC",
             "event": "EVENT",
+            "command": "COMMAND",
         };
         this.logCounts = {
             "severe": 0,
@@ -62,6 +35,7 @@ class Logger {
             "event": 0,
             "music": 0,
             "console": 0,
+            "command": 0,
         };
     }
 
@@ -95,7 +69,7 @@ class Logger {
         };
 
         const getLongestTypeLength = Object.keys(this.types).reduce((a, b) => a.length > b.length ? a : b).length;
-        const header = `[${getDateTime()} - ${type.padStart(getLongestTypeLength, " ")}]`;
+        const header = `[${getExactDate()} - ${type.padStart(getLongestTypeLength, " ")}]`;
 
         const cleanedMessage = typeof message == "string" ? message.replace(/^[^\S\n]+/gm, "") : message;
         const formattedLog = util.format(cleanedMessage);
@@ -111,7 +85,7 @@ class Logger {
                     type: type,
                 });
             } catch (ex) {
-                console.logger(`\x1b[31m[${getDateTime()} - SEVERE] Unable to write to database\x1b[0m`);
+                console.logger(`\x1b[31m[${getExactDate()} - SEVERE] Unable to write to database\x1b[0m`);
                 console.logger(ex);
             }
         }
@@ -186,6 +160,11 @@ class Logger {
     event(message) {
         this.logCounts.event++;
         this.writeLogToFile(message, this.types.event);
+    }
+
+    command(message) {
+        this.logCounts.command++;
+        this.writeLogToFile(message, this.types.command);
     }
 
     async getAllTimeLogCount(type) {
