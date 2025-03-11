@@ -52,6 +52,9 @@
         "personality": "Neutral"
     },
 
+    "timeZone": "America/New_York",
+    "locale": "en-US",
+
     "defaultSuperuserState": false,
     "defaultDebugState": false,
     "autoCommandMatch": true,
