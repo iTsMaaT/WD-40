@@ -42,13 +42,8 @@
             GatewayIntentBits.GuildWebhooks,
             GatewayIntentBits.GuildInvites,
             GatewayIntentBits.GuildVoiceStates,
-            GatewayIntentBits.GuildPresences,
             GatewayIntentBits.GuildMessages,
             GatewayIntentBits.GuildMessageReactions,
-            GatewayIntentBits.GuildMessageTyping,
-            GatewayIntentBits.DirectMessages,
-            GatewayIntentBits.DirectMessageReactions,
-            GatewayIntentBits.DirectMessageTyping,
             GatewayIntentBits.MessageContent,
         ],
         partials: [
@@ -59,8 +54,7 @@
     };
 
     const client = new Client({
-        intents: Object.keys(GatewayIntentBits),
-        partials: Object.keys(Partials),
+        ...neededIntents,
         shards: "auto",
         allowedMentions: { repliedUser: false },
     });
@@ -300,6 +294,13 @@
 
     loadFiles("./events/process/", (event) => {
         process.on(event.name, async (...args) => {
+            if (event.log) logger.event(`Event: [${event.name}] fired.`);
+            await event.execute(client, logger, ...args);
+        });
+    });
+
+    loadFiles("./events/rest/", (event) => {
+        client.rest.on(event.name, async (...args) => {
             if (event.log) logger.event(`Event: [${event.name}] fired.`);
             await event.execute(client, logger, ...args);
         });
