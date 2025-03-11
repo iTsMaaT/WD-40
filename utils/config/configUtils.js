@@ -77,7 +77,7 @@ class Config {
         if (key in this.baseConfig) 
             this.config[key] = this.baseConfig[key];
         else 
-            throw new Error(`Key "${key}" does not exist in the base configuration.`);
+            this.config[key] = undefined;
     
         return this;
     }
