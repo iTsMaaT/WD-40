@@ -73,7 +73,7 @@ const textStyle = {
  * @param {string} [fgColor] - The foreground color.
  * @param {string} [bgColor] - The background color.
  * @param {...string} styles - Additional styles.
- * @returns {string} - The styled text.
+ * @returns {string} The styled text.
  */
 function colorText(text, fgColor, bgColor, ...styles) {
     let colorCodes = "";

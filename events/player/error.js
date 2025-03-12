@@ -1,7 +1,8 @@
 module.exports = {
     name: "error",
     once: false,
-    async execute(client, logger, queue, error) {
-        logger.info(`Queue: ${queue.metadata.guild.name} threw error: \n ${error}`);
+    async execute(client, logger, error) {
+        logger.info("Player error:");
+        logger.error(error);
     },
 };

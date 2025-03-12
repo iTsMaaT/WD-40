@@ -29,7 +29,11 @@ module.exports = {
         },
     },
     category: "admin",
-    examples: ["1081004946872352958 moveall"],
+    examples: [
+        "1081004946872352958 text moveall -cmd",
+        "1081004946872352958 -cat text music",
+        "1081004946872352958 slash reddit",
+    ],
     dbNeeded: true,
     async execute(logger, client, message, args, optionalArgs) {
         const blacklist = await GuildManager.GetBlacklist(message.guild.id);

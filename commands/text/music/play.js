@@ -52,7 +52,7 @@ module.exports = {
             const messageEmbeds = message.embeds || [];
             for (const embed of messageEmbeds) {
                 if (embed.provider?.name === "YouTube") {
-                    string = `${embed.title} - ${embed.author.name}`;
+                    string = embed.title;
                     break;
                 }
             }
@@ -223,6 +223,7 @@ module.exports = {
  * @param {Player} player 
  * @returns {Promise<{ extractor: Extractor | null, type: string }>}
  */
+
 async function awareQueryResolver(query, player) {
     const extractors = player.extractors.store;
     const result = { extractor: null, type: null };

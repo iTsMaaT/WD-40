@@ -44,8 +44,6 @@ module.exports = {
             }
         }
 
-        console.log(status?.activities);
-
         const status_type = status?.activities[0]?.type ?? null;
         const custom_status = status?.activities[0]?.state ?? status?.activities[0]?.name ?? "`No status`";
         const activity_name = status?.activities[1]?.name ?? "`No activity name`";
