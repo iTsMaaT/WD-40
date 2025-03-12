@@ -1,8 +1,7 @@
 /* eslint-disable no-shadow */
 const { eq, and } = require("drizzle-orm");
 const logger = require("@utils/log");
-const { repositories } = require("../../db/tableManager.js");
-const schema = require("../../../schema/schema.js");
+const { repositories, schema } = require("../../db/tableManager.js");
 
 /**
  * Initializes the auto response system for a guild.
@@ -149,12 +148,12 @@ async function autoResponseFn(guildId) {
                         response: Response,
                         channelString: ChannelPrompt,
                         string: String,
-                    }, 
-                    and(
-                        eq(schema.responses.guildId, guildId),
-                        eq(schema.responses.channelString, ChannelPrompt),
-                        eq(schema.responses.string, String),
-                    ));
+                    },
+                        and(
+                            eq(schema.responses.guildId, guildId),
+                            eq(schema.responses.channelString, ChannelPrompt),
+                            eq(schema.responses.string, String),
+                        ));
                 }
             } else {
                 // Delete all entries for this channel prompt

@@ -1,5 +1,4 @@
 const DB = require("./databaseManager");
-const fullSchema = require("../../schema/schema.js");
 
 /**
  * Generates repository functions for a given table.
@@ -52,9 +51,9 @@ function generateRepositoryFunctions(table) {
             const existingRecord = await select().where(filter);
             if (existingRecord.length > 0)
                 await update(obj).where(filter);
-            else 
+            else
                 await insert(obj);
-            
+
         } else {
             await insert(obj);
         }
@@ -71,25 +70,21 @@ function generateRepositoryFunctions(table) {
 }
 
 /**
- * Module for managing database repositories.
+ * Generates repository functions for each table in the schema.
+ * @param {Object} schema The schema object representing the database schema.
+ * @returns {Object} Repository functions for each table.
  */
-const RepositoryManager = {
-    /**
-     * Generates repository functions for each table in the schema.
-     * @param {Object} schema The schema object representing the database schema.
-     * @returns {Object} Repository functions for each table.
-     */
-    generateRepositories(schema) {
-        const repositories = {};
+function generateRepositories(schema) {
+    const repositories = {};
 
-        for (const tableKey in schema) {
-            const table = schema[tableKey];
-            repositories[tableKey] = generateRepositoryFunctions(table);
-        }
+    for (const tableKey in schema) {
+        const table = schema[tableKey];
+        repositories[tableKey] = generateRepositoryFunctions(table);
+    }
 
-        return repositories;
-    },
-};
+    return repositories;
+}
 
-const repositories = RepositoryManager.generateRepositories(fullSchema);
-module.exports = { repositories };
+const schema = DB.getSchema();
+const repositories = generateRepositories(schema);
+module.exports = { repositories, schema };

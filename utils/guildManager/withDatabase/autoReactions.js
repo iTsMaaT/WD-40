@@ -1,8 +1,7 @@
 /* eslint-disable no-shadow */
 const { eq, and } = require("drizzle-orm");
 const logger = require("@utils/log");
-const { repositories } = require("../../db/tableManager.js");
-const schema = require("../../../schema/schema.js");
+const { repositories, schema } = require("../../db/tableManager.js");
 
 /**
  * Initializes the auto reaction system for a guild.
@@ -133,18 +132,18 @@ async function autoReactFn(guildId) {
                 const reactionsTable = cache[ChannelPrompt].filter(val => val.string === String);
                 if (reactionsTable.length > 0) {
                     const Reaction = reactionsTable[0].emotes;
-                    
+
                     await reactionsRepository.upsert({
                         guildId: guildId,
                         emotes: Reaction,
                         channelString: ChannelPrompt,
                         string: String,
-                    }, 
-                    and(
-                        eq(schema.reactions.guildId, guildId),
-                        eq(schema.reactions.channelString, ChannelPrompt),
-                        eq(schema.reactions.string, String),
-                    ));
+                    },
+                        and(
+                            eq(schema.reactions.guildId, guildId),
+                            eq(schema.reactions.channelString, ChannelPrompt),
+                            eq(schema.reactions.string, String),
+                        ));
                 }
             } else {
                 // Delete all entries for this channel prompt
@@ -156,7 +155,7 @@ async function autoReactFn(guildId) {
         }
     }
 
-    return { addReaction, removeReaction, matchReactions, getReactions }; 
+    return { addReaction, removeReaction, matchReactions, getReactions };
 }
 
 const reactions = {};

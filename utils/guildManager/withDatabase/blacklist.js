@@ -1,7 +1,6 @@
 const { eq, and } = require("drizzle-orm");
 const logger = require("@utils/log");
-const { repositories } = require("../../db/tableManager.js");
-const schema = require("../../../schema/schema.js");
+const { repositories, schema } = require("../../db/tableManager.js");
 
 /**
  * Creates and manages a blacklist for a given guild.
@@ -87,7 +86,7 @@ async function blacklistFn(guildId) {
         const key = `${type}:${name?.toLowerCase()}`;
         return bl[userId] === null || bl[userId] === undefined || !bl[userId].includes(key);
     }
-    
+
     /**
      * Retrieves the list of denied permissions for a user.
      * 
@@ -126,5 +125,5 @@ async function GetBlacklist(guildId) {
 }
 
 module.exports = {
-    GetBlacklist, 
+    GetBlacklist,
 };

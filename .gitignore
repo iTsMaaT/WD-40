@@ -7,3 +7,8 @@ utils/reddit/redditConf.json
 ./music
 /utils/temp
 /utils/commandManifest.json
+
+## SQLite databases files
+*.db
+*.db-shm
+*.db-wal
