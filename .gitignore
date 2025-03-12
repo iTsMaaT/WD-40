@@ -10,3 +10,8 @@ utils/reddit/redditConf.json
 /utils/helpers/youtubeCookieHandler/cookies.txt
 music
 downloads
+
+## SQLite databases files
+*.db
+*.db-shm
+*.db-wal

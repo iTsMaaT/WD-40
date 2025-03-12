@@ -68,7 +68,8 @@
     "simple-folder-search": "^2.3.0",
     "simple-ytdl-core": "^1.1.1",
     "youtube-dl-exec": "^3.1.15",
-    "youtubei.js": "^17.2.0"
+    "youtubei.js": "^17.2.0",
+    "better-sqlite3": "^11.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
