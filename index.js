@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 (async () => {
     const Discord = require("discord.js");
     const dotenv = require("dotenv");
@@ -83,7 +84,7 @@
     const exts = require("@discord-player/extractor");
     const { YoutubeiExtractor } = require("discord-player-youtubei");
     const { createServerAbrStream, poTokenExtraction } = await import("discord-player-youtubei/experimental");
-    const { DeezerExtractor } = require("discord-player-deezer");
+    const { DeezerExtractor, NodeDecryptor, JSDecryptor } = require("discord-player-deezer");
     const { SoundgasmExtractor } = require("soundgasm-extractor");
     const { TTSExtractor } = require("tts-extractor");
 
@@ -124,8 +125,9 @@
         const ytExtOptions = { streamOptions: {} };
         if (!discordPlayerConfig?.skipLogin) ytExtOptions.authentication = process.env.YOUTUBE_ACCESS_STRING;
         if (discordPlayerConfig?.useCookie) ytExtOptions.cookie = process.env.YOUTUBE_COOKIE;
+        ytExtOptions.streamOptions.useClient = discordPlayerConfig?.youtubeClient || "IOS";
         if (discordPlayerConfig?.usePoToken) {
-            ytExtOptions.streamOptions.useClient = discordPlayerConfig?.youtubeClient || "IOS";
+            ytExtOptions.streamOptions.useClient = "WEB";
             ytExtOptions.createStream = (track, ext) => createServerAbrStream(track, ext, (err) => console.log(err));
         }
         ytExtOptions.streamOptions.highWaterMark = discordPlayerConfig?.highWaterMark || 1024 * 1024;
@@ -143,11 +145,8 @@
             ytExt.setPoToken(potoken, visitorData);
 
             setInterval(async () => {
-                // eslint-disable-next-line no-shadow
                 const innertube = ytExt.innerTube;
-                // eslint-disable-next-line no-shadow
                 const potoken = await poTokenExtraction(innertube);
-                // eslint-disable-next-line no-shadow
                 const visitorData = innertube.session.context.client.visitorData;
                 ytExt.setPoToken(potoken, visitorData);
             }, 6.048e+8).unref();
@@ -157,6 +156,8 @@
     if (!discordPlayerConfig?.removeDeezer) {
         const deezerExt = await player.extractors.register(DeezerExtractor, {
             decryptionKey: process.env.DEEZER_MASTER_KEY,
+            arl: process.env.DEEZER_ARL_COOKIE,
+            decryptor: NodeDecryptor,
         });
 
         deezerExt.priority = getPriority("deezer") ?? deezerExt.priority;
