@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node --openssl-legacy-provider index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --no-fix .",
     "drizzle:generate": "npx drizzle-kit generate:pg --out ./utils/db/ --schema ./schema/schema.js",
@@ -35,7 +36,7 @@
     "bgutils-js": "^3.2.0",
     "cron": "^4.1.0",
     "discord-player": "^7.1.1-dev.0",
-    "discord-player-deezer": "^2.4.0",
+    "discord-player-deezer": "^2.5.0-beta.1",
     "discord-player-youtubei": "^1.4.2",
     "discord-tts": "^1.2.2",
     "discord-voip": "^7.1.0",
@@ -43,6 +44,7 @@
     "discord.js-akinator": "^5.0.1",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.0",
+    "googlevideo": "^2.0.0",
     "happy-dom": "^17.4.3",
     "jsdom": "^26.0.0",
     "lamejs": "^1.2.1",
@@ -55,6 +57,9 @@
     "simple-folder-search": "^2.3.0",
     "soundgasm-extractor": "^1.1.4",
     "tts-extractor": "^1.0.4"
+  },
+  "overrides": {
+    "youtubei.js": "latest"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.0",
