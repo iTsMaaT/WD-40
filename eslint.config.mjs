@@ -43,6 +43,22 @@ export default [...compat.extends("eslint:recommended"), {
     },
 
     rules: {
+        "no-warning-comments": "off",
+        "multiline-comment-style": "off",
+        "spaced-comment": ["error", "always", {
+            "line": {
+                "markers": ["/"],
+                "exceptions": ["-", "+"],
+            },
+            "block": {
+                "markers": ["!"],
+                "exceptions": ["*"],
+                "balanced": true,
+            },
+        }],
+        "eslint-comments/disable-enable-pair": "off",
+        "eslint-comments/no-unlimited-disable": "off",
+        "eslint-comments/no-unused-disable": "off",
         indent: ["error", 4, {
             SwitchCase: 1,
         }],
@@ -101,7 +117,6 @@ export default [...compat.extends("eslint:recommended"), {
 
         "space-in-parens": "error",
         "space-infix-ops": "error",
-        "spaced-comment": "error",
         yoda: "error",
     },
 }];
