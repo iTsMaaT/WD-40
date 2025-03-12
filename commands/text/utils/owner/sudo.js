@@ -4,7 +4,7 @@ const embedGenerator = require("@utils/helpers/embedGenerator");
 module.exports = {
     name: "sudo",
     description: "Make the bot send a custom message / reply",
-    category: "utils",
+    category: "owner",
     usage: {
         required: {
             "message": "message to send",

@@ -7,7 +7,7 @@ const { createPaginatedMessage } = require("@utils/helpers/createPaginatedMessag
 module.exports = {
     name: "packages",
     description: "Lists the packages and versions",
-    category: "utils",
+    category: "owner",
     private: true,
     async execute(logger, client, message, args, optionalArgs) {
         const WDVersion = changelogs[changelogs.length - 1].version;

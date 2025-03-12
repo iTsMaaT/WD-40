@@ -4,7 +4,7 @@ const { ActivityType } = require("discord.js");
 module.exports = {
     name: "activity",
     description: "Changes the bot's activity status",
-    category: "utils",
+    category: "owner",
     usage: {
         required: {
             "activity": "activity to change to",

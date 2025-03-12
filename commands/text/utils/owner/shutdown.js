@@ -3,7 +3,7 @@ const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 module.exports = {
     name: "shutdown",
     description: "Shuts down the bot from discord",
-    category: "utils",
+    category: "owner",
     usage: {
         required: {
             "reason": "reason for shutdown",

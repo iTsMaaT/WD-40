@@ -3,7 +3,7 @@ const embedGenerator = require("@utils/helpers/embedGenerator");
 module.exports = {
     name: "nick",
     description: "Changes the server nickname",
-    category: "utils",
+    category: "owner",
     usage: {
         required: {
             "nickname": "nickname to set",
