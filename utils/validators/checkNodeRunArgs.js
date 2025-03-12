@@ -6,7 +6,7 @@ const logger = require("@utils/log");
  */
 const checkNodeRunArgs = async function() {
     const args = process.execArgv;
-    const neededArgs = [];
+    const neededArgs = ["--openssl-legacy-provider"];
     for (const arg of neededArgs) {
         if (!args.includes(arg)) {
             logger.severe(`The following argument is missing: ${arg}`);
