@@ -404,7 +404,7 @@
         ]
     },
     {
-        "version": "v5.11.0",
+        "version": "5.11.0",
         "date": "2025-03-10",
         "changes": [
             "Added a >config command (owner only).",
