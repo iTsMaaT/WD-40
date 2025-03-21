@@ -2,7 +2,7 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-export default {
+module.exports = {
     schema: "./schema",
     out: "./drizzle",
     driver: "mysql2",
