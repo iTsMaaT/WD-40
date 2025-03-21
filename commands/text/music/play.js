@@ -36,10 +36,25 @@ module.exports = {
         const player = useMainPlayer();
         const queue = useQueue();
         const playerConfig = config.get("discordPlayerConf");
+
+        // if (await player.play(message.member.voice.channel.id, args.join(" "), { nodeOptions: {
+        //    metadata: {
+        //        channel: message.channel,
+        //        client: message.guild.members.me,
+        //        requestedBy: message.user,
+        //        guild: message.guild,
+        //        probableBridgeSource: "balls",
+        //    },
+        //    verifyFallbackStream: true,
+        //    ...playerConfig.globalPlayerNodeOptions,
+        // } })) return;
+
         const attachment = message.attachments.first()?.attachment;
         let string = args.join(" ") || (playerConfig.removeYoutube ? undefined : "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
 
-        if (!string) 
+        if (string.includes("dzr.page.link")) string = await unshortenURL(string);
+
+        if (!string && !attachment) 
             return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
         
         const stringQueryType = QueryResolver.resolve(string).type;
@@ -253,4 +268,19 @@ async function awareQueryResolver(query, player) {
     }
 
     return result;
+}
+
+async function unshortenURL(url) {
+    try {
+        const response = await fetch(url, {
+            method: "HEAD",
+            signal: AbortSignal.timeout(5000),
+        });
+
+        const urlObj = new URL(response.url);
+        return urlObj.origin + urlObj.pathname;
+    } catch (error) {
+        logger.error(error);
+        return url;
+    }
 }
