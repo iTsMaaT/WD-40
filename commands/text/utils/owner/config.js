@@ -45,6 +45,7 @@ module.exports = {
 
         const createFields = (configObj) => {
             const fields = [];
+             
             // eslint-disable-next-line no-shadow
             for (const [key, value] of Object.entries(configObj)) {
                 const formattedValue = formatValue(value);
