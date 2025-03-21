@@ -61,6 +61,7 @@ Good luck.
 | CLIENT_ID | The client ID of the bot, which you can get from the [Discord Developer Portal](https://discord.com/developers/applications). |
 | SERVER | Either `prod` or `dev`, will make the bot only react to its owner on dev. |
 | OWNER_ID | The ID of the owner of the bot. |
+| CONFIG_FILEPATH | Override the default config file path. You can use `@root` to refer to the root directory of the project. |
 | | |
 | Optional | - |
 | GEMINI_API_KEY | The token for the Gemini AI API, which you can get from the [Gemini API](https://ai.google.dev/gemini-api/docs) website. |

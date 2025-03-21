@@ -60,6 +60,8 @@
     "autoCommandMatch": true,
     "baseCommandCooldown": 3000,
 
+    "logRateLimited": false,
+
     "defaultGeminiModel": "gemini-2.0-flash-lite",
 
     "discordPlayerConf": {
@@ -76,8 +78,9 @@
             "leaveOnEmptyCooldown": 300000,
             "skipOnNoStream": true
         },
+        "dailyReregister": true,
         "removeYoutube": true,
-        "youtubeClient": "TV_EMBEDDED",
+        "youtubeClient": "WEB",
         "attemptYoutubeSearchEvenIfDisabled": true,
         "removeDeezer": false,
         "skipLogin": true,
@@ -95,7 +98,7 @@
         ],
         "extractors": {
             "SoundCloudExtractor": {
-                "enabled": true,
+                "enabled": false,
                 "options": {}
             },
             "SpotifyExtractor": {
