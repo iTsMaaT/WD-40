@@ -6,20 +6,20 @@
     ],
     "settings": {
         "[javascript]": {
-            "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-            "editor.formatOnSave": true,
+            "editor.defaultFormatter": "vscode.typescript-language-features",
+            //"editor.formatOnSave": true,
         },
-        "eslint.format.enable": true,
+        //"eslint.format.enable": true,
         "editor.codeActionsOnSave": {
             "source.fixAll.eslint": "explicit"
         },
-        "eslint.options": {
-            "overrideConfigFile": "eslint.config.mjs"
-        },
-        "eslint.lintTask.enable": true,
-        "eslint.codeActionsOnSave.rules": [
-            "explicit"
-        ],
+        //"eslint.options": {
+        //    "overrideConfigFile": "eslint.config.mjs"
+        //},
+        //"eslint.lintTask.enable": true,
+        //"eslint.codeActionsOnSave.rules": [
+        //    "explicit"
+        //],
         "github.copilot.editor.enableAutoCompletions": false,
         "terminal.integrated.suggest.builtinCompletions": {
 
