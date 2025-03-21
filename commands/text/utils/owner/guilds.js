@@ -2,7 +2,7 @@ const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 
 module.exports = {
     name: "guilds",
-    category: "utils",
+    category: "owner",
     description: "Makes a list of the guilds the bot is in",
     private: true,
     async execute(logger, client, message, args, optionalArgs) {

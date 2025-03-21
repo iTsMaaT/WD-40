@@ -3,7 +3,7 @@ const embedGenerator = require("@utils/helpers/embedGenerator");
 module.exports = {
     name: "debug",
     description: "Enables debug logging",
-    category: "utils",
+    category: "owner",
     usage: {
         required: {
             "server": "server to enable debug",

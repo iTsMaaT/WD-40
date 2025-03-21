@@ -5,6 +5,7 @@ const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerSta
 const { Readable } = require("stream");
 const { getAllAudioUrls } = require("google-tts-api");
 const { fetchGeminiResponse } = require("@utils/helpers/fetchGeminiResponse");
+const getExactDate = require("@functions/getExactDate");
 const config = require("@utils/config/configUtils");
 
 module.exports = {
@@ -45,7 +46,7 @@ module.exports = {
                 ownerId: owner.id,
                 channelId: message.channel.id,
                 channelName: message.channel.name,
-                currentTime: (new Date()).toUTCString(),
+                currentTime: getExactDate,
                 authorUsername: message.author.username,
                 authorDisplayName: message.author.displayName,
                 authorId: message.author.id,

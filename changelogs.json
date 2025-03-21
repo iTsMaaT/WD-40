@@ -414,5 +414,18 @@
             "Fixed a issue where STATUS_CHANNEL_ID was still needed in clientReady.",
             "Many internal refactoring and dependency updates for better performance, stability, and error handling."
         ]
+    },
+    {
+        "version": "5.12.1",
+        "date": "2025-03-20",
+        "changes": [
+            "Blacklist now support all command typoes and categories",
+            "Added timezone and locale configuration options for date and time formatting.",
+            "Improved Deezer extractor with ARL cookie support and NodeDecryptor.",
+            "Deezer should now stutter less",
+            "dzr.page.link links are now supported",
+            "CONFIG_FILEPATH env variable",
+            "Deezer should properly refresh (it would stop working after around 19 hours)"
+        ]
     }
 ]

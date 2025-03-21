@@ -8,7 +8,7 @@ const path = require("path");
  */
 class Config {
     constructor() {
-        this.configFilePath = path.resolve(__dirname, "config.json");
+        this.configFilePath = process.env.CONFIG_FILEPATH || path.resolve(__dirname, "../../utils/config/config.json");
         this.envConfig = {
             OWNER_ID: process.env.OWNER_ID,
             STATUS_CHANNEL_ID: process.env.STATUS_CHANNEL_ID,

@@ -1,10 +1,9 @@
-/* eslint-disable no-shadow */
 (async () => {
     const Discord = require("discord.js");
     const dotenv = require("dotenv");
     dotenv.config();
     require("module-alias/register");
-    const util = require("util");
+    const cron = require("cron");
 
     const Sentry = require("@sentry/node");
 
@@ -60,6 +59,15 @@
         allowedMentions: { repliedUser: false },
     });
 
+    const { registerExtractors, initPlayer } = require("@utils/helpers/registerExtractors");
+    const player = await initPlayer(client);
+    await registerExtractors(player);
+
+    console.log(`Daily reregistering ${config.get("dailyReregister") ? "enabled" : "disabled"}`);
+    new cron.CronJob("0 3 * * *", () => {
+        if (config.get("dailyReregister")) registerExtractors(player);
+    }, null, true, config.get("timeZone"));
+
     global.wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
     // Add array.equals()
@@ -75,103 +83,6 @@
         }
         return this;
     };
-    // music
-    const { Log } = require("youtubei.js");
-    Log.setLevel(Log.Level.NONE);
-
-    const discordPlayerConfig = config.get("discordPlayerConf");
-    const { Player, AudioFilters } = require("discord-player");
-    const exts = require("@discord-player/extractor");
-    const { YoutubeiExtractor } = require("discord-player-youtubei");
-    const { createServerAbrStream, poTokenExtraction } = await import("discord-player-youtubei/experimental");
-    const { DeezerExtractor, NodeDecryptor, JSDecryptor } = require("discord-player-deezer");
-    const { SoundgasmExtractor } = require("soundgasm-extractor");
-    const { TTSExtractor } = require("tts-extractor");
-
-    const player = new Player(client, {
-        // bridgeProvider: discordPlayerConfig.useSoundcloudBridge ? new exts.BridgeProvider(exts.BridgeSource.SoundCloud) : new exts.BridgeProvider(exts.BridgeSource.Auto),
-        skipFFmpeg: discordPlayerConfig?.skipFFmpeg,
-    });
-
-    logger.info("Loading TTSExtractor extractor...");
-    await player.extractors.register(TTSExtractor, {
-        language: "fr",
-        slow: true,
-    });
-
-    const ffmpegFilters = config.get("discordPlayerConf")?.ffmpegFilters || {};
-    for (const filter of Object.entries(ffmpegFilters)) AudioFilters.define(filter[0], filter[1]);
-
-    /**
-     * Get the priority of a stream provider
-     * 
-     * @param {string} streamProvider The stream provider
-     * @returns {number} The priority
-     */
-    const getPriority = (streamProvider) => {
-        const index = discordPlayerConfig?.streamPriorities?.indexOf(streamProvider);
-        return index !== -1 ? 10 + discordPlayerConfig?.streamPriorities.length - index : null;
-    };
-
-    logger.info("Loading SoundgasmExtractor extractor...");
-    await player.extractors.register(SoundgasmExtractor, {
-        skipProbing: true,
-        attemptAlternateProbing: true,
-    });
-
-    if (!discordPlayerConfig?.removeYoutube) {
-        logger.info("Loading YoutubeiExtractor extractor...");
-
-        const ytExtOptions = { streamOptions: {} };
-        if (!discordPlayerConfig?.skipLogin) ytExtOptions.authentication = process.env.YOUTUBE_ACCESS_STRING;
-        if (discordPlayerConfig?.useCookie) ytExtOptions.cookie = process.env.YOUTUBE_COOKIE;
-        ytExtOptions.streamOptions.useClient = discordPlayerConfig?.youtubeClient || "IOS";
-        if (discordPlayerConfig?.usePoToken) {
-            ytExtOptions.streamOptions.useClient = "WEB";
-            ytExtOptions.createStream = (track, ext) => createServerAbrStream(track, ext, (err) => console.log(err));
-        }
-        ytExtOptions.streamOptions.highWaterMark = discordPlayerConfig?.highWaterMark || 1024 * 1024;
-
-        const ytExt = await player.extractors.register(YoutubeiExtractor, {
-            ...ytExtOptions,
-        });
-
-        ytExt.priority = getPriority("youtube") ?? ytExt.priority;
-
-        if (discordPlayerConfig?.usePoToken) {
-            const innertube = ytExt.innerTube;
-            const potoken = await poTokenExtraction(innertube);
-            const visitorData = innertube.session.context.client.visitorData;
-            ytExt.setPoToken(potoken, visitorData);
-
-            setInterval(async () => {
-                const innertube = ytExt.innerTube;
-                const potoken = await poTokenExtraction(innertube);
-                const visitorData = innertube.session.context.client.visitorData;
-                ytExt.setPoToken(potoken, visitorData);
-            }, 6.048e+8).unref();
-        }
-    }
-
-    if (!discordPlayerConfig?.removeDeezer) {
-        const deezerExt = await player.extractors.register(DeezerExtractor, {
-            decryptionKey: process.env.DEEZER_MASTER_KEY,
-            arl: process.env.DEEZER_ARL_COOKIE,
-            decryptor: NodeDecryptor,
-        });
-
-        deezerExt.priority = getPriority("deezer") ?? deezerExt.priority;
-    }
-
-    for (const ext of Object.entries(discordPlayerConfig.extractors)) {
-        if (ext[1].enabled) {
-            logger.info(`Loading ${ext[0]} extractor...`);
-            const currentExt = await player.extractors.register(exts[ext[0]], ext[1].options);
-            for (const streamProvider of discordPlayerConfig.streamPriorities)
-                if (ext[0].toLowerCase().includes(streamProvider.toLowerCase())) currentExt.priority = getPriority(streamProvider) || currentExt.priority;
-        }
-    }
-
 
     console.log("Variables loaded");
 

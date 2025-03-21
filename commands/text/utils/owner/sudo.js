@@ -4,11 +4,11 @@ const embedGenerator = require("@utils/helpers/embedGenerator");
 module.exports = {
     name: "sudo",
     description: "Make the bot send a custom message / reply",
-    category: "utils",
+    category: "owner",
     usage: {
         required: {
-            "message": "message to send",
             "link": "link to the message to send",
+            "message": "message to send",
         },
         optional: {
             "send|s": {
@@ -38,7 +38,7 @@ module.exports = {
         try {
             const messageLink = args.shift();
             const sudoMessage = args.join(" ");
-            const [guildID, channelID, messageID] = extractMessageInfo(messageLink);
+            const [guildID, channelID, messageID] = extractMessageInfo(messageLink).catch(() => null);
 
             if (!optionalArgs["send|s"] && !optionalArgs["reply|r"] && !optionalArgs["emote|e"] && !optionalArgs["clear|c"] && !optionalArgs["dm|d"]) {
                 await message.reply({ embed : [embedGenerator.error({ title: "Missing parameter", description: "You must specify a parameter" })] });

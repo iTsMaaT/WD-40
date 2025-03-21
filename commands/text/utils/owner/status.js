@@ -3,7 +3,7 @@ const { PresenceUpdateStatus } = require("discord.js");
 module.exports = {
     name: "status",
     description: "Changes the bot's activity status",
-    category: "utils",
+    category: "owner",
     usage: {
         required: {
             "status": "status to change to",
@@ -36,6 +36,6 @@ module.exports = {
                 await client.user.setPresence({ status: PresenceUpdateStatus.Online });
             }
         }
-        await message.reply("Status changed to: " + args[0] ?? "Online");
+        await message.reply("Status changed to: " + (args[0] ?? "Online"));
     },
 };

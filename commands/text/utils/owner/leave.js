@@ -3,7 +3,7 @@ const embedGenerator = require("@utils/helpers/embedGenerator");
 module.exports = {
     name: "leave",
     description: "leaves the specified guild",
-    category: "admin",
+    category: "owner",
     usage: {
         required: {
             "guild": "ID of the guild to leave",

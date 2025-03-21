@@ -3,7 +3,7 @@ const embedGenerator = require("@utils/helpers/embedGenerator");
 module.exports = {
     name: "logs",
     description: "Shows the count of each type of log",
-    category: "utils",
+    category: "owner",
     private: true,
     async execute(logger, client, message, args, optionalArgs) {
         const logCounts = logger.logCounts;
