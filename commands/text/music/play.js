@@ -52,7 +52,7 @@ module.exports = {
         const attachment = message.attachments.first()?.attachment;
         let string = args.join(" ") || (playerConfig.removeYoutube ? undefined : "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
 
-        if (string.includes("dzr.page.link")) string = await unshortenURL(string);
+        if (string?.includes("dzr.page.link")) string = await unshortenURL(string);
 
         if (!string && !attachment) 
             return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
@@ -149,7 +149,7 @@ module.exports = {
                 await message.channel.awaitMessages({ filter, max: 1, time: 10000, errors: ["time"] })
                     .then((collected) => {
                         const responseMessage = collected.first();
-                        choice = parseInt(responseMessage.content) - 1;
+                        choice = (parseInt(responseMessage.content) || 1) - 1;
                         responseMessage.delete().catch(() => null);
                     })
                     .catch(() => choice = 0);

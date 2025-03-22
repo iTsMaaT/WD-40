@@ -1,4 +1,3 @@
-/* eslint-disable no-shadow */
 const { Player, AudioFilters } = require("discord-player");
 const config = require("@utils/config/configUtils");
 const discordPlayerConfig = config.get("discordPlayerConf");
@@ -21,7 +20,6 @@ async function initPlayer(client) {
 }
 
 async function registerExtractors(player) {
-    const { createServerAbrStream, poTokenExtraction } = await import("discord-player-youtubei/experimental");
     logger.info("Loading TTSExtractor extractor...");
     await player.extractors.register(TTSExtractor, {
         language: "fr",
@@ -57,31 +55,30 @@ async function registerExtractors(player) {
         ytExtOptions.streamOptions.useClient = discordPlayerConfig?.youtubeClient || "IOS";
         if (discordPlayerConfig?.usePoToken) {
             ytExtOptions.streamOptions.useClient = "WEB";
-            ytExtOptions.createStream = (track, ext) => createServerAbrStream(track, ext, (err) => console.log(err));
+            ytExtOptions.generateWithPoToken = true;
         }
 
         ytExtOptions.streamOptions.highWaterMark = discordPlayerConfig?.highWaterMark || 1024 * 1024;
 
-        console.log(ytExtOptions);
         const ytExt = await player.extractors.register(YoutubeiExtractor, {
             ...ytExtOptions,
         });
 
         ytExt.priority = getPriority("youtube") ?? ytExt.priority;
 
-        if (discordPlayerConfig?.usePoToken) {
-            const innertube = ytExt.innerTube;
-            const potoken = await poTokenExtraction(innertube);
-            const visitorData = innertube.session.context.client.visitorData;
-            ytExt.setPoToken(potoken, visitorData);
-
-            setInterval(async () => {
-                const innertube = ytExt.innerTube;
-                const potoken = await poTokenExtraction(innertube);
-                const visitorData = innertube.session.context.client.visitorData;
-                ytExt.setPoToken(potoken, visitorData);
-            }, 6.048e+8).unref();
-        }
+        // if (discordPlayerConfig?.usePoToken) {
+        //    const innertube = ytExt.innerTube;
+        //    const potoken = await poTokenExtraction(innertube);
+        //    const visitorData = innertube.session.context.client.visitorData;
+        //    ytExt.setPoToken(potoken, visitorData);
+        //
+        //    setInterval(async () => {
+        //        const innertube = ytExt.innerTube;
+        //        const potoken = await poTokenExtraction(innertube);
+        //        const visitorData = innertube.session.context.client.visitorData;
+        //        ytExt.setPoToken(potoken, visitorData);
+        //    }, 6.048e+8).unref();
+        // }
     }
 
     if (!discordPlayerConfig?.removeDeezer) {
