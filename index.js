@@ -64,8 +64,8 @@
     await registerExtractors(player);
 
     console.log(`Daily reregistering ${config.get("dailyReregister") ? "enabled" : "disabled"}`);
-    new cron.CronJob("0 3 * * *", () => {
-        if (config.get("dailyReregister")) registerExtractors(player);
+    new cron.CronJob("0 */12 * * *", async () => {
+        if (config.get("dailyReregister")) await registerExtractors(player);
     }, null, true, config.get("timeZone"));
 
     global.wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
