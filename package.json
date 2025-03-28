@@ -43,7 +43,6 @@
     "discord-tts": "^1.2.2",
     "discord-voip": "^7.1.0",
     "discord.js": "^14.18.0",
-    "discord.js-akinator": "^5.0.1",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.0",
     "googlevideo": "^2.0.0",
