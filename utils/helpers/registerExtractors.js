@@ -6,8 +6,10 @@ const { YoutubeiExtractor } = require("discord-player-youtubei");
 const { DeezerExtractor, NodeDecryptor, JSDecryptor } = require("discord-player-deezer");
 const { SoundgasmExtractor } = require("soundgasm-extractor");
 const { TTSExtractor } = require("tts-extractor");
-// const { SoundCloudExtractor } = require("discord-player-soundcloud");
-const SoundCloudExtractor = require("@utils/helpers/SoundCloudExtractor");
+const { SoundcloudExtractor } = require("discord-player-soundcloud");
+const { SpotifyExtractor } = require("discord-player-spotify");
+// const { AppleMusicExtractor } = require("discord-player-applemusic");
+// const SoundCloudExtractor = require("@utils/helpers/SoundCloudExtractor");
 const logger = require("@utils/log");
 
 const { Log } = require("youtubei.js");
@@ -48,37 +50,10 @@ async function registerExtractors(player) {
 
     if (!discordPlayerConfig?.removeYoutube) {
         logger.info("Loading YoutubeiExtractor extractor...");
-
-        const ytExtOptions = { streamOptions: {} };
-        if (!discordPlayerConfig?.skipLogin) ytExtOptions.authentication = process.env.YOUTUBE_ACCESS_STRING;
-        if (discordPlayerConfig?.useCookie) ytExtOptions.cookie = process.env.YOUTUBE_COOKIE;
-        ytExtOptions.streamOptions.useClient = discordPlayerConfig?.youtubeClient || "IOS";
-        if (discordPlayerConfig?.usePoToken) {
-            ytExtOptions.streamOptions.useClient = "WEB";
-            ytExtOptions.generateWithPoToken = true;
-        }
-
-        ytExtOptions.streamOptions.highWaterMark = discordPlayerConfig?.highWaterMark || 1024 * 1024;
-
-        const ytExt = await player.extractors.register(YoutubeiExtractor, {
-            ...ytExtOptions,
-        });
-
+        
+        const ytExtOptions = getYoutubeExtractorOptions(discordPlayerConfig);
+        const ytExt = await player.extractors.register(YoutubeiExtractor, ytExtOptions);
         ytExt.priority = getPriority("youtube") ?? ytExt.priority;
-
-        // if (discordPlayerConfig?.usePoToken) {
-        //    const innertube = ytExt.innerTube;
-        //    const potoken = await poTokenExtraction(innertube);
-        //    const visitorData = innertube.session.context.client.visitorData;
-        //    ytExt.setPoToken(potoken, visitorData);
-        //
-        //    setInterval(async () => {
-        //        const innertube = ytExt.innerTube;
-        //        const potoken = await poTokenExtraction(innertube);
-        //        const visitorData = innertube.session.context.client.visitorData;
-        //        ytExt.setPoToken(potoken, visitorData);
-        //    }, 6.048e+8).unref();
-        // }
     }
 
     if (!discordPlayerConfig?.removeDeezer) {
@@ -86,16 +61,23 @@ async function registerExtractors(player) {
             decryptionKey: process.env.DEEZER_MASTER_KEY,
             arl: process.env.DEEZER_ARL_COOKIE,
             decryptor: NodeDecryptor,
+            reloadUserInterval: 9 * 60 * 60 * 1000,
         });
 
         deezerExt.priority = getPriority("deezer") ?? deezerExt.priority;
     }
 
     logger.info("Loading SoundCloudExtractor extractor...");
-    await player.extractors.register(SoundCloudExtractor, {
-        clientId: process.env.SOUNDCLOUD_CLIENT_ID,
-        oauthToken: process.env.SOUNDCLOUD_OAUTH_TOKEN,
+    await player.extractors.register(SoundcloudExtractor, {});
+
+    logger.info("Loading SpotifyExtractor extractor...");
+    await player.extractors.register(SpotifyExtractor, {
+        clientId: process.env.SPOTIFY_CLIENT_ID,
+        clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
     });
+
+    // logger.info("Loading AppleMusicExtractor extractor...");
+    // await player.extractors.register(AppleMusicExtractor, {});
 
     for (const ext of Object.entries(discordPlayerConfig.extractors)) {
         if (ext[1].enabled) {
@@ -109,6 +91,33 @@ async function registerExtractors(player) {
 async function reload(player) {
     await player.extractors.unregisterAll();
     await registerExtractors(player);
+}
+
+function getYoutubeExtractorOptions(playerconfig) {
+    const options = {
+        streamOptions: {
+            useClient: playerconfig?.youtubeClient || "IOS",
+            highWaterMark: playerconfig?.highWaterMark || 1024 * 1024,
+        },
+    };
+
+    if (!playerconfig?.skipLogin) 
+        options.authentication = process.env.YOUTUBE_ACCESS_STRING;
+
+    if (playerconfig?.useCookie) 
+        options.cookie = process.env.YOUTUBE_COOKIE;
+    
+    if (playerconfig?.useServerAbrStream) {
+        options.useServerAbrStream = true;
+        if (!playerconfig?.usePoToken) playerconfig.usePoToken = true;
+    }
+
+    if (playerconfig?.usePoToken) {
+        options.streamOptions.useClient = "WEB";
+        options.generateWithPoToken = true;
+    }
+
+    return options;
 }
 
 module.exports = { initPlayer, registerExtractors, reload };

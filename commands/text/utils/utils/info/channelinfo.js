@@ -39,7 +39,7 @@ module.exports = {
                 { name: "Channel Type", value: ChannelType[channel.type] || "Unknown" },
                 { name: "Category", value: channel.parent?.name || "None" },
                 { name: "Position", value: channel.position.toString() || "-" },
-                { name: "Created At", value: `<t:${Math.floor(channel.createdTimestamp / 1000)}:R>` || "-" },
+                { name: "Created At", value: channel.createdTimestamp ? new Date(channel.createdTimestamp).toUTCString() : "-" },
                 { name: "Topic", value: channel.topic || "No topic set" },
             ];
 
@@ -49,7 +49,7 @@ module.exports = {
             }
 
             if (channel.type === ChannelType.GuildVoice || channel.type === ChannelType.GuildStageVoice) {
-                fields.push({ name: "Bitrate", value: `${channel.bitrate / 1000} kbps` || "-" });
+                fields.push({ name: "Bitrate", value: channel.bitrate ? `${channel.bitrate} kbps` : "Unknown" });
                 fields.push({ name: "User Limit", value: channel.userLimit ? `${channel.userLimit} users` : "No limit" });
             }
 

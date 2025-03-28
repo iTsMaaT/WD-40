@@ -78,13 +78,14 @@
             "leaveOnEmptyCooldown": 300000,
             "skipOnNoStream": true
         },
-        "dailyReregister": true,
-        "removeYoutube": true,
+        "dailyReregister": false,
+        "removeYoutube": false,
         "youtubeClient": "WEB",
         "attemptYoutubeSearchEvenIfDisabled": true,
         "removeDeezer": false,
         "skipLogin": true,
         "usePoToken": true,
+        "useServerAbrStream": true,
         "useCookie": true,
         "log": false,
         "logEvent": false,
@@ -102,11 +103,11 @@
                 "options": {}
             },
             "SpotifyExtractor": {
-                "enabled": true,
+                "enabled": false,
                 "options": {}
             },
             "AppleMusicExtractor": {
-                "enabled": true,
+                "enabled": false,
                 "options": {}
             },
             "ReverbnationExtractor": {

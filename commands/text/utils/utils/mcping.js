@@ -24,7 +24,7 @@ module.exports = {
                 title: `Server Status for ${server.host} (Port: ${server.port})`,
                 color: 0xffffff,
                 thumbnail: {
-                    url: `https://api.mcstatus.io/v2/icon/${args[0]}${port}` || "",
+                    url: `https://api.mcstatus.io/v2/icon/${args[0]}${port}`,
                 },
                 fields: [
                     { name: "Server Version", value: server.version.name_clean },
