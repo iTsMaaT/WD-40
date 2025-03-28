@@ -79,7 +79,7 @@
             "skipOnNoStream": true
         },
         "dailyReregister": false,
-        "removeYoutube": false,
+        "removeYoutube": true,
         "youtubeClient": "WEB",
         "attemptYoutubeSearchEvenIfDisabled": true,
         "removeDeezer": false,
