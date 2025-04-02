@@ -79,22 +79,22 @@
             "skipOnNoStream": true
         },
         "dailyReregister": false,
-        "removeYoutube": true,
-        "youtubeClient": "WEB",
+        "removeYoutube": false,
+        "youtubeClient": "IOS",
         "attemptYoutubeSearchEvenIfDisabled": true,
         "removeDeezer": false,
         "skipLogin": true,
-        "usePoToken": true,
-        "useServerAbrStream": true,
-        "useCookie": true,
+        "usePoToken": false,
+        "useServerAbrStream": false,
+        "useCookie": false,
         "log": false,
         "logEvent": false,
         "highWaterMark": 2097152,
         "skipFFmpeg": false,
         "useSoundcloudBridge": false,
         "streamPriorities": [
-            "youtube",
             "deezer",
+            "youtube",
             "soundcloud"
         ],
         "extractors": {
