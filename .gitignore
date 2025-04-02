@@ -2,6 +2,7 @@
 node_modules
 package-lock.json
 tinker.js
+tinker2.js
 pnpm-lock.yaml
 utils/reddit/redditConf.json
 ./music
