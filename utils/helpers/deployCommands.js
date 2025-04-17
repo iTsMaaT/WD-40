@@ -20,11 +20,10 @@ async function updateCommands(client, logger) {
             description: cmd.description,
             options: cmd.options,
             type: cmd.type,
-            // Add any other relevant command properties here
         };
 
         // Create a deterministic string representation of the command
-        const commandString = JSON.stringify(commandObj, Object.keys(commandObj).sort());
+        const commandString = JSON.stringify(commandObj);
 
         // Generate hash of the command
         const hash = crypto
