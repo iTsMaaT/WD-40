@@ -16,6 +16,7 @@ module.exports = {
     },
     aliases: ["linfo"],
     category: "info",
+    private: true,
     cooldown: 10000,
     async execute(logger, client, message, args, optionalArgs) {
         const agent = new https.Agent();
