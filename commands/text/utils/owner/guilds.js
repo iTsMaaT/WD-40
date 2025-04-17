@@ -37,8 +37,8 @@ module.exports = {
             const userCount = guild.memberCount - botCount;
             const totalCount = guild.memberCount;
 
-            const userPadding = " ".repeat(Math.max(...userCountArray).toString().length - userCount.toString().length);
-            const botPadding = " ".repeat(Math.max(...botCountArray).toString().length - botCount.toString().length);
+            const userPadding = " ".repeat(Math.max(0, Math.max(...userCountArray).toString().length - userCount.toString().length));
+            const botPadding = " ".repeat(Math.max(0, Math.max(...botCountArray).toString().length - botCount.toString().length));
   
             totalUsers += userCount;
             totalBots += botCount;
