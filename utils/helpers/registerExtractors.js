@@ -1,107 +1,117 @@
 const { Player, AudioFilters } = require("discord-player");
-const config = require("@utils/config/configUtils");
-const discordPlayerConfig = config.get("discordPlayerConf");
-const exts = require("@discord-player/extractor");
+const { AttachmentExtractor } = require("@discord-player/extractor");
 const { YoutubeiExtractor, stream } = require("discord-player-youtubei");
 const { DeezerExtractor, NodeDecryptor, JSDecryptor } = require("discord-player-deezer");
-const { SoundgasmExtractor } = require("soundgasm-extractor");
-const { TTSExtractor } = require("tts-extractor");
+const { SoundgasmExtractor } = require("discord-player-soundgasm");
+const { TTSExtractor } = require("discord-player-tts");
 const { SoundcloudExtractor } = require("discord-player-soundcloud");
 const { SpotifyExtractor } = require("discord-player-spotify");
-// const { AppleMusicExtractor } = require("discord-player-applemusic");
-// const SoundCloudExtractor = require("@utils/helpers/SoundCloudExtractor");
+const { AppleMusicExtractor } = require("discord-player-applemusic");
+const { getVideoInfoFromOnesieRequest, createReadableFromWeb, getPoToken } = require("@utils/helpers/getInfoFromOnesieRequest.js");
+const config = require("@utils/config/configUtils");
 const logger = require("@utils/log");
 
 const { Log } = require("youtubei.js");
 Log.setLevel(Log.Level.NONE);
 
+const discordPlayerConfig = config.get("discordPlayer");
+const extractors = discordPlayerConfig?.extractors || {};
+
+/**
+ * Initializes a new Player instance
+ * 
+ * @param {Client} client 
+ * @returns 
+ */
 async function initPlayer(client) {
     return new Player(client, {
         skipFFmpeg: discordPlayerConfig?.skipFFmpeg,
     });
 }
 
+/**
+ * Registers all extractors
+ * 
+ * @param {Player} player 
+ * @returns 
+ */
 async function registerExtractors(player) {
-    logger.info("Loading TTSExtractor extractor...");
-    await player.extractors.register(TTSExtractor, {
-        language: "fr",
-        slow: true,
-    });
-
-    const ffmpegFilters = config.get("discordPlayerConf")?.ffmpegFilters || {};
+    const ffmpegFilters = discordPlayerConfig?.ffmpegFilters || {};
     for (const filter of Object.entries(ffmpegFilters)) AudioFilters.define(filter[0], filter[1]);
+    
+    if (extractors.Soundgasm.enabled) {
+        logger.info("Loading TTSExtractor extractor...");
+        const soundgasmExt = await player.extractors.register(SoundgasmExtractor, extractors.Soundgasm.config);
+        soundgasmExt.priority = extractors.Soundgasm.priority ?? soundgasmExt.priority;
+    }
 
-    /**
-     * Get the priority of a stream provider
-     *
-     * @param {string} streamProvider The stream provider
-     * @returns {number} The priority
-     */
-    const getPriority = (streamProvider) => {
-        const index = discordPlayerConfig?.streamPriorities?.indexOf(streamProvider);
-        return index !== -1 ? 10 + discordPlayerConfig?.streamPriorities.length - index : null;
-    };
+    if (extractors.Soundcloud.enabled) {
+        logger.info("Loading Soundcloud extractor...");
+        const soundcloudExt = await player.extractors.register(SoundcloudExtractor, extractors.Soundcloud.config);
+        soundcloudExt.priority = extractors.Soundcloud.priority ?? soundcloudExt.priority;
+    }
 
-    logger.info("Loading SoundgasmExtractor extractor...");
-    await player.extractors.register(SoundgasmExtractor, {
-        skipProbing: true,
-        attemptAlternateProbing: true,
-    });
-
-    if (!discordPlayerConfig?.removeYoutube) {
+    if (extractors.Youtubei.enabled) {
         logger.info("Loading YoutubeiExtractor extractor...");
-        
-        const ytExtOptions = getYoutubeExtractorOptions(discordPlayerConfig);
-        const ytExt = await player.extractors.register(YoutubeiExtractor, ytExtOptions);
-        ytExt.priority = getPriority("youtube") ?? ytExt.priority;
+        const ytExt = await player.extractors.register(YoutubeiExtractor, getYoutubeExtractorOptions(extractors.Youtubei.config));
+        ytExt.priority = extractors.Youtubei.priority ?? ytExt.priority;
     }
 
-    if (!discordPlayerConfig?.removeDeezer) {
-        const deezerExt = await player.extractors.register(DeezerExtractor, {
-            decryptionKey: process.env.DEEZER_MASTER_KEY,
-            arl: process.env.DEEZER_ARL_COOKIE,
-            decryptor: NodeDecryptor,
-            reloadUserInterval: 9 * 60 * 60 * 1000,
-        });
-
-        deezerExt.priority = getPriority("deezer") ?? deezerExt.priority;
+    if (extractors.Deezer.enabled) {
+        logger.info("Loading Deezer extractor...");
+        const deezerExt = await player.extractors.register(DeezerExtractor, getDeezerExtractorOptions(extractors.Deezer.config));
+        deezerExt.priority = extractors.Deezer.priority ?? deezerExt.priority;
     }
 
-    logger.info("Loading SoundCloudExtractor extractor...");
-    await player.extractors.register(SoundcloudExtractor, {});
-
-    logger.info("Loading SpotifyExtractor extractor...");
-    await player.extractors.register(SpotifyExtractor, {
-        clientId: process.env.SPOTIFY_CLIENT_ID,
-        clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-    });
-
-    // logger.info("Loading AppleMusicExtractor extractor...");
-    // await player.extractors.register(AppleMusicExtractor, {});
-
-    for (const ext of Object.entries(discordPlayerConfig.extractors)) {
-        if (ext[1].enabled) {
-            logger.info(`Loading ${ext[0]} extractor...`);
-            const currentExt = await player.extractors.register(exts[ext[0]], ext[1].options);
-            for (const streamProvider of discordPlayerConfig.streamPriorities) if (ext[0].toLowerCase().includes(streamProvider.toLowerCase())) currentExt.priority = getPriority(streamProvider) || currentExt.priority;
-        }
+    if (extractors.Spotify.enabled) {
+        logger.info("Loading SpotifyExtractor extractor...");
+        const spotifyExt = await player.extractors.register(SpotifyExtractor, getSpotifyExtractorOptions(extractors.Spotify.config));
+        spotifyExt.priority = extractors.Spotify.priority ?? spotifyExt.priority;
     }
+
+    if (extractors.AppleMusic.enabled) {
+        logger.info("Loading AppleMusicExtractor extractor...");
+        const appleMusicExt = await player.extractors.register(AppleMusicExtractor, extractors.AppleMusic.config);
+        appleMusicExt.priority = extractors.AppleMusic.priority ?? appleMusicExt.priority;
+    }
+
+    if (extractors.TTS.enabled) {
+        logger.info("Loading TTSExtractor extractor...");
+        const ttsExt = await player.extractors.register(TTSExtractor, extractors.TTS.config);
+        ttsExt.priority = extractors.TTS.priority ?? ttsExt.priority;
+    }
+
+    logger.info("Loading Attachment extractor...");
+    const attachmentExt = await player.extractors.register(AttachmentExtractor, extractors.Attachment.config);
+    attachmentExt.priority = extractors.Attachment.priority ?? attachmentExt.priority;
 }
 
+/**
+ * Reloads all extractors
+ * 
+ * @param {Player} player 
+ * @returns
+ */
 async function reload(player) {
     await player.extractors.unregisterAll();
     await registerExtractors(player);
 }
 
+/**
+ * Gets the Youtube extractor options
+ * 
+ * @param {object} playerconfig 
+ * @returns 
+ */
 function getYoutubeExtractorOptions(playerconfig) {
     const options = {
         streamOptions: {
-            useClient: playerconfig?.youtubeClient || "IOS",
+            useClient: playerconfig?.client || "IOS",
             highWaterMark: playerconfig?.highWaterMark || 1024 * 1024,
         },
     };
 
-    if (!playerconfig?.skipLogin) 
+    if (playerconfig?.useTVOAuthLogin)
         options.authentication = process.env.YOUTUBE_ACCESS_STRING;
 
     if (playerconfig?.useCookie) 
@@ -115,6 +125,57 @@ function getYoutubeExtractorOptions(playerconfig) {
     if (playerconfig?.usePoToken) {
         options.streamOptions.useClient = "WEB";
         options.generateWithPoToken = true;
+    }
+
+    if (playerconfig?.useOnesieRequests) {
+        options.streamOptions.useClient = "WEB";
+        options.generateWithPoToken = true;
+        options.createStream = async (track, ext) => {
+            try {
+                const url = await getVideoInfoFromOnesieRequest(track.url, ext.innerTube, getPoToken(ext.innerTube));
+                const download = await url.download({ format: "mp4", quality: "best", type: "audio" });
+                return createReadableFromWeb(download);
+            } catch (error) {
+                return null;
+            }
+        };
+    }
+
+    return options;
+}
+
+/**
+ * Gets the Deezer extractor options
+ * 
+ * @param {object} playerconfig 
+ * @returns 
+ */
+function getDeezerExtractorOptions(playerconfig) {
+    const options = {
+        decryptor: NodeDecryptor,
+        reloadUserInterval: playerconfig?.reloadUserInterval || 32400000,
+    };
+
+    if (playerconfig?.useAccount) {
+        options.arl = process.env.DEEZER_ARL_COOKIE;
+        options.decryptionKey = process.env.DEEZER_MASTER_KEY;
+    }
+
+    return options;
+}
+
+/**
+ * Gets the Spotify extractor options
+ * 
+ * @param {object} playerconfig 
+ * @returns 
+ */
+function getSpotifyExtractorOptions(playerconfig) {
+    const options = {};
+
+    if (playerconfig?.useAccount) {
+        options.clientId = process.env.SPOTIFY_CLIENT_ID;
+        options.clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
     }
 
     return options;

@@ -1,4 +1,6 @@
 {
+    "warnForConfigNotInBaseConfig": true,
+
     "_types" : [
         { "Playing":   0 },
         { "Streaming": 1 },
@@ -64,63 +66,100 @@
 
     "defaultGeminiModel": "gemini-2.0-flash-lite",
 
-    "discordPlayerConf": {
-        "supportedFileExtensions": ["mp3"],
+    "discordPlayer": {
+        "supportedFileExtensions": ["mp3", "m4a"],
+        "dailyReregister": false,
+        "logPlayerEvents": true,
+        "logQueueEvents": false,
+        "skipFFmpeg": false,
         "globalPlayerNodeOptions": {
             "volume": 50,
             "maxSize": 10000,
             "bufferingTimeout": 15000,
             "leaveOnStop": true,
-            "leaveOnStopCooldown": 0,
+            "leaveOnStopCooldown": 5000,
             "leaveOnEnd": true,
             "leaveOnEndCooldown": 15000,
             "leaveOnEmpty": true,
             "leaveOnEmptyCooldown": 300000,
             "skipOnNoStream": true
         },
-        "dailyReregister": false,
-        "removeYoutube": false,
-        "youtubeClient": "IOS",
-        "attemptYoutubeSearchEvenIfDisabled": true,
-        "removeDeezer": false,
-        "skipLogin": true,
-        "usePoToken": false,
-        "useServerAbrStream": false,
-        "useCookie": false,
-        "log": false,
-        "logEvent": false,
-        "highWaterMark": 2097152,
-        "skipFFmpeg": false,
-        "useSoundcloudBridge": false,
-        "streamPriorities": [
-            "deezer",
-            "youtube",
-            "soundcloud"
-        ],
         "extractors": {
-            "SoundCloudExtractor": {
-                "enabled": false,
-                "options": {}
-            },
-            "SpotifyExtractor": {
-                "enabled": false,
-                "options": {}
-            },
-            "AppleMusicExtractor": {
-                "enabled": false,
-                "options": {}
-            },
-            "ReverbnationExtractor": {
+            "Deezer": {
                 "enabled": true,
-                "options": {}
+                "canStream": true,
+                "canBridge": true,
+                "priority": 12,
+                "config": {
+                    "useAccount": true,
+                    "reloadUserInterval": 32400000
+                }
             },
-            "VimeoExtractor": {
+            "Youtubei": {
                 "enabled": true,
-                "options": {}
+                "canStream": true,
+                "canBridge": true,
+                "priority": 11,
+                "config": {
+                    "client": "IOS",
+                    "highWaterMark": 2097152,
+                    "attemptYoutubeSearchEvenIfDisabled": true,
+                    "useServerAbrStream": false,
+                    "usePoToken": false,
+                    "useOnesieRequests": false,
+                    "useTVOAuthLogin": false,
+                    "useCookie": false
+                }
             },
-            "AttachmentExtractor": {
+            "Soundcloud": {
                 "enabled": true,
-                "options": {}
+                "canStream": true,
+                "canBridge": true,
+                "priority": 10,
+                "config": {}
+            },
+            "Spotify": {
+                "enabled": true,
+                "canStream": false,
+                "canBridge": true,
+                "priority": 2,
+                "config": {
+                    "useAccount": false
+                }
+            },
+            "AppleMusic": {
+                "enabled": true,
+                "canStream": false,
+                "canBridge": true,
+                "priority": 1,
+                "config": {}
+            },
+            "Soundgasm": {
+                "enabled": true,
+                "canStream": true,
+                "canBridge": false,
+                "priority": 1,
+                "config": {
+                    "skipProbing": true,
+                    "attemptAlternateProbing": true
+                }
+            },
+            "TTS": {
+                "enabled": true,
+                "canStream": true,
+                "canBridge": false,
+                "priority": 0,
+                "config": {
+                    "language": "fr",
+                    "slow": true
+                }
+            },
+            "Attachment": {
+                "enabled": true,
+                "canStream": true,
+                "canBridge": false,
+                "priority": 0,
+                "config": {}
             }
         },
         "ffmpegFilters": {
