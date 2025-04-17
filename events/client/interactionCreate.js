@@ -39,6 +39,7 @@ module.exports = {
             const requiredBasePerms = [
                 PermissionsBitField.Flags.ViewChannel,
                 PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ReadMessageHistory,
             ];
 
             const missingBasePerms = requiredBasePerms.filter(perm => !effectivePermissions.has(perm));
@@ -203,6 +204,18 @@ module.exports = {
                     flags: MessageFlags.Ephemeral,
                 });
                 logger.error(error);
+            }
+        }
+
+        // Autocomplete Handling
+        if (interaction.isAutocomplete()) {
+            const command = client.slashcommands.get(interaction.commandName);
+            if (!command || !command.autocomplete) return;
+
+            try {
+                await command.autocomplete(interaction, client);
+            } catch (error) {
+                logger.error(`Error handling autocomplete for command ${interaction.commandName}:`, error);
             }
         }
 
