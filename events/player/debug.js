@@ -4,6 +4,7 @@ module.exports = {
     name: "debug",
     once: false,
     execute(client, logger, log) {
-        if (config.get("discordPlayerConf").log) logger.debug(log);
+        if (config.get("discordPlayer").logPlayerEvents) 
+            logger.debug("Player event:", log);
     },
 };
