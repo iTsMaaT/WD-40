@@ -427,5 +427,16 @@
             "CONFIG_FILEPATH env variable",
             "Deezer should properly refresh (it would stop working after around 19 hours)"
         ]
+    },
+    {
+        "version": "5.12.2",
+        "date": "2025-04-16",
+        "changes": [
+            "Complete refactor of the player configs",
+            "New config options to warn for config keys not in the base config",
+            ">reddit can now fetch normal posts instead of images only.",
+            "Fixed certain SoundCloud tracks not playing.",
+            "Fixed various bugs related to permissions, error handling, and logging."
+        ]
     }
 ]
