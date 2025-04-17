@@ -32,15 +32,6 @@ module.exports = {
             console.logger(`- ${name.padEnd(maxNameLength)} (${extractor.priority.toString().padStart(maxPriorityLength)})`);
         }
 
-        console.logger("--------------------------------------------------");
-
-
-        console.logger("Use YouTube extractor: " + !config.get("discordPlayerConf")?.removeYoutube);
-        console.logger("Use Po token: " + config.get("discordPlayerConf")?.usePoToken);
-        console.logger("Skip login: " + config.get("discordPlayerConf")?.skipLogin);
-        console.logger("High water mark: " + toEngineerNotation(parseInt(config.get("discordPlayerConf")?.highWaterMark)) + "B");
-        console.logger("--------------------------------------------------");
-       
         if (process.env.SERVER != "dev" && process.env.STATUS_CHANNEL_ID) client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");
 
         logger.info(`Bot starting on [${process.env.SERVER}]...`);
@@ -51,7 +42,7 @@ module.exports = {
 
         console.log("Initializing Reddit conf file...");
         await initConfFile();
-        console.log("Reddit conf file initialized.");
+        console.log("Reddit config file initialized.");
 
         console.log("Guild manager initiation...");
         const guilds = await client.guilds.fetch();
@@ -71,7 +62,7 @@ module.exports = {
         config.set("SUPERUSER_WHITELIST", [...config.get("SUPERUSER_WHITELIST"), process.env.OWNER_ID]);
         console.log(`Whitelisted users: ${config.get("SUPERUSER_WHITELIST").join(", ")}`);
         if (process.env.SERVER == "dev") config.set("defaultSuperuserState", true);
-        console.log(`Debug is ${config.get("DefaultDebugState") ? "en" : "dis"}abled`);
+        console.log(`Debug is ${config.get("defaultDebugState") ? "en" : "dis"}abled`);
         console.log(`Superuser is ${config.get("defaultSuperuserState") ? "en" : "dis"}abled`);
 
         console.log("Starting LiveUpdatingBotStats...");
