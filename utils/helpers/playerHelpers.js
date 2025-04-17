@@ -1,8 +1,24 @@
 const { useQueue } = require("discord-player");
 const { toggleLiveChat } = require("./playerLiveChat");
-const { SoundCloudExtractor, AttachmentExtractor } = require("@discord-player/extractor");
-const { YoutubeiExtractor, stream } = require("discord-player-youtubei");
+const { AttachmentExtractor } = require("@discord-player/extractor");
+const { YoutubeiExtractor } = require("discord-player-youtubei");
 const { DeezerExtractor } = require("discord-player-deezer");
+const { SoundgasmExtractor } = require("discord-player-soundgasm");
+const { TTSExtractor } = require("discord-player-tts");
+const { SoundcloudExtractor } = require("discord-player-soundcloud");
+const { SpotifyExtractor } = require("discord-player-spotify");
+const { AppleMusicExtractor } = require("discord-player-applemusic");
+
+const identifierMap = {
+    "youtubei": YoutubeiExtractor.identifier,
+    "deezer": DeezerExtractor.identifier,
+    "soundcloud": SoundcloudExtractor.identifier,
+    "spotify": SpotifyExtractor.identifier,
+    "applemusic": AppleMusicExtractor.identifier,
+    "tts": TTSExtractor.identifier,
+    "attachment": AttachmentExtractor.identifier,
+    "Soundgasm": SoundgasmExtractor.identifier,
+};
 
 /**
  * Get the loop mode of the queue.
@@ -10,26 +26,9 @@ const { DeezerExtractor } = require("discord-player-deezer");
  * @param {Queue} queue - The queue to get the loop mode from.
  * @returns {string} The loop mode of the queue.
  */
-const getLoopMode = function(queue) {
-    let LoopMode;
-    switch (queue?.repeatMode) {
-        case 0:
-            LoopMode = "❌ Off";
-            break;
-        case 1:
-            LoopMode = "✅ Track";
-            break;
-        case 2:
-            LoopMode = "✅ Queue";
-            break;
-        case 3:
-            LoopMode = "✅ Autoplay";
-            break;
-        default:
-            LoopMode = "❌ Off";
-            break;
-    }
-    return LoopMode;
+const getLoopMode = (queue) => {
+    const modes = ["❌ Off", "✅ Track", "✅ Queue", "✅ Autoplay"];
+    return modes[queue?.repeatMode] || "❌ Off";
 };
 
 /**
@@ -38,21 +37,7 @@ const getLoopMode = function(queue) {
  * @param {Queue} queue - The queue to get the pause mode from.
  * @returns {string} The pause mode of the queue.
  */
-const getPauseMode = function(queue) {
-    let PauseMode;
-    switch (queue?.paused) {
-        case true:
-            PauseMode = "✅ Paused";
-            break;
-        case false:
-            PauseMode = "❌ Unpaused";
-            break;
-        default:
-            PauseMode = "❌ Unpaused";
-            break;
-    }
-    return PauseMode;
-};
+const getPauseMode = (queue) => queue?.paused ? "✅ Paused" : "❌ Unpaused";
 
 /**
  * Get the formatted source string of the queue.
@@ -60,32 +45,16 @@ const getPauseMode = function(queue) {
  * @param {Queue} queue - The queue to get the source from.
  * @returns {string} The source of the queue.
  */
-const getFormattedSource = function(queue) {
-    let source;
-    switch (queue?.source) {
-        case "youtube":
-            source = "YouTube";
-            break;
-        case "soundcloud":
-            source = "SoundCloud";
-            break;
-        case "deezer":
-            source = "Deezer";
-            break;
-        case "spotify":
-            source = "Spotify";
-            break;
-        case "applemusic":
-            source = "Apple Music";
-            break;
-        case "tidal":
-            source = "Tidal";
-            break;
-        default:
-            source = "N/A";
-            break;
-    }
-    return source;
+const getFormattedSource = (queue) => {
+    const sourceMap = {
+        youtube: "YouTube",
+        soundcloud: "SoundCloud",
+        deezer: "Deezer",
+        spotify: "Spotify",
+        applemusic: "Apple Music",
+        tidal: "Tidal",
+    };
+    return sourceMap[queue?.source] || "N/A";
 };
 
 /**
@@ -107,35 +76,15 @@ const useStats = (guild) => {
  * @returns {Extractor} The extractor to use.
  */
 const searchWithPriorities = function(playerConfig) {
-    for (const priority of playerConfig.streamPriorities) {
-        if ((priority === "youtube" && playerConfig.removeYoutube) ||
-            (priority === "deezer" && playerConfig.removeDeezer))
-            continue;
-        
+    const extractorsArray = Object.entries(playerConfig.extractors);
 
-        let ext;
-        try {
-            switch (priority) {
-                case "youtube":
-                    ext = YoutubeiExtractor.identifier;
-                    break;
-                case "deezer":
-                    ext = DeezerExtractor.identifier;
-                    break;
-                case "soundcloud":
-                    ext = SoundCloudExtractor.identifier;
-                    break;
-                default:
-                    return null;
-            }
+    const streamableAndBridgeableExtractors = extractorsArray.filter(extractor => {
+        return extractor[1].canStream && extractor[1].canBridge;
+    }).sort((a, b) => {
+        return  b[1].priority - a[1].priority;
+    });
 
-        } catch (err) {
-            return null;
-        }
-        return ext;
-    }
-
-    return null;
+    return identifierMap[streamableAndBridgeableExtractors[0][0].toLowerCase()] || null; 
 };
 
 /**
@@ -147,28 +96,14 @@ const searchWithPriorities = function(playerConfig) {
  */
 const getProbableBridgeSource = function(playerConfig, providesStream) {
     if (providesStream) return "Itself";
-
-    const streamProviders = playerConfig.streamPriorities.filter(priority => {
-        return !(priority === "youtube" && playerConfig.removeYoutube || 
-                 priority === "deezer" && playerConfig.removeDeezer);
+    const extractorsArray = Object.entries(playerConfig.extractors);
+    const streamableAndBridgeableExtractors = extractorsArray.filter(extractor => {
+        return extractor[1].canStream && extractor[1].canBridge;
+    }).sort((a, b) => {
+        return  b[1].priority - a[1].priority;
     });
 
-    for (const sp of streamProviders) {
-        switch (sp) {
-            case "soundcloud":
-                streamProviders[sp] = "SoundCloud";
-                break;
-            case "youtube":
-                streamProviders[sp] = "YouTube";
-                break;
-            case "deezer":
-                streamProviders[sp] = "Deezer";
-                break;
-            default:
-                streamProviders[sp] = sp;
-                break;
-        }
-    }
+    const streamProviders = streamableAndBridgeableExtractors.map(extractor => extractor[0]);
 
     return streamProviders.length > 0 ? streamProviders.join(" \\▶ ") : "N/A";
 };
