@@ -47,8 +47,7 @@ class Logger {
  * @param {string} type - The type of log message.
  * @returns {Promise<void>} A Promise indicating completion.
  */
-    async writeLogToFile(message, type) {
-
+    async writeLogToFile(message, type, ...args) {
         const getColorByType = (text, logType) => {
             switch (logType) {
                 case "ERROR":
@@ -64,24 +63,29 @@ class Logger {
                 case "INFO":
                     return colorText(text, foregroundColor.green);
                 default:
-                    return colorText(text, foregroundColor.white);
+                    return text;
             }
         };
 
         const getLongestTypeLength = Object.keys(this.types).reduce((a, b) => a.length > b.length ? a : b).length;
         const header = `[${getExactDate()} - ${type.padStart(getLongestTypeLength, " ")}]`;
 
-        const cleanedMessage = typeof message == "string" ? message.replace(/^[^\S\n]+/gm, "") : message;
-        const formattedLog = util.format(cleanedMessage);
+        // Format the message and args
+        const formattedMessage = args.length === 0
+            ? (typeof message === "object"
+                ? util.inspect(message, { colors: true, depth: null })
+                : String(message))
+            : util.format(message, ...args);
+
         // Adds color depending on log type, then the log header, then the log and finally a newline
-        process.stdout.write(getColorByType(`${header} ${formattedLog}`, type) + "\n"); 
-    
+        process.stdout.write(getColorByType(`${header} ${formattedMessage}`, type) + "\n");
+
         if (type == "CONSOLE" || type == "EVENT") return;
-    
+
         if (databaseManager.dbExists()) {
             try {
                 await repositories.logs.insert({
-                    value: formattedLog,
+                    value: formattedMessage,
                     type: type,
                 });
             } catch (ex) {
@@ -91,13 +95,29 @@ class Logger {
         }
     }
 
-    error(message) {
+    console(message, ...args) {
+        this.logCounts.console++;
+        this.writeLogToFile(message, this.types.console, ...args);
+    }
+
+    warning(message, ...args) {
+        this.logCounts.warning++;
+        if (process.env.SERVER == "prod" && process.env.SENTRY_DSN) {
+            Sentry.withScope((scope) => {
+                scope.setLevel("warning");
+                Sentry.captureException(new Error(util.format(message, ...args)));
+            });
+        }
+        this.writeLogToFile(message, this.types.warning, ...args);
+    }
+
+    error(message, ...args) {
         if (process.env.SERVER == "prod" && process.env.SENTRY_DSN) {
             let sError;
             if (message.stack) 
                 sError = message;
             else 
-                sError = new Error(message);
+                sError = new Error(util.format(message, ...args));
             
             Sentry.withScope((scope) => {
                 scope.setLevel("error");
@@ -105,43 +125,27 @@ class Logger {
             });
         }
         const stackTrace = new Error("Generated Stacktrace: ").stack;
-        this.writeLogToFile(message.stack || message + "\n" + stackTrace, this.types.error);
+        this.writeLogToFile(util.format(message, ...args) + "\n" + stackTrace, this.types.error);
     }
 
-    debug(message) {
-        this.writeLogToFile(message, this.types.debug);
+    debug(message, ...args) {
+        this.writeLogToFile(message, this.types.debug, ...args);
         this.logCounts.debug++;
     }
 
-    info(message) {
-        this.writeLogToFile(message, this.types.info);
+    info(message, ...args) {
+        this.writeLogToFile(message, this.types.info, ...args);
         this.logCounts.info++;
     }
 
-    console(message) {
-        this.writeLogToFile(message, this.types.console);
-        this.logCounts.console++;
-    }
-
-    warning(message) {
-        this.logCounts.warning++;
-        if (process.env.SERVER == "prod" && process.env.SENTRY_DSN) {
-            Sentry.withScope((scope) => {
-                scope.setLevel("warning");
-                Sentry.captureException(new Error(message));
-            });
-        }
-        this.writeLogToFile(message, this.types.warning);
-    }
-
-    severe(message) {
+    severe(message, ...args) {
         this.logCounts.severe++;
         if (process.env.SERVER == "prod" && process.env.SENTRY_DSN) {
             let sError;
             if (message.stack) 
                 sError = message;
             else 
-                sError = new Error(message);
+                sError = new Error(util.format(message, ...args));
             
             Sentry.withScope((scope) => {
                 scope.setLevel("fatal");
@@ -149,22 +153,22 @@ class Logger {
             });
         }
         const stackTrace = new Error("Generated Stacktrace: ").stack;
-        this.writeLogToFile(message.stack || message + "\n" + stackTrace, this.types.severe);
+        this.writeLogToFile(message.stack || message + "\n" + stackTrace, this.types.severe, ...args);
     }
 
-    music(message) {
+    music(message, ...args) {
         this.logCounts.music++;
-        this.writeLogToFile(message, this.types.music);
+        this.writeLogToFile(message, this.types.music, ...args);
     }
 
-    event(message) {
+    event(message, ...args) {
         this.logCounts.event++;
-        this.writeLogToFile(message, this.types.event);
+        this.writeLogToFile(message, this.types.event, ...args);
     }
 
-    command(message) {
+    command(message, ...args) {
         this.logCounts.command++;
-        this.writeLogToFile(message, this.types.command);
+        this.writeLogToFile(message, this.types.command, ...args);
     }
 
     async getAllTimeLogCount(type) {
