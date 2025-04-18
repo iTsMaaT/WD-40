@@ -69,7 +69,7 @@
     "discordPlayer": {
         "supportedFileExtensions": ["mp3", "m4a"],
         "dailyReregister": false,
-        "logPlayerEvents": true,
+        "logPlayerEvents": false,
         "logQueueEvents": false,
         "skipFFmpeg": false,
         "globalPlayerNodeOptions": {
