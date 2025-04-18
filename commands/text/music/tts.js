@@ -2,11 +2,9 @@ const { PermissionsBitField } = require("discord.js");
 const { Readable } = require("stream");
 const { useQueue, useMainPlayer, QueryType, Track } = require("discord-player");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("discord-voip");
-const { getAllAudioBase64 } = require("google-tts-api");
 const config = require("@utils/config/configUtils");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { probeStream } = require("mediaplex");
-const { TTSExtractor } = require("tts-extractor");
 
 module.exports = {
     name: "tts",

@@ -52,6 +52,9 @@ class Config {
      * @returns {any}
      */
     get(key) {
+        if (this.config["warnForConfigNotInBaseConfig"] && !(key in this.baseConfig) && !(key in this.envConfig)) 
+            console.warn(`The key "${key}" does not exist in the base configuration.`);
+
         return this.config[key];
     }
 
@@ -71,7 +74,6 @@ class Config {
      * Reset a specific configuration key to its original value in memory.
      * @param {keyof BaseConfig} key
      * @returns {Config}
-     * @throws {Error} If the key does not exist in the base configuration.
      */
     reset(key) {
         if (key in this.baseConfig) 
@@ -106,6 +108,14 @@ class Config {
      */
     getAll() {
         return this.config;
+    }
+
+    /**
+     * Get all configuration keys.
+     * @returns {keyof BaseConfig[]}
+     */
+    getAllBaseConfig() {
+        return this.baseConfig;
     }
     
     /**

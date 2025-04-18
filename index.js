@@ -20,17 +20,18 @@
     console.warner = console.warn;
     console.logger = console.log;
     // console.warn = (log, args) => logger.warning(log + " " + util.format(args));
-    console.log = (log) => logger.console(log);
+    console.log = (message, ...args) => logger.console(message, ...args);
+    console.warn = (message, ...args) => logger.warning(message, ...args);
+    console.error = (message, ...args) => logger.error(message, ...args);
+    console.info = (message, ...args) => logger.info(message, ...args);
+    console.debug = (message, ...args) => logger.debug(message, ...args);
     console.log("Logger instanciated");
 
     const { Client, GatewayIntentBits, Partials } = require("discord.js");
     const { getPermissionArrayNames } = require("@functions/discordFunctions");
     const config = require("@utils/config/configUtils");
 
-    if (!process.env.DEEZER_MASTER_KEY) config.set("removeDeezer", true);
-
     const fs = require("fs");
-
 
     const neededIntents = {
         intents: [
@@ -63,9 +64,9 @@
     const player = await initPlayer(client);
     await registerExtractors(player);
 
-    console.log(`Daily reregistering ${config.get("dailyReregister") ? "enabled" : "disabled"}`);
+    console.log(`Daily reregistering ${config.get("discordPlayer")?.dailyReregister ? "enabled" : "disabled"}`);
     new cron.CronJob("0 */12 * * *", async () => {
-        if (config.get("dailyReregister")) await registerExtractors(player);
+        if (config.get("discordPlayer")?.dailyReregister) await registerExtractors(player);
     }, null, true, config.get("timeZone"));
 
     global.wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

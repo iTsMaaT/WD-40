@@ -20,11 +20,5 @@
         //"eslint.codeActionsOnSave.rules": [
         //    "explicit"
         //],
-        "github.copilot.editor.enableAutoCompletions": false,
-        "terminal.integrated.suggest.builtinCompletions": {
-
-            "pwshCode": true,
-            "pwshGit": true
-        },
     }
 }

@@ -115,6 +115,7 @@ Step 5 - Send the downloaded media to your favorite social media!
             const requiredBasePerms = [
                 PermissionsBitField.Flags.ViewChannel,
                 PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ReadMessageHistory,
             ];
 
             const missingBasePerms = requiredBasePerms.filter(perm => !effectivePermissions.has(perm));

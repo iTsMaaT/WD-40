@@ -22,11 +22,11 @@ const fetchReddit = async function(ChannelNSFW, subreddits, limit, type = "sub",
         const { baseUrl, headers } = await getRedditToken();
         let content;
 
-        if (type === "sub") 
-        {content = await makeRequest(`${baseUrl}/r/${subreddit}/hot?limit=100`, headers);}
-        else if (type === "user") 
-        {content = await makeRequest(`${baseUrl}/user/${subreddit}/submitted?limit=100`, headers);}
-        else {
+        if (type === "sub") {
+            content = await makeRequest(`${baseUrl}/r/${subreddit}/hot?limit=100`, headers);
+        } else if (type === "user") {
+            content = await makeRequest(`${baseUrl}/user/${subreddit}/submitted?limit=100`, headers);
+        } else {
             logger.error("Wrong type");
             return {
                 color: 0xff0000,

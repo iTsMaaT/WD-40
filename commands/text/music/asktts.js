@@ -3,7 +3,6 @@ const embedGenerator = require("@utils/helpers/embedGenerator");
 const { useQueue, useMainPlayer } = require("discord-player");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("discord-voip");
 const { Readable } = require("stream");
-const { getAllAudioUrls } = require("google-tts-api");
 const { fetchGeminiResponse } = require("@utils/helpers/fetchGeminiResponse");
 const getExactDate = require("@functions/getExactDate");
 const config = require("@utils/config/configUtils");

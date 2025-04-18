@@ -20,7 +20,7 @@ module.exports = {
     requiredENVs: ["GEMINI_API_KEY"],
     execute: async (logger, client, message, args, optionalArgs) => {
         try {
-            const apiKey = process.env.GEMINI_API_KEY; // Replace with your API key
+            const apiKey = process.env.GEMINI_API_KEY;
             
             const prompt = args.join(" ");
             if (!prompt) return await message.reply({ embeds: [embedGenerator.warning("Please provide a prompt.")] });

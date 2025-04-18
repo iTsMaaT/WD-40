@@ -35,7 +35,7 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         const player = useMainPlayer();
         const queue = useQueue();
-        const playerConfig = config.get("discordPlayerConf");
+        const playerConfig = config.get("discordPlayer");
 
         // if (await player.play(message.member.voice.channel.id, args.join(" "), { nodeOptions: {
         //    metadata: {
@@ -50,7 +50,7 @@ module.exports = {
         // } })) return;
 
         const attachment = message.attachments.first()?.attachment;
-        let string = args.join(" ") || (playerConfig.removeYoutube ? undefined : "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+        let string = args.join(" ") || "Never gonna give you up";
 
         if (string?.includes("dzr.page.link")) string = await unshortenURL(string);
 
@@ -63,7 +63,10 @@ module.exports = {
         const needsBridge = stringQueryType === QueryType.AUTO_SEARCH || stringQueryType === QueryType.SPOTIFY_SONG;
         const doesntNeedBridge = isYoutube || isSoundcloud || stringQueryType === QueryType.ARBITRARY;
 
-        if (stringQueryType === QueryType.YOUTUBE_VIDEO && playerConfig.removeYoutube && playerConfig.attemptYoutubeSearchEvenIfDisabled) {
+        if (stringQueryType === QueryType.YOUTUBE_VIDEO 
+            && !playerConfig.extractors.Youtubei.enabled 
+            && playerConfig.extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled) 
+        {
             const messageEmbeds = message.embeds || [];
             for (const embed of messageEmbeds) {
                 if (embed.provider?.name === "YouTube") {
@@ -100,8 +103,8 @@ module.exports = {
 
                 if (!research.hasTracks()) {
                     let footerText = "";
-                    if (playerConfig.removeYoutube && isYoutube) {
-                        footerText = playerConfig.attemptYoutubeSearchEvenIfDisabled
+                    if (!playerConfig.extractors.Youtubei.enabled && isYoutube) {
+                        footerText = playerConfig.extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled
                             ? "YouTube extraction is disabled, to support YouTube links, the YouTube embed must be visible"
                             : "Youtube has been disabled, for more info, use the help command and go in the support server.";
                     }
@@ -159,13 +162,13 @@ module.exports = {
                     return await sentMessage.edit({ embeds: [embedGenerator.warning({
                         description: "No results found",
                         footer: { 
-                            text: playerConfig.removeYoutube && isYoutube ? "Youtube has been disabled, for more info, use the help command and go in the support server." : undefined,
+                            text: !playerConfig.extractors.Youtubei.enabled && isYoutube ? "Youtube has been disabled, for more info, use the help command and go in the support server." : undefined,
                         },
                     })] });
                 }
             }
 
-            if (research?.tracks?.length + (queue?.size ?? 0) > playerConfig.maxQueueSize) 
+            if (research?.tracks?.length + (queue?.size ?? 0) > playerConfig.globalPlayerNodeOptions.maxSize) 
                 return await sentMessage.edit({ embeds: [embedGenerator.error(`Cannot enqueue more than ${playerConfig.maxQueueSize} tracks.`)] });
             
 
@@ -221,7 +224,7 @@ module.exports = {
             
 
             await sentMessage.edit({ embeds: [embed] });
-            if (playerConfig.removeYoutube && isYoutube && playerConfig.attemptYoutubeSearchEvenIfDisabled) 
+            if (!playerConfig.extractors.Youtubei.enabled && isYoutube && playerConfig.extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled)
                 await message.channel.send({ embeds: [embedGenerator.warning("Youtube links might not be accurate as YouTube extraction is disabled")] });
             
         } catch (err) {

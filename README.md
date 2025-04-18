@@ -75,8 +75,11 @@ Good luck.
 | REDDIT_REFRESH_TOKEN | The refresh token for the Reddit API, which you can get from the [Reddit](https://www.reddit.com/prefs/apps) website. |
 | YOUTUBE_COOKIE | The cookie for the YouTube API, which you can get from executing `npx --no discord-player-youtubei` in your terminal ([more info](https://github.com/retrouser955/discord-player-youtubei)). |
 | DEEZER_MASTER_KEY | The master key for the Deezer API. |
+| DEEZER_ARL_COOKIE | Your deezer cookie. |
 | DATABASE_URL | The URL for the database, to create the DB, please refer to [DATABASE](#database) below. |
 | SENTRY_DSN | Sentry DSN to enable Sentry logging of ERROR/SEVERE/WARNING |
+| SPOTIFY_CLIENT_ID | Your Spotify's app client ID. |
+| SPOTIFY_CLIENT_SECRET | You Spotify's app client secret. |
 | - | - |
 | STATUS_CHANNEL_ID | The ID of the channel where the bot will post status updates. |
 | MEMBERS_UPDATE_ID | The ID of the channel where the bot will post member updates. |
@@ -100,9 +103,7 @@ You can also configure the file extensions in the config file.
 
 The bot uses a MySQL database to store data. You can create a database by running the following command:
 
-```sql
-CREATE DATABASE bot;
-```
+> TODO
 
 ## No Database Mode
 As of version 5.8.0, you can run the bot without a database. Simply don't provide the `DATABASE_URL` in your `.env` file. Note that some features requiring persistence will be disabled in this mode.

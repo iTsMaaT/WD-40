@@ -269,7 +269,7 @@ module.exports = {
                     });
                 }
             } catch (error) {
-                logger.error("Error during interaction:", error);
+                logger.error(error);
             }
         });
 

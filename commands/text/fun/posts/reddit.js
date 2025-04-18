@@ -14,6 +14,10 @@ module.exports = {
                 hasValue: true,
                 description: "subreddit to fetch from. Either -u or -s has to be passed",
             },
+            "image|i": {
+                hasValue: false,
+                description: "Fetch an image instead of a post",
+            },
         },
     },
     category: "fun",
@@ -24,9 +28,9 @@ module.exports = {
         const user = optionalArgs["user|u"];
         try {
             if (sub) 
-                message.reply({ embeds: [await FetchReddit(message.channel.nsfw, [sub], 5, "sub")] });
+                message.reply({ embeds: [await FetchReddit(message.channel.nsfw, [sub], 5, "sub", optionalArgs["image|i"] ? "image" : "text")] });
             else if (user) 
-                message.reply({ embeds: [await FetchReddit(message.channel.nsfw, [user], 5, "user")] });
+                message.reply({ embeds: [await FetchReddit(message.channel.nsfw, [user], 5, "user", optionalArgs["image|i"] ? "image" : "text")] });
             else 
                 return await message.reply({ embeds: [embedGenerator.warning("Wrong argument usage, please refer to `help reddit`")] });
             

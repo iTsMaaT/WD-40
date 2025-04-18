@@ -99,12 +99,11 @@ module.exports = {
                 timestamp: new Date(),
                 color: 0xffffff,
             };
-            console.log("yes");
 
-            await interaction.reply({ embeds: [userInfoEmbed] });
+            await interaction.editReply({ embeds: [userInfoEmbed] });
         } catch (err) {
             logger.error(err);
-            return await interaction.reply({ embeds: [embedGenerator.error("An error occured.")] });
+            return await interaction.editReply({ embeds: [embedGenerator.error("An error occured.")] });
         }
     },
 };
