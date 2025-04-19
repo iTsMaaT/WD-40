@@ -73,7 +73,7 @@ Good luck.
 | REDDIT_CLIENT_SECRET | The client secret for the Reddit API, which you can get from the [Reddit](https://www.reddit.com/prefs/apps) website. |
 | REDDIT_CLIENT_ID | The client ID for the Reddit API, which you can get from the [Reddit](https://www.reddit.com/prefs/apps) website. |
 | REDDIT_REFRESH_TOKEN | The refresh token for the Reddit API, which you can get from the [Reddit](https://www.reddit.com/prefs/apps) website. |
-| YOUTUBE_COOKIE | The cookie for the YouTube API, which you can get from executing `npx --no discord-player-youtubei` in your terminal ([more info](https://github.com/retrouser955/discord-player-youtubei)). |
+| YOUTUBE_COOKIE | A YouTube session cookie. It is recommended to get it from an alt account in an incognito tab. |
 | DEEZER_MASTER_KEY | The master key for the Deezer API. |
 | DEEZER_ARL_COOKIE | Your deezer cookie. |
 | DATABASE_URL | The URL for the database, to create the DB, please refer to [DATABASE](#database) below. |
@@ -89,7 +89,7 @@ Good luck.
 | GLOBAL_BLACKLIST | A comma-separated list of user IDs that are globally blacklisted from using the bot. |
 | SUPERUSER_WHITELIST | A comma-separated list of user IDs that have superuser permissions. |
 
-> If eddit client secret, ID, and token are not configured, it will use the normal API instead of going through OAUTH if not specified.
+> If Reddit client secret, ID, and token are not configured, it will use the normal API instead of going through OAUTH if not specified.
 
 ## Add your own music library
 
@@ -103,9 +103,10 @@ You can also configure the file extensions in the config file.
 
 The bot uses a MySQL database to store data. You can create a database by running the following command:
 
-> TODO
+> TODO (For more details : https://github.com/iTsMaaT/WD-40/tree/database-docs-and-sqlite)
 
 ## No Database Mode
+
 As of version 5.8.0, you can run the bot without a database. Simply don't provide the `DATABASE_URL` in your `.env` file. Note that some features requiring persistence will be disabled in this mode.
 
 # Help and support
@@ -114,7 +115,7 @@ If you need help, feel free to join the [support server](https://discord.gg/pqKE
 
 # Known issues
 
-If you are hosting on a VPS and use Youtube for the music part, your IP might get blocked by YouTube as it systematically blocks IPs that are from a VPS, in this case, you can disable YouTube and use Deezer or SoundCloud instead by modifing the config in `utils/config/config.json`.
+If you are hosting on a VPS and use Youtube for the music part, your IP might get blocked by YouTube as it systematically blocks IPs that are from a VPS, in this case, you can disable YouTube and use Deezer or SoundCloud instead by modifying the config in `utils/config/config.json`.
 
 [JavaScript-Badge]: https://img.shields.io/badge/JavaScript-%23323330.svg?style=flat&logo=javascript&logoColor=%23F7DF1E
 [JavaScript-Url]: https://en.wikipedia.org/wiki/JavaScript "JavaScript"
