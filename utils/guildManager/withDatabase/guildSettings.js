@@ -2,6 +2,7 @@ const { eq, and } = require("drizzle-orm");
 const logger = require("@utils/log");
 const { repositories } = require("../../db/tableManager.js");
 const schema = require("../../../schema/schema.js");
+const config = require("@utils/config/configUtils");
 
 const prefixes = {};
 const responses = {};
@@ -64,7 +65,7 @@ async function AddGuildToDatabase(guild) {
         guildId: guild.id,
         guildName: guild.name,
     });
-    prefixes[guild.id] = ">";
+    prefixes[guild.id] = config.get("defaultPrefix");
     responses[guild.id] = false;
 }
     
