@@ -5,9 +5,8 @@
  */
 const isURL = function(string) {
     try {
-        const url = new URL(string);
-        return url.protocol === "http:" || url.protocol === "https:";
-    } catch (err) {
+        return ["http:", "https:"].includes(new URL(string).protocol);
+    } catch {
         return false;
     }
 };
