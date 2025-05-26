@@ -28,7 +28,7 @@ module.exports = {
         const toQuery = matchedQueries[1];
 
         const fromPosition = isNaN(fromQuery) ? queue.tracks.map(track => track.title).indexOf(findBestMatch(algorithms.FUZZY_MATCH, fromQuery, queue.tracks.data.map(track => track.title)).match) : parseInt(fromQuery) - 1;
-        const toPosition = isNaN(toQuery) ? queue.tracks.map(track => track.title).indexOf(findBestMatch(algorithms.FUZZY_MATCH, toQuery, queue.tracks.data.map(track => track.title)).match) : parseInt(fromQuery) - 1;      
+        const toPosition = isNaN(toQuery) ? queue.tracks.map(track => track.title).indexOf(findBestMatch(algorithms.FUZZY_MATCH, toQuery, queue.tracks.data.map(track => track.title)).match) : parseInt(toQuery) - 1;      
 
         if (fromPosition > queue.tracks.data.length || toPosition > queue.tracks.data.length) 
             return await message.reply({ embeds: [embedGenerator.error("Please enter a number between 1 and " + queue.tracks.data.length)] });
