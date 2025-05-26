@@ -4,12 +4,12 @@ const { WebhookClient } = require("discord.js");
 
 /**
  * Creates a webhook if it doesn't exist, or returns a new one with a valid token.
- * @param {Message} message The message object
+ * @param {Channel} channel The channel object
  * @param {string} name The name of the webhook
- * @returns {WebhookClient} The webhook client with token
+ * @returns {Promise<WebhookClient>} The webhook client with token
  */
-async function createOrUseWebhook(message, name) {
-    const webhooks = await message.channel.fetchWebhooks();
+async function createOrUseWebhook(channel, name) {
+    const webhooks = await channel.fetchWebhooks();
         
     // Delete oldest webhooks if there are too many
     if (webhooks.size >= 10) {
@@ -25,13 +25,13 @@ async function createOrUseWebhook(message, name) {
     let webhook = webhooks.find(wh => wh.name === name);
 
     if (!webhook) {
-        webhook = await message.channel.createWebhook({
+        webhook = await channel.createWebhook({
             name: name,
             reason: "Webhook creation requested",
         });
     } else {
         await webhook.delete("Recreating webhook to ensure token availability.");
-        webhook = await message.channel.createWebhook({
+        webhook = await channel.createWebhook({
             name: name,
             reason: "Recreated webhook to retrieve token.",
         });
