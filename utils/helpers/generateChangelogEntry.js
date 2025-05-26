@@ -54,11 +54,11 @@ async function generateChangelogEntry() {
 
         ${randomChangelog.changes.join("\n")}
 
-        The base command prefix is ${config.get("withoutDatabaseConfig").prefix}
+        The base command prefix is ${config.get("defaultPrefix")}
         You should use it for better context
         for example: 
-        "in the help command" would become "in ${config.get("withoutDatabaseConfig").prefix}help"
-        "new commandname command" would become "new command: ${config.get("withoutDatabaseConfig").prefix}commandname"
+        "in the help command" would become "in ${config.get("defaultPrefix")}help"
+        "new commandname command" would become "new command: ${config.get("defaultPrefix")}commandname"
 
         Commit messages:
         ${significantCommits}
