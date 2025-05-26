@@ -1,5 +1,6 @@
 const { useQueue } = require("discord-player");
 const { toggleLiveChat } = require("./playerLiveChat");
+const { distubePluginToExtractor } = require("./distubePluginToDiscordPlayerExtractor");
 const { AttachmentExtractor } = require("@discord-player/extractor");
 const { YoutubeiExtractor } = require("discord-player-youtubei");
 const { DeezerExtractor } = require("discord-player-deezer");
@@ -116,4 +117,5 @@ module.exports = {
     useStats,
     searchWithPriorities,
     getProbableBridgeSource,
+    distubePluginToExtractor,
 };
