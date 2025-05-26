@@ -90,7 +90,7 @@
         // Supported file extensions for the player (in the ./music folder)
         "supportedFileExtensions": ["mp3", "m4a"],
         "dailyReregister": false,
-        "logPlayerEvents": true,
+        "logPlayerEvents": false,
         "logQueueEvents": false,
         "skipFFmpeg": false,
         // Path to FFmpeg binary, null if global
