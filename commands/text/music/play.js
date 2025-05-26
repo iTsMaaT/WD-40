@@ -60,12 +60,12 @@ module.exports = {
         const stringQueryType = QueryResolver.resolve(string).type;
         const isYoutube = [QueryType.YOUTUBE_SEARCH, QueryType.YOUTUBE, QueryType.YOUTUBE_PLAYLIST, QueryType.YOUTUBE_VIDEO].includes(stringQueryType);
         const isSoundcloud = [QueryType.SOUNDCLOUD_SEARCH, QueryType.SOUNDCLOUD, QueryType.SOUNDCLOUD_PLAYLIST, QueryType.SOUNDCLOUD_TRACK].includes(stringQueryType);
-        const needsBridge = stringQueryType === QueryType.AUTO_SEARCH || stringQueryType === QueryType.SPOTIFY_SONG;
-        const doesntNeedBridge = isYoutube || isSoundcloud || stringQueryType === QueryType.ARBITRARY;
+        const needsBridge = (stringQueryType === QueryType.AUTO_SEARCH || stringQueryType === QueryType.SPOTIFY_SONG) && !attachment;
+        const doesntNeedBridge = isYoutube || isSoundcloud || stringQueryType === QueryType.ARBITRARY || attachment ? true : false;
 
         if (stringQueryType === QueryType.YOUTUBE_VIDEO 
             && !playerConfig.extractors.Youtubei.enabled 
-            && playerConfig.extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled) 
+            && playerConfig.extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.usingEmbed) 
         {
             const messageEmbeds = message.embeds || [];
             for (const embed of messageEmbeds) {
@@ -148,12 +148,12 @@ module.exports = {
 
                 await sentMessage.edit({ embeds: [choicesEmbed] });
 
-                const filter = (m) => m.author.id === message.author.id;
+                const filter = (m) => m.author.id === message.author.id && !isNaN(m.content);
                 await message.channel.awaitMessages({ filter, max: 1, time: 10000, errors: ["time"] })
                     .then((collected) => {
                         const responseMessage = collected.first();
                         choice = (parseInt(responseMessage.content) || 1) - 1;
-                        responseMessage.delete().catch(() => null);
+                        // responseMessage.delete().catch(() => null);
                     })
                     .catch(() => choice = 0);
             } else {
