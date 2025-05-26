@@ -65,7 +65,7 @@
     await registerExtractors(player);
 
     console.log(`Daily reregistering ${config.get("discordPlayer")?.dailyReregister ? "enabled" : "disabled"}`);
-    new cron.CronJob("0 */12 * * *", async () => {
+    new cron.CronJob(config.get("cronJobs").dailyReregister, async () => {
         if (config.get("discordPlayer")?.dailyReregister) await registerExtractors(player);
     }, null, true, config.get("timeZone"));
 
