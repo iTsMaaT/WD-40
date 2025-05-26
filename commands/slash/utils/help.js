@@ -17,19 +17,29 @@ module.exports = {
         },
     ],
     async autocomplete(interaction, client) {
-        const focusedValue = interaction.options.getFocused();
+        const focusedValue = interaction.options.getFocused() || "help";
         const addedSlashCommands = new Set();
         client.slashcommands.each((val) => {
             if (!val.private && !addedSlashCommands.has(val.name)) 
                 addedSlashCommands.add(val.name);
         });
-        const matches = findBestMatch(algorithms.LEVENSHTEIN_DISTANCE, focusedValue, [...addedSlashCommands]);
+        const addedCommands = new Set();
+        client.commands.each((val) => {
+            if (!val.private && !addedCommands.has(val.name)) 
+                addedCommands.add(val.name);
+        });
+        allCommands = new Set([...addedSlashCommands, ...addedCommands]);
+        const matches = findBestMatch(algorithms.SLICED_LEVENSHTEIN_DISTANCE, focusedValue, [...allCommands]);
+        console.log(matches);
 
         await interaction.respond(
-            matches.matches.slice(0, 5).map(match => ({
-                name: match.value,
-                value: match.value,
-            })),
+            matches.matches
+                .filter(match => match.score > 0.4)
+                .slice(0, 5)
+                .map(match => ({
+                    name: match.value,
+                    value: match.value,
+                })),
         );
     },
     async execute(logger, interaction, client) {
