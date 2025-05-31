@@ -1,5 +1,4 @@
 const config = require("@utils/config/configUtils");
-const dbConfig = config.get("withoutDatabaseConfig");
 
 const prefixes = {};
 const responses = {};
@@ -51,8 +50,9 @@ async function CheckIfGuildExists(guild) {
  * @param {object} guild - The guild object to add.
  */
 async function AddGuildToDatabase(guild) {
-    prefixes[guild.id] = dbConfig.prefix;
-    responses[guild.id] = dbConfig.responses;
+    prefixes[guild.id] = config.get("defaultPrefix");
+    responses[guild.id] = config.get("defaultResponses");
+    personality[guild.id] = config.get("defaultPersonality");
 }
     
 /**
@@ -63,7 +63,9 @@ async function AddGuildToDatabase(guild) {
  */
 async function GetGuildSettings(guild) {
     return {
-        ...dbConfig,
+        prefix: config.get("defaultPrefix"),
+        responses: config.get("defaultResponses"),
+        personality: config.get("defaultPersonality"),
         guildId: guild.id,
         guildName: guild.name || "",
         active: 1,

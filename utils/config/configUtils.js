@@ -8,7 +8,8 @@ const path = require("path");
  */
 class Config {
     constructor() {
-        this.configFilePath = process.env.CONFIG_FILEPATH || path.resolve(__dirname, "../../utils/config/config.json");
+        this.configFilePath = process.env.CONFIG_FILEPATH || path.resolve(__dirname, "../../utils/config/config.jsonc");
+        
         this.envConfig = {
             OWNER_ID: process.env.OWNER_ID,
             STATUS_CHANNEL_ID: process.env.STATUS_CHANNEL_ID,
@@ -24,14 +25,69 @@ class Config {
     }
 
     /**
+     * Strip comments from a JSON string.
+     * @param {string} jsonString
+     * @returns {string}
+     */
+    stripJsonComments(jsonString) {
+        let insideString = false;
+        let insideSingleLineComment = false;
+        let insideMultiLineComment = false;
+        let result = "";
+        let prevChar = "";
+        
+        for (let i = 0; i < jsonString.length; i++) {
+            const currentChar = jsonString[i];
+            const nextChar = jsonString[i + 1];
+      
+            if (insideSingleLineComment) {
+                if (currentChar === "\n" || currentChar === "\r") {
+                    insideSingleLineComment = false;
+                    result += currentChar;
+                }
+                continue;
+            }
+      
+            if (insideMultiLineComment) {
+                if (currentChar === "*" && nextChar === "/") {
+                    insideMultiLineComment = false;
+                    i++; // Skip '/'
+                }
+                continue;
+            }
+      
+            if (insideString) {
+                if (currentChar === "\"" && prevChar !== "\\") 
+                    insideString = false;
+            
+                result += currentChar;
+            } else if (currentChar === "\"" && !insideString) {
+                insideString = true;
+                result += currentChar;
+            } else if (currentChar === "/" && nextChar === "/") {
+                insideSingleLineComment = true;
+                i++; // Skip nextChar
+            } else if (currentChar === "/" && nextChar === "*") {
+                insideMultiLineComment = true;
+                i++; // Skip nextChar
+            } else {
+                result += currentChar;
+            }
+      
+            prevChar = currentChar;
+        }
+      
+        return result;
+    }      
+
+    /**
      * Load the base configuration from a JSON file.
      * @private
      */
     loadBaseConfig() {
-    /**
-     * @type {BaseConfig}
-     */
-        this.baseConfig = require(this.configFilePath);
+        const fileContent = fs.readFileSync(this.configFilePath, "utf-8");
+        const strippedFileContent = this.stripJsonComments(fileContent);
+        this.baseConfig = JSON.parse(strippedFileContent);
         this.config = { ...this.baseConfig, ...this.envConfig };
     }   
 
@@ -129,16 +185,6 @@ class Config {
         else 
             throw new Error(`Key "${key}" does not exist in the configuration.`);
 
-        return this;
-    }
-
-    /**
-     * Save the current configuration back to the original config file.
-     * @returns {Config}
-     */
-    save() {
-        fs.writeFileSync(this.configFilePath, JSON.stringify(this.config, null, 2), "utf-8");
-        this.reload();
         return this;
     }
 }

@@ -35,7 +35,7 @@ module.exports = {
         message.delete();
         
         // Create a webhook in the target channel
-        const webhook = await createOrUseWebhook(message, "FakeMessage");
+        const webhook = await createOrUseWebhook(message.channel, "FakeMessage");
 
         // Send the fake message using the webhook
         await webhook.send({

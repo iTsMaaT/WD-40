@@ -12,7 +12,7 @@
 
 ## [5.12.1] - March 19, 2025
 
-- Blacklist now support all command typoes and categories
+- Blacklist now support all command types and categories
 - Added timezone and locale configuration options for date and time formatting.
 - Improved Deezer extractor with ARL cookie support and NodeDecryptor.
 - Deezer should now stutter less
@@ -32,7 +32,7 @@
 ## [5.10.0] - February 25, 2025
 
 - Reworked music commands to require users to be in a voice channel.
-- Enhanced music player with interactive panel controls (\>`playerPanel`).        
+- Enhanced music player with interactive panel controls (`\>playerpanel`).        
 - Added Deezer music support.
 - Improved song removal process with confirmation and error handling in \>remove. 
 - Updated \>loop command: now toggles off if the same loop mode is selected again.
@@ -40,7 +40,7 @@
 - Migrated to discord-player v7, introducing potential breaking changes.
 - Added a \>logs command to view session log statistics (owner only).
 - Created \>playlink context menu command to play links directly from messages.
-- Improved help command (\>`help`) with clearer parameter explanations.
+- Improved help command (`\>help`) with clearer parameter explanations.
 - Many internal refactoring and dependency updates for better performance and stability.
 - Fixed various bugs and edge cases related to permissions, error handling, and logging.
 - Changed Gemini model to gemini-2.0-flash-lite.
@@ -95,7 +95,7 @@
 ## [5.5.0] - August 25, 2024
 
 - \>jump, \>remove and \>move now can take queries instead of a position
-- Added -search to \>queue, searches for a song in the queue and get it's position
+- Added -search to \>queue, searches for a song in the queue and get its position
 - \>botinfo now has process info
 - \>nowplaying now shows the paused and loop status better
 - \>skip now shows what you skipped, and what will now play
@@ -109,7 +109,7 @@
 
 ## [5.4.0] - July 17, 2024
 
-- Fixed music again dammnit
+- Fixed music again...
 - Better \>play response embed
 - Hotfix to YouTube links containing 'list' search parameter not fetching and erroring out
 
@@ -228,8 +228,8 @@ Right click message \> apps \> translate
 - Added new commands:
 \>mcskin: get the skin of a minecraft user
 \>wikihow: get a random image from Wikihow
-\>emote: easely add a emote/sticker to a server
-\>linkinfo: analize a link
+\>emote: easily add a emote/sticker to a server
+\>linkinfo: analyze a link
 - Fixes
 
 ## [4.2.0] - June 6, 2023
@@ -302,7 +302,7 @@ Right click message \> apps \> translate
 
 - Refactoring
 - Multiple new commands (\>cat, \>dog, \>minecraft, \>meme, \>fact)
-- Completlely switched to a database system
+- Completely switched to a database system
 - Auto-responses are now per guilds and disabled by default
 
 ## [2.3.1] - May 27, 2023

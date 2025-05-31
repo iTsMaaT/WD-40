@@ -1,20 +1,17 @@
-const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai");
+const { GoogleGenAI, HarmCategory, HarmBlockThreshold } = require("@google/genai");
 const config = require("@utils/config/configUtils");
 
 const DEFAULT_SAFETY_SETTINGS = [
     {
         category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
         threshold: HarmBlockThreshold.BLOCK_NONE,
-    },
-    {
+    }, {
         category: HarmCategory.HARM_CATEGORY_HARASSMENT,
         threshold: HarmBlockThreshold.BLOCK_NONE,
-    },
-    {
+    }, {
         category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
         threshold: HarmBlockThreshold.BLOCK_NONE,
-    },
-    {
+    }, {
         category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
         threshold: HarmBlockThreshold.BLOCK_NONE,
     },
@@ -30,7 +27,13 @@ const DEFAULT_SAFETY_SETTINGS = [
  * 
  * @returns {Promise<string>} The response from the Gemini API.
  */
-async function fetchGeminiResponse(prompt, apiKey, model = config.get("defaultGeminiModel"), safetySettings = DEFAULT_SAFETY_SETTINGS) {
+async function fetchGeminiResponse(
+    prompt,
+    apiKey, 
+    model = config.get("defaultGeminiModel"), 
+    safetySettings = DEFAULT_SAFETY_SETTINGS, 
+    temperature = 2,
+) {
     if (!prompt) 
         throw new Error("Prompt is required.");
     
@@ -38,11 +41,18 @@ async function fetchGeminiResponse(prompt, apiKey, model = config.get("defaultGe
         throw new Error("API key is required.");
     
     try {
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const modelInstance = genAI.getGenerativeModel({ model, safetySettings });
+        const genAI = new GoogleGenAI({ apiKey });
 
-        const result = await modelInstance.generateContent(prompt);
-        return result.response?.text() || "Sorry I don't feel comfortable answering that question.";
+        const response = await genAI.models.generateContent({ 
+            contents: prompt,
+            model, 
+            config: {
+                safetySettings,
+                temperature,
+            },
+        });
+
+        return response.text || "Sorry I don't feel comfortable answering that question.";
     } catch (error) {
         if (error.response && error.response.status === 401) 
             throw new Error("API key is invalid.");

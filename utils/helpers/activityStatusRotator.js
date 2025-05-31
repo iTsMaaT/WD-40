@@ -18,21 +18,24 @@ const generateIpAddress = () => {
  * Updates the bot's activities with the configured activities.
  * @param {import("discord.js").Client} client - The Discord client.
  */
-const updateActivities = (client) => {
+const updateActivities = async (client) => {
     const activities = config.get("activities");
     if (!activities || !Array.isArray(activities)) {
         logger.error("Activities configuration is missing or invalid.");
         throw new Error("Activities configuration is missing or invalid.");
     }
 
+    const guilds = await client.guilds.fetch();
+    const guildCount = guilds.size;
+
     const ipAddress = generateIpAddress();
-    
+
     activities.forEach(activity => {
         activity.name = activity.name
             .replace("{statusChance}", (1 / activities.length * 100).toFixed(2))
             .replace("{statusCount}", activities.length - 1)
             .replace("{ipAddress}", ipAddress)
-            .replace("{guildCount}", client.guilds.cache.size);
+            .replace("{guildCount}", guildCount);
     });
 
     const randomActivity = activities[Math.floor(Math.random() * activities.length)];
@@ -47,7 +50,7 @@ const updateActivities = (client) => {
 const activateRotator = (client, server) => {
     if (server !== "dev") {
         updateActivities(client);
-        new cron.CronJob("0 3 * * *", () => updateActivities(client), null, true, config.get("timeZone"));
+        new cron.CronJob(config.get("cronJobs").activityStatusRotator, updateActivities, null, true, config.get("timeZone"));
     } else {
         client.user.setActivity("Under maintenance...", { type: ActivityType.Custom });
     }

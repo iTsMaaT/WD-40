@@ -22,7 +22,7 @@ module.exports = {
     inSameVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
         const player = useMainPlayer();
-        const playerConfig = config.get("discordPlayerConf");
+        const playerConfig = config.get("discordPlayer");
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You must provide a prompt.")] });
 
         const text = args.join(" ");

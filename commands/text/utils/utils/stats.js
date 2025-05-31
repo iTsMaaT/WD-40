@@ -8,6 +8,14 @@ const DB = require("@root/utils/db/databaseManager");
 const GuildManager = require("@guildManager");
 const { useMainPlayer } = require("discord-player");
 const { toEngineerNotation } = require("@functions/formattingFunctions");
+const { ChartJSNodeCanvas } = require("chartjs-node-canvas");
+const { AttachmentBuilder } = require("discord.js");
+
+const chartJSNodeCanvas = new ChartJSNodeCanvas({
+    width: 800,
+    height: 600,
+    backgroundColour: "#222222",
+});
 
 module.exports = {
     name: "stats",
@@ -37,6 +45,7 @@ module.exports = {
         const uptime = formatDuration(client.uptime);
         const ping = client.ws.ping + "ms";
         const botAge = formatDuration(Date.now() - client.user.createdAt);
+        const botJoinDate = message.guild.members.cache.get(client.user.id)?.joinedAt;
         let totalExecutedCommands;
         try {
             totalExecutedCommands = (await DB.drizzle.execute(sql`SELECT COUNT(m.ID) AS count FROM Logs m WHERE m.Value LIKE "Executing [%"`))[0][0].count;
@@ -71,6 +80,20 @@ module.exports = {
             lastCommandTimeSinceNow = formatDuration(Date.now() - lastExecutedCommand.createdTimestamp);
         }
 
+        const timestamps = [];
+        for (const [guildId, guild] of client.guilds.cache) {
+            try {
+                const botMember = await guild.members.fetch(client.user.id);
+                const userCount = guild.memberCount;
+                timestamps.push({ joinedTimestamp: botMember.joinedTimestamp, userCount });
+            } catch (err) {
+                console.error(`Failed to fetch bot member for guild ${guild.name}:`, err);
+            }
+        }
+
+        const buffer = await generateChartBuffer(timestamps);
+        const attachment = new AttachmentBuilder(buffer, { name: "user_growth.png" });
+
         const embed = {
             title: `Stats for ${client.user.username} (v${WDVersion})`,
             color: 0xffffff,
@@ -86,7 +109,8 @@ module.exports = {
                     value: 
                     `Guilds: **${totalGuilds}**\n` + 
                     `Users: **${totalUsers}** (Here: **${userHere}**)\n` + 
-                    `Channels: **${totalChannels}**`,
+                    `Channels: **${totalChannels}**\n` +
+                    `Bot joined this server on: **${botJoinDate.toDateString()}**`,
                 }, {
                     name: "Connection info",
                     value: 
@@ -116,11 +140,109 @@ module.exports = {
                     `Listeners: **${totalListeners}**`,
                 },
             ],
+            image: {
+                url: "attachment://user_growth.png",
+            },
             footer: {
                 text: `The bot is ${botAge} old | Created by @itsmaat`,
             },
             timestamp: new Date(),
         };
-        message.reply({ embeds: [embed] });
+
+        message.reply({ embeds: [embed], files: [attachment] });
     },
 };
+
+async function generateChartBuffer(timestamps) {
+    const sortedData = timestamps.sort((a, b) => a.joinedTimestamp - b.joinedTimestamp);
+
+    const countPerDay = {};
+    sortedData.forEach(({ joinedTimestamp, userCount }) => {
+        const day = new Date(joinedTimestamp).toISOString().split("T")[0];
+        countPerDay[day] = (countPerDay[day] || 0) + userCount;
+    });
+
+    const startDate = new Date(Object.keys(countPerDay)[0]);
+    const endDate = new Date();
+    const labels = [];
+    const data = [];
+    let totalUsers = 0;
+    for (
+        let date = new Date(startDate.getTime());
+        date <= endDate;
+        date = new Date(date.getTime() + 24 * 60 * 60 * 1000)
+    ) {
+        const day = date.toISOString().split("T")[0];
+        totalUsers += countPerDay[day] || 0; // Add 0 if no new members joined on this day
+        labels.push(day);
+        data.push(totalUsers);
+    }
+
+    const chartData = labels.map((label, i) => ({
+        x: new Date(label).getTime(), // numeric timestamp
+        y: data[i],
+    }));
+
+    const lastTimestamp = new Date(labels[labels.length - 1]).getTime();
+    const oneDay = 24 * 60 * 60 * 1000;
+    
+    const config = {
+        type: "line",
+        data: {
+            datasets: [{
+                label: "Users Joined Over Time",
+                data: chartData,
+                borderColor: "white",
+                borderWidth: 2,
+                fill: false,
+                tension: 0.1,
+                pointRadius: 0,
+            }],
+        },
+        options: {
+            scales: {
+                x: {
+                    type: "linear",
+                    ticks: {
+                        callback: function(value) {
+                            const date = new Date(value);
+                            return date.toISOString().split("T")[0];
+                        },
+                        color: "white",
+                        // maxTicksLimit: 7,
+                    },
+                    title: {
+                        display: true,
+                        text: "Date",
+                        color: "white",
+                    },
+                    min: chartData[0].x,
+                    max: lastTimestamp + oneDay,
+
+                },
+                y: {
+                    ticks: { color: "white" },
+                    title: {
+                        display: true,
+                        text: "Total Users",
+                        color: "white",
+                    },
+                },
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: "Bot User Growth History",
+                    color: "white",
+                },
+                legend: {
+                    labels: {
+                        color: "white",
+                    },
+                },
+            },
+        },
+    };
+
+    return await chartJSNodeCanvas.renderToBuffer(config);
+}

@@ -33,8 +33,9 @@ module.exports = {
         const tag = ":dotted_line_face:";
         const name = args[0].toString();
 
-        const imageAttachment = message.attachments.first();
-        if (!imageAttachment || !imageAttachment.attachment) return await message.reply({ embeds: [embedGenerator.warning("Invalid attachment")] });
+        const imageAttachment = message.attachments.first() || (message.reference && (await message.channel.messages.fetch(message.reference.messageId)).attachments.first());
+        if (!imageAttachment || !imageAttachment.attachment) 
+            return await message.reply({ embeds: [embedGenerator.warning("Invalid attachment. Ensure you attach an image or reply to a message with an image.")] });
 
         try {
             // Fetch image and convert to buffer
@@ -57,7 +58,7 @@ module.exports = {
                 
 
                 const emoteBuffer = await sharp(imageBuffer)
-                    .resize(128, 128)
+                    .resize(128, 128, { fit: "fill" }) // Reshape instead of cropping
                     .toFormat("png")
                     .toBuffer();
 
@@ -77,7 +78,7 @@ module.exports = {
                 
 
                 const stickerBuffer = await sharp(imageBuffer)
-                    .resize(320, 320)
+                    .resize(320, 320, { fit: "fill" }) // Reshape instead of cropping
                     .toFormat("png")
                     .toBuffer();
 

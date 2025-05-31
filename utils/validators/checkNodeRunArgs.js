@@ -4,7 +4,7 @@ const logger = require("@utils/log");
  * Checks if the proper arguments are passed to the node.js run command
  * @returns {void}
  */
-const checkNodeRunArgs = async function() {
+const checkNodeRunArgs = function() {
     const args = process.execArgv;
     const neededArgs = ["--openssl-legacy-provider"];
     for (const arg of neededArgs) {

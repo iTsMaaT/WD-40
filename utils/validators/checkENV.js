@@ -4,7 +4,7 @@ const logger = require("@utils/log");
  * Validate the environment variables
  * @returns {void}
  */
-const validateEnvironmentVariables = async function() {
+const validateEnvironmentVariables = function() {
     logger.debug("Validating environment variables...");
     const requiredEnvironmentVariables = [
         "TOKEN",

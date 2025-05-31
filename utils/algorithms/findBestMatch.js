@@ -4,7 +4,11 @@
  */
 const algorithms = {
     LEVENSHTEIN_DISTANCE: "leven",
+    SLICED_LEVENSHTEIN_DISTANCE: "sliced_leven",
     FUZZY_MATCH: "fuzzy",
+    JARO_WINKLER: "jaro_winkler",
+    DICE_COEFFICIENT: "dice",
+    SUBSEQUENCE_MATCH: "subsequence",
 };
 
 /**
@@ -33,6 +37,14 @@ const findBestMatch = (algorithm, input, values) => {
             return levenshteinDistanceAlgorithm(input, values);
         case algorithms.FUZZY_MATCH:
             return fuzzyMatchAlgorithm(input, values);
+        case algorithms.SLICED_LEVENSHTEIN_DISTANCE:
+            return slicedLevenshteinDistanceAlgorithm(input, values);
+        case algorithms.JARO_WINKLER:
+            return jaroWinklerAlgorithm(input, values);
+        case algorithms.DICE_COEFFICIENT:
+            return diceCoefficientAlgorithm(input, values);
+        case algorithms.SUBSEQUENCE_MATCH:
+            return fzyStyleMatchAlgorithm(input, values);
         default:
             throw new Error("Invalid algorithm provided");
     }
@@ -165,6 +177,251 @@ function fuzzyMatchAlgorithm(searchString, listOfStrings) {
     return {
         match: matches[0].value,
         score: matches[0].score,
+        matches,
+    };
+}
+
+/**
+ * Find the best match between a given input and a list of values using the sliced Levenshtein distance algorithm.
+ * 
+ * @param {string} input - The input string to find the best match for.
+ * @param {string[]} values - An array of strings to find the best match in.
+ * @returns {{match: string, score: number, matches: Array<{value: string, score: number}>}} An object containing the best match, its score, and a sorted array of matches.
+ */
+function slicedLevenshteinDistanceAlgorithm(input, values) {
+    const matches = values.map(value => {
+        const inputLength = input.length;
+        const slices = Array.from({ length: value.length - inputLength + 1 }, (_, i) =>
+            value.slice(i, i + inputLength),
+        );
+
+        let bestScore = 0;
+        for (const slice of slices) {
+            const rawDistance = levenshteinDistance(input, slice);
+            const normalizedScore = 1 - rawDistance / inputLength;
+            if (normalizedScore > bestScore) bestScore = normalizedScore;
+        }
+
+        return {
+            value,
+            score: bestScore,
+        };
+    });
+
+    matches.sort((a, b) => b.score - a.score);
+
+    return {
+        match: matches[0].value,
+        score: matches[0].score,
+        matches,
+    };
+}
+
+/**
+ * Calculate the Jaro-Winkler similarity between two strings.
+ * 
+ * @param {string} s1 - The first string.
+ * @param {string} s2 - The second string.
+ * @returns {number} The Jaro-Winkler similarity score between 0 and 1.
+ */
+function jaroWinklerSimilarity(s1, s2) {
+    const m = s1.length;
+    const n = s2.length;
+
+    if (m === 0 || n === 0) return 0;
+
+    const matchDistance = Math.floor(Math.max(m, n) / 2) - 1;
+    const s1Matches = Array(m).fill(false);
+    const s2Matches = Array(n).fill(false);
+
+    let matches = 0;
+    for (let i = 0; i < m; i++) {
+        const start = Math.max(0, i - matchDistance);
+        const end = Math.min(i + matchDistance + 1, n);
+
+        for (let j = start; j < end; j++) {
+            if (s2Matches[j]) continue;
+            if (s1[i] !== s2[j]) continue;
+            s1Matches[i] = true;
+            s2Matches[j] = true;
+            matches++;
+            break;
+        }
+    }
+
+    if (matches === 0) return 0;
+
+    let transpositions = 0;
+    let k = 0;
+    for (let i = 0; i < m; i++) {
+        if (!s1Matches[i]) continue;
+        while (!s2Matches[k]) k++;
+        if (s1[i] !== s2[k]) transpositions++;
+        k++;
+    }
+
+    transpositions /= 2;
+
+    const jaro = (matches / m + matches / n + (matches - transpositions) / matches) / 3;
+
+    // Jaro-Winkler adjustment
+    const prefixLength = Math.min(4, [...s1].findIndex((c, i) => c !== s2[i]) || 0);
+    const scalingFactor = 0.1;
+
+    return jaro + prefixLength * scalingFactor * (1 - jaro);
+}
+
+/**
+ * Find the best match using the Jaro-Winkler similarity algorithm.
+ * 
+ * @param {string} input - The input string to find the best match for.
+ * @param {string[]} values - An array of strings to find the best match in.
+ * @returns {{match: string, score: number, matches: Array<{value: string, score: number}>}} An object containing the best match, its score, and a sorted array of matches.
+ */
+function jaroWinklerAlgorithm(input, values) {
+    const matches = values.map(value => ({
+        value,
+        score: jaroWinklerSimilarity(input, value),
+    }));
+
+    matches.sort((a, b) => b.score - a.score);
+
+    return {
+        match: matches[0].value,
+        score: matches[0].score,
+        matches,
+    };
+}
+
+/**
+ * Calculate the Dice coefficient between two strings.
+ * 
+ * @param {string} s1 - The first string.
+ * @param {string} s2 - The second string.
+ * @returns {number} The Dice coefficient score between 0 and 1.
+ */
+function diceCoefficient(s1, s2) {
+    if (!s1 || !s2) return 0;
+
+    const bigrams = str => {
+        const result = [];
+        for (let i = 0; i < str.length - 1; i++) 
+            result.push(str.slice(i, i + 2));
+        
+        return result;
+    };
+
+    const bigrams1 = bigrams(s1);
+    const bigrams2 = bigrams(s2);
+
+    const intersection = bigrams1.filter(bigram => bigrams2.includes(bigram)).length;
+
+    return (2 * intersection) / (bigrams1.length + bigrams2.length);
+}
+
+/**
+ * Find the best match using the Dice coefficient algorithm.
+ * 
+ * @param {string} input - The input string to find the best match for.
+ * @param {string[]} values - An array of strings to find the best match in.
+ * @returns {{match: string, score: number, matches: Array<{value: string, score: number}>}} An object containing the best match, its score, and a sorted array of matches.
+ */
+function diceCoefficientAlgorithm(input, values) {
+    const matches = values.map(value => ({
+        value,
+        score: diceCoefficient(input, value),
+    }));
+
+    matches.sort((a, b) => b.score - a.score);
+
+    return {
+        match: matches[0]?.value || "",
+        score: matches[0]?.score || 0,
+        matches,
+    };
+}
+
+/**
+ * Score the similarity between input and target using a subsequence-based heuristic.
+ * Prioritizes compact matches, word boundaries, and character proximity.
+ * 
+ * @param {string} input - The search query string.
+ * @param {string} target - The target string to score against.
+ * @returns {number} A raw score (may be negative if not a match).
+ */
+function fzyScore(input, target) {
+    input = input.toLowerCase();
+    target = target.toLowerCase();
+
+    let score = 0;
+    let inputIdx = 0;
+    let lastMatchIdx = -1;
+
+    for (let i = 0; i < target.length && inputIdx < input.length; i++) {
+        if (target[i] === input[inputIdx]) {
+            const isBoundary = i === 0 || /[\s\-_.]/.test(target[i - 1]);
+            score += isBoundary ? 10 : 5;
+
+            if (lastMatchIdx !== -1) {
+                const gap = i - lastMatchIdx - 1;
+                score -= gap;
+            }
+
+            lastMatchIdx = i;
+            inputIdx++;
+        }
+    }
+
+    if (inputIdx < input.length) return -Infinity;
+
+    score -= (target.length - input.length) * 0.5;
+
+    return score;
+}
+
+/**
+ * Normalize an array of match scores to the range [0, 1].
+ * 
+ * @param {Array<{ value: string, score: number }>} matches - Array of raw-scored matches.
+ * @returns {Array<{ value: string, score: number }>} Array with normalized scores.
+ */
+function normalizeScores(matches) {
+    const validScores = matches.filter(m => m.score !== -Infinity);
+    if (validScores.length === 0) return [];
+
+    const max = Math.max(...validScores.map(m => m.score));
+    const min = Math.min(...validScores.map(m => m.score));
+
+    if (max === min) 
+        return validScores.map(m => ({ ...m, score: 1 }));
+    
+
+    return validScores.map(m => ({
+        ...m,
+        score: (m.score - min) / (max - min),
+    }));
+}
+
+/**
+ * Find the best match between a given input and a list of values using a subsequence-based matcher.
+ * Similar to fzy or Windows Start Menu style search.
+ * 
+ * @param {string} input - The input string to find the best match for.
+ * @param {string[]} values - An array of strings to match against.
+ * @returns {{ match: string, score: number, matches: Array<{ value: string, score: number }> }}
+ *          Best match, its normalized score, and full sorted list of matches with scores.
+ */
+function fzyStyleMatchAlgorithm(input, values) {
+    const rawMatches = values.map(value => ({
+        value,
+        score: fzyScore(input, value),
+    }));
+
+    const matches = normalizeScores(rawMatches).sort((a, b) => b.score - a.score);
+
+    return {
+        match: matches[0]?.value || "",
+        score: matches[0]?.score || 0,
         matches,
     };
 }

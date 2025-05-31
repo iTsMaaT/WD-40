@@ -19,12 +19,10 @@ module.exports = {
     async execute(client, logger, msg) {
         const TextCooldowns = client.TextCooldowns;
         const autoCorrectCooldowns = new Map();
-        await handleCommand(msg);
-        try {
-            await handleAutoResponses(msg);
-        } catch (error) {
-            logger.error(error);
-        }
+        await Promise.allSettled([
+            handleCommand(msg),
+            handleAutoResponses(msg).catch(error => logger.error(error)),
+        ]);
 
         async function handleAutoResponses(message) {
             if (message.author.bot) return;
@@ -89,6 +87,7 @@ Step 5 - Send the downloaded media to your favorite social media!
             if (config.get("defaultSuperuserState") && !config.get("SUPERUSER_WHITELIST").includes(message.author.id)) return;
             if (!message.guild) return;
             if (config.get("GLOBAL_BLACKLIST").includes(message.author.id)) return;
+            if (message.content.trim() == `<@${client.user.id}>`) return;
 
             const prefix = GuildManager.GetPrefix(message.guild);
             if (!message.content.startsWith(prefix) && !message.content.startsWith(`<@${client.user.id}>`)) return;
@@ -156,7 +155,7 @@ Step 5 - Send the downloaded media to your favorite social media!
 
 
             // Auto-Correction AFTER permission checks
-            if (!command && config.get("autoCommandMatch")) {
+            if (!command && commandName && config.get("autoCommandMatch")) {
                 const lastCorrection = autoCorrectCooldowns.get(message.author.id) || 0;
                 if (Date.now() - lastCorrection < 10000) return; // 10-second cooldown
 

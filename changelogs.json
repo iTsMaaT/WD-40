@@ -42,7 +42,7 @@
         "changes": [
             "Refactoring",
             "Multiple new commands (>cat, >dog, >minecraft, >meme, >fact)",
-            "Completlely switched to a database system",
+            "Completely switched to a database system",
             "Auto-responses are now per guilds and disabled by default"
         ]
     },
@@ -152,7 +152,7 @@
         "version": "4.3.0",
         "date": "2023-06-14",
         "changes": [
-            "Added new commands:\n>mcskin: get the skin of a minecraft user\n>wikihow: get a random image from Wikihow\n>emote: easely add a emote/sticker to a server\n>linkinfo: analize a link",
+            "Added new commands:\n>mcskin: get the skin of a minecraft user\n>wikihow: get a random image from Wikihow\n>emote: easily add a emote/sticker to a server\n>linkinfo: analyze a link",
             "Fixes"
         ]
     },
@@ -296,7 +296,7 @@
         "version": "5.4.0",
         "date": "2024-07-18",
         "changes": [
-            "Fixed music again dammnit",
+            "Fixed music again...",
             "Better >play response embed",
             "Hotfix to YouTube links containing 'list' search parameter not fetching and erroring out"
         ]
@@ -316,7 +316,7 @@
         "date": "2024-08-26",
         "changes": [
             ">jump, >remove and >move now can take queries instead of a position",
-            "Added -search to >queue, searches for a song in the queue and get it's position",
+            "Added -search to >queue, searches for a song in the queue and get its position",
             ">botinfo now has process info",
             ">nowplaying now shows the paused and loop status better",
             ">skip now shows what you skipped, and what will now play"
@@ -387,7 +387,7 @@
         "date": "2025-02-26",
         "changes": [
             "Reworked music commands to require users to be in a voice channel.",
-            "Enhanced music player with interactive panel controls (>`playerPanel`).        ",
+            "Enhanced music player with interactive panel controls (`>playerpanel`).        ",
             "Added Deezer music support.",
             "Improved song removal process with confirmation and error handling in >remove. ",
             "Updated >loop command: now toggles off if the same loop mode is selected again.",
@@ -395,7 +395,7 @@
             "Migrated to discord-player v7, introducing potential breaking changes.",
             "Added a >logs command to view session log statistics (owner only).",
             "Created >playlink context menu command to play links directly from messages.",
-            "Improved help command (>`help`) with clearer parameter explanations.",
+            "Improved help command (`>help`) with clearer parameter explanations.",
             "Many internal refactoring and dependency updates for better performance and stability.",
             "Fixed various bugs and edge cases related to permissions, error handling, and logging.",
             "Changed Gemini model to gemini-2.0-flash-lite.",
@@ -419,7 +419,7 @@
         "version": "5.12.1",
         "date": "2025-03-20",
         "changes": [
-            "Blacklist now support all command typoes and categories",
+            "Blacklist now support all command types and categories",
             "Added timezone and locale configuration options for date and time formatting.",
             "Improved Deezer extractor with ARL cookie support and NodeDecryptor.",
             "Deezer should now stutter less",
@@ -437,6 +437,19 @@
             ">reddit can now fetch normal posts instead of images only.",
             "Fixed certain SoundCloud tracks not playing.",
             "Fixed various bugs related to permissions, error handling, and logging."
+        ]
+    },
+    {
+        "version": "5.12.3",
+        "date": "2025-05-31",
+        "changes": [
+            "Fixed multiple typos",
+            "Config JSON file now supports comments (JSON to JSONC)",
+            "Fixed >asktts and >tts not working properly",
+            "Fixed the play command choice sometimes just ignoring the next command",
+            "Added autocomplete to the /help command",
+            "Some config refactoring",
+            "(Hopefully) fixed YouTube by switching to the WEB_EMBEDDED client, and having YT-DLP as a fallback for streaming"
         ]
     }
 ]

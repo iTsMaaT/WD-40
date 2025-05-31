@@ -27,7 +27,7 @@ module.exports = {
         let geminiResponse, sent;
         const player = useMainPlayer();
         const queue = useQueue();
-        const playerConfig = config.get("discordPlayerConf");
+        const playerConfig = config.get("discordPlayer");
 
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.error("You must provide a prompt.")] });
 

@@ -59,7 +59,7 @@ const timeFormatToMS = function(timeString) {
  * @returns {string} The prettified string
  */
 const prettyString = function(inputString, type, addDot = false) {
-    const punctuationMarks = ["!", "?", ".", ",", ";", ")", ":", "}", "]", ">"];
+    const punctuationMarks = ["!", "?", ".", ",", ";", ":"];
     let modifiedString = "";
     if (type === "all") {
         // Capitalize first letter of each word

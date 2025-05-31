@@ -1,15 +1,18 @@
 {
+    // Warn if the configuration is not part of the base configuration
     "warnForConfigNotInBaseConfig": true,
 
-    "_types" : [
-        { "Playing":   0 },
-        { "Streaming": 1 },
-        { "Listening": 2 },
-        { "Watching":  3 },
-        { "Custom":    4 },
-        { "Competing": 5 }
-    ],
+    /*
+    Types of activities with their corresponding IDs
+    - Playing:   0
+    - Streaming: 1
+    - Listening: 2
+    - Watching:  3
+    - Custom:    4
+    - Competing: 5
+    */
 
+    // List of activity statuses for the bot
     "activities": [
         { "type": 2, "name": ">help" },
         { "type": 2, "name": "your freaky songs" },
@@ -48,41 +51,61 @@
         { "type": 4, "name": "CDUjkju9sy" }
     ],
     
-    "withoutDatabaseConfig": {
-        "prefix": ">",
-        "responses": 0,
-        "personality": "Neutral"
+    "defaultPrefix": ">",
+    "defaultResponses": false,
+    // Default AI personality of the bot
+    "defaultPersonality": "Neutral",
+
+    "defaultEmbedColors": {
+        "success": "#00FF00", 
+        "error": "#FF0000",
+        "warning": "#FFFF00",
+        "info": "#FFFFFF"
     },
 
-    "timeZone": "America/New_York",
+    "cronJobs": {
+        "dailyReregister": "0 */12 * * *",
+        "activityStatusRotator": "0 3 * * *"
+    },
+    
+    "timeZone": "America/Toronto",
     "locale": "en-US",
 
     "defaultSuperuserState": false,
     "defaultDebugState": false,
+
+    // Automatically match commands even if not exact
     "autoCommandMatch": true,
+
+    // Base cooldown time for commands (in milliseconds)
     "baseCommandCooldown": 3000,
 
+    // Log rate-limited events
     "logRateLimited": false,
 
+    // Default Gemini model for AI interactions
     "defaultGeminiModel": "gemini-2.0-flash-lite",
 
     "discordPlayer": {
+        // Supported file extensions for the player (in the ./music folder)
         "supportedFileExtensions": ["mp3", "m4a"],
         "dailyReregister": false,
         "logPlayerEvents": false,
         "logQueueEvents": false,
         "skipFFmpeg": false,
+        // Path to FFmpeg binary, null if global
+        "ffmpegPath": null,
         "globalPlayerNodeOptions": {
             "volume": 50,
-            "maxSize": 10000,
-            "bufferingTimeout": 15000,
-            "leaveOnStop": true,
-            "leaveOnStopCooldown": 5000,
-            "leaveOnEnd": true,
-            "leaveOnEndCooldown": 15000,
-            "leaveOnEmpty": true,
-            "leaveOnEmptyCooldown": 300000,
-            "skipOnNoStream": true
+            "maxSize": 10000,               // Maximum size of the queue
+            "bufferingTimeout": 15000,      // Timeout for buffering (in ms)
+            "leaveOnStop": true,            // Leave the voice channel when stopped
+            "leaveOnStopCooldown": 5000,    // Cooldown before leaving (in ms)
+            "leaveOnEnd": true,             // Leave the voice channel when the queue ends
+            "leaveOnEndCooldown": 15000,    // Cooldown before leaving (in ms)
+            "leaveOnEmpty": true,           // Leave the voice channel when empty
+            "leaveOnEmptyCooldown": 300000, // Cooldown before leaving (in ms)
+            "skipOnNoStream": true          // Skip tracks if no stream is available
         },
         "extractors": {
             "Deezer": {
@@ -91,8 +114,8 @@
                 "canBridge": true,
                 "priority": 12,
                 "config": {
-                    "useAccount": true,
-                    "reloadUserInterval": 32400000
+                    "useAccount": true,             // Use account for Deezer (needed to get streams)
+                    "reloadUserInterval": 32400000  // Interval to reload user data (in ms)
                 }
             },
             "Youtubei": {
@@ -101,14 +124,17 @@
                 "canBridge": true,
                 "priority": 11,
                 "config": {
-                    "client": "IOS",
-                    "highWaterMark": 2097152,
-                    "attemptYoutubeSearchEvenIfDisabled": true,
-                    "useServerAbrStream": false,
-                    "usePoToken": false,
-                    "useOnesieRequests": false,
-                    "useTVOAuthLogin": false,
-                    "useCookie": false
+                    "client": "WEB_EMBEDDED",                   // Client type for YouTube
+                    "highWaterMark": 2097152,                   // High water mark for streams
+                    "attemptYoutubeSearchEvenIfDisabled": {
+                        "usingEmbed": false,                    // Attempt to search using embed
+                        "usingScraping": false                  // Attempt to search using scraping
+                    },
+                    "useServerAbrStream": false,                // Use server ABR stream
+                    "usePoToken": true,                         // Use TrustedClient token for authentication
+                    "useOnesieRequests": false,                 // Use Onesie requests
+                    "useTVOAuthLogin": false,                   // Use TV OAuth login
+                    "useCookie": false                          // Use cookies for authentication
                 }
             },
             "Soundcloud": {
@@ -124,7 +150,7 @@
                 "canBridge": true,
                 "priority": 2,
                 "config": {
-                    "useAccount": false
+                    "useAccount": false // Use app credentials for Spotify
                 }
             },
             "AppleMusic": {
@@ -140,8 +166,8 @@
                 "canBridge": false,
                 "priority": 1,
                 "config": {
-                    "skipProbing": true,
-                    "attemptAlternateProbing": true
+                    "skipProbing": true,               // Skip probing for Soundgasm
+                    "attemptAlternateProbing": true    // Attempt alternate probing
                 }
             },
             "TTS": {
@@ -150,8 +176,8 @@
                 "canBridge": false,
                 "priority": 0,
                 "config": {
-                    "language": "fr",
-                    "slow": true
+                    "language": "fr",   // Language for TTS
+                    "slow": true        // Slow mode for TTS
                 }
             },
             "Attachment": {
@@ -170,6 +196,5 @@
             "lofi": "aecho=0.8:0.88:60:0.4,volume=0.5,asetrate=22050",
             "8D": "apulsator=hz=0.08"
         }
-
     }
 }

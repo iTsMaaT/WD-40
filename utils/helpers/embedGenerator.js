@@ -1,5 +1,7 @@
 const { EmbedBuilder } = require("discord.js");
 const { client } = require("@root/index");
+const config = require("@utils/config/configUtils");
+const colors = config.get("defaultEmbedColors");
 
 /**
  * Generates different types of embedded messages.
@@ -21,7 +23,7 @@ class EmbedGenerator extends EmbedBuilder {
      * @returns {EmbedGenerator} The created error embed.
      */
     error(data) {
-        return this.create(data, data.color || 0xff0000);
+        return this.create(data, data.color || colors.error);
     }
 
     /**
@@ -30,7 +32,7 @@ class EmbedGenerator extends EmbedBuilder {
      * @returns {EmbedGenerator} The created success embed.
      */
     success(data) {
-        return this.create(data, data.color || 0x00ff00);
+        return this.create(data, data.color || colors.success);
     }
 
     /**
@@ -39,7 +41,7 @@ class EmbedGenerator extends EmbedBuilder {
      * @returns {EmbedGenerator} The created warning embed.
      */
     warning(data) {
-        return this.create(data, data.color || 0xffff00);
+        return this.create(data, data.color || colors.warning);
     }
 
     /**
@@ -48,7 +50,7 @@ class EmbedGenerator extends EmbedBuilder {
      * @returns {EmbedGenerator} The created info embed.
      */
     info(data) {
-        return this.create(data, data.color || 0xffffff);
+        return this.create(data, data.color || colors.info);
     }
 
     /**

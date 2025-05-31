@@ -31,7 +31,8 @@
     const { getPermissionArrayNames } = require("@functions/discordFunctions");
     const config = require("@utils/config/configUtils");
 
-    const fs = require("fs");
+    const fs = require("fs").promises;
+    const path = require("path");
 
     const neededIntents = {
         intents: [
@@ -65,7 +66,7 @@
     await registerExtractors(player);
 
     console.log(`Daily reregistering ${config.get("discordPlayer")?.dailyReregister ? "enabled" : "disabled"}`);
-    new cron.CronJob("0 */12 * * *", async () => {
+    new cron.CronJob(config.get("cronJobs").dailyReregister, async () => {
         if (config.get("discordPlayer")?.dailyReregister) await registerExtractors(player);
     }, null, true, config.get("timeZone"));
 
@@ -101,26 +102,35 @@
     const permissionBitFields = [];
 
     /**
-     * Load files from a folder
+     * Asynchronously load JavaScript files from a folder (recursive)
      * 
      * @param {string} folder The folder to load files from
-     * @param {Function} callback The callback function
+     * @param {Function} callback The callback function (can be async)
      * 
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    function loadFiles(folder, callback) {
-        const commandFiles = fs.readdirSync(folder);
+    async function loadFiles(folder, callback) {
+        const commandFiles = await fs.readdir(folder);
+
         while (commandFiles.length > 0) {
             const file = commandFiles.shift();
-            if (file.endsWith(".js")) {
-                const loaded = require(`${folder}${file}`);
-                loaded.filePath = (folder + file).replace("./", process.cwd() + "/");
-                if (loaded.loadFileIgnore) continue;
-                callback(loaded, file);
-            } else {
-                if (!fs.lstatSync(folder + file).isDirectory()) continue;
-                const newFiles = fs.readdirSync(folder + file);
-                newFiles.forEach(f => commandFiles.push(file + "/" + f));
+            const fullPath = path.join(folder, file);
+            const absolutePath = path.resolve(fullPath);
+
+            const stat = await fs.lstat(absolutePath);
+            if (stat.isDirectory()) {
+                const newFiles = await fs.readdir(absolutePath);
+                newFiles.forEach(f => commandFiles.push(path.join(file, f)));
+            } else if (file.endsWith(".js")) {
+                try {
+                    const loaded = require(absolutePath); // Use absolute path for require
+                    loaded.filePath = absolutePath; // Store absolute path for reference
+
+                    if (loaded.loadFileIgnore) continue;
+                    await callback(loaded, file);
+                } catch (err) {
+                    console.error(`Failed to load ${absolutePath}:`, err);
+                }
             }
         }
     }
