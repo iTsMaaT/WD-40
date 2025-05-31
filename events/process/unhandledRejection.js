@@ -7,5 +7,6 @@ module.exports = {
             return logger.warning("Invalid form body error occured, igoring stack.");
         logger.event("Unhandled Promise Rejection:");
         logger.severe(err);
+        // logger.severe("Promise:", promise);
     },
 };
