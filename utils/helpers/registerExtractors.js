@@ -76,8 +76,8 @@ async function registerExtractors(player) {
             ytExt = await player.extractors.register(YoutubeiExtractor, {
                 ...getYoutubeExtractorOptions(extractors.Youtubei.config),
                 createStream: async (track, ext) => {
-                    if (!extractors.Youtubei.enabled && extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.useScraping) return null;  
                     try {
+                        if (!extractors.Youtubei.enabled && extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.useScraping) return null;  
                         return await originalStream(track, ext);
                     } catch (err) {
                         logger.warning(`Original stream failed for ${track.url}, falling back to ytdl-core. Error: ${err.message}`);
@@ -174,7 +174,8 @@ function getYoutubeExtractorOptions(playerconfig) {
     }
 
     if (playerconfig?.usePoToken) {
-        options.streamOptions.useClient = "WEB";
+        if (!["WEB", "WEB_EMBEDDED"].includes(playerconfig?.client))
+            options.streamOptions.useClient = "WEB";
         options.generateWithPoToken = true;
     }
 
