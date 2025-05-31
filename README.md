@@ -57,13 +57,13 @@ Good luck.
 | | |
 | Required | - |
 | TOKEN | The bot token, which you can get from the [Discord Developer Portal](https://discord.com/developers/applications). |
-| DEV_TOKEN | The development bot token, which you can get from the [Discord Developer Portal](https://discord.com/developers/applications). |
 | CLIENT_ID | The client ID of the bot, which you can get from the [Discord Developer Portal](https://discord.com/developers/applications). |
 | SERVER | Either `prod` or `dev`, will make the bot only react to its owner on dev. |
 | OWNER_ID | The ID of the owner of the bot. |
-| CONFIG_FILEPATH | Override the default config file path. You can use `@root` to refer to the root directory of the project. |
 | | |
 | Optional | - |
+| DEV_TOKEN | The development bot token, which you can get from the [Discord Developer Portal](https://discord.com/developers/applications). |
+| CONFIG_FILEPATH | Override the default config file path. You can use `@root` to refer to the root directory of the project. |
 | GEMINI_API_KEY | The token for the Gemini AI API, which you can get from the [Gemini API](https://ai.google.dev/gemini-api/docs) website. |
 | PTERODACTYL_API_KEY | If hosting on Pterodactyl, the API key for your panel. |
 | PTERODACTYL_URL | The URL for your panel. |
