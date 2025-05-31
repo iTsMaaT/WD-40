@@ -438,5 +438,18 @@
             "Fixed certain SoundCloud tracks not playing.",
             "Fixed various bugs related to permissions, error handling, and logging."
         ]
+    },
+    {
+        "version": "5.12.3",
+        "date": "2025-05-31",
+        "changes": [
+            "Fixed multiple typos",
+            "Config JSON file now supports comments (JSON to JSONC)",
+            "Fixed >asktts and >tts not working properly",
+            "Fixed the play command choice sometimes just ignoring the next command",
+            "Added autocomplete to the /help command",
+            "Some config refactoring",
+            "(Hopefully) fixed YouTube by switching to the WEB_EMBEDDED client, and having YT-DLP as a fallback for streaming"
+        ]
     }
 ]
