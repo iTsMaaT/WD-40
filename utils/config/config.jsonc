@@ -124,14 +124,14 @@
                 "canBridge": true,
                 "priority": 11,
                 "config": {
-                    "client": "IOS",                            // Client type for YouTube
+                    "client": "WEB_EMBEDDED",                   // Client type for YouTube
                     "highWaterMark": 2097152,                   // High water mark for streams
                     "attemptYoutubeSearchEvenIfDisabled": {
-                        "usingEmbed": true,                     // Attempt to search using embed
+                        "usingEmbed": false,                    // Attempt to search using embed
                         "usingScraping": false                  // Attempt to search using scraping
                     },
                     "useServerAbrStream": false,                // Use server ABR stream
-                    "usePoToken": false,                        // Use TrustedClient token for authentication
+                    "usePoToken": true,                         // Use TrustedClient token for authentication
                     "useOnesieRequests": false,                 // Use Onesie requests
                     "useTVOAuthLogin": false,                   // Use TV OAuth login
                     "useCookie": false                          // Use cookies for authentication
