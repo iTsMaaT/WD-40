@@ -142,6 +142,7 @@ module.exports = {
                     research.tracks.unshift(fileTrack.tracks[0]);
                 }
 
+                choicesEmbed.data.fields.push({ name: "0 - Cancel", value: "Cancels the request" });
                 research.tracks.slice(0, 10).forEach((track, index) => {
                     choicesEmbed.data.fields.push({ name: `${index + 1} - ${track.title}`, value: `By ${track.author}` });
                 });
@@ -152,7 +153,7 @@ module.exports = {
                 await message.channel.awaitMessages({ filter, max: 1, time: 10000, errors: ["time"] })
                     .then((collected) => {
                         const responseMessage = collected.first();
-                        choice = (parseInt(responseMessage.content) || 1) - 1;
+                        choice = (parseInt(responseMessage.content)) - 1;
                         // responseMessage.delete().catch(() => null);
                     })
                     .catch(() => choice = 0);
@@ -168,8 +169,12 @@ module.exports = {
                 }
             }
 
+            if (choice === -1) return await sentMessage.edit({ embeds: [embedGenerator.warning("Play request cancelled")] });
+            if (choice !== null && (choice < 0 || choice >= research.tracks.length))
+                return await sentMessage.edit({ embeds: [embedGenerator.warning("Invalid choice, please enter a valid number")] });
+
             if (research?.tracks?.length + (queue?.size ?? 0) > playerConfig.globalPlayerNodeOptions.maxSize) 
-                return await sentMessage.edit({ embeds: [embedGenerator.error(`Cannot enqueue more than ${playerConfig.maxQueueSize} tracks.`)] });
+                return await sentMessage.edit({ embeds: [embedGenerator.warning(`Cannot enqueue more than ${playerConfig.maxQueueSize} tracks.`)] });
             
 
             if (optionalArgs["shuffle|s"] && !choice) await research?.tracks?.shuffle();
@@ -241,10 +246,9 @@ module.exports = {
  * @param {Player} player 
  * @returns {Promise<{ extractor: Extractor | null, type: string }>}
  */
-
 async function awareQueryResolver(query, player) {
     const extractors = player.extractors.store;
-    const result = { extractor: null, type: null };
+    const result = { extractor: null, type: null, canStream: false };
 
     if (!query || !extractors || !extractors.size) return result;
 
@@ -273,6 +277,12 @@ async function awareQueryResolver(query, player) {
     return result;
 }
 
+/**
+ * Unshortens a URL using a HEAD request
+ * 
+ * @param {string} url - The URL to unshorten
+ * @returns {Promise<string>} The unshortened URL or the original URL if an error occurs
+ */
 async function unshortenURL(url) {
     try {
         const response = await fetch(url, {
