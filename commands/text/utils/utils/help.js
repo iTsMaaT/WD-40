@@ -21,24 +21,20 @@ module.exports = {
             const CommandEmbed = {
                 title: `**${pref}${command.name}**`,
                 color: 0xffffff,
-                fields: [{ name: "Description", value: command.description }],
+                fields: [{ name: "Description", value: command.extendedDescription || command.description }],
                 timestamp: new Date(),
             };
 
-            if (typeof command.usage === "string") {
-                CommandEmbed.fields.push({ name: "Options", value: command.description });
-            } else if (typeof command.usage === "object") {
-                let requiredString = "";
-                let optionalString = "";
-                let usageString = "";
-                if (Object.keys(command.usage.required ?? {}).length) 
-                    requiredString += `__Parameters__:\n${Object.keys(command.usage.required).map(key => `${key.toLowerCase()}: ${prettyString(command.usage.required[key], "first", false)}`).join("\n")}`;
-                if (Object.keys(command.usage.optional ?? {}).length) 
-                    optionalString += `__Flags__:\n${Object.keys(command.usage.optional).map(key => `-${key.split("|")[0].toLowerCase()}${key.split("|").slice(1).length > 0 ? `[${key.split("|").slice(1).join(",").toLowerCase()}]` : ""}${(command.usage.optional[key].hasValue ?? false) ? " <value>" : ""}: ${prettyString(command.usage.optional[key].description, "first", false)}`).join("\n")}`;
-                usageString = `${requiredString}${requiredString.length > 0 && optionalString.length > 0 ? "\n" : ""}${optionalString}`;
-                CommandEmbed.fields.push({ name: "Options", value: usageString });
-                CommandEmbed.footer = { text: "Flags usage explanation: -FlagName[FlagAliase(s)]: FlagDescription" };
-            }
+            let requiredString = "";
+            let optionalString = "";
+            let usageString = "";
+            if (Object.keys(command.usage.required ?? {}).length) 
+                requiredString += `__Parameters__:\n${Object.keys(command.usage.required).map(key => `${key.toLowerCase()}: ${prettyString(command.usage.required[key], "first", false)}`).join("\n")}`;
+            if (Object.keys(command.usage.optional ?? {}).length) 
+                optionalString += `__Flags__:\n${Object.keys(command.usage.optional).map(key => `-${key.split("|")[0].toLowerCase()}${key.split("|").slice(1).length > 0 ? `[${key.split("|").slice(1).join(",").toLowerCase()}]` : ""}${(command.usage.optional[key].hasValue ?? false) ? " <value>" : ""}: ${prettyString(command.usage.optional[key].description, "first", false)}`).join("\n")}`;
+            usageString = `${requiredString}${requiredString.length > 0 && optionalString.length > 0 ? "\n" : ""}${optionalString}`;
+            CommandEmbed.fields.push({ name: "Options", value: usageString });
+            CommandEmbed.footer = { text: "Flags usage explanation: -FlagName[FlagAliase(s)]: FlagDescription" };
 
             if (command.aliases) CommandEmbed.fields.push({ name: "Aliases", value: command.aliases.join(", ") });
             if (command.examples) {
