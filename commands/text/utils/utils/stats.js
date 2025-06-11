@@ -10,6 +10,8 @@ const { useMainPlayer } = require("discord-player");
 const { toEngineerNotation } = require("@functions/formattingFunctions");
 const { ChartJSNodeCanvas } = require("chartjs-node-canvas");
 const { AttachmentBuilder } = require("discord.js");
+let totalUserCache = 0;
+let imageCache = null;
 
 const chartJSNodeCanvas = new ChartJSNodeCanvas({
     width: 800,
@@ -178,6 +180,11 @@ async function generateChartBuffer(timestamps) {
         data.push(totalUsers);
     }
 
+    
+    if (totalUserCache == Object.values(countPerDay).reduce((acc, count) => acc + count, 0)) return imageCache;
+
+    totalUserCache = Object.values(countPerDay).reduce((acc, count) => acc + count, 0);
+
     const chartData = labels.map((label, i) => ({
         x: new Date(label).getTime(), // numeric timestamp
         y: data[i],
@@ -244,5 +251,7 @@ async function generateChartBuffer(timestamps) {
         },
     };
 
-    return await chartJSNodeCanvas.renderToBuffer(config);
+    const finalBuffer = await chartJSNodeCanvas.renderToBuffer(config);
+    imageCache = finalBuffer;
+    return finalBuffer;
 }

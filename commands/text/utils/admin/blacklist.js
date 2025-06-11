@@ -5,7 +5,8 @@ const GuildManager = require("@guildManager");
 
 module.exports = {
     name: "blacklist",
-    description: "Blacklist a user from using commands, if category or command option is not provided, will blacklist the command",
+    description: "Blacklist a user from using commands (defaults to blacklisting the command)",
+    extendedDescription: "Blacklist a user from using commands, if category or command option is not provided, will blacklist the command",
     admin: true,
     usage: {
         required: {
