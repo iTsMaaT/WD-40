@@ -164,18 +164,24 @@
 
     // Text command handler
     loadFiles("./commands/text/", (command) => {
-        command.isAlias = false;
-        command.lastExecutionTime = 1000;
-        if (client.commands.get(command.name)) throw new Error(`Text command [${command.name}] already exists\n${command.filePath}`);
-        client.commands.set(command.name, command);
-        if (!command.cooldown) command.cooldown = config.get("baseCommandCooldown") || 3000;
+        try {
+            if (command.description.length > 100) throw new Error(`Text command [${command.name}] description is too long (${command.description.length} characters, max 100)\n${command.filePath}`); 
+            command.isAlias = false;
+            command.lastExecutionTime = 1000;
+            if (client.commands.get(command.name)) throw new Error(`Text command [${command.name}] already exists\n${command.filePath}`);
+            client.commands.set(command.name, command);
+            if (!command.cooldown) command.cooldown = config.get("baseCommandCooldown") || 3000;
 
-        if (command.aliases && Array.isArray(command.aliases)) {
-            command.isAlias = true;
-            command.aliases.forEach(alias => {
-                if (client.commands.get(alias)) throw new Error(`Text command alias [${alias}] already exists\n${command.filePath}`);
-                client.commands.set(alias, command);
-            });
+            if (command.aliases && Array.isArray(command.aliases)) {
+                command.isAlias = true;
+                command.aliases.forEach(alias => {
+                    if (client.commands.get(alias)) throw new Error(`Text command alias [${alias}] already exists\n${command.filePath}`);
+                    client.commands.set(alias, command);
+                });
+            }
+        } catch (error) {
+            logger.error(`Failed to load text command [${command.name}]: ${error.message}`);
+            process.exit(0);
         }
 
         if (command.permissions) permissionBitFields.push(...command.permissions);
