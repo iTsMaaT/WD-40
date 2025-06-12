@@ -293,7 +293,7 @@ async function unshortenURL(url) {
         const urlObj = new URL(response.url);
         return urlObj.origin + urlObj.pathname;
     } catch (error) {
-        logger.error(error);
+        console.error(error);
         return url;
     }
 }

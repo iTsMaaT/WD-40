@@ -101,7 +101,6 @@ async function registerExtractors(player) {
                 logger.error("YoutubeiExtractor registration returned null.");
             else 
                 ytExt.priority = extractors.Youtubei.priority ?? ytExt.priority;
-    
         } catch (e) {
             logger.error("Failed to register YoutubeiExtractor:", e);
         }
