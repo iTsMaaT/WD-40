@@ -150,7 +150,7 @@
                 "canBridge": true,
                 "priority": 2,
                 "config": {
-                    "useAccount": false // Use app credentials for Spotify
+                    "useAccount": true // Use app credentials for Spotify
                 }
             },
             "AppleMusic": {
