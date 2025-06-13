@@ -9,14 +9,13 @@ module.exports = {
     inSameVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
         const queue = useQueue();
-        if (!queue) return message.guild?.me?.voice?.setChannel(null).catch(() => null);
+        if (!queue) {
+            message.reply({ embeds: [embedGenerator.warning("There is no music playing.")] });
+            return message.guild?.me?.voice?.setChannel(null).catch(() => null);
+        }
             
         queue.delete();
 
-        const stoppped_music_embed = embedGenerator.info({
-            title: "Stopped!",
-        }).withAuthor(message.author);
-
-        message.reply({ embeds: [stoppped_music_embed] });
+        message.reply({ embeds: [embedGenerator.info({ title: "Stopped!" }).withAuthor(message.author)] });
     },
 };
