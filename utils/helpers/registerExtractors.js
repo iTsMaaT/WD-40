@@ -50,7 +50,7 @@ async function registerExtractors(player) {
     // subsonicExt.priority = 100;
     
     if (extractors.Soundgasm.enabled) {
-        logger.info("Loading TTSExtractor extractor...");
+        logger.info("Loading Soundgasm extractor...");
         const soundgasmExt = await player.extractors.register(SoundgasmExtractor, extractors.Soundgasm.config);
         soundgasmExt.priority = extractors.Soundgasm.priority ?? soundgasmExt.priority;
     }
