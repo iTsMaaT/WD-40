@@ -28,10 +28,10 @@ module.exports = {
             let requiredString = "";
             let optionalString = "";
             let usageString = "";
-            if (Object.keys(command.usage.required ?? {}).length) 
-                requiredString += `__Parameters__:\n${Object.keys(command.usage.required).map(key => `${key.toLowerCase()}: ${prettyString(command.usage.required[key], "first", false)}`).join("\n")}`;
-            if (Object.keys(command.usage.optional ?? {}).length) 
-                optionalString += `__Flags__:\n${Object.keys(command.usage.optional).map(key => `-${key.split("|")[0].toLowerCase()}${key.split("|").slice(1).length > 0 ? `[${key.split("|").slice(1).join(",").toLowerCase()}]` : ""}${(command.usage.optional[key].hasValue ?? false) ? " <value>" : ""}: ${prettyString(command.usage.optional[key].description, "first", false)}`).join("\n")}`;
+            if (Object.keys(command.usage?.required ?? {}).length) 
+                requiredString += `__Parameters__:\n${Object.keys(command.usage?.required).map(key => `${key.toLowerCase()}: ${prettyString(command.usage?.required[key], "first", false)}`).join("\n")}`;
+            if (Object.keys(command.usage?.optional ?? {}).length) 
+                optionalString += `__Flags__:\n${Object.keys(command.usage?.optional).map(key => `-${key.split("|")[0].toLowerCase()}${key.split("|").slice(1).length > 0 ? `[${key.split("|").slice(1).join(",").toLowerCase()}]` : ""}${(command.usage?.optional[key].hasValue ?? false) ? " <value>" : ""}: ${prettyString(command.usage?.optional[key].description, "first", false)}`).join("\n")}`;
             usageString = `${requiredString}${requiredString.length > 0 && optionalString.length > 0 ? "\n" : ""}${optionalString}`;
             CommandEmbed.fields.push({ name: "Options", value: usageString });
             CommandEmbed.footer = { text: "Flags usage explanation: -FlagName[FlagAliase(s)]: FlagDescription" };
@@ -273,7 +273,7 @@ module.exports = {
             row.components.forEach(component => {
                 component.setDisabled(true);
             });
-            await helpMessage.edit({
+            await helpMessage?.edit({
                 embeds: [embed],
                 components: [row],
                 allowedMentions: { repliedUser: false },

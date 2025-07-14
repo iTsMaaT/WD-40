@@ -1,4 +1,4 @@
-const { Player, AudioFilters } = require("discord-player");
+const { Player, AudioFilters, onBeforeCreateStream } = require("discord-player");
 const { AttachmentExtractor } = require("@discord-player/extractor");
 const { YoutubeiExtractor, stream } = require("discord-player-youtubei");
 const { DeezerExtractor, NodeDecryptor, JSDecryptor } = require("discord-player-deezer");
@@ -42,15 +42,31 @@ async function registerExtractors(player) {
     const ffmpegFilters = discordPlayerConfig?.ffmpegFilters || {};
     for (const filter of Object.entries(ffmpegFilters)) AudioFilters.define(filter[0], filter[1]);
 
-    // const subsonicExt = await player.extractors.register(SubsonicExtractor, {
-    //    username: process.env.SUBSONIC_USERNAME,
-    //    password: process.env.SUBSONIC_PASSWORD,
-    //    host: process.env.SUBSONIC_URL,
-    // });
-    // subsonicExt.priority = 100;
+    onBeforeCreateStream(async (track, queryType, queue) => {
+        try {
+            if (track.extractor.identifier === DeezerExtractor.identifier ||
+                track.extractor.identifier === SoundcloudExtractor.identifier ||
+                track.extractor.identifier === YoutubeiExtractor.identifier ||
+                track.extractor.identifier === SubsonicExtractor.identifier ||
+                track.extractor.identifier === TTSExtractor.identifier
+            ) return await track.extractor?.stream(track);
+            return undefined;
+        } catch {
+            return undefined;
+        }
+    });
+
+    if (extractors.Subsonic.enabled) {
+        const subsonicExt = await player.extractors.register(SubsonicExtractor, {
+            username: process.env.SUBSONIC_USERNAME,
+            password: process.env.SUBSONIC_PASSWORD,
+            host: process.env.SUBSONIC_URL,
+        });
+        subsonicExt.priority = extractors.Subsonic.priority ?? subsonicExt.priority;
+    }
     
     if (extractors.Soundgasm.enabled) {
-        logger.info("Loading TTSExtractor extractor...");
+        logger.info("Loading SoundgasmExtractor extractor...");
         const soundgasmExt = await player.extractors.register(SoundgasmExtractor, extractors.Soundgasm.config);
         soundgasmExt.priority = extractors.Soundgasm.priority ?? soundgasmExt.priority;
     }
@@ -76,22 +92,33 @@ async function registerExtractors(player) {
             ytExt = await player.extractors.register(YoutubeiExtractor, {
                 ...getYoutubeExtractorOptions(extractors.Youtubei.config),
                 createStream: async (track, ext) => {
-                    try {
-                        if (!extractors.Youtubei.enabled && extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.useScraping) return null;  
-                        return await originalStream(track, ext);
-                    } catch (err) {
-                        logger.warning(`Original stream failed for ${track.url}, falling back to ytdl-core. Error: ${err.message}`);
+                    if (extractors.Youtubei.config.useOnesieRequests) {
                         try {
-                            const info = await ytdl.getInfo(track.url);
-                            if (!info.formats?.length) return null;
-                            const format = info.formats
-                                .filter(f => f.hasAudio && (!track.live || f.isHLS))
-                                .sort((a, b) => Number(b.audioBitrate) - Number(a.audioBitrate) || Number(a.bitrate) - Number(b.bitrate))[0];
-                            if (!format) return null;
-                            return format.url;
-                        } catch (ytdlErr) {
-                            logger.error("ytdl-core also failed:", ytdlErr);
+                            const url = await getVideoInfoFromOnesieRequest(track.url, ext.innerTube, ext.innerTube.po_token);
+                            const download = await url.download({ format: "mp4", quality: "best", type: "audio" });
+                            return createReadableFromWeb(download);
+                        } catch (error) {
+                            logger.error("Failed to get video info from Onesie request:", error);
                             return null;
+                        }
+                    } else {
+                        try {
+                            if (!extractors.Youtubei.enabled && extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.useScraping) return null;  
+                            return await originalStream(track, ext);
+                        } catch (err) {
+                            logger.warning(`Original stream failed for ${track.url}, falling back to ytdl-core. Error: ${err.message}`);
+                            try {
+                                const info = await ytdl.getInfo(track.url);
+                                if (!info.formats?.length) return null;
+                                const format = info.formats
+                                    .filter(f => f.hasAudio && (!track.live || f.isHLS))
+                                    .sort((a, b) => Number(b.audioBitrate) - Number(a.audioBitrate) || Number(a.bitrate) - Number(b.bitrate))[0];
+                                if (!format) return null;
+                                return format.url;
+                            } catch (ytdlErr) {
+                                logger.error("ytdl-core also failed:", ytdlErr);
+                                return null;
+                            }
                         }
                     }
                 },
@@ -104,7 +131,6 @@ async function registerExtractors(player) {
         } catch (e) {
             logger.error("Failed to register YoutubeiExtractor:", e);
         }
-
     }
 
     if (extractors.Deezer.enabled) {
@@ -131,9 +157,11 @@ async function registerExtractors(player) {
         ttsExt.priority = extractors.TTS.priority ?? ttsExt.priority;
     }
 
-    logger.info("Loading Attachment extractor...");
-    const attachmentExt = await player.extractors.register(AttachmentExtractor, extractors.Attachment.config);
-    attachmentExt.priority = extractors.Attachment.priority ?? attachmentExt.priority;
+    if (extractors.Attachment.enabled) {
+        logger.info("Loading Attachment extractor...");
+        const attachmentExt = await player.extractors.register(AttachmentExtractor, extractors.Attachment.config);
+        attachmentExt.priority = extractors.Attachment.priority ?? attachmentExt.priority;
+    }
 }
 
 /**
@@ -177,20 +205,6 @@ function getYoutubeExtractorOptions(playerconfig) {
             options.streamOptions.useClient = "WEB";
         options.generateWithPoToken = true;
     }
-
-    // if (playerconfig?.useOnesieRequests) {
-    //    options.streamOptions.useClient = "WEB";
-    //    options.generateWithPoToken = true;
-    //    options.createStream = async (track, ext) => {
-    //        try {
-    //            const url = await getVideoInfoFromOnesieRequest(track.url, ext.innerTube, getPoToken(ext.innerTube));
-    //            const download = await url.download({ format: "mp4", quality: "best", type: "audio" });
-    //            return createReadableFromWeb(download);
-    //        } catch (error) {
-    //            return null;
-    //        }
-    //    };
-    // }
 
     return options;
 }

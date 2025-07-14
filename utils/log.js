@@ -37,6 +37,12 @@ class Logger {
             "console": 0,
             "command": 0,
         };
+
+        this.consoleLogMode = "all"; // "all" or "error"
+        this.allowedTypes = {
+            all: null, // null means allow all
+            error: ["ERROR", "WARNING", "SEVERE"],
+        };
     }
 
     /**
@@ -78,7 +84,10 @@ class Logger {
             : util.format(message, ...args);
 
         // Adds color depending on log type, then the log header, then the log and finally a newline
-        process.stdout.write(getColorByType(`${header} ${formattedMessage}`, type) + "\n");
+        const allowed = this.allowedTypes[this.consoleLogMode];
+        if (!allowed || allowed.includes(type)) 
+            process.stdout.write(getColorByType(`${header} ${formattedMessage}`, type) + "\n");
+        
 
         if (type == "CONSOLE" || type == "EVENT") return;
 
@@ -93,6 +102,15 @@ class Logger {
                 console.logger(ex);
             }
         }
+    }
+
+    setConsoleLogMode(mode) {
+        if (!["all", "error"].includes(mode)) throw new Error("Invalid log mode");
+        this.consoleLogMode = mode;
+    }
+    
+    getConsoleLogMode() {
+        return this.consoleLogMode;
     }
 
     console(message, ...args) {
@@ -173,9 +191,13 @@ class Logger {
 
     async getAllTimeLogCount(type) {
         try {
-            const allTimeLogs = await repositories.logs.select();
-            if (!type) return allTimeLogs.length;
-            return allTimeLogs.filter(log => log.type == type.toUpperCase()).length;
+            if (databaseManager.dbExists()) {
+                const allTimeLogs = await repositories.logs.select();
+                if (!type) return allTimeLogs.length;
+                return allTimeLogs.filter(log => log.type == type.toUpperCase()).length;
+            } else {
+                return this.getTotalLogCount();
+            }
         } catch (ex) {
             this.error(ex);
             return -1;

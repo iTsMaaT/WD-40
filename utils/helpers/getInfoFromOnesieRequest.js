@@ -40,6 +40,21 @@ async function getVideoInfoFromOnesieRequest(youtubeUrl, innertubeClient, potoke
         return { encrypted, hmac, iv };
     };
 
+    async function decryptResponse(iv, hmac, data, clientKey) {
+        const aesKeyData = clientKey.slice(0, 16);
+        const hmacKeyData = clientKey.slice(16, 32);
+
+        // Verify HMAC
+        const expectedHmac = crypto.createHmac("sha256", hmacKeyData)
+            .update(Buffer.concat([data, iv]))
+            .digest();
+        if (!expectedHmac.equals(hmac)) throw new Error("HMAC mismatch");
+
+        // Decrypt
+        const decipher = crypto.createDecipheriv("aes-128-ctr", aesKeyData, iv);
+        return Buffer.concat([decipher.update(data), decipher.final()]);
+    }
+
     /**
      * Gets the YouTube TV client config
      * 
@@ -80,10 +95,11 @@ async function getVideoInfoFromOnesieRequest(youtubeUrl, innertubeClient, potoke
     async function prepareOnesieRequest({ videoId, poToken, clientConfig, innertube }) {
         const { clientKeyData, encryptedClientKey, onesieUstreamerConfig } = clientConfig;
         const clonedInnerTubeContext = JSON.parse(JSON.stringify(innertube.session.context));
-    
-        clonedInnerTubeContext.client.clientName = Constants.CLIENTS.WEB.NAME;
-        clonedInnerTubeContext.client.clientVersion = Constants.CLIENTS.WEB.VERSION;
-    
+
+        // Use TV client for better compatibility
+        clonedInnerTubeContext.client.clientName = Constants.CLIENTS.TV.NAME;
+        clonedInnerTubeContext.client.clientVersion = Constants.CLIENTS.TV.VERSION;
+
         const params = {
             playbackContext: {
                 contentPlaybackContext: {
@@ -116,22 +132,17 @@ async function getVideoInfoFromOnesieRequest(youtubeUrl, innertubeClient, potoke
             headers,
             body: JSON.stringify(playerRequestJson),
             proxiedByTrustedBandaid: true,
-            skipResponseEncryption: true,
+            skipResponseEncryption: false, // <--- changed
         }).finish();
-    
+
         const { encrypted, hmac, iv } = await encryptRequest(clientKeyData, onesieRequest);
-    
-        // const clientName = parseInt(Constants.CLIENTS.TV.NAME_ID, 10);
-        // if (isNaN(clientName)) 
-        //    throw new Error("Invalid clientName: Constants.CLIENTS.TV.NAME_ID must be a valid integer");
-        
-    
+
         const body = Protos.OnesieRequest.encode({
             urls: [],
             playerRequest: {
                 encryptedClientKey,
                 encryptedOnesiePlayerRequest: encrypted,
-                enableCompression: false,
+                enableCompression: true, // <--- changed
                 hmac: hmac,
                 iv: iv,
                 TQ: true,
@@ -158,7 +169,7 @@ async function getVideoInfoFromOnesieRequest(youtubeUrl, innertubeClient, potoke
             bufferedRanges: [],
             onesieUstreamerConfig,
         }).finish();
-    
+
         const videoIdBytes = base64ToU8(videoId);
     
         const encodedVideoIdChars = [];
@@ -199,7 +210,7 @@ async function getVideoInfoFromOnesieRequest(youtubeUrl, innertubeClient, potoke
         method: "POST",
         headers: {
             "accept": "*/*",
-            "content-type": "text/plain",
+            "content-type": "application/octet-stream", // <--- changed
         },
         referrer: "https://www.youtube.com/",
         body: onesieRequest.body,
@@ -227,13 +238,45 @@ async function getVideoInfoFromOnesieRequest(youtubeUrl, innertubeClient, potoke
         }
     });
 
-    const onesiePlayerResponse = onesie.find((header) => header.type === Protos.OnesieHeaderType.PLAYER_RESPONSE);
+    const onesiePlayerResponse = onesie.find((header) => header.type === Protos.OnesieHeaderType.PLAYER_RESPONSE); // <--- changed
 
     if (onesiePlayerResponse) {
-        const playerResponse = Protos.OnesiePlayerResponse.decode(onesiePlayerResponse.data);
+        let responseData = onesiePlayerResponse.data;
 
-        if (playerResponse.onesieProxyStatus !== Protos.OnesieProxyStatus.ONESIE_PROXY_STATUS_OK)
+        // Decrypt first if needed
+        if (
+            onesiePlayerResponse.cryptoParams &&
+        onesiePlayerResponse.cryptoParams.iv &&
+        onesiePlayerResponse.cryptoParams.hmac
+        ) {
+            responseData = await decryptResponse(
+                onesiePlayerResponse.cryptoParams.iv,
+                onesiePlayerResponse.cryptoParams.hmac,
+                responseData,
+                clientConfig.clientKeyData,
+            );
+        }
+
+        // Then decompress if needed
+        if (
+            onesiePlayerResponse.cryptoParams &&
+        onesiePlayerResponse.cryptoParams.compressionType === 1
+        ) {
+            const zlib = require("zlib");
+            if (responseData[0] === 0x1f && responseData[1] === 0x8b) 
+                responseData = zlib.gunzipSync(responseData);
+            else 
+                console.warn("compressionType is 1 but data is not GZIP, skipping decompression");
+        
+        }
+
+        const playerResponse = Protos.OnesiePlayerResponse.decode(responseData);
+
+        if (playerResponse.onesieProxyStatus !== Protos.OnesieProxyStatus.ONESIE_PROXY_STATUS_OK) {
+            console.error("Onesie proxy status:", playerResponse.onesieProxyStatus);
+            console.error("PlayerResponse body (raw):", playerResponse.body);
             throw new Error("Onesie proxy status not OK");
+        }
 
         if (playerResponse.httpStatus !== 200)
             throw new Error("Http status not OK");
@@ -342,6 +385,15 @@ async function getPoToken(innertube, init) {
         })),
         visitorData,
     };
+
+    try {
+        globalThis.document.close();
+    } catch {
+    // no-op
+    }
+    // Clean up after jsdom is ran
+    delete globalThis.window;
+    delete globalThis.document;
   
     return poTokenResult;
 }

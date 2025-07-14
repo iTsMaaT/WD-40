@@ -135,7 +135,7 @@
         }
     }
 
-    loadFiles("./utils/validators/", async (validator) => {
+    await loadFiles("./utils/validators/", async (validator) => {
         if (!validator.execute) {
             logger.severe(`Validator [${validator.filePath}] is missing an execute function`);
             process.exit(0);
@@ -152,7 +152,7 @@
 
     // Slash command handler
     client.discoveredCommands = [];
-    loadFiles("./commands/slash/", (slashcommand, fileName) => {
+    await loadFiles("./commands/slash/", (slashcommand, fileName) => {
         if ("name" in slashcommand && "execute" in slashcommand && "description" in slashcommand) {
             if (client.slashcommands.get(slashcommand.name)) throw new Error(`Slash command or alias [${slashcommand.name}] already exists`);
             client.slashcommands.set(slashcommand.name, slashcommand);
@@ -163,7 +163,7 @@
     });
 
     // Text command handler
-    loadFiles("./commands/text/", (command) => {
+    await loadFiles("./commands/text/", (command) => {
         try {
             if (command.description.length > 100) throw new Error(`Text command [${command.name}] description is too long (${command.description.length} characters, max 100)\n${command.filePath}`); 
             command.isAlias = false;
@@ -196,7 +196,7 @@
     ].join("\n"));
 
     // Context menu command handler
-    loadFiles("./commands/context/", (contextcommand, fileName) => {
+    await loadFiles("./commands/context/", (contextcommand, fileName) => {
         if ("name" in contextcommand && "execute" in contextcommand && "type" in contextcommand) {
             if (client.contextcommands.get(contextcommand.name)) throw new Error(`Context command or alias [${contextcommand.name}] already exists`);
             client.contextcommands.set(contextcommand.name, contextcommand);
@@ -207,7 +207,7 @@
     });
 
     // Event handler
-    loadFiles("./events/client/", (event) => {
+    await loadFiles("./events/client/", (event) => {
         if (event.once) {
             client.once(event.name, async (...args) => {
                 if (event.log) logger.event(`Event: [${event.name}] fired.`);
@@ -221,28 +221,28 @@
         }
     });
 
-    loadFiles("./events/process/", (event) => {
+    await loadFiles("./events/process/", (event) => {
         process.on(event.name, async (...args) => {
             if (event.log) logger.event(`Event: [${event.name}] fired.`);
             await event.execute(client, logger, ...args);
         });
     });
 
-    loadFiles("./events/rest/", (event) => {
+    await loadFiles("./events/rest/", (event) => {
         client.rest.on(event.name, async (...args) => {
             if (event.log) logger.event(`Event: [${event.name}] fired.`);
             await event.execute(client, logger, ...args);
         });
     });
 
-    loadFiles("./events/player/", (event) => {
+    await loadFiles("./events/player/", (event) => {
         player.on(event.name, async (...args) => {
             if (event.log) logger.event(`Event: [${event.name}] fired.`);
             await event.execute(client, logger, ...args);
         });
     });
 
-    loadFiles("./events/playerEvents/", (event) => {
+    await loadFiles("./events/playerEvents/", (event) => {
         player.events.on(event.name, async (...args) => {
             if (event.log) logger.event(`Event: [${event.name}] fired.`);
             await event.execute(client, logger, ...args);
@@ -250,22 +250,24 @@
     });
 
     process.stdin.setEncoding("utf8");
-    loadFiles("./events/console/", (event) => {
+    await loadFiles("./events/console/", (event) => {
         if (client.consoleCommands.get(event.name)) throw new Error(`Command or alias [${event.name}] already exists`);
         client.consoleCommands.set(event.name, event);
     });
 
     process.stdin.on("data", async (input) => {
-        const args = input.split(/ +/);
-        const commandName = args.shift().toLowerCase().trim();
+        const trimmedInput = input.trim();
+        process.stdout.write(trimmedInput + "\n");
+        const args = trimmedInput.split(/ +/);
+        const commandName = args.shift().toLowerCase();
         const command = client.consoleCommands.get(commandName);
         if (!command) return;
 
         process.stdout.write("\u001b[1A\u001b[2K");
         await console.logger(`
-    Executing [${commandName}]
-    by        [CONSOLE]
-    ---------------------------`
+        Executing [${commandName}]
+        by        [CONSOLE]
+        ---------------------------`
             .replace(/^\s+/gm, ""));
 
         await command.execute(client, logger, args);

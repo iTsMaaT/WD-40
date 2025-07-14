@@ -45,7 +45,7 @@ module.exports = {
                 ownerId: owner.id,
                 channelId: message.channel.id,
                 channelName: message.channel.name,
-                currentTime: getExactDate,
+                currentTime: getExactDate(),
                 authorUsername: message.author.username,
                 authorDisplayName: message.author.displayName,
                 authorId: message.author.id,

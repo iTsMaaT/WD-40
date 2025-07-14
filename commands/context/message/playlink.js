@@ -10,7 +10,7 @@ module.exports = {
     type: ApplicationCommandType.Message,
     ephemeral: true,
     async execute(logger, interaction, client) {
-        const playerConfig = config.get("discordPlayerConf");
+        const playerConfig = config.get("discordPlayer");
         const player = useMainPlayer();
         const message = interaction.targetMessage;
         const queries = getURLs(message.content) || [];

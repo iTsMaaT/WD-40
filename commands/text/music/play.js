@@ -2,6 +2,8 @@ const { PermissionsBitField } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { getLoopMode } = require("@utils/helpers/playerHelpers");
 const { QueryType, useMainPlayer, useQueue, QueryResolver } = require("discord-player");
+const { SpotifyExtractor } = require("discord-player-spotify");
+const { YoutubeiExtractor } = require("discord-player-youtubei");
 const config = require("@utils/config/configUtils");
 const { searchWithPriorities, getProbableBridgeSource } = require("@utils/helpers/playerHelpers");
 const fs = require("fs");
@@ -10,7 +12,7 @@ const { simpleFolderSearch } = require("simple-folder-search");
 
 module.exports = {
     name: "play",
-    description: "Play a song (works best with YouTube or Soundcloud links)",
+    description: "Play a song (works best with Deezer or Soundcloud links (YouTube breaks often))", 
     aliases: ["p"],
     usage: {
         required: {
@@ -28,7 +30,7 @@ module.exports = {
         },
     },
     category: "music",
-    examples: ["never gonna give you up"],
+    examples: ["never gonna give you up", "https://www.youtube.com/watch?v=dQw4w9WgXcQ -pn", "https://open.spotify.com/album/3tH2uMqhU1hP9BBOkDkXIZ -s -pn"],
     permissions: [PermissionsBitField.Flags.Connect],
     cooldown: 1000,
     inVoiceChannel: true,
@@ -57,16 +59,14 @@ module.exports = {
         if (!string && !attachment) 
             return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
         
-        const stringQueryType = QueryResolver.resolve(string).type;
-        const isYoutube = [QueryType.YOUTUBE_SEARCH, QueryType.YOUTUBE, QueryType.YOUTUBE_PLAYLIST, QueryType.YOUTUBE_VIDEO].includes(stringQueryType);
-        const isSoundcloud = [QueryType.SOUNDCLOUD_SEARCH, QueryType.SOUNDCLOUD, QueryType.SOUNDCLOUD_PLAYLIST, QueryType.SOUNDCLOUD_TRACK].includes(stringQueryType);
-        const needsBridge = (stringQueryType === QueryType.AUTO_SEARCH || stringQueryType === QueryType.SPOTIFY_SONG) && !attachment;
-        const doesntNeedBridge = isYoutube || isSoundcloud || stringQueryType === QueryType.ARBITRARY || attachment ? true : false;
+        const queryType = await awareQueryResolver(string, player, playerConfig);
 
-        if (stringQueryType === QueryType.YOUTUBE_VIDEO 
+        if (
+            queryType.extractor?.identifier == YoutubeiExtractor.identifier 
+            && (queryType.type === "track" || queryType.type === null)
             && !playerConfig.extractors.Youtubei.enabled 
-            && playerConfig.extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.usingEmbed) 
-        {
+            && playerConfig.extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.usingEmbed
+        ) {
             const messageEmbeds = message.embeds || [];
             for (const embed of messageEmbeds) {
                 if (embed.provider?.name === "YouTube") {
@@ -84,11 +84,15 @@ module.exports = {
         try {
             let research, specificSearch, choice = null;
 
-            if (needsBridge) {
-                if (stringQueryType === QueryType.SPOTIFY_SONG) {
+            if (!queryType.canStream && queryType.type !== "playlist") {
+                if (
+                    queryType.extractor?.identifier === SpotifyExtractor.identifier 
+                    && queryType.type === "track" 
+                    && playerConfig.extractors.Spotify.enabled
+                ) {
                     research = await player.search(string, {
                         requestedBy: message.member,
-                        searchEngine: QueryType.SPOTIFY_SONG,
+                        searchEngine: `ext:${SpotifyExtractor.identifier}`,
                     });
                     if (!research.hasTracks()) return await sentMessage.edit({ embeds: [embedGenerator.warning("No results found")] });
                     specificSearch = research.tracks[0]?.title ? `${research.tracks[0].title} - ${research.tracks[0].author}` : string;
@@ -150,11 +154,11 @@ module.exports = {
                 await sentMessage.edit({ embeds: [choicesEmbed] });
 
                 const filter = (m) => m.author.id === message.author.id && !isNaN(m.content);
-                await message.channel.awaitMessages({ filter, max: 1, time: 10000, errors: ["time"] })
+                await message.channel.awaitMessages({ filter, max: 1, time: 10000, errors: ["time", "channelDelete", "guildDelete", "messageDelete"] })
                     .then((collected) => {
                         const responseMessage = collected.first();
                         choice = (parseInt(responseMessage.content)) - 1;
-                        // responseMessage.delete().catch(() => null);
+                        responseMessage.delete().catch(() => null);
                     })
                     .catch(() => choice = 0);
             } else {
@@ -198,9 +202,9 @@ module.exports = {
                                 client: message.guild.members.me,
                                 requestedBy: message.user,
                                 guild: message.guild,
-                                probableBridgeSource: getProbableBridgeSource(playerConfig, !needsBridge && doesntNeedBridge),
+                                probableBridgeSource: getProbableBridgeSource(playerConfig, queryType.canStream),
                             },
-                            verifyFallbackStream: true,
+                            verifyFallbackStream: false,
                             ...playerConfig.globalPlayerNodeOptions,
                         },
                     },
@@ -217,16 +221,15 @@ module.exports = {
                 description: isURL(finalTrack.url) ? `[${finalTrack.title}](${finalTrack.url})` : finalTrack.title,
                 fields: [
                     { name: "Pre-shuffled", value: optionalArgs["shuffle|s"] ? "Yes" : "No", inline: true },
-                    { name: "Will play next", value: optionalArgs["playnext|pn"] && queue ? "Yes" : "No", inline: true },
+                    { name: "Force play next", value: optionalArgs["playnext|pn"] && queue ? "Yes" : "No", inline: true },
                     { name: "Extractor", value: `\`${finalTrack.extractor?.identifier || "N/A"}\`` },
-                    { name: "Probable bridge source ( [\\▶] = upon fail, falls back to...)", value: getProbableBridgeSource(playerConfig, !needsBridge && doesntNeedBridge) },
+                    { name: "Probable bridge source ( [\\▶] = upon fail, falls back to...)", value: getProbableBridgeSource(playerConfig, queryType.canStream) },
                 ],
                 footer: { text: `Loop mode: ${getLoopMode(queue)}` },
             }).withAuthor(message.author);
 
             if (finalSearchResult?.playlist) 
                 embed.data.fields.push({ name: "Playlist", value: `[${finalSearchResult.playlist.title}](${finalSearchResult.playlist.url})` });
-            
 
             await sentMessage.edit({ embeds: [embed] });
             if (!playerConfig.extractors.Youtubei.enabled && isYoutube && playerConfig.extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled)
@@ -246,9 +249,10 @@ module.exports = {
  * @param {Player} player 
  * @returns {Promise<{ extractor: Extractor | null, type: string }>}
  */
-async function awareQueryResolver(query, player) {
+async function awareQueryResolver(query, player, playerConfig) {
     const extractors = player.extractors.store;
     const result = { extractor: null, type: null, canStream: false };
+    const extractorConfig = Object.entries(playerConfig?.extractors) || {};
 
     if (!query || !extractors || !extractors.size) return result;
 
@@ -266,6 +270,10 @@ async function awareQueryResolver(query, player) {
         try {
             if (await extractor.validate(query, QueryResolver.resolve(query).type)) {
                 result.extractor = extractor;
+                const configEntry = extractorConfig.find(
+                    ext => extractor.identifier.toLowerCase().includes(ext[0].toLowerCase()),
+                );
+                result.canStream = configEntry ? !!configEntry[1].canStream : false;
                 break;
             }
         } catch {
