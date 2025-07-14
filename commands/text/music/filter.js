@@ -12,7 +12,7 @@ module.exports = {
     inVoiceChannel: true,
     inSameVoiceChannel: true,
     async execute(logger, client, message, args, optionalArgs) {
-        const ffmpegFilters = config.get("discordPlayerConf")?.ffmpegFilters || {};
+        const ffmpegFilters = config.get("discordPlayer")?.ffmpegFilters || {};
 
         const queue = useQueue();
         const filter = args[0]?.toLowerCase();
