@@ -24,7 +24,7 @@ module.exports = {
 
             queue = useQueue();
             if (!queue || !queue.currentTrack) {
-                if (queue.repeatMode !== QueueRepeatMode.AUTOPLAY) return await message.channel.send({ embeds: [embedGenerator.error("There is nothing left to play.")] });
+                if (queue?.repeatMode !== QueueRepeatMode.AUTOPLAY) return await message.channel.send({ embeds: [embedGenerator.error("There is nothing left to play.")] });
                 else return await message.channel.send({ embeds: [embedGenerator.warning("Autoplay is enabled, a song will start playing shortly.")] });
             } 
 
