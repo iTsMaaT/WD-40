@@ -10,6 +10,7 @@ const checkGitHubVersion = async function() {
     const repoUrlArray = repository.url.split("/");
     const repoIdentifier = `${repoUrlArray[3]}/${repoUrlArray[4].split(".")[0]}`;
     const result = await (await fetch(`https://api.github.com/repos/${repoIdentifier}/contents/package.json`)).json();
+    if (result?.message?.includes("No server is currently available to service your request")) return logger.severe("GitHub API is currently unavailable. Cannot check version.");
     const githubVersion = JSON.parse(Buffer.from(result.content, "base64").toString("utf-8")).version; 
     logger.debug(`Current version is ${version}`);
 
