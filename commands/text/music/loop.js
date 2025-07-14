@@ -20,10 +20,10 @@ module.exports = {
         const queue = useQueue();
         const loopMode = args[0]?.toLowerCase() || "queue";
 
+        if (!queue || !queue.tracks) return await message.reply({ embeds: [embedGenerator.error("There is nothing playing.")] });
+        
         let newLoopMode;
         const oldLoopMode = queue.repeatMode;
-
-        if (!queue || !queue.tracks) return await message.reply({ embeds: [embedGenerator.error("There is nothing playing.")] });
 
         switch (loopMode) {
             case "off":
