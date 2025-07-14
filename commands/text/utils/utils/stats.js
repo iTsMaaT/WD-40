@@ -10,6 +10,7 @@ const { useMainPlayer } = require("discord-player");
 const { toEngineerNotation } = require("@functions/formattingFunctions");
 const { ChartJSNodeCanvas } = require("chartjs-node-canvas");
 const { AttachmentBuilder } = require("discord.js");
+const config = require("@utils/config/configUtils");
 let totalUserCache = 0;
 let imageCache = null;
 
@@ -192,8 +193,11 @@ async function generateChartBuffer(timestamps) {
 
     const lastTimestamp = new Date(labels[labels.length - 1]).getTime();
     const oneDay = 24 * 60 * 60 * 1000;
-    
-    const config = {
+
+    const timeZone = config.get("timeZone") || "UTC";
+    const locale = config.get("locale") || "en-CA";
+
+    const configChart = {
         type: "line",
         data: {
             datasets: [{
@@ -213,7 +217,7 @@ async function generateChartBuffer(timestamps) {
                     ticks: {
                         callback: function(value) {
                             const date = new Date(value);
-                            return date.toISOString().split("T")[0];
+                            return date.toLocaleDateString(locale, { timeZone });
                         },
                         color: "white",
                         // maxTicksLimit: 7,
@@ -251,7 +255,7 @@ async function generateChartBuffer(timestamps) {
         },
     };
 
-    const finalBuffer = await chartJSNodeCanvas.renderToBuffer(config);
+    const finalBuffer = await chartJSNodeCanvas.renderToBuffer(configChart);
     imageCache = finalBuffer;
     return finalBuffer;
 }
