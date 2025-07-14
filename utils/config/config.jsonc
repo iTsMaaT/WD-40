@@ -96,6 +96,7 @@
         // Path to FFmpeg binary, null if global
         "ffmpegPath": null,
         "globalPlayerNodeOptions": {
+            "disableSeeker": false,         // Disable seeking in the player
             "volume": 50,
             "maxSize": 10000,               // Maximum size of the queue
             "bufferingTimeout": 15000,      // Timeout for buffering (in ms)
@@ -108,6 +109,13 @@
             "skipOnNoStream": true          // Skip tracks if no stream is available
         },
         "extractors": {
+            "Subsonic": {
+                "enabled": true,
+                "canStream": true,
+                "canBridge": false,
+                "priority": 15,
+                "config": {}
+            },
             "Deezer": {
                 "enabled": true,
                 "canStream": true,
