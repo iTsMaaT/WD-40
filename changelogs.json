@@ -451,5 +451,12 @@
             "Some config refactoring",
             "(Hopefully) fixed YouTube by switching to the WEB_EMBEDDED client, and having YT-DLP as a fallback for streaming"
         ]
+    },
+    {
+        "version": "5.12.4",
+        "date": "2025-07-14",
+        "changes": [
+            "Multiple bug fixes and optimisations"
+        ]
     }
 ]
