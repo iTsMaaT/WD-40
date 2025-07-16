@@ -458,5 +458,12 @@
         "changes": [
             "Multiple bug fixes and optimisations"
         ]
+    },
+    {
+        "version": "5.12.5",
+        "date": "2025-07-14",
+        "changes": [
+            "Multiple bug fixes related to self-hosting"
+        ]
     }
 ]
