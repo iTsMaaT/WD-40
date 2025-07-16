@@ -32,7 +32,7 @@ class LiveUpdatingBotStats {
      * @returns {Promise<void>}
      */
     async start() {
-        if (process.env.SERVER === "dev") return;
+        if (process.env.SERVER === "dev" || !DB.dbExists()) return;
         const jobExecution = async () => {
             const embed = await this.generateStatsEmbed();
             this.handleMessage({ embeds: [embed] });
