@@ -265,7 +265,7 @@
 
         process.stdout.write("\u001b[1A\u001b[2K");
         await console.logger(`
-        Executing [${commandName}]
+        Executing [${trimmedInput}]
         by        [CONSOLE]
         ---------------------------`
             .replace(/^\s+/gm, ""));
@@ -274,5 +274,5 @@
     });
 
     // Logins with the token
-    client.login(process.env.SERVER === "dev" && process.env.DEV_TOKEN ? process.env.DEV_TOKEN : process.env.TOKEN);
+    await client.login(process.env.SERVER === "dev" && process.env.DEV_TOKEN ? process.env.DEV_TOKEN : process.env.TOKEN);
 })();
