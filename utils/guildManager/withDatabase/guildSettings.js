@@ -52,7 +52,7 @@ async function SetActiveOrCreate(guild, status = true) {
  */
 async function CheckIfGuildExists(guild) {
     const result = await repositories.guildsettings.select().where(eq(schema.guildsettings.guildId, guild.id));
-    return !result.length == 0;
+    return result.length > 0;
 }
     
 /**
@@ -67,6 +67,7 @@ async function AddGuildToDatabase(guild) {
     });
     prefixes[guild.id] = config.get("defaultPrefix");
     responses[guild.id] = false;
+    personality[guild.id] = config.get("defaultPersonality");
 }
     
 /**
@@ -98,6 +99,7 @@ async function UpdateGuild(guild, data) {
 async function ToggleResponses(guild, status) {
     await UpdateGuild(guild, { responses: status });
     responses[guild.id] = status;
+    return responses[guild.id];
 }
 
 /**
@@ -109,6 +111,7 @@ async function ToggleResponses(guild, status) {
 async function TogglePrefix(guild, prefix) {
     await UpdateGuild(guild, { prefix: prefix });
     prefixes[guild.id] = prefix;
+    return prefixes[guild.id];
 }
 
 /**
@@ -119,7 +122,8 @@ async function TogglePrefix(guild, prefix) {
  */
 async function SetPersonality(guild, persona) {
     await UpdateGuild(guild, { Persona: persona });
-    persona[guild.id] = persona;
+    personality[guild.id] = persona;
+    return personality[guild.id];
 }
 
 /**

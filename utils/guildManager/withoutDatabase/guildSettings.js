@@ -90,6 +90,7 @@ async function UpdateGuild(guild, data) {
  */
 async function ToggleResponses(guild, status) {
     responses[guild.id] = status;
+    return responses[guild.id];
 }
 
 /**
@@ -100,6 +101,7 @@ async function ToggleResponses(guild, status) {
  */
 async function TogglePrefix(guild, prefix) {
     prefixes[guild.id] = prefix;
+    return prefixes[guild.id];
 }
 
 /**
@@ -109,7 +111,8 @@ async function TogglePrefix(guild, prefix) {
  * @param {string} persona - The new personality string to set.
  */
 async function SetPersonality(guild, persona) {
-    persona[guild.id] = persona;
+    personality[guild.id] = persona;
+    return personality[guild.id];
 }
 
 /**
