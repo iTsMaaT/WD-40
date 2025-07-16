@@ -60,6 +60,10 @@ module.exports = {
             return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
         
         const queryType = await awareQueryResolver(string, player, playerConfig);
+        if (!isURL(string)) {
+            queryType.canStream = false;
+            queryType.type = "search";
+        }
 
         if (
             queryType.extractor?.identifier == YoutubeiExtractor.identifier 
