@@ -163,6 +163,31 @@ function getPermissionArrayNames(flags) {
     return new PermissionsBitField(flags).toArray();
 }
 
+/**
+ * Fetches all guilds from the client
+ * @param {Client} client The client to fetch guilds from
+ * @returns {Promise<Map<string, Guild>>} A map of all guilds
+ */
+async function fetchAllGuilds(client) {
+    let after;
+    const allGuilds = new Map();
+
+    while (true) {
+        const fetched = await client.guilds.fetch({ limit: 200, after });
+        if (!fetched.size) break;
+
+        // eslint-disable-next-line no-shadow
+        for (const [id, guild] of fetched) 
+            allGuilds.set(id, guild);
+        
+
+        after = [...fetched.keys()].pop(); // set the last ID as cursor
+        if (fetched.size < 200) break;
+    }
+
+    return allGuilds;
+}
+
 module.exports = { 
     createOrUseWebhook,
     id,

@@ -45,7 +45,7 @@ module.exports = {
         console.log("Reddit config file initialized.");
 
         console.log("Guild manager initiation...");
-        const guilds = await client.guilds.fetch();
+        const guilds = client.guilds.cache;
         console.log(`Found ${guilds.size} guilds.`);
         await GuildManager.init(guilds, client);
         console.log("Guild manager initiation done.");
