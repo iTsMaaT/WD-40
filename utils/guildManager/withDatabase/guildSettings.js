@@ -15,17 +15,18 @@ const personality = {};
  * @param {object} client - The Discord client instance.
  */
 async function init(guilds, client) {
-    guilds.forEach(async (guild) => {
+    for (const guildObj of guilds) {
+        const guild = guildObj[1];
         const exists = await CheckIfGuildExists(guild);
         if (!exists) await AddGuildToDatabase(guild);
         const settings = await GetGuildSettings(guild);
-        prefixes[guild.id] = settings.prefix;
-        responses[guild.id] = settings.responses;
-        personality[guild.id] = settings.personality;
-    });
+        prefixes[guild.id] = settings.prefix ?? config.get("defaultPrefix");
+        responses[guild.id] = settings.responses ?? false;
+        personality[guild.id] = settings.personality ?? config.get("defaultPersonality");
+    }
 
     const DBguildIDs = (await repositories.guildsettings.select()).map(item => item.guildId);
-    const botGuildIds = client.guilds.cache.map(gui => gui.id);
+    const botGuildIds = guilds.map(g => g.id);
     const notInGuildIds = DBguildIDs.filter(id => !botGuildIds.includes(id));
     for (const notInGuildId of notInGuildIds) 
         await SetActiveOrCreate({ id: notInGuildId }, false);
@@ -64,6 +65,9 @@ async function AddGuildToDatabase(guild) {
     await repositories.guildsettings.insert({
         guildId: guild.id,
         guildName: guild.name,
+        prefix: config.get("defaultPrefix"),
+        responses: false,
+        personality: config.get("defaultPersonality"),
     });
     prefixes[guild.id] = config.get("defaultPrefix");
     responses[guild.id] = false;
@@ -121,7 +125,7 @@ async function TogglePrefix(guild, prefix) {
  * @param {string} persona - The new personality string to set.
  */
 async function SetPersonality(guild, persona) {
-    await UpdateGuild(guild, { Persona: persona });
+    await UpdateGuild(guild, { personality: persona });
     personality[guild.id] = persona;
     return personality[guild.id];
 }
@@ -132,6 +136,9 @@ async function SetPersonality(guild, persona) {
  * @returns {string} The prefix for the guild.
  */
 function GetPrefix(guild) {
+    if (prefixes[guild.id] === undefined) 
+        logger.warn(`Prefix not found in cache for guild ${guild.id}`);
+    
     return prefixes[guild.id];
 }
 

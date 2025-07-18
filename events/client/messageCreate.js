@@ -17,6 +17,7 @@ module.exports = {
     once: false,
     log: false,
     async execute(client, logger, msg) {
+        if (!client.clientInitialized) return;
         const TextCooldowns = client.TextCooldowns;
         const autoCorrectCooldowns = new Map();
         await Promise.allSettled([
