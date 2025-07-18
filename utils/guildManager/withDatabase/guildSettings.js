@@ -15,8 +15,7 @@ const personality = {};
  * @param {object} client - The Discord client instance.
  */
 async function init(guilds, client) {
-    for (const guildObj of guilds) {
-        const guild = guildObj[1];
+    for (const guild of guilds.values()) {
         const exists = await CheckIfGuildExists(guild);
         if (!exists) await AddGuildToDatabase(guild);
         const settings = await GetGuildSettings(guild);
@@ -137,7 +136,7 @@ async function SetPersonality(guild, persona) {
  */
 function GetPrefix(guild) {
     if (prefixes[guild.id] === undefined) 
-        logger.warn(`Prefix not found in cache for guild ${guild.id}`);
+        logger.warning(`Prefix not found in cache for guild ${guild.id}`);
     
     return prefixes[guild.id];
 }

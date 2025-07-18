@@ -6,6 +6,7 @@ const getPterodactylInfo = require("@utils/functions/getPterodactylInfo.js");
 const getUniqueValues = require("@utils/functions/getUniqueValues.js");
 const EmbedGenerator = require("@utils/helpers/embedGenerator");
 const { repositories } = require("@utils/db/tableManager.js");
+const guildSettings = require("@utils/guildManager/withDatabase/guildSettings.js");
 
 module.exports = {
     name: "test",
@@ -13,6 +14,9 @@ module.exports = {
     category: "fun",
     private: true,
     async execute(logger, client, message, args, optionalArgs) {
-        //
+        for (const guild of client.guilds.cache.values()) {
+            const settings = await guildSettings.GetGuildSettings(guild);
+            logger.info(`Guild ${guild.name} (${guild.id}) has prefix ${settings.prefix}`);
+        }
     },
 };
