@@ -8,7 +8,7 @@ module.exports = {
     description: "Play a game of Hangman!",
     category: "games",
     async execute(logger, client, message, args, optionalArgs) {
-        const prefix = GuildManager.GetPrefix(message.guild);
+        const prefix = GuildManager.GetPrefix(message.guild.id);
 
         // List of words for the game
         const word = words[Math.floor(Math.random() * words.length)].toUpperCase(); // Random word in uppercase

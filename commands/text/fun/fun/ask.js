@@ -96,7 +96,7 @@ module.exports = {
                 const reference = await message.channel.messages.fetch(reply.reference.messageId);
                 if (reference.id !== currentReply.id) return;
 
-                const prefix = GuildManager.GetPrefix(message.guild);
+                const prefix = GuildManager.GetPrefix(message.guild.id);
                 const replyContent = reply.content;
                 await reply.channel.sendTyping();
 

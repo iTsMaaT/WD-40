@@ -120,8 +120,8 @@ async function SetPersonality(guild, persona) {
  * @param {object} guild - The guild object to retrieve the prefix for.
  * @returns {string} The prefix for the guild.
  */
-function GetPrefix(guild) {
-    return prefixes[guild.id];
+function GetPrefix(guildid) {
+    return prefixes[guildid];
 }
 
 /**

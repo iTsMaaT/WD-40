@@ -28,7 +28,7 @@ module.exports = {
         async function handleAutoResponses(message) {
             if (message.author.bot) return;
             if (!message.guild) return;
-            const prefix = GuildManager.GetPrefix(message.guild);
+            const prefix = GuildManager.GetPrefix(message.guild.id);
 
             if (message.content.trim() == `<@${client.user.id}>`) {
                 const embed = {
@@ -90,7 +90,7 @@ Step 5 - Send the downloaded media to your favorite social media!
             if (config.get("GLOBAL_BLACKLIST").includes(message.author.id)) return;
             if (message.content.trim() == `<@${client.user.id}>`) return;
 
-            const prefix = GuildManager.GetPrefix(message.guild);
+            const prefix = GuildManager.GetPrefix(message.guild.id);
             if (!message.content.startsWith(prefix) && !message.content.startsWith(`<@${client.user.id}>`)) return;
 
             let args, commandName;

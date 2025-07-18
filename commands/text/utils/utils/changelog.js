@@ -21,7 +21,7 @@ module.exports = {
             timestamp: new Date(),
         };
 
-        const prefix = GuildManager.GetPrefix(message.guild);
+        const prefix = GuildManager.GetPrefix(message.guild.id);
         message.reply({ embeds: [changelogEmbed], content: `For help: ${prefix}help` });
     },
 };

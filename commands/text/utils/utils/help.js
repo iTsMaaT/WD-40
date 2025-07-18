@@ -14,7 +14,7 @@ module.exports = {
         },
     },
     async execute(logger, client, message, args, optionalArgs) {
-        const prefix = GuildManager.GetPrefix(message.guild);
+        const prefix = GuildManager.GetPrefix(message.guild.id);
 
         // Function to generate the full help embed for a command
         const generateFullCommandEmbed = (command, pref) => {

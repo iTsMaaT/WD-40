@@ -17,7 +17,7 @@ module.exports = {
     async execute(logger, client, message, args, optionalArgs) {
         const newPrefix = args[0];
         if (newPrefix?.length > 3) return await message.reply({ embeds: [embedGenerator.warning("Prefix can't have more than 3 characters")] });
-        if (!newPrefix) return await message.reply({ embeds: [embedGenerator.info(`The prefix is \`${GuildManager.GetPrefix(message.guild)}\``)] });
+        if (!newPrefix) return await message.reply({ embeds: [embedGenerator.info(`The prefix is \`${GuildManager.GetPrefix(message.guild.id)}\``)] });
 
         if (!dbManager.dbExists()) {
             return await message.reply({ embeds: [embedGenerator.error({
