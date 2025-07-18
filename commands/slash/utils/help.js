@@ -42,7 +42,7 @@ module.exports = {
         );
     },
     async execute(logger, interaction, client) {
-        const prefix = GuildManager.GetPrefix(interaction.guild);
+        const prefix = GuildManager.GetPrefix(interaction.guild.id);
 
         const generateFullCommandEmbed = (command, pref) => {
             const CommandEmbed = {

@@ -32,7 +32,7 @@ module.exports = {
         
         const PteroInfo = await getPterodactylInfo();
         const RamUsageFormatted = `${PteroInfo?.ram.usage.clean || (toEngineerNotation(process.memoryUsage().rss) + "B rss")} / ${PteroInfo?.ram.limit.clean || (toEngineerNotation(process.memoryUsage().heapTotal) + "B heap")} (${PteroInfo?.ram.pourcentage.clean || "N/A"})`;
-        const prefix = GuildManager.GetPrefix(message.guild);
+        const prefix = GuildManager.GetPrefix(message.guild.id);
         let lastCommandTimeSinceNow = "";
         let lastExecutedCommand = "";
         let lastCommandLink = "";

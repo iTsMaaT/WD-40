@@ -134,11 +134,11 @@ async function SetPersonality(guild, persona) {
  * @param {object} guild - The guild object to retrieve the prefix for.
  * @returns {string} The prefix for the guild.
  */
-function GetPrefix(guild) {
-    if (prefixes[guild.id] === undefined) 
-        logger.warning(`Prefix not found in cache for guild ${guild.id}`);
+function GetPrefix(guildid) {
+    if (prefixes[guildid] === undefined) 
+        logger.warning(`Prefix not found in cache for guild ${guildid}`);
     
-    return prefixes[guild.id];
+    return prefixes[guildid];
 }
 
 /**
