@@ -123,8 +123,8 @@
                 newFiles.forEach(f => commandFiles.push(path.join(file, f)));
             } else if (file.endsWith(".js")) {
                 try {
-                    const loaded = require(absolutePath); // Use absolute path for require
-                    loaded.filePath = absolutePath; // Store absolute path for reference
+                    const loaded = require(absolutePath);
+                    loaded.filePath = absolutePath;
 
                     if (loaded.loadFileIgnore) continue;
                     await callback(loaded, file);
@@ -265,6 +265,7 @@
 
         process.stdout.write("\u001b[1A\u001b[2K");
         await console.logger(`
+        ---------------------------
         Executing [${trimmedInput}]
         by        [CONSOLE]
         ---------------------------`
