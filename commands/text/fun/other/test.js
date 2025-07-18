@@ -7,6 +7,7 @@ const getUniqueValues = require("@utils/functions/getUniqueValues.js");
 const EmbedGenerator = require("@utils/helpers/embedGenerator");
 const { repositories } = require("@utils/db/tableManager.js");
 const guildSettings = require("@utils/guildManager/withDatabase/guildSettings.js");
+const GuildManager = require("@guildManager");
 
 module.exports = {
     name: "test",
@@ -15,8 +16,8 @@ module.exports = {
     private: true,
     async execute(logger, client, message, args, optionalArgs) {
         for (const guild of client.guilds.cache.values()) {
-            const settings = await guildSettings.GetGuildSettings(guild);
-            logger.info(`Guild ${guild.name} (${guild.id}) has prefix ${settings.prefix}`);
+            const prefix = GuildManager.GetPrefix(guild.id);
+            logger.info(`Guild ${guild.name} (${guild.id}) has prefix ${prefix}`);
         }
     },
 };
