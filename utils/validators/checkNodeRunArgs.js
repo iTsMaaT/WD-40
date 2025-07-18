@@ -13,6 +13,17 @@ const checkNodeRunArgs = function() {
             process.exit(0);
         }
     }
+
+    if (process.env.npm_lifecycle_event) 
+        if (process.env.npm_lifecycle_event.split(":")[1] !== "dev" && process.env.server == "dev") logger.warning("You should be running the bot in dev mode by doing `npm run start:dev`");
+
+    // logger.info("Current npm variables:");
+    // for (const [key, value] of Object.entries(process.env)) {
+    //    if (key.startsWith("npm_")) 
+    //        logger.info(`${key} = ${value}`);
+    //
+    // }
+    
 };
 
 module.exports = { execute: checkNodeRunArgs };
