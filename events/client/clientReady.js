@@ -46,6 +46,7 @@ module.exports = {
 
         console.log("Guild manager initiation...");
         const guilds = await client.guilds.fetch();
+        console.log(`Found ${guilds.size} guilds.`);
         await GuildManager.init(guilds, client);
         console.log("Guild manager initiation done.");
 
