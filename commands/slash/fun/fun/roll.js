@@ -30,7 +30,7 @@ module.exports = {
 
         // Limits the input to 50d50
         if (numDices > 50 || numSides > 50) 
-            return interaction.editReplyeply({ embeds: [embedGenerator.warning("Maximum of 50 dices with 50 sides")] });
+            return interaction.editReply({ embeds: [embedGenerator.warning("Maximum of 50 dices with 50 sides")] });
             
 
         // Roll the dices

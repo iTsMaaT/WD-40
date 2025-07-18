@@ -65,10 +65,12 @@ module.exports = {
         console.log(`Debug is ${config.get("defaultDebugState") ? "en" : "dis"}abled`);
         console.log(`Superuser is ${config.get("defaultSuperuserState") ? "en" : "dis"}abled`);
 
-        console.log("Starting LiveUpdatingBotStats...");
-        const liveUpdatingBotStats = new LiveUpdatingBotStats(client, client.channels.cache.get(config.get("LIVE_UPDATE_CHANNEL_ID")));
-        liveUpdatingBotStats.start();
-        console.log("LiveUpdatingBotStats started.");
+        if (config.get("LIVE_UPDATE_CHANNEL_ID")) {
+            console.log("Starting LiveUpdatingBotStats...");
+            const liveUpdatingBotStats = new LiveUpdatingBotStats(client, client.channels.cache.get(config.get("LIVE_UPDATE_CHANNEL_ID")));
+            liveUpdatingBotStats.start();
+            console.log("LiveUpdatingBotStats started.");
+        }
 
         console.log("Waiting for websocket to report sensical ping (> -1ms)");
         console.logger(`
@@ -121,8 +123,9 @@ module.exports = {
         // start confirmation
         const interval = setInterval(() => {
             if (client.ws.ping !== -1) {
-                if (process.env.SERVER != "dev" && process.env.STATUS_CHANNEL_ID) client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
+                if (process.env.SERVER != "dev" && config.get("STATUS_CHANNEL_ID")) client.channels.cache.get(config.get("STATUS_CHANNEL_ID")).send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
                 logger.info(`Bot started successfully with a websocket ping of ${client.ws.ping}ms`);
+                client.clientInitialized = true;
                 clearInterval(interval);
             }
         }, 500);
