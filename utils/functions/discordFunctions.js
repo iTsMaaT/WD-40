@@ -168,21 +168,31 @@ function getPermissionArrayNames(flags) {
  * @param {Client} client The client to fetch guilds from
  * @returns {Promise<Map<string, Guild>>} A map of all guilds
  */
-async function fetchAllGuilds(client) {
-    let after;
+async function fetchAllGuildsPaginated() {
     const allGuilds = new Map();
+    let after = undefined;
+    const limit = 100; // Discord's max per page
 
     while (true) {
-        const fetched = await client.guilds.fetch({ limit: 200, after });
-        if (!fetched.size) break;
+        const params = new URLSearchParams({ limit: limit.toString() });
+        if (after) params.append("after", after);
 
-        // eslint-disable-next-line no-shadow
-        for (const [id, guild] of fetched) 
-            allGuilds.set(id, guild);
-        
+        const res = await fetch(`https://discord.com/api/v10/users/@me/guilds?${params}`, {
+            headers: {
+                Authorization: `Bot ${process.env.SERVER === "dev" && process.env.DEV_TOKEN ? process.env.DEV_TOKEN : process.env.TOKEN}`,
+            },
+        });
 
-        after = [...fetched.keys()].pop(); // set the last ID as cursor
-        if (fetched.size < 200) break;
+        if (!res.ok) {
+            const err = await res.text();
+            throw new Error(`Discord API error: ${res.status} - ${err}`);
+        }
+
+        const guilds = await res.json();
+        for (const g of guilds) allGuilds.set(g.id, g);
+
+        if (guilds.length < limit) break; // done paginating
+        after = guilds[guilds.length - 1].id;
     }
 
     return allGuilds;
@@ -196,4 +206,5 @@ module.exports = {
     editOrSend, 
     multipleImageEmbed,
     getPermissionArrayNames,
+    fetchAllGuildsPaginated,
 };
