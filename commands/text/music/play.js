@@ -66,7 +66,7 @@ module.exports = {
         }
 
         if (
-            queryType.extractor?.identifier == YoutubeiExtractor.identifier 
+            (string.includes("youtube.com") || string.includes("youtu.be")) 
             && (queryType.type === "track" || queryType.type === null)
             && !playerConfig.extractors.Youtubei.enabled 
             && playerConfig.extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.usingEmbed
@@ -111,9 +111,9 @@ module.exports = {
 
                 if (!research.hasTracks()) {
                     let footerText = "";
-                    if (!playerConfig.extractors.Youtubei.enabled && isYoutube) {
-                        footerText = playerConfig.extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled
-                            ? "YouTube extraction is disabled, to support YouTube links, the YouTube embed must be visible"
+                    if (!playerConfig.extractors.Youtubei.enabled && (string.includes("youtube.com") || string.includes("youtu.be"))) { 
+                        footerText = playerConfig.extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.usingEmbed
+                            ? "YouTube extraction is disabled, to support YouTube links, the YouTube embed must be visible (and it stillmight fail)"
                             : "Youtube has been disabled, for more info, use the help command and go in the support server.";
                     }
                     return await sentMessage.edit({ embeds: [embedGenerator.warning({
