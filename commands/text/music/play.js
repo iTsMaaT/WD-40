@@ -171,7 +171,7 @@ module.exports = {
                     return await sentMessage.edit({ embeds: [embedGenerator.warning({
                         description: "No results found",
                         footer: { 
-                            text: !playerConfig.extractors.Youtubei.enabled && isYoutube ? "Youtube has been disabled, for more info, use the help command and go in the support server." : undefined,
+                            text: !playerConfig.extractors.Youtubei.enabled && (string.includes("youtube.com") || string.includes("youtu.be")) ? "Youtube has been disabled, for more info, use the help command and go in the support server." : undefined,
                         },
                     })] });
                 }
@@ -236,7 +236,7 @@ module.exports = {
                 embed.data.fields.push({ name: "Playlist", value: `[${finalSearchResult.playlist.title}](${finalSearchResult.playlist.url})` });
 
             await sentMessage.edit({ embeds: [embed] });
-            if (!playerConfig.extractors.Youtubei.enabled && isYoutube && playerConfig.extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled)
+            if (!playerConfig.extractors.Youtubei.enabled && (string.includes("youtube.com") || string.includes("youtu.be")) && playerConfig.extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.usingEmbed)
                 await message.channel.send({ embeds: [embedGenerator.warning("Youtube links might not be accurate as YouTube extraction is disabled")] });
             
         } catch (err) {
