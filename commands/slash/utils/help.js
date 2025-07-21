@@ -198,7 +198,9 @@ module.exports = {
                 let commandPrefix = prefix;
                 if (i.customId === "command_select") {
                     const selectedCommandName = i.values[0].replace(/[*:[\] ]/g, "");
-                    const command = categories[counter - 1].includes("slash") ? client.slashcommands.get(selectedCommandName) : client.commands.get(selectedCommandName);
+                    const command = categories[counter - 1].includes("slash")
+                        ? client.slashcommands.get(selectedCommandName)
+                        : client.commands.get(selectedCommandName);
                     if (categories[counter - 1].includes("slash")) commandPrefix = "/";
 
                     if (command) {
@@ -209,6 +211,7 @@ module.exports = {
                         });
                         return;
                     }
+                    return;
                 }
 
                 if (i.customId === "next") 
@@ -273,13 +276,22 @@ module.exports = {
         });
 
         collector.on("end", async () => {
-            row.components.forEach(component => {
-                component.setDisabled(true);
-            });
-            await interaction.editReply({
-                embeds: [embed],
-                components: [row],
-            });
+            try {
+                row.components.forEach(component => component.setDisabled(true));
+        
+                if (!interaction.channel || (!interaction.replied && !interaction.deferred)) return;
+
+                await interaction.editReply({
+                    embeds: [embed],
+                    components: [row],
+                });
+            } catch (error) {
+                if (![10003, 10008, 40060].includes(error.code)) { // Also include "Unknown Interaction"
+                    console.error("Collector cleanup editReply failed:", error);
+                }
+            }
         });
+
+
     },
 };

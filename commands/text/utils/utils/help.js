@@ -173,21 +173,24 @@ module.exports = {
             try {
                 let commandPrefix = prefix;
                 if (interaction.customId === "command_select") {
-                    const commandName = interaction.values[0].replace(/[*:[\] ]/g, ""); // Retrieve selected command
-                    
-                    const command = categories[counter - 1].includes("slash") ? client.slashcommands.get(commandName) : client.commands.get(commandName);
+                    const commandName = interaction.values[0].replace(/[*:[\] ]/g, "");
+                    const command = categories[counter - 1].includes("slash")
+                        ? client.slashcommands.get(commandName)
+                        : client.commands.get(commandName);
+
                     if (categories[counter - 1].includes("slash")) commandPrefix = "/";
-                    
-                    
+
                     if (command) {
                         const fullCommandEmbed = generateFullCommandEmbed(command, commandPrefix);
+
                         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
                         await interaction.followUp({
                             embeds: [fullCommandEmbed],
-                            flags: MessageFlags.Ephemeral,
                         });
+
                         return;
                     }
+                    return;
                 }
 
                 if (interaction.customId === "next") 
@@ -270,15 +273,24 @@ module.exports = {
         });
 
         collector.on("end", async () => {
-            row.components.forEach(component => {
-                component.setDisabled(true);
-            });
-            await helpMessage?.edit({
-                embeds: [embed],
-                components: [row],
-                allowedMentions: { repliedUser: false },
-            });
+            try {
+                row.components.forEach(component => {
+                    component.setDisabled(true);
+                });
+
+                if (!helpMessage?.editable || !helpMessage.channel) return;
+
+                await helpMessage.edit({
+                    embeds: [embed],
+                    components: [row],
+                    allowedMentions: { repliedUser: false },
+                });
+            } catch (error) {
+                if (error.code !== 10003 && error.code !== 10008) 
+                    console.error("Failed to edit help message on collector end:", error);
+            }
         });
+
 
         collector.on("ignore", (interaction) => {
             interaction.reply({ embeds: [embedGenerator.warning("Execute the command yourself to use the buttons")], flags: MessageFlags.Ephemeral });
