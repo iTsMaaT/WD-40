@@ -127,7 +127,7 @@
                 }
             },
             "Youtubei": {
-                "enabled": true,
+                "enabled": false,
                 "canStream": true,
                 "canBridge": true,
                 "priority": 11,
@@ -135,7 +135,7 @@
                     "client": "WEB_EMBEDDED",                   // Client type for YouTube
                     "highWaterMark": 2097152,                   // High water mark for streams
                     "attemptYoutubeSearchEvenIfDisabled": {
-                        "usingEmbed": false,                    // Attempt to search using embed
+                        "usingEmbed": true,                    // Attempt to search using embed
                         "usingScraping": false                  // Attempt to search using scraping
                     },
                     "useServerAbrStream": false,                // Use server ABR stream
