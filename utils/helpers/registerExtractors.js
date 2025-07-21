@@ -9,6 +9,8 @@ const { SpotifyExtractor } = require("discord-player-spotify");
 const { AppleMusicExtractor } = require("discord-player-applemusic");
 const { SubsonicExtractor } = require("discord-player-subsonic");
 const { getVideoInfoFromOnesieRequest, createReadableFromWeb, getPoToken } = require("@utils/helpers/getInfoFromOnesieRequest.js");
+const { distubePluginToExtractor } = require("@utils/helpers/distubePluginToDiscordPlayerExtractor.js");
+const { YouTubePlugin } = require("@distube/youtube");
 const ytdl = require("@distube/ytdl-core");
 const config = require("@utils/config/configUtils");
 const logger = require("@utils/log");
@@ -55,6 +57,9 @@ async function registerExtractors(player) {
             return undefined;
         }
     });
+
+    // const distubeExt = await player.extractors.register(distubePluginToExtractor(YouTubePlugin, { }));
+    // distubeExt.priority = extractors.Youtubei.priority ?? distubeExt.priority;
 
     if (extractors.Subsonic.enabled) {
         const subsonicExt = await player.extractors.register(SubsonicExtractor, {

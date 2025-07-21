@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node --openssl-legacy-provider --no-deprecation index.js",
-    "start:dev": "node --openssl-legacy-provider --trace-deprecation index.js",
+    "start:dev": "node --openssl-legacy-provider --trace-deprecation --trace-warnings index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --no-fix .",
     "drizzle:generate": "npx drizzle-kit generate:pg --out ./utils/db/ --schema ./schema/schema.js",
@@ -30,6 +30,7 @@
   "homepage": "https://github.com/iTsMaaT/WD-40",
   "dependencies": {
     "@discord-player/extractor": "^7.1.0",
+    "@distube/youtube": "^1.0.4",
     "@distube/ytdl-core": "^4.16.12",
     "@google/genai": "^1.7.0",
     "@iamtraction/google-translate": "^2.0.1",
