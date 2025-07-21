@@ -21,7 +21,7 @@ module.exports = {
 
             FactEmbed = embedGenerator.info({
                 title: "The joke:",
-                description: `Catagory: ${joke.category}\nFlags: ${trueFlags.join(", ")}\n\n ${joke.setup ?? joke.joke} \n ${joke.delivery ?? ""}`,
+                description: `Catagory: ${joke.category}\nFlags: ${trueFlags.join(", ")}\n\n${joke.setup ?? joke.joke}\n${joke.delivery ?? ""}`,
                 footer: { text: `ID : ${joke.id}` },
             }).withAuthor(message.author);
 

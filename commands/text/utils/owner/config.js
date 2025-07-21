@@ -115,12 +115,6 @@ module.exports = {
                 await message.reply({ embeds: [configEmbed] });
                 break;
             }
-            case "save": {
-                config.save();
-                const configEmbed = createConfigEmbed("Configuration", "Configuration saved");
-                await message.reply({ embeds: [configEmbed] });
-                break;
-            }
             default: {
                 const configEmbed = createConfigEmbed("Configuration", "Invalid subcommand");
                 await message.reply({ embeds: [configEmbed] });
