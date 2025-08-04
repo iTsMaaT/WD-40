@@ -17,7 +17,7 @@ const algorithms = {
  * @param {string} algorithm - The algorithm to use for finding the best match.
  * @param {string} input - The input string to find the best match for.
  * @param {string[]} values - An array of strings to find the best match in.
- * @returns {{match: string, score: number, matches: Array<{value: string, score: number}>}} An object containing the best match, its score, and a sorted array of matches.
+ * @returns {{match: string, score: number, index: number, matches: Array<{value: string, score: number}>}} An object containing the best match, its score, its index in the list of values, and a sorted array of matches.
  * @throws {Error} If an invalid algorithm is provided.
  */
 const findBestMatch = (algorithm, input, values) => {
@@ -27,28 +27,37 @@ const findBestMatch = (algorithm, input, values) => {
     if (!input || !values || !Array.isArray(values) || values.length === 0) {
         return {
             match: "",
+            index: -1,
             score: 0,
             matches: [],
         };
     }
 
-    switch (algorithm) {
-        case algorithms.LEVENSHTEIN_DISTANCE:
-            return levenshteinDistanceAlgorithm(input, values);
-        case algorithms.FUZZY_MATCH:
-            return fuzzyMatchAlgorithm(input, values);
-        case algorithms.SLICED_LEVENSHTEIN_DISTANCE:
-            return slicedLevenshteinDistanceAlgorithm(input, values);
-        case algorithms.JARO_WINKLER:
-            return jaroWinklerAlgorithm(input, values);
-        case algorithms.DICE_COEFFICIENT:
-            return diceCoefficientAlgorithm(input, values);
-        case algorithms.SUBSEQUENCE_MATCH:
-            return fzyStyleMatchAlgorithm(input, values);
-        default:
-            throw new Error("Invalid algorithm provided");
-    }
+    const result = (() => {
+        switch (algorithm) {
+            case algorithms.LEVENSHTEIN_DISTANCE:
+                return levenshteinDistanceAlgorithm(input, values);
+            case algorithms.FUZZY_MATCH:
+                return fuzzyMatchAlgorithm(input, values);
+            case algorithms.SLICED_LEVENSHTEIN_DISTANCE:
+                return slicedLevenshteinDistanceAlgorithm(input, values);
+            case algorithms.JARO_WINKLER:
+                return jaroWinklerAlgorithm(input, values);
+            case algorithms.DICE_COEFFICIENT:
+                return diceCoefficientAlgorithm(input, values);
+            case algorithms.SUBSEQUENCE_MATCH:
+                return fzyStyleMatchAlgorithm(input, values);
+            default:
+                throw new Error("Invalid algorithm provided");
+        }
+    })();
+
+    return {
+        index: values.indexOf(result.match),
+        ...result,
+    };
 };
+
 
 /**
  * Calculate the Levenshtein distance between two strings.
@@ -191,6 +200,15 @@ function fuzzyMatchAlgorithm(searchString, listOfStrings) {
 function slicedLevenshteinDistanceAlgorithm(input, values) {
     const matches = values.map(value => {
         const inputLength = input.length;
+        // If input is longer than value, compare whole value as one slice
+        if (inputLength > value.length) {
+            const rawDistance = levenshteinDistance(input, value);
+            const normalizedScore = 1 - rawDistance / inputLength;
+            return {
+                value,
+                score: normalizedScore,
+            };
+        }
         const slices = Array.from({ length: value.length - inputLength + 1 }, (_, i) =>
             value.slice(i, i + inputLength),
         );
@@ -342,12 +360,12 @@ function diceCoefficientAlgorithm(input, values) {
 }
 
 /**
- * Score the similarity between input and target using a subsequence-based heuristic.
- * Prioritizes compact matches, word boundaries, and character proximity.
+ * Score the similarity between input and target using a partial subsequence-based heuristic.
+ * Scores based on the longest matching subsequence, even if not all input chars are matched.
  * 
  * @param {string} input - The search query string.
  * @param {string} target - The target string to score against.
- * @returns {number} A raw score (may be negative if not a match).
+ * @returns {number} A raw score (0 if no match).
  */
 function fzyScore(input, target) {
     input = input.toLowerCase();
@@ -356,9 +374,11 @@ function fzyScore(input, target) {
     let score = 0;
     let inputIdx = 0;
     let lastMatchIdx = -1;
+    let matchedChars = 0;
 
     for (let i = 0; i < target.length && inputIdx < input.length; i++) {
         if (target[i] === input[inputIdx]) {
+            matchedChars++;
             const isBoundary = i === 0 || /[\s\-_.]/.test(target[i - 1]);
             score += isBoundary ? 10 : 5;
 
@@ -372,9 +392,10 @@ function fzyScore(input, target) {
         }
     }
 
-    if (inputIdx < input.length) return -Infinity;
-
-    score -= (target.length - input.length) * 0.5;
+    // Score is proportional to the fraction of input matched
+    if (matchedChars === 0) return 0;
+    score *= matchedChars / input.length;
+    score -= (target.length - matchedChars) * 0.5;
 
     return score;
 }
@@ -386,20 +407,16 @@ function fzyScore(input, target) {
  * @returns {Array<{ value: string, score: number }>} Array with normalized scores.
  */
 function normalizeScores(matches) {
+    // Include all matches, set score to 0 for -Infinity
     const validScores = matches.filter(m => m.score !== -Infinity);
-    if (validScores.length === 0) return [];
+    const max = validScores.length ? Math.max(...validScores.map(m => m.score)) : 1;
+    const min = validScores.length ? Math.min(...validScores.map(m => m.score)) : 0;
 
-    const max = Math.max(...validScores.map(m => m.score));
-    const min = Math.min(...validScores.map(m => m.score));
-
-    if (max === min) 
-        return validScores.map(m => ({ ...m, score: 1 }));
-    
-
-    return validScores.map(m => ({
-        ...m,
-        score: (m.score - min) / (max - min),
-    }));
+    return matches.map(m => {
+        if (m.score === -Infinity) return { ...m, score: 0 };
+        if (max === min) return { ...m, score: 1 };
+        return { ...m, score: (m.score - min) / (max - min) };
+    });
 }
 
 /**

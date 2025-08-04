@@ -23,7 +23,7 @@ module.exports = {
 
         const fullQuery = args.join(" ");
         const matchedQueries = extractNumbersAndStrings(fullQuery);
-        if (matchedQueries.length !== 2) return await message.reply({ embeds: [embedGenerator.error("Please enter two numbers / queries")] });
+        if (matchedQueries.length !== 2) return await message.reply({ embeds: [embedGenerator.error("Please enter two numbers / queries (the queries must be encased in quotes(\"))")] });
         const fromQuery = matchedQueries[0];
         const toQuery = matchedQueries[1];
 
@@ -58,7 +58,13 @@ module.exports = {
             const interaction = await moveConfirmationMessage.awaitMessageComponent({
                 filter: (inter) => inter.user.id === message.author.id,
                 time: 15000,
+            }).catch(async () => {
+                row.components.forEach((component) => component.setDisabled(true));
+                await moveConfirmationMessage.edit({ embeds: [embedGenerator.error("Timed out")], components: [row] });
+                return null;
             });
+
+            if (!interaction) return;
 
             if (interaction.customId === "moveSong") {
                 await moveConfirmationMessage.edit({ embeds: [embedGenerator.info({ title: "Moving song..." })] });

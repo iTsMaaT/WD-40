@@ -7,6 +7,6 @@ module.exports = {
             return;
         }
         logger.setConsoleLogMode(mode);
-        console.warning(`Console log mode set to: ${mode}`);
+        console.warner(`Console log mode set to: ${mode}`);
     },
 };

@@ -54,8 +54,7 @@ module.exports = {
         const attachment = message.attachments.first()?.attachment;
         let string = args.join(" ") || "Never gonna give you up";
 
-        if (string?.includes("dzr.page.link")) string = await unshortenURL(string);
-
+        
         if (!string && !attachment) 
             return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
         
@@ -64,6 +63,8 @@ module.exports = {
             queryType.canStream = false;
             queryType.type = "search";
         }
+
+        if (isURL(string) && string.includes("deezer")) string = await unshortenURL(string);
 
         if (
             (string.includes("youtube.com") || string.includes("youtu.be")) 
@@ -298,14 +299,15 @@ async function awareQueryResolver(query, player, playerConfig) {
 async function unshortenURL(url) {
     try {
         const response = await fetch(url, {
-            method: "HEAD",
-            signal: AbortSignal.timeout(5000),
+            method: "GET",
+            redirect: "follow",
+            signal: AbortSignal.timeout(7000),
         });
 
-        const urlObj = new URL(response.url);
-        return urlObj.origin + urlObj.pathname;
+        const { origin, pathname } = new URL(response.url);
+        return origin + pathname;
     } catch (error) {
-        console.error(error);
+        console.error("Failed to unshorten:", error.message);
         return url;
     }
 }
