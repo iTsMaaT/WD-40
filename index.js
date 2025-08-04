@@ -19,7 +19,6 @@
     const logger = require("@utils/log");
     console.warner = console.warn;
     console.logger = console.log;
-    // console.warn = (log, args) => logger.warning(log + " " + util.format(args));
     console.log = (message, ...args) => logger.console(message, ...args);
     console.warn = (message, ...args) => logger.warning(message, ...args);
     console.error = (message, ...args) => logger.error(message, ...args);
@@ -57,6 +56,7 @@
 
     const client = new Client({
         ...neededIntents,
+        shards: "auto",
         allowedMentions: { repliedUser: false },
     });
 
