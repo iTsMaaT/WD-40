@@ -20,6 +20,7 @@ module.exports = {
             const country = json[0];
             const currencies = Object.values(country.currencies).map(currency => `${currency.name} (${currency.symbol})`);
             const languages = Object.values(country.languages);
+            const tld = country.tld ? country.tld[0] : "N/A";
 
             const countryEmbed = {
                 color: 0xffffff,
@@ -28,15 +29,15 @@ module.exports = {
                     url: country.flags.png,
                 },
                 fields: [
-                    { name: "Top level domain name", value: country.tld[0], inline: true },
+                    { name: "Top level domain name", value: tld, inline: true },
                     { name: "Population", value: country.population, inline: true },
                     { name: "Independant", value: country.independent + " (" + country.status + ")", inline: true },
-                    { name: "UN member", value: country.unMember, inline: true },
+                    { name: "UN member", value: country.unMember ?? "N/A", inline: true },
                     { name: "Currency", value: currencies.join(", "), inline: true },
                     { name: "Capital", value: country.capital[0], inline: true },
                     { name: "Continent", value: country.continents[0], inline: true },
                     { name: "Language(s)", value: languages.join(", ") },
-                    { name: "Flag info", value: country.flags.alt },
+                    { name: "Flag info", value: country.flags.alt ?? "N/A" },
                 ],
                 timestamp: new Date(),
             };
@@ -49,7 +50,7 @@ module.exports = {
 
             message.channel.send({ embeds: [countryEmbed] });
         } catch (error) {
-            logger.error(`Error retrieving country information: ${error}`);
+            logger.error(`Error retrieving country information: ${error.stack}`);
             return await message.reply({ embeds: [embedGenerator.error("Couldn't fetch country infomations")] });
         }
     },
