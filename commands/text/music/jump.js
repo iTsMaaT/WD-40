@@ -24,7 +24,8 @@ module.exports = {
         if (!queue || !queue.tracks) 
             return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue.")] });
 
-        const fullQuery = args.join(" ");
+        let fullQuery = args.join(" ");
+        if (!(fullQuery.startsWith("\"") && fullQuery.endsWith("\""))) fullQuery = `"${fullQuery}"`;
         const matchedQueries = extractNumbersAndStrings(fullQuery);
         if (matchedQueries.length !== 1) 
             return await message.reply({ embeds: [embedGenerator.error("Please enter a valid number or title. (refer to the help command for more info)")] });
