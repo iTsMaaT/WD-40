@@ -80,7 +80,7 @@ const searchWithPriorities = function(playerConfig) {
     const extractorsArray = Object.entries(playerConfig.extractors);
 
     const streamableAndBridgeableExtractors = extractorsArray.filter(extractor => {
-        return extractor[1].canStream && extractor[1].canBridge;
+        return extractor[1].canStream && extractor[1].canBridge && extractor[1].enabled;
     }).sort((a, b) => {
         return  b[1].priority - a[1].priority;
     });
@@ -99,7 +99,7 @@ const getProbableBridgeSource = function(playerConfig, providesStream) {
     if (providesStream) return "Itself";
     const extractorsArray = Object.entries(playerConfig.extractors);
     const streamableAndBridgeableExtractors = extractorsArray.filter(extractor => {
-        return extractor[1].canStream && extractor[1].canBridge;
+        return extractor[1].canStream && extractor[1].canBridge && extractor[1].enabled;
     }).sort((a, b) => {
         return  b[1].priority - a[1].priority;
     });
