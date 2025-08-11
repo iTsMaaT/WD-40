@@ -19,8 +19,8 @@ const { Readable } = require("stream");
 
 /**
  * Convert a Distube plugin to a discord-player extractor
- * @param plugin - The Distube plugin to convert
- * @param options - Options for the plugin
+ * @param {typeof ExtractorPlugin} plugin - The Distube plugin to convert
+ * @param {object} options - Options for the plugin
  * 
  * @returns A discord-player extractor
  */
@@ -39,6 +39,7 @@ function distubePluginToExtractor(
         static identifier = `com.distube.${distubePluginInstance.constructor.name}`;
 
         async activate() {
+            if (typeof this.plugin.init === "function") await this.plugin.init();
             this.protocols = [distubePluginInstance.constructor.name];
         }
 
