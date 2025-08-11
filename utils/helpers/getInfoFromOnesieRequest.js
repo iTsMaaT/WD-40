@@ -1,6 +1,7 @@
 const crypto = require("crypto");
+const { UniversalCache, Constants, YT, Innertube, Utils } = require("youtubei.js");
+const { base64ToU8, PART, Protos, QUALITY,  GoogleVideo } = require("googlevideo");
 const { PassThrough, Readable } = require("stream");
-const { Utils } = require("youtubei.js");
 const { JSDOM } = require("jsdom");
 const { BG, BgConfig } = require("bgutils-js");
 
@@ -13,8 +14,6 @@ const { BG, BgConfig } = require("bgutils-js");
  * @returns 
  */
 async function getVideoInfoFromOnesieRequest(youtubeUrl, innertubeClient, potoken) {
-    const { UniversalCache, Constants, YT, default: Innertube } = await import("youtubei.js");
-    const { base64ToU8, PART, Protos, QUALITY, default: GoogleVideo } = await import("googlevideo");
 
     /**
      * Encrypts a request

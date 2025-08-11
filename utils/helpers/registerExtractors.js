@@ -10,7 +10,8 @@ const { AppleMusicExtractor } = require("discord-player-applemusic");
 const { SubsonicExtractor } = require("discord-player-subsonic");
 const { getVideoInfoFromOnesieRequest, createReadableFromWeb, getPoToken } = require("@utils/helpers/getInfoFromOnesieRequest.js");
 const { distubePluginToExtractor } = require("@utils/helpers/distubePluginToDiscordPlayerExtractor.js");
-const { YouTubePlugin } = require("@distube/youtube");
+const { YoutubePlugin } = require("./distubeYoutubeExtractor.js");
+const { Innertube, ClientType } = require("youtubei.js");
 const ytdl = require("@distube/ytdl-core");
 const config = require("@utils/config/configUtils");
 const logger = require("@utils/log");
@@ -41,6 +42,11 @@ async function initPlayer(client) {
  * @returns 
  */
 async function registerExtractors(player) {
+    const innerTubeInstance = await Innertube.create({
+        client_type: ClientType.TV_EMBEDDED,
+    });
+
+    innerTubeInstance.session.signIn(tokenToObject(process.env.YOUTUBE_ACCESS_STRING));
     const ffmpegFilters = discordPlayerConfig?.ffmpegFilters || {};
     for (const filter of Object.entries(ffmpegFilters)) AudioFilters.define(filter[0], filter[1]);
 
@@ -84,57 +90,88 @@ async function registerExtractors(player) {
 
     if (extractors.Youtubei.enabled || extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.useScraping) {
         logger.info("Loading YoutubeiExtractor extractor...");
-        const tempYtExt = await player.extractors.register(YoutubeiExtractor, {
-            ...getYoutubeExtractorOptions(extractors.Youtubei.config),
-        });
-
-        const originalStream = tempYtExt.stream.bind(tempYtExt);
-
-        await player.extractors.unregister(YoutubeiExtractor.identifier);
-
-        let ytExt = null;
-        try {
-            ytExt = await player.extractors.register(YoutubeiExtractor, {
+        if (extractors.Youtubei.config.useDistubeAlternative) {
+            const ytExt = await player.extractors.register(distubePluginToExtractor(YoutubePlugin, {}));
+            ytExt.priority = extractors.Youtubei.priority ?? ytExt.priority;
+        } else {
+        
+            const tempYtExt = await player.extractors.register(YoutubeiExtractor, {
                 ...getYoutubeExtractorOptions(extractors.Youtubei.config),
-                createStream: async (track, ext) => {
-                    if (extractors.Youtubei.config.useOnesieRequests) {
-                        try {
-                            const url = await getVideoInfoFromOnesieRequest(track.url, ext.innerTube, ext.innerTube.po_token);
-                            const download = await url.download({ format: "mp4", quality: "best", type: "audio" });
-                            return createReadableFromWeb(download);
-                        } catch (error) {
-                            logger.error("Failed to get video info from Onesie request:", error);
-                            return null;
-                        }
-                    } else {
-                        try {
-                            if (!extractors.Youtubei.enabled && extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.useScraping) return null;  
-                            return await originalStream(track, ext);
-                        } catch (err) {
-                            logger.warning(`Original stream failed for ${track.url}, falling back to ytdl-core. Error: ${err.message}`);
-                            try {
-                                const info = await ytdl.getInfo(track.url);
-                                if (!info.formats?.length) return null;
-                                const format = info.formats
-                                    .filter(f => f.hasAudio && (!track.live || f.isHLS))
-                                    .sort((a, b) => Number(b.audioBitrate) - Number(a.audioBitrate) || Number(a.bitrate) - Number(b.bitrate))[0];
-                                if (!format) return null;
-                                return format.url;
-                            } catch (ytdlErr) {
-                                logger.error("ytdl-core also failed:", ytdlErr);
-                                return null;
-                            }
-                        }
-                    }
-                },
             });
 
-            if (!ytExt) 
-                logger.error("YoutubeiExtractor registration returned null.");
-            else 
-                ytExt.priority = extractors.Youtubei.priority ?? ytExt.priority;
-        } catch (e) {
-            logger.error("Failed to register YoutubeiExtractor:", e);
+            const originalStream = tempYtExt.stream.bind(tempYtExt);
+
+            await player.extractors.unregister(YoutubeiExtractor.identifier);
+
+            let ytExt = null;
+            try {
+                ytExt = await player.extractors.register(YoutubeiExtractor, {
+                    ...getYoutubeExtractorOptions(extractors.Youtubei.config),
+                    createStream: async (track, ext) => {
+                        try {
+                            if (extractors.Youtubei.config.useOnesieRequests) {
+                                try {
+                                    const url = await getVideoInfoFromOnesieRequest(track.url, ext.innerTube, ext.innerTube.po_token);
+                                    const download = await url.download({ format: "mp4", quality: "best", type: "audio" });
+                                    return createReadableFromWeb(download);
+                                } catch (error) {
+                                    logger.error("Failed to get video info from Onesie request:", error);
+                                }
+                            } else if (extractors.Youtubei.config.useTVOAuthLogin) {
+                                try {
+                                    const videoId = new URL(track.url).searchParams.get("v");
+                                    const info = await innerTubeInstance.getBasicInfo(videoId, {
+                                        client: "TV",
+                                    });
+                                    let format;
+                                    if (info.basic_info.is_live) {
+                                        format = info.streaming_data.hls_manifest_url;
+                                    } else {
+                                        const format251 = info.streaming_data.adaptive_formats.find(
+                                            (f) => f.itag === 251,
+                                        );
+                                        format = format251.decipher(this.yt.session.player);
+                                    }
+                                    if (!format) throw new DisTubeError("NO_STREAM_URL");
+                                    return format;
+                                } catch (error) {
+                                    logger.error("Failed to get video info from TV OAuth:", error);
+                                }
+                            } else {
+                                if (!extractors.Youtubei.enabled && extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.useScraping) return null;  
+                                try {
+                                    return await originalStream(track, ext);
+                                } catch (err) {
+                                    logger.warning(`Original stream failed for ${track.url}, falling back to ytdl-core. Error: ${err.message}`);
+                                }
+                            }
+                        } catch (mainErr) {
+                            logger.error("Main Youtube stream method failed:", mainErr);
+                        }
+
+                        if (!extractors.Youtubei.config.useYTDLFallback) return null;
+                        try {
+                            const info = await ytdl.getInfo(track.url);
+                            if (!info.formats?.length) return null;
+                            const format = info.formats
+                                .filter(f => f.hasAudio && (!track.live || f.isHLS))
+                                .sort((a, b) => Number(b.audioBitrate) - Number(a.audioBitrate) || Number(a.bitrate) - Number(b.bitrate))[0];
+                            if (!format) return null;
+                            return format.url;
+                        } catch (ytdlErr) {
+                            logger.error("ytdl-core also failed:", ytdlErr);
+                            return null;
+                        }
+                    },
+                });
+
+                if (!ytExt) 
+                    logger.error("YoutubeiExtractor registration returned null.");
+                else 
+                    ytExt.priority = extractors.Youtubei.priority ?? ytExt.priority;
+            } catch (e) {
+                logger.error("Failed to register YoutubeiExtractor:", e);
+            }
         }
     }
 
@@ -249,6 +286,49 @@ function getSpotifyExtractorOptions(playerconfig) {
     }
 
     return options;
+}
+
+function tokenToObject(token) {
+    if (!token.includes("; ") || !token.includes("=")) {
+        throw new Error(
+            "Error: this is not a valid authentication token. Make sure you are putting the entire string instead of just what's behind access_token=",
+        );
+    }
+
+    const kvPair = token.split("; ");
+
+    const validKeys = [
+        "access_token",
+        "expiry_date",
+        "expires_in",
+        "refresh_token",
+        "scope",
+        "token_type",
+        "client",
+    ];
+    // @ts-ignore
+    const finalObject = {};
+    for (const kv of kvPair) {
+        const [key, value] = kv.split("=");
+        if (!validKeys.includes(key)) continue;
+        // @ts-expect-error
+        finalObject[key] = Number.isNaN(Number(value))
+            ? value
+            : Number(value);
+    }
+
+    // perform final checks
+    const requiredKeys = ["access_token", "expiry_date", "refresh_token"];
+
+    for (const key of requiredKeys) {
+        if (!(key in finalObject)) {
+            throw new Error(
+                `Error: Invalid authentication keys. Missing the required key ${key}. Make sure you are putting the entire string instead of just what's behind access_token=`,
+            );
+        }
+    }
+
+    return finalObject;
 }
 
 module.exports = { initPlayer, registerExtractors, reload };
