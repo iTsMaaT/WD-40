@@ -132,17 +132,19 @@
                 "canBridge": true,
                 "priority": 11,
                 "config": {
-                    "client": "WEB_EMBEDDED",                   // Client type for YouTube
-                    "highWaterMark": 2097152,                   // High water mark for streams
+                    "client": "TV_EMBEDDED",                   // Client type for YouTube
+                    "highWaterMark": 2097152,                  // High water mark for streams
                     "attemptYoutubeSearchEvenIfDisabled": {
                         "usingEmbed": true,                    // Attempt to search using embed
-                        "usingScraping": false                  // Attempt to search using scraping
+                        "usingScraping": false                 // Attempt to search using scraping
                     },
-                    "useServerAbrStream": false,                // Use server ABR stream
-                    "usePoToken": true,                         // Use TrustedClient token for authentication
-                    "useOnesieRequests": false,                 // Use Onesie requests
-                    "useTVOAuthLogin": false,                   // Use TV OAuth login
-                    "useCookie": false                          // Use cookies for authentication
+                    "useServerAbrStream": false,               // Use server ABR stream
+                    "usePoToken": true,                        // Use TrustedClient token for authentication
+                    "useOnesieRequests": true,                 // Use Onesie requests
+                    "useTVOAuthLogin": true,                   // Use TV OAuth login
+                    "useCookie": false,                        // Use cookies for authentication
+                    "useDistubeAlternative": true,             // Use Distube alternative
+                    "useYTDLFallback": true                    // Use ytdl-core fallback
                 }
             },
             "Soundcloud": {
