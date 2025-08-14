@@ -4,7 +4,7 @@ module.exports = {
     name: "bird",
     description: "birb pics!",
     category: "posts",
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         message.reply({ embeds: [await FetchReddit(message.channel.nsfw, ["birdswitharms", "BirdsBeingDicks", "birding"], 5)] });
     },
 };

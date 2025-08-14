@@ -14,7 +14,7 @@ module.exports = {
     admin: true,
     permissions: [PermissionsBitField.Flags.MoveMembers],
     aliases: ["mova"],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
   
         // Check if the user is in a voice channel
         if (!message.member.voice.channel) 

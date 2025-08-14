@@ -136,8 +136,16 @@ async function SetPersonality(guild, persona) {
  */
 function GetPrefix(guildid) {
     if (prefixes[guildid] === undefined) 
-        logger.warning(`Prefix not found in cache for guild ${guildid}`);
-    
+        logger.warning(`Prefix not found in cache for guild ${guildid}, forcing it to the base prefix`);
+
+    try {
+        TogglePrefix(guildid, config.get("defaultPrefix"));
+    } catch (error) {
+        logger.error(`Failed to set default prefix for guild ${guildid}: ${error.message}`);
+        logger.warning("forcing it in cache only");
+        prefixes[guildid] = config.get("defaultPrefix");
+    }
+
     return prefixes[guildid];
 }
 

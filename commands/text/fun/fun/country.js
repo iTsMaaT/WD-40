@@ -10,7 +10,7 @@ module.exports = {
     },
     category: "fun",
     examples: ["Canada"],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         if (!args[0]) return message.channel.send("No country provided");
         try {
 

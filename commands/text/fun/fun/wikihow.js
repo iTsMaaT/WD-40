@@ -4,7 +4,7 @@ module.exports = {
     name: "wikihow",
     description: "Gives a random image from wikihow",
     category: "fun",
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
 
         try {
             const wikihowImage = await (await fetch("https://www.wikihow.com/api.php?action=query&generator=random&prop=imageinfo&format=json&iiprop=url&grnnamespace=6", { https: { rejectUnauthorized: false } })).json();

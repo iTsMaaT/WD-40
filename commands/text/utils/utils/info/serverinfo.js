@@ -6,7 +6,7 @@ module.exports = {
     description: "Gives info about the server",
     category: "info",
     aliases: ["sinfo"],
-    execute: async (logger, client, message, args, optionalArgs) => {
+    execute: async (logger, client, message, args, flags) => {
         try {
             const guild = message.guild;
             const owner = await guild.fetchOwner();

@@ -18,7 +18,7 @@ module.exports = {
     cooldown: 20000,
     cooldownGroup: "AI",
     requiredENVs: ["GEMINI_API_KEY"],
-    execute: async (logger, client, message, args, optionalArgs) => {
+    execute: async (logger, client, message, args, flags) => {
         try {
             const apiKey = process.env.GEMINI_API_KEY;
             

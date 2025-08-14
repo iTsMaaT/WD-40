@@ -297,7 +297,7 @@ Step 5 - Send the downloaded media to your favorite social media!
                 if (command.lastExecutionTime >= 1000) await message.channel.sendTyping();
 
                 // Process Optional Arguments
-                const optionalArgs = {};
+                const flags = {};
                 if (typeof command.usage === "object") {
                     const usage = command.usage;
                     const optionalKeys = Object.keys(usage.optional ?? {});
@@ -306,10 +306,10 @@ Step 5 - Send the downloaded media to your favorite social media!
                         for (const k of optionalKeys) {
                             if (k.toLowerCase().split("|").map(s => "-" + s).includes(args[part]?.toLowerCase())) {
                                 if (usage.optional[k].hasValue) {
-                                    optionalArgs[k] = args[parseInt(part) + 1];
+                                    flags[k] = args[parseInt(part) + 1];
                                     args.splice(part, 2);
                                 } else {
-                                    optionalArgs[k] = true;
+                                    flags[k] = true;
                                     args.splice(part, 1);
                                 }
                             }
@@ -332,7 +332,7 @@ Step 5 - Send the downloaded media to your favorite social media!
                 }
 
                 await player.context.provide({ guild: message.guild }, async () => {
-                    await command.execute(logger, client, message, args, optionalArgs);
+                    await command.execute(logger, client, message, args, flags);
                 });
 
                 command.lastExecutionTime = Date.now() - startTime;

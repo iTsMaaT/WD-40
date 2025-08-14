@@ -12,7 +12,7 @@ module.exports = {
     },
     category: "info",
     aliases: ["uinfo"],
-    execute: async (logger, client, message, args, optionalArgs) => {
+    execute: async (logger, client, message, args, flags) => {
         let id;
         let target;
         let status;

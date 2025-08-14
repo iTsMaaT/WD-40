@@ -6,7 +6,7 @@ module.exports = {
     description: "Reload the config",
     category: "owner",
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         config.reload();
         await message.reply({ embeds: [embedGenerator.success("Reloaded the config.")] });
     },

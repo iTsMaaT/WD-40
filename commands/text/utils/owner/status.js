@@ -10,7 +10,7 @@ module.exports = {
         },
     },
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         switch (args[0]) {
             case "donotdisturb":
             case "dnd": 

@@ -9,7 +9,7 @@ module.exports = {
     description: "Gives info about the Pterodactyl server",
     category: "info",
     aliases: ["binfo"],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         try {
             const PteroInfo = await getPterodactylInfo();
             const memoryUsage = process.memoryUsage();

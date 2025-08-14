@@ -10,7 +10,7 @@ module.exports = {
         },
     },
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         let guild;
         try {
             if (args[0]) 

@@ -9,7 +9,7 @@ module.exports = {
     category: "music",
     inVoiceChannel: true,
     inSameVoiceChannel: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const queue = useQueue();
         const player = useMainPlayer();
 

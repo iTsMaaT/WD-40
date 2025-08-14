@@ -4,8 +4,8 @@ const { useQueue, useTimeline, useMainPlayer } = require("discord-player");
 const { getPauseMode } = require("@utils/helpers/playerHelpers");
 
 module.exports = {
-    name: "pause",
-    description: "Pauses / Resumes currently playing music",
+    name: "unpause",
+    description: "Unpauses currently playing music",
     category: "music",
     inVoiceChannel: true,
     inSameVoiceChannel: true,
@@ -15,7 +15,7 @@ module.exports = {
 
         if (!queue || !queue.currentTrack) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue right now.")] });
 
-        timeline.paused ? timeline.resume() : timeline.pause();
+        timeline.resume();
 
         const embed = embedGenerator.info({
             title: getPauseMode(timeline),

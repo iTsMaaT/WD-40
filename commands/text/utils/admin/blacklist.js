@@ -36,9 +36,9 @@ module.exports = {
         "1081004946872352958 slash reddit",
     ],
     dbNeeded: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const blacklist = await GuildManager.GetBlacklist(message.guild.id);
-        const list = optionalArgs["list|l"];
+        const list = flags["list|l"];
 
         if (list) {
             const target = await message.guild.members.fetch(id(args[0])) || message.author;
@@ -69,10 +69,10 @@ module.exports = {
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You did not provide a user.")] });
         if (!args[1]) return await message.reply({ embeds: [embedGenerator.warning("You did not provide the type of command to blacklist.")] });
         if (!args[2]) return await message.reply({ embeds: [embedGenerator.warning("You did not provide the name of the command to blacklist.")] });
-        if (optionalArgs["category|cat"] && optionalArgs["command|cmd"]) return await message.reply({ embeds: [embedGenerator.warning("You cannot blaclist a command and category at the same time.")] });
+        if (flags["category|cat"] && flags["command|cmd"]) return await message.reply({ embeds: [embedGenerator.warning("You cannot blaclist a command and category at the same time.")] });
         if (["commands", "slashcommands", "contextcommands"].includes(args[1].toLowerCase())) return await message.reply({ embeds: [embedGenerator.warning("Invalid command / category type.")] });
-        const blacklistCategory = Boolean(optionalArgs["category|cat"]);
-        const blacklistCommand = Boolean(optionalArgs["command|cmd"]) || !blacklistCategory;
+        const blacklistCategory = Boolean(flags["category|cat"]);
+        const blacklistCommand = Boolean(flags["command|cmd"]) || !blacklistCategory;
         let target, owner;
 
         const executor = await message.guild.members.fetch(message.author.id);

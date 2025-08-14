@@ -14,7 +14,7 @@ module.exports = {
     description: "Test command",
     category: "fun",
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         for (const guild of client.guilds.cache.values()) {
             const prefix = GuildManager.GetPrefix(guild.id);
             logger.info(`Guild ${guild.name} (${guild.id}) has prefix ${prefix}`);

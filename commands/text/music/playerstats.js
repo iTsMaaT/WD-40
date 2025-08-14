@@ -8,7 +8,7 @@ module.exports = {
     description: "Get the stats of the current queue",
     category: "music",
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const queue = useQueue();
         if (!queue) return await message.reply({ embeds: [embedGenerator.error("There is no queue.")] });
 

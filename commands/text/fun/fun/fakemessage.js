@@ -15,7 +15,7 @@ module.exports = {
     permissions: [PermissionsBitField.Flags.ManageWebhooks, PermissionsBitField.Flags.ManageMessages],
     aliases: ["fmsg"],
     cooldown: 5000,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         let UserID;
 
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You must provide a prompt")] });

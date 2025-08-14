@@ -4,7 +4,7 @@ module.exports = {
     name: "capybara",
     description: "Cute but not cute according to chatGPT",
     category: "posts",
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const image = await (await fetch("https://api.capy.lol/v1/capybara?json=true")).json();
         const embed = embedGenerator.info({
             title: "Random capybara",

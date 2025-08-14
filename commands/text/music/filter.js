@@ -11,7 +11,7 @@ module.exports = {
     private: false,
     inVoiceChannel: true,
     inSameVoiceChannel: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const ffmpegFilters = config.get("discordPlayer")?.ffmpegFilters || {};
 
         const queue = useQueue();

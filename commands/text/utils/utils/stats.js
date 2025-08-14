@@ -24,7 +24,7 @@ module.exports = {
     name: "stats",
     description: "Gives statistics about the bot",
     category: "utils",
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const player = useMainPlayer();
 
         const addedCommands = new Set();

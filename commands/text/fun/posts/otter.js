@@ -5,7 +5,7 @@ module.exports = {
     description: "birb pics!",
     category: "posts",
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         message.reply({ embeds: [await FetchReddit(message.channel.nsfw, ["otters"], 5)] });
     },
 };

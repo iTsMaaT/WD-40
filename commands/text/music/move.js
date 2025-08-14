@@ -17,7 +17,7 @@ module.exports = {
     examples: ["3 5", "\"Never Gonna Give You Up\" 5", "\"toto africa\" \"Never Gonna Give You Up\""],
     inVoiceChannel: true,
     inSameVoiceChannel: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const queue = useQueue();
         if (!queue || !queue.tracks) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue.")] });
 

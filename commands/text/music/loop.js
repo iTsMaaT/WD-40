@@ -16,7 +16,7 @@ module.exports = {
     examples: ["track"],
     inVoiceChannel: true,
     inSameVoiceChannel: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const queue = useQueue();
         const loopMode = args[0]?.toLowerCase() || "queue";
 

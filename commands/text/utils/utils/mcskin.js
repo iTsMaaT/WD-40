@@ -11,7 +11,7 @@ module.exports = {
     },
     category: "utils",
     examples: ["Notch"],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const name = args[0] ?? "mhf_steve";
     
         try {

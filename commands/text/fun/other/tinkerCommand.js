@@ -4,7 +4,7 @@ module.exports = {
     description: "Test command",
     category: "other",
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         if (message.author.id != process.env.OWNER_ID) return;
 
         

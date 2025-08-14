@@ -34,7 +34,7 @@ module.exports = {
     permissions: [PermissionsBitField.Flags.Connect],
     cooldown: 1000,
     inVoiceChannel: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const player = useMainPlayer();
         const queue = useQueue();
         const playerConfig = config.get("discordPlayer");
@@ -186,10 +186,10 @@ module.exports = {
                 return await sentMessage.edit({ embeds: [embedGenerator.warning(`Cannot enqueue more than ${playerConfig.maxQueueSize} tracks.`)] });
             
 
-            if (optionalArgs["shuffle|s"] && !choice) await research?.tracks?.shuffle();
+            if (flags["shuffle|s"] && !choice) await research?.tracks?.shuffle();
 
             let finalTrack, finalSearchResult;
-            if (optionalArgs["playnext|pn"] && queue) {
+            if (flags["playnext|pn"] && queue) {
                 const tracksToInsert = choice !== null ? [research.tracks[choice]] : research.tracks.reverse();
                 for (const track of tracksToInsert) 
                     queue.insertTrack(track, 0);
@@ -225,8 +225,8 @@ module.exports = {
                 thumbnail: { url: finalTrack.thumbnail },
                 description: isURL(finalTrack.url) ? `[${finalTrack.title}](${finalTrack.url})` : finalTrack.title,
                 fields: [
-                    { name: "Pre-shuffled", value: optionalArgs["shuffle|s"] ? "Yes" : "No", inline: true },
-                    { name: "Force play next", value: optionalArgs["playnext|pn"] && queue ? "Yes" : "No", inline: true },
+                    { name: "Pre-shuffled", value: flags["shuffle|s"] ? "Yes" : "No", inline: true },
+                    { name: "Force play next", value: flags["playnext|pn"] && queue ? "Yes" : "No", inline: true },
                     { name: "Extractor", value: `\`${finalTrack.extractor?.identifier || "N/A"}\`` },
                     { name: "Probable bridge source ( [\\▶] = upon fail, falls back to...)", value: getProbableBridgeSource(playerConfig, queryType.canStream) },
                 ],

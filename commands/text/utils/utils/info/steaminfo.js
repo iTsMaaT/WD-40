@@ -13,7 +13,7 @@ module.exports = {
     },
     examples: ["76561198868461949"],
     requiredENVs: ["STEAM_API_KEY"],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         if (!args[0]) {
             return await message.reply({
                 embeds: [embedGenerator.warning("You must provide a Steam ID.")],

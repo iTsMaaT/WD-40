@@ -13,7 +13,7 @@ module.exports = {
             "command name": "The name of the command to get info of (Optional)",
         },
     },
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const prefix = GuildManager.GetPrefix(message.guild.id);
 
         // Function to generate the full help embed for a command

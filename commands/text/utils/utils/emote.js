@@ -24,9 +24,9 @@ module.exports = {
     examples: ["-e sus", "greatStickerName -s", "-e -s stickerAndEmoteName"],
     permissions: [PermissionsBitField.Flags.CreateGuildExpressions],
     admin: true,
-    async execute(logger, client, message, args, optionalArgs) {
-        const emoteArg = optionalArgs["emote|e"];
-        const stickerArg = optionalArgs["sticker|s"];
+    async execute(logger, client, message, args, flags) {
+        const emoteArg = flags["emote|e"];
+        const stickerArg = flags["sticker|s"];
         if (!emoteArg && !stickerArg) return await message.reply({ embeds: [embedGenerator.warning("You have to use either -e, -s, or both")] });
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You have to specify a name for the emote/sticker")] });
 

@@ -5,7 +5,7 @@ module.exports = {
     name: "rps",
     description: "Play Rock, Paper, Scissors against the bot!",
     category: "games",
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
 
         // Options for Rock, Paper, Scissors
         const options = ["Rock", "Paper", "Scissors"];

@@ -6,7 +6,7 @@ module.exports = {
     description: "Play a game of Blackjack.",
     aliases: ["bj"],
     category: "games",
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
 
         // Create and shuffle the deck
         const suits = ["`♠️`", "♥️", "♦️", "`♣️`"];

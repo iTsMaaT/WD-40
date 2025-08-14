@@ -19,7 +19,7 @@ module.exports = {
     inVoiceChannel: true,
     inSameVoiceChannel: true,
     requiredENVs: ["GEMINI_API_KEY"],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         if (!args.length)
             return message.reply({ embeds: [embedGenerator.warning("Please provide a song description.")] });
 

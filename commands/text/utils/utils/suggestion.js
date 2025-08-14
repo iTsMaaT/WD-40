@@ -9,7 +9,7 @@ module.exports = {
         },
     },
     category: "utils",
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
 
         if (!process.env.SUGGESTION_CHANNEL_ID) return await message.reply({ embeds: [embedGenerator.error("No suggestion channel has been set by the owner.")] });
 
