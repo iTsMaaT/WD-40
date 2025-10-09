@@ -155,6 +155,7 @@ class YoutubeSabrExtractor extends BaseExtractor {
                 title: info.basic_info?.title ?? `YouTube:${videoId}`,
                 author: info.basic_info?.author ?? null,
                 url: `https://www.youtube.com/watch?v=${videoId}`,
+                thumbnail: info.basic_info?.thumbnail[0]?.url,
                 duration: Util.buildTimeCode(Util.parseMS(durationMs)),
                 source: "youtube-sabr",
                 requestedBy: context.requestedBy ?? null,
