@@ -1,6 +1,22 @@
-const { Innertube, UniversalCache } = require("youtubei.js");
+const { Innertube, UniversalCache, Platform } = require("youtubei.js");
 
 let ineerTubeInstance = null;
+
+Platform.shim.eval = async (data, env) => {
+    const properties = [];
+
+    if (env.n) 
+        properties.push(`n: exportedVars.nFunction("${env.n}")`);
+  
+
+    if (env.sig) 
+        properties.push(`sig: exportedVars.sigFunction("${env.sig}")`);
+  
+
+    const code = `${data.output}\nreturn { ${properties.join(", ")} }`;
+
+    return new Function(code)();
+};
 
 /**
  * Get the Innertube instance
@@ -10,7 +26,7 @@ async function getInnertube() {
     if (!ineerTubeInstance) {
         ineerTubeInstance = await Innertube.create({
             cache: new UniversalCache(false),
-            player_id: "0004de42",
+            // player_id: "0004de42",
             cookie: process.env.YOUTUBE_COOKIE,
         });
     }
