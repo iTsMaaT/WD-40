@@ -160,8 +160,23 @@ class YoutubeSabrExtractor extends BaseExtractor {
                 return this.createResponse(dpPlaylist, plTracks);
             }
 
+            async function searchYoutubeWithQueryString(query) {
+                const search = await this.innertube.search(query);
+                if (search.results.length === 0) return;
+
+                return search.results[0];
+            };
+
             // Otherwise treat as single video
-            const videoId = extractVideoId(query);
+            let videoId = null;
+            try {
+                videoId = extractVideoId(query);
+            } catch (err) {
+                if (err.message === "Invalid youtube url") {
+                    const searchResult = await searchYoutubeWithQueryString(query);
+                    videoId = searchResult.video_id;
+                }
+            }
             if (!videoId) return this.createResponse(null, []);
 
             const info = await this.innertube.getBasicInfo(videoId);
