@@ -18,6 +18,7 @@ module.exports = {
     cooldown: 20000,
     cooldownGroup: "AI",
     requiredENVs: ["GEMINI_API_KEY"],
+    private: true,
     execute: async (logger, client, message, args, flags) => {
         try {
             const apiKey = process.env.GEMINI_API_KEY;
@@ -72,9 +73,10 @@ module.exports = {
             logger.error(err);
             if (err.message.includes("API key is invalid")) 
                 return await message.reply({ embeds: [embedGenerator.error("Invalid API key. Please check your configuration.")] });
+            else if (err.message.includes("You exceeded your current quota")) 
+                return await message.reply({ embeds: [embedGenerator.error("Timed out. To stop this from happening, please consider donating to the project.")] });
             else 
                 return await message.reply({ embeds: [embedGenerator.error("An error occurred.")] });
-            
         }
 
         function limitString(string, limit) {
