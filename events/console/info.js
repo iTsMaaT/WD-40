@@ -1,8 +1,9 @@
 const changelog = require("@root/changelogs.json");
+const { getGuildCount } = require("@utils/helpers/shardingUtils");
 
 module.exports = {
     name: "info",
-    execute(client, logger) {
+    async execute(client, logger) {
         const uptime = formatUptime(process.uptime());
         const WDVersion = changelog.slice(-1).map(({ version }) => { return version; }).join();
         console.logger(`
@@ -10,7 +11,7 @@ module.exports = {
         - Version: ${WDVersion}
         - Ping: ${client.ws.ping + "ms"}
         - Uptime: ${uptime}
-        - Server Count: ${client.guilds.cache.size}
+        - Server Count: ${await getGuildCount(client)}
         - User Count: ${client.users.cache.size}`
             .replace(/^\s+/gm, ""));
 
