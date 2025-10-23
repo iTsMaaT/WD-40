@@ -1,7 +1,7 @@
 const { Constants, YTNodes } = require("youtubei.js");
 const { EnabledTrackTypes, buildSabrFormat } = require("googlevideo/utils");
 const { SabrStream } = require("googlevideo/sabr-stream");
-const { Readable } = require("stream");
+const { Readable, PassThrough, once } = require("stream");
 const { getWebPoMinter, invalidateWebPoMinter, generateDataSyncTokens } = require("./poTokenGenerator.js");
 const { getInnertube } = require("./getInnertube.js");
 
@@ -17,26 +17,28 @@ const DEFAULT_OPTIONS = {
  * @returns {Readable} The Node.js Readable stream
  */
 function toNodeReadable(stream) {
-    if (!stream) return null;
-    if (typeof stream.pipe === "function") return stream;
-    if (typeof stream.getReader === "function") {
-        const reader = stream.getReader();
-        const iterable = (async function* () {
-            try {
-                while (true) {
-                    const { value, done } = await reader.read();
-                    if (done) break;
-                    if (value !== undefined) yield value;
+    const nodeStream = new PassThrough();
+    const reader = stream.getReader();
+
+    (async () => {
+        try {
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                if (value) {
+                    if (!nodeStream.write(Buffer.from(value))) 
+                        await once(nodeStream, "drain");
+          
                 }
-            } finally {
-                reader.releaseLock?.();
             }
-        })();
-        return Readable.from(iterable);
-    }
-    if (Symbol.asyncIterator in stream) return Readable.from(stream);
-    throw new TypeError("Unsupported stream type returned from SABR");
+        } finally {
+            nodeStream.end();
+        }
+    })();
+
+    return nodeStream;
 }
+
 
 /**
  * Creates a SABR stream for a given video ID
@@ -44,8 +46,8 @@ function toNodeReadable(stream) {
  * @param {string} videoId - The video ID
  * @returns {Promise<Readable>} The SABR stream
  */
-async function createSabrStream(videoId) {
-    const innertube = await getInnertube();
+async function createSabrStream(videoId, cookies, logSabrEvents = false) {
+    const innertube = await getInnertube(cookies);
     let accountInfo = null;
 
     // === Mint initial PO token ===
@@ -73,7 +75,7 @@ async function createSabrStream(videoId) {
         },
         contentCheckOk: true,
         racyCheckOk: true,
-        serviceIntegrityDimensions: { poToken: contentPoToken },
+        serviceIntegrityDimensions: { poToken: poToken },
         parse: true,
     });
 
@@ -88,15 +90,12 @@ async function createSabrStream(videoId) {
     if (!serverAbrStreamingUrl) throw new Error("serverAbrStreamingUrl not found");
 
     const sabrFormats = playerResponse.streaming_data?.adaptive_formats.map(buildSabrFormat) || [];
-    console.log(serverAbrStreamingUrl);
-
-    await globalThis.wait(1);
 
     const serverAbrStream = new SabrStream({
         formats: sabrFormats,
         serverAbrStreamingUrl,
         videoPlaybackUstreamerConfig,
-        poToken: poToken,
+        poToken: contentPoToken,
         clientInfo: {
             clientName: parseInt(Constants.CLIENT_NAME_IDS[innertube.session.context.client.clientName]),
             clientVersion: innertube.session.context.client.clientVersion,
@@ -108,13 +107,13 @@ async function createSabrStream(videoId) {
     let lastStatus = null;
     serverAbrStream.on("streamProtectionStatusUpdate", async (statusUpdate) => {
         if (statusUpdate.status !== lastStatus) {
-            console.log("Stream Protection Status Update:", statusUpdate);
+            if (logSabrEvents) console.log("Stream Protection Status Update:", statusUpdate);
             lastStatus = statusUpdate.status;
         }
         if (statusUpdate.status === 2) {
             protectionFailureCount = Math.min(protectionFailureCount + 1, 10);
             if (protectionFailureCount === 1 || protectionFailureCount % 5 === 0) 
-                console.log(`Rotating PO token... (attempt ${protectionFailureCount})`);
+                if (logSabrEvents) console.log(`Rotating PO token... (attempt ${protectionFailureCount})`);
         
             try {
                 const rotationMinter = await getWebPoMinter(innertube, { forceRefresh: protectionFailureCount >= 3 });
@@ -124,11 +123,11 @@ async function createSabrStream(videoId) {
                 serverAbrStream.setPoToken(mintedPoToken);
             } catch (err) {
                 if (protectionFailureCount === 1 || protectionFailureCount % 5 === 0) 
-                    console.error("Failed to rotate PO token:", err);
+                    if (logSabrEvents) console.error("Failed to rotate PO token:", err);
             
             }
         } else if (statusUpdate.status === 3) {
-            console.error("Stream protection rejected token (SPS 3). Resetting Botguard.");
+            if (logSabrEvents) console.error("Stream protection rejected token (SPS 3). Resetting Botguard.");
             invalidateWebPoMinter();
         } else {
             protectionFailureCount = 0;
@@ -136,7 +135,7 @@ async function createSabrStream(videoId) {
     });
 
     serverAbrStream.on("error", (err) => {
-        console.error("SABR stream error:", err);
+        if (logSabrEvents) console.error("SABR stream error:", err);
     });
 
     // === Start SABR stream ===
