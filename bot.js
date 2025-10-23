@@ -56,7 +56,6 @@
 
     const client = new Client({
         ...neededIntents,
-        shards: "auto",
         allowedMentions: { repliedUser: false },
     });
 
