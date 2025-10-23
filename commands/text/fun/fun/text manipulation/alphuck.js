@@ -10,7 +10,7 @@ module.exports = {
         },
     },
     examples: ["Hello, World!"],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("Please provide a string to translate")] });
 
         const bf = brainfuckToAlphuck(stringToBF(args.join(" ")));

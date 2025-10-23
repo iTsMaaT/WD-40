@@ -1,4 +1,4 @@
-const { MessageFlags } = require("discord.js");
+const { MessageFlags, PermissionsBitField } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const GuildManager = require("@guildManager");
 const words = require("./hangman words.js").words;
@@ -7,7 +7,8 @@ module.exports = {
     name: "hangman",
     description: "Play a game of Hangman!",
     category: "games",
-    async execute(logger, client, message, args, optionalArgs) {
+    permissions: [PermissionsBitField.Flags.ManageMessages],
+    async execute(logger, client, message, args, flags) {
         const prefix = GuildManager.GetPrefix(message.guild.id);
 
         // List of words for the game
@@ -103,8 +104,7 @@ module.exports = {
 
             await gameMessage.edit({ embeds: [updatedEmbed] });
 
-            // Delete the user's guess message
-            await msg.delete();
+            await msg.delete().catch(() => null);
 
             // End the game if the player has won or lost
             if (win || lose) 

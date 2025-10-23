@@ -34,31 +34,31 @@ module.exports = {
         },
     },
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         try {
             const messageLink = args.shift();
             const sudoMessage = args.join(" ");
             const [guildID, channelID, messageID] = extractMessageInfo(messageLink).catch(() => null);
 
-            if (!optionalArgs["send|s"] && !optionalArgs["reply|r"] && !optionalArgs["emote|e"] && !optionalArgs["clear|c"] && !optionalArgs["dm|d"]) {
+            if (!flags["send|s"] && !flags["reply|r"] && !flags["emote|e"] && !flags["clear|c"] && !flags["dm|d"]) {
                 await message.reply({ embed : [embedGenerator.error({ title: "Missing parameter", description: "You must specify a parameter" })] });
                 return;
             }
 
-            if (optionalArgs["send|s"]) {
+            if (flags["send|s"]) {
                 await client.channels.cache.get(channelID).send(sudoMessage);
                 await message.reply({ embeds: [embedGenerator.success("Send sudo successful.")] });
                 logger.info(`Sudo -s used by ${message.author.displayName} (${message.author.id}) in <#${channelID}>, Message content : ${sudoMessage}`);
             }
         
-            if (optionalArgs["reply|r"]) {
+            if (flags["reply|r"]) {
                 const toReply = await client.channels.cache.get(channelID).messages.fetch({ cache: false, message: messageID });
                 await toReply.reply(sudoMessage);
                 await message.reply({ embeds: [embedGenerator.success("Reply sudo successful.")] });
                 logger.info(`Sudo -r used by ${message.author.displayName} (${message.author.id}) in <#${channelID}>, Message content : ${sudoMessage}`);
             }
 
-            if (optionalArgs["emote|e"]) {
+            if (flags["emote|e"]) {
                 const sudoMessageNoSpace = sudoMessage.replace(/\s/g, "").toUpperCase();
                 const toReply = await client.channels.cache.get(channelID).messages.fetch({ cache: false, message: messageID });
                 for (i = 0; i < sudoMessageNoSpace.length; i++) {
@@ -70,14 +70,14 @@ module.exports = {
                 logger.info(`Sudo -e used by ${message.author.displayName} (${message.author.id}) in <#${channelID}>, Message content : ${sudoMessage}`);
             }
 
-            if (optionalArgs["clear|c"]) {
+            if (flags["clear|c"]) {
                 const toReply = await client.channels.cache.get(channelID).messages.fetch({ cache: false, message: messageID });
                 toReply.reactions.removeAll();
                 await message.reply({ embeds: [embedGenerator.success("Emote sudo successful.")] });
                 logger.info(`Sudo -c used by ${message.author.displayName} (${message.author.id}) in <#${channelID}>, Message content : ${sudoMessage}`);
             }
 
-            if (optionalArgs["dm|d"]) {
+            if (flags["dm|d"]) {
                 const UserID = messageLink;
                 client.users.send(UserID, sudoMessage);
                 await message.reply({ embeds: [embedGenerator.success("DM sudo successful.")] });

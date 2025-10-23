@@ -7,7 +7,7 @@ module.exports = {
     category: "music",
     inVoiceChannel: true,
     inSameVoiceChannel: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const queue = useQueue();
         if (!queue) return await message.reply({ embeds: [embedGenerator.error("There is no queue to shuffle.")] });
         if (queue.tracks.size < 2) return await message.reply({ embeds: [embedGenerator.error("There is nothing to shuffle.")] });

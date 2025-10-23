@@ -11,7 +11,7 @@ module.exports = {
         },
     },
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         config.set("defaultSuperuserState", !config.get("defaultSuperuserState"));
         return await message.reply({
             embeds: [

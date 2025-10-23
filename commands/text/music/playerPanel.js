@@ -12,7 +12,7 @@ module.exports = {
     private: true,
     inVoiceChannel: true,
     inSameVoiceChannel: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const queue = useQueue();
         const timeline = useTimeline();
         const history = useHistory();

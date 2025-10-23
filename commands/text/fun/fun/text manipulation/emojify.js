@@ -10,7 +10,7 @@ module.exports = {
     },
     category: "text manipulation",
     examples: ["Hello, World!"],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
 
         // Map of all characters to emotes
         const emoteMap = {

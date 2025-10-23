@@ -9,7 +9,7 @@ module.exports = {
     description: "Lists the packages and versions",
     category: "owner",
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const WDVersion = changelogs[changelogs.length - 1].version;
     
         const embed = {

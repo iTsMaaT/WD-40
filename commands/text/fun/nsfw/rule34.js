@@ -9,7 +9,7 @@ module.exports = {
         },
     },
     category: "NSFW",
-    execute: async (logger, client, message, args, optionalArgs) => {
+    execute: async (logger, client, message, args, flags) => {
         if (!message.channel.nsfw) return await message.reply({ embeds: [embedGenerator.error("This command is only available in NSFW channels")] });
         try {
             const url = "http://rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=" + args.join("+");

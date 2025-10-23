@@ -1,4 +1,5 @@
 {
+
     // Warn if the configuration is not part of the base configuration
     "warnForConfigNotInBaseConfig": true,
 
@@ -132,6 +133,8 @@
                 "canBridge": true,
                 "priority": 11,
                 "config": {
+                    "useSabrAlternative": true,                // Use a local alternative (bypasses all other config)
+                    "logSabrEvents": true,                     // Log SABR events for the SABR alternative
                     "client": "TV_EMBEDDED",                   // Client type for YouTube
                     "highWaterMark": 2097152,                  // High water mark for streams
                     "attemptYoutubeSearchEvenIfDisabled": {
@@ -143,7 +146,6 @@
                     "useOnesieRequests": true,                 // Use Onesie requests
                     "useTVOAuthLogin": true,                   // Use TV OAuth login
                     "useCookie": false,                        // Use cookies for authentication
-                    "useDistubeAlternative": true,             // Use Distube alternative
                     "useYTDLFallback": true                    // Use ytdl-core fallback
                 }
             },

@@ -16,7 +16,7 @@ module.exports = {
     },
     category: "music",
     aliases: ["q"],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const queue = useQueue();
         const history = useHistory();
 
@@ -32,7 +32,7 @@ module.exports = {
         const trackFields = [];
         const historyFields = [];
 
-        if (optionalArgs["search|s"]) {
+        if (flags["search|s"]) {
             const search = args.join(" ");
             const bestMatch = findBestMatch(algorithms.FUZZY_MATCH, search, tracks.map(track => track.title));
             const matches = bestMatch.matches.slice(0, 5);

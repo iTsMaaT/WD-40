@@ -5,7 +5,7 @@ module.exports = {
     name: "translate",
     description: "Translate the replied to message",
     category: "utils",
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const LanguageCode = message.guild.preferredLocale.split("-")[0].toString().toLowerCase();
 
         if (!message.reference) return await message.reply({ embeds: [embedGenerator.warning("You need to reply to a message")] });

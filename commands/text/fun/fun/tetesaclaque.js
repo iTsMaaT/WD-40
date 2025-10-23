@@ -6,7 +6,7 @@ module.exports = {
     description: "Tells you which tetes a claque you are",
     category: "fun",
     aliases: ["tac"],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const tacs = {
             "fernand": "Fernand",
             "gabriel_samuel": "Gabriel",

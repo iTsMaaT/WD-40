@@ -4,7 +4,7 @@ module.exports = {
     name: "fact",
     description: "Get a random fact",
     category: "fun",
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         try {
             const fact = await (await fetch("https://uselessfacts.jsph.pl/random.json?language=en")).json();
 

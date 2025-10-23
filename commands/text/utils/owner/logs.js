@@ -5,7 +5,7 @@ module.exports = {
     description: "Shows the count of each type of log",
     category: "owner",
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const logCounts = logger.logCounts;
 
         const embed = embedGenerator.info({

@@ -6,7 +6,7 @@ module.exports = {
     aliases: ["rl"],
     description: "Play a game of Russian Roulette. Spin the chamber and pull the trigger!",
     category: "games",
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
 
         // Game state
         let chamberPosition = Math.floor(Math.random() * 6); // Random chamber position (0-5)

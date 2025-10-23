@@ -10,7 +10,7 @@ module.exports = {
         },
     },
     examples: ["Hello, World!"],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You need to provide a prompt.")] });
         if (args.join(" ").length > 250) return await message.reply({ embeds: [embedGenerator.error("The result is too long (>250)")] });
 

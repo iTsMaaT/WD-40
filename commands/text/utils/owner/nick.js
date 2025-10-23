@@ -10,7 +10,7 @@ module.exports = {
         },
     },
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         try {
             const newNickname = args.join(" ");
             const member = message.guild.members.cache.get(client.user.id);

@@ -8,7 +8,7 @@ module.exports = {
     private: false,
     admin: true,
     permissions: [PermissionsBitField.Flags.CreateInstantInvite],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
 
         const guild = message.guild;
 

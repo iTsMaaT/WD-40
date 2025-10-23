@@ -4,7 +4,7 @@ module.exports = {
     name: "joke",
     description: "le funny",
     category: "fun",
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
 
         try {
             const response = await fetch("https://v2.jokeapi.dev/joke/Any");

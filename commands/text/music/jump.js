@@ -17,7 +17,7 @@ module.exports = {
     examples: ["3", "\"Never Gonna Give You Up\""],
     inVoiceChannel: true,
     inSameVoiceChannel: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const queue = useQueue();
         if (!args[0]) 
             return await message.reply({ embeds: [embedGenerator.error("Please enter a number or title to skip to.")] });

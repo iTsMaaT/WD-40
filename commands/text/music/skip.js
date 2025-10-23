@@ -9,7 +9,7 @@ module.exports = {
     cooldown: 1000,
     inVoiceChannel: true,
     inSameVoiceChannel: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         let queue = useQueue();
         if (!queue || !queue.currentTrack) return await message.reply({ embeds: [embedGenerator.error("There is nothing in the queue right now.")] });
 

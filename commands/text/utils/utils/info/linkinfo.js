@@ -18,7 +18,7 @@ module.exports = {
     category: "info",
     private: true,
     cooldown: 10000,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const agent = new https.Agent();
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("Please provide a URL")] });
         const link = args[0];

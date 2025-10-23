@@ -11,7 +11,7 @@ module.exports = {
     },
     category: "info",
     aliases: ["cinfo"],
-    execute: async (logger, client, message, args, optionalArgs) => {
+    execute: async (logger, client, message, args, flags) => {
         let channel;
 
         // Determine the channel

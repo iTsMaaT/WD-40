@@ -7,7 +7,7 @@ module.exports = {
     description: "Manage the current configuration",
     category: "owner",
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const subCommand = args[0];
         const key = args[1];
         const value = args.slice(2).join(" ");

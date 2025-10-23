@@ -23,14 +23,14 @@ module.exports = {
     category: "fun",
     examples: ["-p aww", "-u spez"],
     cooldown: 3000,
-    async execute(logger, client, message, args, optionalArgs) {
-        const sub = optionalArgs["subreddit|s|p"];
-        const user = optionalArgs["user|u"];
+    async execute(logger, client, message, args, flags) {
+        const sub = flags["subreddit|s|p"];
+        const user = flags["user|u"];
         try {
             if (sub) 
-                message.reply({ embeds: [await FetchReddit(message.channel.nsfw, [sub], 5, "sub", optionalArgs["image|i"] ? "image" : "text")] });
+                message.reply({ embeds: [await FetchReddit(message.channel.nsfw, [sub], 5, "sub", flags["image|i"] ? "image" : "text")] });
             else if (user) 
-                message.reply({ embeds: [await FetchReddit(message.channel.nsfw, [user], 5, "user", optionalArgs["image|i"] ? "image" : "text")] });
+                message.reply({ embeds: [await FetchReddit(message.channel.nsfw, [user], 5, "user", flags["image|i"] ? "image" : "text")] });
             else 
                 return await message.reply({ embeds: [embedGenerator.warning("Wrong argument usage, please refer to `help reddit`")] });
             

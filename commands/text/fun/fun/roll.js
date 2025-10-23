@@ -10,7 +10,7 @@ module.exports = {
     },
     category: "fun",
     examples: ["2d20"],
-    execute(logger, client, message, args, optionalArgs) {
+    execute(logger, client, message, args, flags) {
         // Check if arguments are provided
         if (args.length > 0) {
             // Parse the number of dices and the number of sides per dice

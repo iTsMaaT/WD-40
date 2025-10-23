@@ -16,7 +16,7 @@ module.exports = {
     examples: ["3", "\"Never Gonna Give You Up\""],
     inVoiceChannel: true,
     inSameVoiceChannel: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const queue = useQueue();
 
         if (!queue || !queue.tracks || !queue.currentTrack) 

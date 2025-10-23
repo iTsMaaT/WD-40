@@ -14,13 +14,13 @@ module.exports = {
     admin: true,
     permissions: [PermissionsBitField.Flags.MuteMembers],
     aliases: ["ma"],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         if (!message.member.voice.channel) 
             return await message.reply({ embeds: [embedGenerator.warning("You need to be in a voice channel to use this command.")] });
         
         const voiceChannel = message.member.voice.channel;
-        if (!optionalArgs["mute|m"] && !optionalArgs["unmute|um"]) return await message.reply({ embeds: [embedGenerator.warning("Invalid argument. Please specify either \"-mute\" or \"-unmute\".")] });
-        const deafenBool = optionalArgs["mute|m"] || Object.keys(optionalArgs).length === 0;
+        if (!flags["mute|m"] && !flags["unmute|um"]) return await message.reply({ embeds: [embedGenerator.warning("Invalid argument. Please specify either \"-mute\" or \"-unmute\".")] });
+        const deafenBool = flags["mute|m"] || Object.keys(flags).length === 0;
 
         voiceChannel.members.forEach(async (member) => {
             if (!member.user.bot && member.id !== message.author.id) {

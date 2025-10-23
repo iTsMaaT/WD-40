@@ -10,7 +10,7 @@ module.exports = {
         },
     },
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         config.set("defaultDebugState", !config.get("defaultDebugState"));
         return await message.reply({
             embeds: [

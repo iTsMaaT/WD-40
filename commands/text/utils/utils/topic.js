@@ -11,7 +11,7 @@ module.exports = {
     },
     category: "utils",
     examples: ["50"],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const count = args[0] || 100;
         if (count > 100) return await message.reply({ embeds: [embedGenerator.error("Message count must be less than 100.")] });
         if (count < 1) return await message.reply({ embeds: [embedGenerator.error("Message count must be greater than 0.")] });

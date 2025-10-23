@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { client } = require("@root/index");
+const { client } = require("@root/bot");
 const config = require("@utils/config/configUtils");
 const colors = config.get("defaultEmbedColors");
 

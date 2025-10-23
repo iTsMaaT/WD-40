@@ -137,7 +137,7 @@ const createPaginatedMessage = async function(messageOrInteraction, options) {
             const authorId = messageOrInteraction.author?.id || messageOrInteraction.user.id;
             return interaction.user.id === authorId && filter(interaction);
         },
-        time: timeout,
+        idle: timeout,
         dispose: true,
     });
 

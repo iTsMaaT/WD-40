@@ -7,7 +7,7 @@ module.exports = {
     category: "music",
     inVoiceChannel: true,
     inSameVoiceChannel: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const queue = useQueue();
         if (!queue) {
             message.reply({ embeds: [embedGenerator.warning("There is no music playing.")] });

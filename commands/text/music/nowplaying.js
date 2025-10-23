@@ -8,7 +8,7 @@ module.exports = {
     description: "See what song is currently playing",
     category: "music",
     aliases: ["np", "playing"],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const queue = useQueue();
         const timeline = useTimeline();
 

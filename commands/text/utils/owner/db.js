@@ -17,13 +17,13 @@ module.exports = {
         },
     },
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         let data;
 
         const tables = Object.keys(repositories);
         const tableList = tables.filter(name => !name.startsWith("_") && !name.startsWith("$"));
 
-        if (optionalArgs["list|l|t"] || !args[0] || !tableList.includes(args[0])) return message.reply(`Tables: ${tableList.join(", ")}`);
+        if (flags["list|l|t"] || !args[0] || !tableList.includes(args[0])) return message.reply(`Tables: ${tableList.join(", ")}`);
 
         const tableName = args[0];
         const previousDate = Date.now();

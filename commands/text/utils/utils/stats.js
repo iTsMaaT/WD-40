@@ -1,7 +1,6 @@
 const formatDuration = require("@utils/functions/formatDuration");
 const os = require("os");
 const changelogs = require("@root/changelogs.json");
-const embedGenerator = require("@utils/helpers/embedGenerator");
 const getPterodactylInfo = require("@root/utils/functions/getPterodactylInfo");
 const { sql } = require("drizzle-orm");
 const DB = require("@root/utils/db/databaseManager");
@@ -11,6 +10,8 @@ const { toEngineerNotation } = require("@functions/formattingFunctions");
 const { ChartJSNodeCanvas } = require("chartjs-node-canvas");
 const { AttachmentBuilder } = require("discord.js");
 const config = require("@utils/config/configUtils");
+const { getAllPlayerStatsSharded } = require("@utils/helpers/playerHelpers");
+
 let totalUserCache = 0;
 let imageCache = null;
 
@@ -24,52 +25,83 @@ module.exports = {
     name: "stats",
     description: "Gives statistics about the bot",
     category: "utils",
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const player = useMainPlayer();
 
         const addedCommands = new Set();
-        client.commands.each((val) => {if (!val.private && !addedCommands.has(val.name))  addedCommands.add(val.name); });
-        
+        client.commands.each((val) => {
+            if (!val.private && !addedCommands.has(val.name))
+                addedCommands.add(val.name);
+        });
+
         const PteroInfo = await getPterodactylInfo();
         const RamUsageFormatted = `${PteroInfo?.ram.usage.clean || (toEngineerNotation(process.memoryUsage().rss) + "B rss")} / ${PteroInfo?.ram.limit.clean || (toEngineerNotation(process.memoryUsage().heapTotal) + "B heap")} (${PteroInfo?.ram.pourcentage.clean || "N/A"})`;
         const prefix = GuildManager.GetPrefix(message.guild.id);
-        let lastCommandTimeSinceNow = "";
-        let lastExecutedCommand = "";
-        let lastCommandLink = "";
+
         const WDVersion = changelogs[changelogs.length - 1].version;
         const Shards = client.options.shardCount ?? 1;
         const nodeVersion = process.version;
         const amountTextCommands = addedCommands.size;
         const amountSlashCommands = client.slashcommands.size;
-        const totalUsers = client.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0);
+
+        const [guildCounts, userCounts, channelCounts, pings, timestampsArrays] = await Promise.all([
+            client.shard.fetchClientValues("guilds.cache.size"),
+            client.shard.broadcastEval(c => c.guilds.cache.reduce((acc, g) => acc + g.memberCount, 0)),
+            client.shard.fetchClientValues("channels.cache.size"),
+            client.shard.fetchClientValues("ws.ping"),
+            client.shard.broadcastEval(async c => {
+                const arr = [];
+                for (const [guildId, guild] of c.guilds.cache) {
+                    try {
+                        const botMember = await guild.members.fetch(c.user.id);
+                        arr.push({
+                            joinedTimestamp: botMember.joinedTimestamp,
+                            userCount: guild.memberCount,
+                        });
+                    } catch {
+                        null;
+                    }
+                }
+                return arr;
+            }),
+        ]);
+
+        const totalGuilds = guildCounts.reduce((a, b) => a + b, 0);
+        const totalUsers = userCounts.reduce((a, b) => a + b, 0);
+        const totalChannels = channelCounts.reduce((a, b) => a + b, 0);
+        const avgPing = (pings.reduce((a, b) => a + b, 0) / pings.length).toFixed(2);
+
+        const timestamps = timestampsArrays.flat();
+
         const userHere = message.guild.memberCount;
-        const totalGuilds = client.guilds.cache.size;
-        const totalChannels = client.channels.cache.size;
         const uptime = formatDuration(client.uptime);
-        const ping = client.ws.ping + "ms";
         const botAge = formatDuration(Date.now() - client.user.createdAt);
         const botJoinDate = message.guild.members.cache.get(client.user.id)?.joinedAt;
+        const ping = avgPing + "ms";
+
         let totalExecutedCommands;
         try {
-            totalExecutedCommands = (await DB.drizzle.execute(sql`SELECT COUNT(m.ID) AS count FROM Logs m WHERE m.Value LIKE "Executing [%"`))[0][0].count;
+            totalExecutedCommands = (await DB.drizzle.execute(sql`
+                SELECT COUNT(m.ID) AS count
+                FROM Logs m
+                WHERE m.Value LIKE "Executing [%"
+            `))[0][0].count;
         } catch (ex) {
             totalExecutedCommands = "N/A (DB not connected)";
         }
-        const VoicesPlaying = client.voice.adapters.size;
-        const playerStatitics = player.generateStatistics();
-        let totalTracks = 0;
-        let totalListeners = 0;
-        playerStatitics.queues.map((queue) => {
-            totalTracks += queue.status.playing ? queue.tracksCount + 1 : queue.tracksCount;
-            totalListeners += queue.listeners;
-        });
-      
+
+        const VoicesPlaying = (await client.shard.fetchClientValues("voice.adapters.size")).reduce((a, b) => a + b, 0);
+        const playerStatitics = await getAllPlayerStatsSharded(client);
+
+        // recent command detection (local only)
         const fetchedMessages = await message.channel.messages.fetch({ limit: 100 });
-        const lastExecutedCommands = Array.from(fetchedMessages.values()).filter(msg => 
-            msg.content.startsWith(prefix) && 
+        const lastExecutedCommands = Array.from(fetchedMessages.values()).filter(msg =>
+            msg.content.startsWith(prefix) &&
             msg.id !== message.id,
-        ).sort((a, b) => b.createdTimestamp - a.createdTimestamp).slice(0, 10);        
+        ).sort((a, b) => b.createdTimestamp - a.createdTimestamp).slice(0, 10);
+
         const TextCommands = client.commands.map(command => command.name);
+        let lastExecutedCommand = "";
         for (const command of lastExecutedCommands) {
             if (TextCommands.includes(command.content.split(" ")[0].replace(prefix, ""))) {
                 lastExecutedCommand = command;
@@ -78,69 +110,61 @@ module.exports = {
         }
 
         const lastCommandContent = lastExecutedCommand?.content;
+        let lastCommandLink = "";
+        let lastCommandTimeSinceNow = "";
         if (lastExecutedCommand) {
             lastCommandLink = `https://discord.com/channels/${lastExecutedCommand.guild.id}/${lastExecutedCommand.channel.id}/${lastExecutedCommand.id}`;
             lastCommandTimeSinceNow = formatDuration(Date.now() - lastExecutedCommand.createdTimestamp);
         }
 
-        const timestamps = [];
-        for (const [guildId, guild] of client.guilds.cache) {
-            try {
-                const botMember = await guild.members.fetch(client.user.id);
-                const userCount = guild.memberCount;
-                timestamps.push({ joinedTimestamp: botMember.joinedTimestamp, userCount });
-            } catch (err) {
-                console.error(`Failed to fetch bot member for guild ${guild.name}:`, err);
-            }
-        }
-
+        // --- GRAPH ---
         const buffer = await generateChartBuffer(timestamps);
         const attachment = new AttachmentBuilder(buffer, { name: "user_growth.png" });
 
+        // --- EMBED ---
         const embed = {
             title: `Stats for ${client.user.username} (v${WDVersion})`,
             color: 0xffffff,
-            description: "",
             fields: [
                 {
                     name: "Commands count",
-                    value: 
-                    `Text commands: **${amountTextCommands}**\n` + 
-                    `Slash commands: **${amountSlashCommands}**`,
+                    value:
+                        `Text commands: **${amountTextCommands}**\n` +
+                        `Slash commands: **${amountSlashCommands}**`,
                 }, {
                     name: "Server count",
-                    value: 
-                    `Guilds: **${totalGuilds}**\n` + 
-                    `Users: **${totalUsers}** (Here: **${userHere}**)\n` + 
-                    `Channels: **${totalChannels}**\n` +
-                    `Bot joined this server on: **${botJoinDate.toDateString()}**`,
+                    value:
+                        `Guilds: **${totalGuilds}**\n` +
+                        `Users: **${totalUsers}** (Here: **${userHere}**)\n` +
+                        `Channels: **${totalChannels}**\n` +
+                        `Bot joined this server on: **${botJoinDate.toDateString()}**`,
                 }, {
                     name: "Connection info",
-                    value: 
-                    `Ping: **${ping}**\n` + 
-                    `Uptime: **${uptime}**`,
+                    value:
+                        `Ping (avg): **${ping}**\n` +
+                        `Uptime: **${uptime}**`,
                 }, {
                     name: "Commands stats",
-                    value: 
-                    `Total executed commands (approximately): **${totalExecutedCommands}**\n` +
-                    `Last executed command (in \`${message.guild.name}\`):\n` + 
-                    `\`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow || "Never"} ago) ${lastCommandLink ? `Link: ${lastCommandLink}` : ""}`,
+                    value:
+                        `Total executed commands (approximately): **${totalExecutedCommands}**\n` +
+                        `Last executed command (in \`${message.guild.name}\`):\n` +
+                        `\`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow || "Never"} ago) ${lastCommandLink ? `Link: ${lastCommandLink}` : ""}`,
                 }, {
                     name: "Hosting",
-                    value: 
-                    `Host: **${os.platform().replace(/win32/g, "Windows")} ${os.release()}**\n` + 
-                    `Architecture: **${os.arch()}**\n` +
-                    `cores: **${os.cpus().length}**\n` +
-                    `Shard count: **${Shards}**\n` + 
-                    `NodeJS version: **${nodeVersion}**\n` + 
-                    `Ram usage: **${RamUsageFormatted}**`,
+                    value:
+                        `Host: **${os.platform().replace(/win32/g, "Windows")} ${os.release()}**\n` +
+                        `Architecture: **${os.arch()}**\n` +
+                        `Cores: **${os.cpus().length}**\n` +
+                        `Shard count: **${Shards}**\n` +
+                        `NodeJS version: **${nodeVersion}**\n` +
+                        `Ram usage: **${RamUsageFormatted}**`,
                 }, {
                     name: "Voice",
-                    value: 
-                    `Playing in **${VoicesPlaying} / ${totalGuilds}** VCs\n` + 
-                    `Queues: **${playerStatitics.queues.length}**\n` + 
-                    `Tracks: **${totalTracks}**\n` + 
-                    `Listeners: **${totalListeners}**`,
+                    value:
+                        `Playing in **${VoicesPlaying} / ${totalGuilds}** VCs\n` +
+                        `Queues: **${playerStatitics.queueSize}**\n` +
+                        `Tracks: **${playerStatitics.tracksCount + playerStatitics.queueSize}**\n` +
+                        `Listeners: **${playerStatitics.listeners}**`,
                 },
             ],
             image: {
@@ -176,18 +200,17 @@ async function generateChartBuffer(timestamps) {
         date = new Date(date.getTime() + 24 * 60 * 60 * 1000)
     ) {
         const day = date.toISOString().split("T")[0];
-        totalUsers += countPerDay[day] || 0; // Add 0 if no new members joined on this day
+        totalUsers += countPerDay[day] || 0;
         labels.push(day);
         data.push(totalUsers);
     }
 
-    
     if (totalUserCache == Object.values(countPerDay).reduce((acc, count) => acc + count, 0)) return imageCache;
 
     totalUserCache = Object.values(countPerDay).reduce((acc, count) => acc + count, 0);
 
     const chartData = labels.map((label, i) => ({
-        x: new Date(label).getTime(), // numeric timestamp
+        x: new Date(label).getTime(),
         y: data[i],
     }));
 
@@ -220,7 +243,6 @@ async function generateChartBuffer(timestamps) {
                             return date.toLocaleDateString(locale, { timeZone });
                         },
                         color: "white",
-                        // maxTicksLimit: 7,
                     },
                     title: {
                         display: true,
@@ -229,7 +251,6 @@ async function generateChartBuffer(timestamps) {
                     },
                     min: chartData[0].x,
                     max: lastTimestamp + oneDay,
-
                 },
                 y: {
                     ticks: { color: "white" },

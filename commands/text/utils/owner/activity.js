@@ -1,5 +1,6 @@
 const config = require("@config/configUtils");
 const { ActivityType } = require("discord.js");
+const embedGenerator = require("@utils/helpers/embedGenerator.js");
 
 module.exports = {
     name: "activity",
@@ -21,26 +22,31 @@ module.exports = {
         },
     },
     private: true,
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         const activities = config.get("activities");
-        if (!args[0] && !optionalArgs["preset|p"] && !optionalArgs["list|l"]) {
-            client.user.setActivity(activities[Math.floor(Math.random() * activities.length)], { type: ActivityType.Custom });
-            return await message.reply({ content: "Activity randomised" });
+        if (!flags["preset|p"] && !flags["list|l"]) {
+            if (!args[0]) {
+                client.user.setActivity(activities[Math.floor(Math.random() * activities.length)], { type: ActivityType.Custom });
+                return await message.reply({ embeds: [embedGenerator.success("Activity randomised")] });
+            } else {
+                client.user.setActivity(args.join(" "), { type: ActivityType.Custom });
+                return await message.reply({ embeds: [embedGenerator.success(`Activity changed to : \`${args.join(" ")}\``)] });
+            }
         }
 
-        if (optionalArgs["list|l"]) {
+        if (flags["list|l"]) {
             let activityList = "";
             const maxIndexWidth = (activities.length - 1).toString().length;
             activities.forEach((activity, index) => {
                 const formattedIndex = `[${index.toString().padStart(maxIndexWidth, " ")}]`;
                 activityList += `${formattedIndex} : ${activity.name}\n`;
             });
-            return await message.reply({ content: `\`\`\`${activityList}\`\`\`` });
+            return await message.reply({ embeds: [embedGenerator.info("Available activities", `\`\`\`${activityList}\`\`\``)] });
         }
 
-        if (optionalArgs["preset|p"]) {
-            client.user.setActivity(activities[optionalArgs["preset|p"]], { type: ActivityType.Custom });
-            return await message.reply({ content: `Activity changed to : \`${activities[optionalArgs["preset|p"]]}\``  });
+        if (flags["preset|p"]) {
+            client.user.setActivity(activities[flags["preset|p"]], { type: ActivityType.Custom });
+            return await message.reply({ embeds: [embedGenerator.success(`Activity changed to : \`${activities[flags["preset|p"]]}\``)] });
         }
 
         await message.reply({ embeds: [embedGenerator.warning("Invalid activity")] });

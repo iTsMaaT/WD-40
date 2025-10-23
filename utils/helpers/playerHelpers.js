@@ -3,15 +3,17 @@ const { toggleLiveChat } = require("./playerLiveChat");
 const { distubePluginToExtractor } = require("./distubePluginToDiscordPlayerExtractor");
 const { AttachmentExtractor } = require("@discord-player/extractor");
 const { YoutubeiExtractor } = require("discord-player-youtubei");
+const { YoutubeSabrExtractor } = require("@utils/helpers/youtubei/youtubeiExtractor");
 const { DeezerExtractor } = require("discord-player-deezer");
 const { SoundgasmExtractor } = require("discord-player-soundgasm");
 const { TTSExtractor } = require("discord-player-tts");
 const { SoundcloudExtractor } = require("discord-player-soundcloud");
 const { SpotifyExtractor } = require("discord-player-spotify");
 const { AppleMusicExtractor } = require("discord-player-applemusic");
+const config = require("@utils/config/configUtils");
 
 const identifierMap = {
-    "youtubei": YoutubeiExtractor.identifier,
+    "youtubei": config.get("discordPlayer").extractors.Youtubei.config.useSabrAlternative ? YoutubeSabrExtractor.identifier : YoutubeiExtractor.identifier,
     "deezer": DeezerExtractor.identifier,
     "soundcloud": SoundcloudExtractor.identifier,
     "spotify": SpotifyExtractor.identifier,
@@ -65,7 +67,7 @@ const getFormattedSource = (queue) => {
  * @returns {object} The stats of the queue.
  */
 const useStats = (guild) => {
-    const queue = useQueue(guild);
+    const queue = useQueue(guild.id);
     if (!queue) return null;
     return queue.stats.generate();
 };
@@ -109,7 +111,31 @@ const getProbableBridgeSource = function(playerConfig, providesStream) {
     return streamProviders.length > 0 ? streamProviders.join(" \\▶ ") : "N/A";
 };
 
+const getAllPlayerStatsSharded = async (client) => {
+    const stats = await client.shard.broadcastEval(() => {
+        // eslint-disable-next-line no-shadow
+        const { useQueue } = require("discord-player");
+        return this.guilds.cache.map(guild => {
+            const queue = useQueue(guild.id);
+            if (!queue) return null;
+            return queue.stats.generate();
+        });
+    });
+
+    const queueSize = stats.length;
+    const flatStats = stats.flat().filter(Boolean);
+
+    return {
+        tracksCount: flatStats.reduce((acc, stat) => acc + stat.tracksCount, 0),
+        historySize: flatStats.reduce((acc, stat) => acc + stat.historySize, 0),
+        queueSize,
+        extractors: flatStats.reduce((acc, stat) => acc + stat.extractors, 0),
+        listeners: flatStats.reduce((acc, stat) => acc + stat.listeners, 0),
+    };
+};
+
 module.exports = {
+    getAllPlayerStatsSharded,
     getLoopMode,
     getPauseMode,
     getFormattedSource,

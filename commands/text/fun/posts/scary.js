@@ -6,7 +6,7 @@ module.exports = {
     description: "Good luck",
     category: "posts",
     aliases: ["twosentencehorror"],
-    async execute(logger, client, message, args, optionalArgs) {
+    async execute(logger, client, message, args, flags) {
         try {
             const embed = await fetchReddit(true, ["2sentence2horror"], 20, "sub", "text");
             if (!embed || embed.title === "Couldn't fetch a post after **20** tries") 
