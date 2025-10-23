@@ -189,7 +189,7 @@ module.exports = {
 
         const collector = helpMessage.createMessageComponentCollector({
             filter,
-            time: 120000,
+            idle: 120000,
         });
 
         let embed = categoryEmbed;
