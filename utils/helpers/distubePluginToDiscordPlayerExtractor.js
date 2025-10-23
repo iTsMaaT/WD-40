@@ -32,15 +32,15 @@ function distubePluginToExtractor(
 
     const extractorClass = class extends BaseExtractor {
         constructor(context) {
-            super(context);
+            super(context, options);
             this.plugin = distubePluginInstance;
         }
 
-        static identifier = `com.distube.${distubePluginInstance.constructor.name}`;
+        static identifier = `com.distube.${plugin.name.toLowerCase() ?? plugin.constructor.name.toLowerCase()}`;
 
         async activate() {
+            this.protocols = [plugin.name.toLowerCase() ?? plugin.constructor.name.toLowerCase];
             if (typeof this.plugin.init === "function") await this.plugin.init();
-            this.protocols = [distubePluginInstance.constructor.name];
         }
 
         async deactivate() {
@@ -59,7 +59,7 @@ function distubePluginToExtractor(
             if (typeof this.plugin.resolve === "function" && isUrl(url)) 
                 result = await this.plugin.resolve(url, options);
             else if (plugin.prototype instanceof ExtractorPlugin && typeof plugin.prototype.searchSong === "function" && !isUrl(url)) 
-                result = await new plugin(options).searchSong(url, options);
+                result = await this.plugin.searchSong(url, options);
             else 
                 throw new Error("Plugin cannot search or resolve URL");
             
@@ -115,7 +115,7 @@ function distubePluginToExtractor(
             }
 
             const result = await this.context.requestBridge(info, this);
-            if (result.result) throw new Error("Could not bridge this track");
+            if (!result?.result) throw new Error("Could not bridge this track");
             return result.result;
         }
 
@@ -147,7 +147,7 @@ function distubeSongToDiscordPlayerTrack(song, player) {
         thumbnail: song.thumbnail || "",
         duration: song.formattedDuration,
         views: song.views || 0,
-        requestedBy: song.member?.user || null,
+        requestedBy: song.member?.user ?? this.context.client?.user ?? null,
         source: "arbitrary",
     });
 }
@@ -180,9 +180,11 @@ function isUrl(input) {
 
 function timeFormatToMs(time) {
     const parts = time.split(":").map(Number);
-    return parts.reduce((acc, part, index) => {
+    const seconds = parts.reduce((acc, part, index) => {
         return acc + part * Math.pow(60, parts.length - index - 1);
     }, 0);
+    return seconds * 1000;
 }
+
 
 module.exports = { distubePluginToExtractor };
