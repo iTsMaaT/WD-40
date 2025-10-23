@@ -1,5 +1,4 @@
 const fs = require("fs");
-const axios = require("axios");
 
 /**
  * Fetches the Reddit token from the Reddit API
