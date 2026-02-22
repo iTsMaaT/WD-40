@@ -22,12 +22,12 @@ Platform.shim.eval = async (data, env) => {
  * Get the Innertube instance
  * @returns {Promise<Innertube>} The Innertube instance
  */
-async function getInnertube(cookies) {
+async function getInnertube() {
     if (!ineerTubeInstance) {
         ineerTubeInstance = await Innertube.create({
             cache: new UniversalCache(false),
             // player_id: "0004de42",
-            cookie: cookies,
+            cookie: process.env.YOUTUBE_COOKIE,
         });
     }
     return ineerTubeInstance; 
