@@ -8,7 +8,6 @@
 - Added better error for AI model overloading
 - Added more details for self-hosting in the README
 - Made all paginated embed's buttons disable after 2mins of inactivity
-- Disabled AI commands due to lack of funds
 - Multiple bug fixes and optimisations
 
 ## [5.12.5] - July 13, 2025
