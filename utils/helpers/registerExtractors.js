@@ -8,10 +8,10 @@ const { SoundcloudExtractor } = require("discord-player-soundcloud");
 const { SpotifyExtractor } = require("discord-player-spotify");
 const { AppleMusicExtractor } = require("discord-player-applemusic");
 const { SubsonicExtractor } = require("discord-player-subsonic");
+const { getVideoInfoFromOnesieRequest, createReadableFromWeb, getPoToken } = require("@utils/helpers/getInfoFromOnesieRequest.js");
 const { distubePluginToExtractor } = require("@utils/helpers/distubePluginToDiscordPlayerExtractor.js");
 const { YoutubePlugin } = require("./distubeYoutubeExtractor.js");
 const { Innertube, ClientType } = require("youtubei.js");
-const { YoutubeSabrExtractor } = require("./youtubei/youtubeiExtractor.js");
 const ytdl = require("@distube/ytdl-core");
 const config = require("@utils/config/configUtils");
 const logger = require("@utils/log");
@@ -90,8 +90,8 @@ async function registerExtractors(player) {
 
     if (extractors.Youtubei.enabled || extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.useScraping) {
         logger.info("Loading YoutubeiExtractor extractor...");
-        if (extractors.Youtubei.config.useSabrAlternative) {
-            const ytExt = await player.extractors.register(YoutubeSabrExtractor, { cookies: process.env.YOUTUBE_COOKIE, logSabrEvents: extractors.Youtubei.config.logSabrEvents });
+        if (extractors.Youtubei.config.useDistubeAlternative) {
+            const ytExt = await player.extractors.register(distubePluginToExtractor(YoutubePlugin, {}));
             ytExt.priority = extractors.Youtubei.priority ?? ytExt.priority;
         } else {
         
@@ -109,7 +109,15 @@ async function registerExtractors(player) {
                     ...getYoutubeExtractorOptions(extractors.Youtubei.config),
                     createStream: async (track, ext) => {
                         try {
-                            if (extractors.Youtubei.config.useTVOAuthLogin) {
+                            if (extractors.Youtubei.config.useOnesieRequests) {
+                                try {
+                                    const url = await getVideoInfoFromOnesieRequest(track.url, ext.innerTube, ext.innerTube.po_token);
+                                    const download = await url.download({ format: "mp4", quality: "best", type: "audio" });
+                                    return createReadableFromWeb(download);
+                                } catch (error) {
+                                    logger.error("Failed to get video info from Onesie request:", error);
+                                }
+                            } else if (extractors.Youtubei.config.useTVOAuthLogin) {
                                 try {
                                     const videoId = new URL(track.url).searchParams.get("v");
                                     const info = await innerTubeInstance.getBasicInfo(videoId, {
