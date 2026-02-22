@@ -8,15 +8,16 @@ const EmbedGenerator = require("@utils/helpers/embedGenerator");
 const { repositories } = require("@utils/db/tableManager.js");
 const guildSettings = require("@utils/guildManager/withDatabase/guildSettings.js");
 const GuildManager = require("@guildManager");
-const { getAllPlayerStatsSharded } = require("@utils/helpers/playerHelpers");
-const { useMainPlayer } = require("discord-player");
-const player = useMainPlayer();
+
 module.exports = {
     name: "test",
     description: "Test command",
     category: "fun",
     private: true,
     async execute(logger, client, message, args, flags) {
-        console.log(await getAllPlayerStatsSharded(client, player));
+        for (const guild of client.guilds.cache.values()) {
+            const prefix = GuildManager.GetPrefix(guild.id);
+            logger.info(`Guild ${guild.name} (${guild.id}) has prefix ${prefix}`);
+        }
     },
 };
