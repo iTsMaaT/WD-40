@@ -7,7 +7,7 @@ const { getInnertube } = require("./getInnertube.js");
  * Discord-player extractor using only helpers from youtubeSabrCore.js.
  */
 class YoutubeSabrExtractor extends BaseExtractor {
-    static identifier = "com.itsmaat.discord-player.youtube-sabr";
+    static identifier = "youtube-sabr";
 
     async activate() {
         this.protocols = ["youtube", "yt"];
@@ -32,25 +32,9 @@ class YoutubeSabrExtractor extends BaseExtractor {
     }
 
     async handle(query, context) {
-        console.log(query);
         try {
-            let isPlaylist = false;
-            let playlistId = null;
-            try {
-                const urlObj = new URL(query);
-                console.log(urlObj);
-                const hasList = urlObj.searchParams.has("list");
-                const isShortLink = /(^|\.)youtu\.be$/i.test(urlObj.hostname);
-                console.log(isShortLink);
-                isPlaylist = hasList && !isShortLink;
-                playlistId = isPlaylist ? urlObj.searchParams.get("list") : null;
-            } catch {
-                // fallback for non-URL queries (or plain playlist ids)
-                const m = query.match(/[?&]list=([a-zA-Z0-9_-]+)/);
-                isPlaylist = !!m;
-                playlistId = m?.[1] ?? null;
-            }
-            console.log(isPlaylist, playlistId);
+            const isPlaylist = /[?&]list=([a-zA-Z0-9_-]+)/.test(query);
+            const playlistId = extractPlaylistId(query);
 
             // If playlist detected
             if (isPlaylist && playlistId) {

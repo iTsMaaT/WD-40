@@ -68,7 +68,7 @@ async function createSabrStream(videoId) {
                 vis: 0,
                 splay: false,
                 lactMilliseconds: "-1",
-                signatureTimestamp: innertube.session.player?.signature_timestamp,
+                signatureTimestamp: innertube.session.player?.sts,
             },
         },
         contentCheckOk: true,
@@ -77,7 +77,7 @@ async function createSabrStream(videoId) {
         parse: true,
     });
 
-    const serverAbrStreamingUrl = await innertube.session.player?.decipher(
+    const serverAbrStreamingUrl = innertube.session.player?.decipher(
         playerResponse.streaming_data?.server_abr_streaming_url,
     );
     const videoPlaybackUstreamerConfig =
@@ -88,9 +88,6 @@ async function createSabrStream(videoId) {
     if (!serverAbrStreamingUrl) throw new Error("serverAbrStreamingUrl not found");
 
     const sabrFormats = playerResponse.streaming_data?.adaptive_formats.map(buildSabrFormat) || [];
-    console.log(serverAbrStreamingUrl);
-
-    await globalThis.wait(1);
 
     const serverAbrStream = new SabrStream({
         formats: sabrFormats,
