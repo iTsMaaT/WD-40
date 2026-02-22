@@ -45,16 +45,8 @@ module.exports = {
         console.log("Reddit config file initialized.");
 
         console.log("Guild manager initiation...");
-        const guilds = (await client.shard.broadcastEval(c =>
-            c.guilds.cache.map(g => ({
-                id: g.id,
-                name: g.name,
-                memberCount: g.memberCount,
-                joinedTimestamp: g.members.me?.joinedTimestamp ?? null,
-                ownerId: g.ownerId,
-            })),
-        )).flat();
-        console.log(`Found ${guilds.length} guilds.`);
+        const guilds = client.guilds.cache;
+        console.log(`Found ${guilds.size} guilds.`);
         await GuildManager.init(guilds, client);
         console.log("Guild manager initiation done.");
 

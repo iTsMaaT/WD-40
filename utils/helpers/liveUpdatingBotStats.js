@@ -4,8 +4,9 @@ const logger = require("@utils/log");
 const os = require("os");
 const changelogs = require("@root/changelogs.json");
 const getPterodactylInfo = require("@root/utils/functions/getPterodactylInfo");
-const { sql } = require("drizzle-orm");
+const { sql, desc } = require("drizzle-orm");
 const DB = require("@root/utils/db/databaseManager");
+const GuildManager = require("@guildManager");
 const { useMainPlayer } = require("discord-player");
 const cron = require("cron");
 const { toEngineerNotation } = require("@functions/formattingFunctions");
@@ -13,6 +14,11 @@ const config = require("@utils/config/configUtils");
 const timeZone = config.get("timeZone");
 const getExactDate = require("@functions/getExactDate");
 
+/**
+ * LiveUpdatingBotStats class.
+ * 
+ * @class LiveUpdatingBotStats
+ */
 class LiveUpdatingBotStats {
     constructor(client, channel, cronTime) {
         this.client = client;
@@ -20,6 +26,11 @@ class LiveUpdatingBotStats {
         this.cronTime = cronTime || "0 * * * *";
     }
 
+    /**
+     * Starts the live updating bot stats (unless in dev).
+     * 
+     * @returns {Promise<void>}
+     */
     async start() {
         if (process.env.SERVER === "dev" || !DB.dbExists()) return;
         const jobExecution = async () => {
@@ -31,29 +42,21 @@ class LiveUpdatingBotStats {
         new cron.CronJob(this.cronTime, jobExecution, null, true, timeZone);
     }
 
+    /**
+     * Generates the stats embed.
+     * 
+     * @returns {Promise<object>} The stats embed.
+     */
     async generateStatsEmbed() {
         const PteroInfo = await getPterodactylInfo();
         const RamUsageFormatted = `${PteroInfo?.ram.usage.clean || (toEngineerNotation(process.memoryUsage().rss) + "B rss")} / ${PteroInfo?.ram.limit.clean || (toEngineerNotation(process.memoryUsage().heapTotal) + "B heap")} (${PteroInfo?.ram.pourcentage.clean || "N/A"})`;
         const WDVersion = changelogs[changelogs.length - 1].version;
-
-        // --- GLOBAL STATS ---
-        const [guildCounts, userCounts, channelCounts, pings] = await Promise.all([
-            this.client.shard.fetchClientValues("guilds.cache.size"),
-            this.client.shard.broadcastEval(c => c.guilds.cache.reduce((acc, g) => acc + g.memberCount, 0)),
-            this.client.shard.fetchClientValues("channels.cache.size"),
-            this.client.shard.fetchClientValues("ws.ping"),
-        ]);
-
-        const totalGuilds = guildCounts.reduce((a, b) => a + b, 0);
-        const totalUsers = userCounts.reduce((a, b) => a + b, 0);
-        const totalChannels = channelCounts.reduce((a, b) => a + b, 0);
-        const avgPing = (pings.reduce((a, b) => a + b, 0) / pings.length).toFixed(2);
-
-        // --- LOCAL STATS ---
+        const totalUsers = this.client.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0);
+        const totalGuilds = this.client.guilds.cache.size;
+        const totalChannels = this.client.channels.cache.size;
         const uptime = formatDuration(this.client.uptime);
+        const ping = this.client.ws.ping + "ms";
         const botAge = formatDuration(Date.now() - this.client.user.createdAt);
-        const ping = avgPing + "ms";
-
         const VoicesPlaying = this.client.voice.adapters.size;
         const player = useMainPlayer();
         const playerStatitics = player.generateStatistics();
@@ -63,19 +66,13 @@ class LiveUpdatingBotStats {
             totalTracks += queue.status.playing ? queue.tracksCount + 1 : queue.tracksCount;
             totalListeners += queue.listeners;
         });
-
         let totalExecutedCommands;
         try {
-            totalExecutedCommands = (await DB.drizzle.execute(sql`
-                SELECT COUNT(m.ID) AS count
-                FROM Logs m
-                WHERE m.Value LIKE "Executing [%"
-            `))[0][0].count;
+            totalExecutedCommands = (await DB.drizzle.execute(sql`SELECT COUNT(m.ID) AS count FROM Logs m WHERE m.Value LIKE "Executing [%"`))[0][0].count;
         } catch (ex) {
             totalExecutedCommands = "N/A (DB not connected)";
         }
 
-        // --- LOG COUNTS ---
         const severeLogCount = logger.logCounts.severe;
         const errorLogCount = logger.logCounts.error;
         const warningLogCount = logger.logCounts.warning;
@@ -84,40 +81,39 @@ class LiveUpdatingBotStats {
         const totalLogCount = logger.getTotalLogCount();
         const allTimeLogCount = await logger.getAllTimeLogCount();
 
-        // --- EMBED ---
         const embed = embedGenerator.info({
             title: `Live bot stats (v${WDVersion})`,
             description: `Last updated at ${getExactDate()}`,
             fields: [
                 {
                     name: "Server count",
-                    value:
-                        `Guilds: **${totalGuilds}**\n` +
-                        `Users: **${totalUsers}**\n` +
-                        `Channels: **${totalChannels}**`,
+                    value: 
+                    `Guilds: **${totalGuilds}**\n` + 
+                    `Users: **${totalUsers}**\n` + 
+                    `Channels: **${totalChannels}**`,
                 }, {
                     name: "Connection info",
-                    value:
-                        `Ping (avg): **${ping}**\n` +
-                        `Uptime: **${uptime}**`,
+                    value: 
+                    `Ping: **${ping}**\n` + 
+                    `Uptime: **${uptime}**`,
                 }, {
                     name: "Commands stats",
-                    value:
-                        `Total executed commands (approximately): **${totalExecutedCommands}**`,
+                    value: 
+                    `Total executed commands (approximately): **${totalExecutedCommands}**`,
                 }, {
                     name: "Hosting",
-                    value:
-                        `Host: **${os.platform().replace(/win32/g, "Windows")} ${os.release()}**\n` +
-                        `Architecture: **${os.arch()}**\n` +
-                        `cores: **${os.cpus().length}**\n` +
-                        `Ram usage: **${RamUsageFormatted}**`,
+                    value: 
+                    `Host: **${os.platform().replace(/win32/g, "Windows")} ${os.release()}**\n` + 
+                    `Architecture: **${os.arch()}**\n` +
+                    `cores: **${os.cpus().length}**\n` +
+                    `Ram usage: **${RamUsageFormatted}**`,
                 }, {
                     name: "Voice",
-                    value:
-                        `Playing in **${VoicesPlaying} / ${totalGuilds}** VCs\n` +
-                        `Queues: **${playerStatitics.queues.length}**\n` +
-                        `Tracks: **${totalTracks}**\n` +
-                        `Listeners: **${totalListeners}**`,
+                    value: 
+                    `Playing in **${VoicesPlaying} / ${totalGuilds}** VCs\n` + 
+                    `Queues: **${playerStatitics.queues.length}**\n` + 
+                    `Tracks: **${totalTracks}**\n` + 
+                    `Listeners: **${totalListeners}**`,
                 }, {
                     name: "Severe logs",
                     value: severeLogCount,
@@ -155,6 +151,13 @@ class LiveUpdatingBotStats {
         return embed;
     }
 
+    /**
+     * Handles the sending of a message to the channel.
+     * @param {object} channel - The channel object.
+     * @param {string} messageCreateOptions - The message options.
+     * 
+     * @returns {Promise<void>}
+     */
     async handleMessage(messageCreateOptions) {
         let lastMessage;
         try {
