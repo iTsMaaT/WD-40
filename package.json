@@ -1,6 +1,6 @@
 {
   "name": "wd40",
-  "version": "5.13.0",
+  "version": "5.12.5",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,8 +16,7 @@
     "cl": "npm run createChangelogMD",
     "generateChangelogEntry": "node ./utils/helpers/generateChangelogEntry.js",
     "gce": "npm run generateChangelogEntry",
-    "updateall": "npx npm-check-updates -u && npm i",
-    "cloc": "powershell -Command \"(Get-ChildItem -Recurse -File -Include *.js,*.ts | Where-Object { $_.FullName -notmatch '\\\\node_modules\\\\|\\\\dist\\\\' } | ForEach-Object { (Get-Content $_.FullName -ReadCount 0).Count }) | Measure-Object -Sum | Select-Object -ExpandProperty Sum\""
+    "updateall": "npx npm-check-updates -u && npm i"
   },
   "repository": {
     "type": "git",
@@ -35,14 +34,14 @@
     "@distube/ytdl-core": "^4.16.12",
     "@google/genai": "^1.7.0",
     "@iamtraction/google-translate": "^2.0.1",
-    "@napi-rs/canvas": "^0.1.80",
     "@sentry/node": "^9.33.0",
+    "axios": "^1.10.0",
     "chart.js": "^4.5.0",
     "chartjs-adapter-date-fns": "^3.0.0",
     "chartjs-node-canvas": "^5.0.0",
     "cron": "^4.3.1",
     "discord-player": "^7.2.0-dev.2",
-    "discord-player-applemusic": "^1.0.3",
+    "discord-player-applemusic": "^1.0.2",
     "discord-player-deezer": "^2.5.0-beta.1",
     "discord-player-soundcloud": "^1.0.7",
     "discord-player-soundgasm": "^1.1.5",
@@ -55,13 +54,14 @@
     "distube": "^5.0.7",
     "dotenv": "^16.6.1",
     "drizzle-orm": "^0.44.2",
-    "googlevideo": "^4.0.4",
+    "googlevideo": "^3.0.0",
+    "heapdump": "^0.3.15",
     "module-alias": "^2.2.3",
     "mysql2": "^3.14.1",
     "node-html-parser": "^7.0.1",
     "sharp": "^0.34.2",
     "simple-folder-search": "^2.3.0",
-    "youtubei.js": "^16.0.1"
+    "youtubei.js": "^15.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
