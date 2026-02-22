@@ -19,7 +19,6 @@ module.exports = {
     inVoiceChannel: true,
     inSameVoiceChannel: true,
     requiredENVs: ["GEMINI_API_KEY"],
-    private: true,
     async execute(logger, client, message, args, flags) {
         if (!args.length)
             return message.reply({ embeds: [embedGenerator.warning("Please provide a song description.")] });
@@ -64,18 +63,8 @@ module.exports = {
 
                 if (wrongSongs.length > 0) 
                     prompt += `\n\nPrevious incorrect answers (this is a list of answers that the user already refuted as incorrect):\n${wrongSongs.join("\n")}`;
-                let aiResponse;
-                try {
-                    aiResponse = await fetchGeminiResponse(prompt, process.env.GEMINI_API_KEY);
-                } catch (err) {
-                    logger.error(err);
-                    if (err.message.includes("API key is invalid")) 
-                        return await message.reply({ embeds: [embedGenerator.error("Invalid API key. Please check your configuration.")] });
-                    else if (err.message.includes("You exceeded your current quota")) 
-                        return await message.reply({ embeds: [embedGenerator.error("Timed out. To stop this from happening, please consider donating to the project.")] });
-                    else 
-                        return await message.reply({ embeds: [embedGenerator.error("An error occurred.")] });
-                }
+
+                const aiResponse = await fetchGeminiResponse(prompt, process.env.GEMINI_API_KEY);
                 const regex = /^(.*?)\s*-\s*(.*?)$/;
                 const match = aiResponse.trim().replace(/\s+/g, " ").match(regex);
 

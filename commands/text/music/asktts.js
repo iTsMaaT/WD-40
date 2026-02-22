@@ -23,7 +23,6 @@ module.exports = {
     inVoiceChannel: true,
     inSameVoiceChannel: true,
     requiredENVs: ["GEMINI_API_KEY"],
-    private: true,
     async execute(logger, client, message, args) {
         let geminiResponse, sent;
         const player = useMainPlayer();
