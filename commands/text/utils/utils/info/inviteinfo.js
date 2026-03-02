@@ -63,6 +63,12 @@ module.exports = {
                 timestamp: new Date(),
             };
   
+            // ensure no field exceeds Discord's limits
+            for (const f of embed.fields) {
+                f.name = truncate(f.name, 256);
+                f.value = truncate(f.value, 1024);
+            }
+  
             await message.reply({ embeds: [embed] });
         } catch (error) {
             logger.error(error);
@@ -71,12 +77,22 @@ module.exports = {
     },
 };
   
-function formatObject(obj) {
-    let formatted = "";
-    for (const key in obj) {
-        const value = obj[key] !== null ? obj[key] : "-";
-        formatted += `**${key}:** ${value}\n`;
-    }
-    return formatted;
+function truncate(str, maxLen) {
+    if (str == null) return "-";
+    str = String(str);
+    if (str.length <= maxLen) return str;
+    return str.slice(0, maxLen - 3) + "...";
 }
   
+function formatObject(obj, maxLen = 1024) {
+    let formatted = "";
+    for (const key in obj) {
+        let value = obj[key] !== null ? obj[key] : "-";
+        value = truncate(value, maxLen);     // cut each individual property
+        formatted += `**${key}:** ${value}\n`;
+    }
+    if (formatted.length > maxLen) 
+        formatted = truncate(formatted, maxLen);
+    
+    return formatted;
+}

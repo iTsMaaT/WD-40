@@ -1,5 +1,4 @@
 {
-
     // Warn if the configuration is not part of the base configuration
     "warnForConfigNotInBaseConfig": true,
 
@@ -37,7 +36,7 @@
         { "type": 4, "name": "That's the gros sourire message" },
         { "type": 4, "name": "Barbeque bacon burger" },
         { "type": 4, "name": "Give suggestions! (I'm desperate) | >suggestion" },
-        { "type": 4, "name": "Do you know who else suffers from dimentia?" },
+        { "type": 4, "name": "Do you know who else suffers from dementia?" },
         { "type": 4, "name": "Fuck Mee6" },
         { "type": 4, "name": "Amongst Us" },
         { "type": 4, "name": "Ferme ta yeule" },
@@ -85,7 +84,7 @@
     "logRateLimited": false,
 
     // Default Gemini model for AI interactions
-    "defaultGeminiModel": "gemini-2.0-flash-lite",
+    "defaultGeminiModel": "gemini-3-flash-preview",
 
     "discordPlayer": {
         // Supported file extensions for the player (in the ./music folder)
@@ -133,8 +132,6 @@
                 "canBridge": true,
                 "priority": 11,
                 "config": {
-                    "useSabrAlternative": true,                // Use a local alternative (bypasses all other config)
-                    "logSabrEvents": true,                     // Log SABR events for the SABR alternative
                     "client": "TV_EMBEDDED",                   // Client type for YouTube
                     "highWaterMark": 2097152,                  // High water mark for streams
                     "attemptYoutubeSearchEvenIfDisabled": {
@@ -142,10 +139,11 @@
                         "usingScraping": false                 // Attempt to search using scraping
                     },
                     "useServerAbrStream": false,               // Use server ABR stream
-                    "usePoToken": true,                        // Use TrustedClient token for authentication
-                    "useOnesieRequests": true,                 // Use Onesie requests
-                    "useTVOAuthLogin": true,                   // Use TV OAuth login
-                    "useCookie": false,                        // Use cookies for authentication
+                    "usePoToken": false,                       // Use TrustedClient token for authentication
+                    "useOnesieRequests": false,                // Use Onesie requests
+                    "useTVOAuthLogin": false,                  // Use TV OAuth login
+                    "useCookie": true,                         // Use cookies for authentication
+                    "useDistubeAlternative": false,            // Use Distube alternative
                     "useYTDLFallback": true                    // Use ytdl-core fallback
                 }
             },

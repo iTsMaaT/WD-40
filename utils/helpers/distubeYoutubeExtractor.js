@@ -9,6 +9,11 @@ const {
     YTNodes,
 } = require("youtubei.js");
 
+async function getPlaylist(id) {
+    const yt = await Innertube.create();
+    return await yt.getPlaylist(id);
+}
+
 function extractYoutubeId(url) {
     const regex =
     /^(?:https?:\/\/)?(?:(?:www|m)\.)?(?:youtube\.com|youtu\.be|music\.youtube\.com)(?:\/(?:(?:watch\?v=|embed\/|v\/|shorts\/|live\/)?([\w-]{11}))(?:\S+)?|\/playlist\?list=((?:PL|UU|LL|RD|OL)[\w-]{16,41}))(?:\S+)?/;
@@ -44,28 +49,20 @@ class YoutubePlugin extends ExtractorPlugin {
     constructor(configs) {
         super();
         this.configs = configs;
-        this.ytInfo = null;   // For info/search/resolve
-        this.ytStream = null; // For streaming
+        this.yt = null;
     }
 
     async init(distube) {
         super.init(distube);
-        // Info instance: IOS, no login
-        this.ytInfo = await Innertube.create({
-            client_type: ClientType.IOS,
-            cache: new UniversalCache(false),
-        });
-        // Stream instance: TV_EMBEDDED, with login
-        this.ytStream = await Innertube.create({
-            player_id: "0004de42",
+        this.yt = await Innertube.create({
             client_type: ClientType.TV_EMBEDDED,
-            cache: new UniversalCache(false),
+            cache: new UniversalCache(true, this.configs.cacheDir),
         });
-        await this.ytStream.session.signIn(tokenToObject(process.env.YOUTUBE_ACCESS_STRING));
-        const info = await this.ytStream.account.getInfo();
+        await this.yt.session.signIn(tokenToObject(process.env.YOUTUBE_ACCESS_STRING));
+        const info = await this.yt.account.getInfo();
         console.log(info.contents?.contents
             ? `Signed into YouTube using the name: ${info.contents.contents[0].is(YTNodes.AccountItem) ? (info.contents.contents[0].as(YTNodes.AccountItem).account_name.text ?? "UNKNOWN ACCOUNT") : "UNKNOWN ACCOUNT"}`
-            : `Signed into YouTube using the client name: ${this.ytStream.session.client_name}@${this.ytStream.session.client_version}`);
+            : `Signed into YouTube using the client name: ${this.yt.session.client_name}@${this.yt.session.client_version}`);
     }
 
     validate(url) {
@@ -83,7 +80,7 @@ class YoutubePlugin extends ExtractorPlugin {
                 "INVALID_SONG",
                 "Cannot get stream URL from an invalid song.",
             );}
-            const info = await this.ytStream.getBasicInfo(new URL(song.url).searchParams.get("v"), {
+            const info = await this.yt.getBasicInfo(new URL(song.url).searchParams.get("v"), {
                 client: "TV",
             });
             let format;
@@ -93,7 +90,7 @@ class YoutubePlugin extends ExtractorPlugin {
                 const format251 = info.streaming_data.adaptive_formats.find(
                     (f) => f.itag === 251,
                 );
-                format = format251.decipher(this.ytStream.session.player);
+                format = format251.decipher(this.yt.session.player);
             }
             if (!format) throw new DisTubeError("NO_STREAM_URL");
             return format;
@@ -103,10 +100,10 @@ class YoutubePlugin extends ExtractorPlugin {
     }
 
     async searchSong(query, options) {
-        const result = await this.ytInfo.search(query.trim(), {
+        const result = await this.yt.search(query.trim(), {
             type: "video",
         });
-        const info = await this.ytInfo.getBasicInfo(result.results[0].video_id);
+        const info = await this.yt.getBasicInfo(result.results[0].video_id);
         return new YoutubeSong(this, info, options);
     }
 
@@ -114,11 +111,11 @@ class YoutubePlugin extends ExtractorPlugin {
         const validated = extractYoutubeId(url);
         if (!validated.id) throw new DisTubeError("CANNOT_RESOLVE_SONG");
         if (validated.isPlaylist) {
-            const pl = await this.ytInfo.getPlaylist(validated.id);
+            const pl = await getPlaylist(validated.id);
             const promises = pl.items
                 .filter((i) => i.id !== undefined)
                 .map(async (i) => {
-                    const song = await this.ytInfo.getBasicInfo(i.id);
+                    const song = await this.yt.getBasicInfo(i.id);
                     return song;
                 });
             const songs = await Promise.all(promises);
@@ -134,8 +131,12 @@ class YoutubePlugin extends ExtractorPlugin {
                 },
                 options,
             );
+            // throw new DisTubeError(
+            //   "PLAYLIST_NOT_SUPPORTED",
+            //   "Playlist is not supported"
+            // );
         } else {
-            const info = await this.ytInfo.getBasicInfo(validated.id);
+            const info = await this.yt.getBasicInfo(validated.id);
             return new YoutubeSong(this, info, options);
         }
     }

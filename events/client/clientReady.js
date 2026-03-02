@@ -32,6 +32,8 @@ module.exports = {
             console.logger(`- ${name.padEnd(maxNameLength)} (${extractor.priority.toString().padStart(maxPriorityLength)})`);
         }
 
+        if (process.env.SERVER != "dev" && process.env.STATUS_CHANNEL_ID) client.channels.cache.get(process.env.STATUS_CHANNEL_ID).send("Bot starting!");
+
         logger.info(`Bot starting on [${process.env.SERVER}]...`);
         
         console.log("Activating activity status rotator...");
@@ -43,16 +45,8 @@ module.exports = {
         console.log("Reddit config file initialized.");
 
         console.log("Guild manager initiation...");
-        const guilds = (await client.shard.broadcastEval(c =>
-            c.guilds.cache.map(g => ({
-                id: g.id,
-                name: g.name,
-                memberCount: g.memberCount,
-                joinedTimestamp: g.members.me?.joinedTimestamp ?? null,
-                ownerId: g.ownerId,
-            })),
-        )).flat();
-        console.log(`Found ${guilds.length} guilds.`);
+        const guilds = client.guilds.cache;
+        console.log(`Found ${guilds.size} guilds.`);
         await GuildManager.init(guilds, client);
         console.log("Guild manager initiation done.");
 
@@ -131,6 +125,7 @@ module.exports = {
         // start confirmation
         const interval = setInterval(() => {
             if (client.ws.ping !== -1) {
+                if (process.env.SERVER != "dev" && config.get("STATUS_CHANNEL_ID")) client.channels.cache.get(config.get("STATUS_CHANNEL_ID")).send(`Bot Online!, **Ping**: \`${client.ws.ping}ms\``);
                 logger.info(`Bot started successfully with a websocket ping of ${client.ws.ping}ms`);
                 clearInterval(interval);
             }

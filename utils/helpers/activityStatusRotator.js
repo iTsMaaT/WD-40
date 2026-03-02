@@ -3,7 +3,6 @@ const randomMinMax = require("@root/utils/functions/randomMinMax");
 const config = require("@utils/config/configUtils");
 const { ActivityType } = require("discord.js");
 const logger = require("@utils/log");
-const { getGuildCount } = require("@utils/helpers/shardingUtils");
 
 /**
  * Generates a random public IPv4 address.
@@ -57,7 +56,8 @@ const updateActivities = async (client) => {
         throw new Error("Activities configuration is missing or invalid.");
     }
 
-    const guildCount = await getGuildCount(client);
+    const guilds = await client.guilds.fetch();
+    const guildCount = guilds.size;
 
     const ipAddress = generateIpAddress();
 

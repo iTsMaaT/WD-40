@@ -57,7 +57,7 @@ async function fetchGeminiResponse(
         if (error.response && error.response.status === 401) 
             throw new Error("API key is invalid.");
         else 
-            throw new Error(error);
+            throw new Error(`An error occurred: ${error.message}`);
     }
 }
 

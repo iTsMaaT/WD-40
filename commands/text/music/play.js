@@ -31,7 +31,7 @@ module.exports = {
     },
     category: "music",
     examples: ["never gonna give you up", "https://www.youtube.com/watch?v=dQw4w9WgXcQ -pn", "https://open.spotify.com/album/3tH2uMqhU1hP9BBOkDkXIZ -s -pn"],
-    permissions: [PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak],
+    permissions: [PermissionsBitField.Flags.Connect],
     cooldown: 1000,
     inVoiceChannel: true,
     async execute(logger, client, message, args, flags) {
@@ -65,7 +65,6 @@ module.exports = {
         }
 
         if (isURL(string) && string.includes("deezer")) string = await unshortenURL(string);
-        if (isURL(string) && new URL(string).hostname === "youtu.be") string = string.split("?list=")[0];
 
         if (
             (string.includes("youtube.com") || string.includes("youtu.be")) 

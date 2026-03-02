@@ -6,6 +6,6 @@ module.exports = {
     category: "posts",
     private: true,
     async execute(logger, client, message, args, flags) {
-        message.reply({ embeds: [await FetchReddit(message.channel.nsfw, ["otters"], 5)] });
+        message.reply({ embeds: [await FetchReddit(message.channel.nsfw || message.guild && Number(message.guild.nsfwLevel) >= 1, ["otters"], 5)] });
     },
 };
