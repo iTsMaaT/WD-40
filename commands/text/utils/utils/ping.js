@@ -12,7 +12,7 @@ module.exports = {
             title: "Ping Information",
             color: 0xffffff, 
             fields: [
-                { name: "Bot's Ping", value: `\`${client.ws.ping}ms\`` },
+                { name: "Bot's Ping", value: `\`${client.ws.ping.toFixed(2)}ms\`` },
                 { name: "Uptime", value: `\`${formatDuration(client.uptime)}\`` },
                 { name: "Round Trip Latency", value: `\`${sent.createdTimestamp - message.createdTimestamp}ms\`` },
                 { name: "Bot's Age", value: `<t:${Math.floor(client.user.createdTimestamp / 1000)}:R>` },

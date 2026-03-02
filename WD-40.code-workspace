@@ -13,6 +13,9 @@
         "editor.codeActionsOnSave": {
             "source.fixAll.eslint": "explicit"
         },
+        "githubPullRequests.ignoredPullRequestBranches": [
+            "develop"
+        ],
         //"eslint.options": {
         //    "overrideConfigFile": "eslint.config.mjs"
         //},

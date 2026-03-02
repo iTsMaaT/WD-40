@@ -5,6 +5,6 @@ module.exports = {
     description: "Fetches a post from different Minecraft subreddits",
     category: "posts",
     async execute(logger, client, message, args, flags) {
-        message.reply({ embeds: [await FetchReddit(message.channel.nsfw, ["minecraftmemes", "minecraftbuilds", "mcpe", "technicalminecraft", "minecraftbedrockers"], 5)] });
+        message.reply({ embeds: [await FetchReddit(message.channel.nsfw || message.guild && Number(message.guild.nsfwLevel) >= 1, ["minecraftmemes", "minecraftbuilds", "mcpe", "technicalminecraft", "minecraftbedrockers"], 5)] });
     },
 };

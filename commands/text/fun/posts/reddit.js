@@ -28,9 +28,9 @@ module.exports = {
         const user = flags["user|u"];
         try {
             if (sub) 
-                message.reply({ embeds: [await FetchReddit(message.channel.nsfw, [sub], 5, "sub", flags["image|i"] ? "image" : "text")] });
+                message.reply({ embeds: [await FetchReddit(message.channel.nsfw || message.guild && Number(message.guild.nsfwLevel) >= 1 || message.guild && Number(message.guild.nsfwLevel) >= 1, [sub], 5, "sub", flags["image|i"] ? "image" : "text")] });
             else if (user) 
-                message.reply({ embeds: [await FetchReddit(message.channel.nsfw, [user], 5, "user", flags["image|i"] ? "image" : "text")] });
+                message.reply({ embeds: [await FetchReddit(message.channel.nsfw || message.guild && Number(message.guild.nsfwLevel) >= 1 || message.guild && Number(message.guild.nsfwLevel) >= 1, [user], 5, "user", flags["image|i"] ? "image" : "text")] });
             else 
                 return await message.reply({ embeds: [embedGenerator.warning("Wrong argument usage, please refer to `help reddit`")] });
             
