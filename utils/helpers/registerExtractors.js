@@ -11,6 +11,7 @@ const { SubsonicExtractor } = require("discord-player-subsonic");
 const { distubePluginToExtractor } = require("@utils/helpers/distubePluginToDiscordPlayerExtractor.js");
 const { YoutubePlugin } = require("./distubeYoutubeExtractor.js");
 const { Innertube, ClientType } = require("youtubei.js");
+const youtubeCookieHandler = require("./youtubeCookieHandler/youtubeCookieHandler");
 const ytdl = require("@distube/ytdl-core");
 const config = require("@utils/config/configUtils");
 const logger = require("@utils/log");
@@ -41,21 +42,6 @@ async function initPlayer(client) {
  * @returns 
  */
 async function registerExtractors(player) {
-    const innerTubeInstance = await Innertube.create({
-        client_type: ClientType.TV_EMBEDDED,
-    });
-
-    // Only attempt to sign in if we have a token string configured. Otherwise
-    // the helper will throw a TypeError which crashes the whole bot startup.
-    if (process.env.YOUTUBE_ACCESS_STRING) {
-        try {
-            innerTubeInstance.session.signIn(tokenToObject(process.env.YOUTUBE_ACCESS_STRING));
-        } catch (e) {
-            logger.warning("Failed to parse YOUTUBE_ACCESS_STRING, skipping signin:", e);
-        }
-    } else {
-        logger.info("YOUTUBE_ACCESS_STRING not set; continuing without authenticated Youtube session");
-    }
     const ffmpegFilters = discordPlayerConfig?.ffmpegFilters || {};
     for (const filter of Object.entries(ffmpegFilters)) AudioFilters.define(filter[0], filter[1]);
 
@@ -170,7 +156,7 @@ function getYoutubeExtractorOptions(playerconfig) {
         options.authentication = process.env.YOUTUBE_ACCESS_STRING;
 
     if (playerconfig?.useCookie) 
-        options.cookie = process.env.YOUTUBE_COOKIE;
+        options.cookie = youtubeCookieHandler();
     
     if (playerconfig?.useServerAbrStream) {
         options.useServerAbrStream = true;
