@@ -36,7 +36,6 @@ const processQueue = async (queueName) => {
         // Continue processing if there are more operations
         if (queue.length > 0) 
             setImmediate(() => processQueue(queueName));
-        
     }
 };
 

@@ -55,9 +55,9 @@ async function fetchGeminiResponse(
         return response.text || "Sorry I don't feel comfortable answering that question.";
     } catch (error) {
         if (error.response && error.response.status === 401) 
-            throw new Error("API key is invalid.");
+            throw new Error("API key is invalid.", { cause: error });
         else 
-            throw new Error(`An error occurred: ${error.message}`);
+            throw new Error(`An error occurred: ${error.message}`, { cause: error });
     }
 }
 
