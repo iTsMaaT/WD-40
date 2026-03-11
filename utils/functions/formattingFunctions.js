@@ -60,7 +60,7 @@ const timeFormatToMS = function(timeString) {
  */
 const prettyString = function(inputString, type, addDot = false) {
     const punctuationMarks = ["!", "?", ".", ",", ";", ":"];
-    let modifiedString = "";
+    let modifiedString;
     if (type === "all") {
         // Capitalize first letter of each word
         const words = inputString.toLowerCase().split(" ");

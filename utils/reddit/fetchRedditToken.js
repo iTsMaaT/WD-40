@@ -9,7 +9,7 @@ const axios = require("axios");
 async function getRedditToken() {    
     const { version, homepage } = require("@root/package.json");
     const UserAgent = `web:${homepage}:${version} (by /u/${process.env.REDDIT_USERNAME || "unknown"})`;
-    let baseUrl = "https://www.reddit.com";
+    let baseUrl;
     const headers = {
         "User-Agent": UserAgent,
         "Accept": "application/json",
