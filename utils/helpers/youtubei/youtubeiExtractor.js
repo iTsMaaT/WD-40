@@ -1,6 +1,7 @@
 // YoutubeSabrExtractor.js
 const { BaseExtractor, Track, Playlist, Util } = require("discord-player");
 const { createSabrStream } = require("./youtubeSabrCore");
+const { createLivestream } = require("./youtubeLivesHandler");
 const { getInnertube } = require("./getInnertube.js");
 
 /**
@@ -10,9 +11,9 @@ class YoutubeSabrExtractor extends BaseExtractor {
     static identifier = "com.itsmaat.discord-player.youtube-sabr";
 
     async activate() {
-        this.protocols = ["youtube", "yt"];
+        this.protocols = ["sabr"];
         this.cookies = this.options.cookies;
-        this.logSabrEvents = this.options.logSabrEvents;
+        this.logSabrEvents = this.options.logSabrEvents ?? true; // Enable logging by default for debugging
         this.innertube = await getInnertube(this.cookies);
 
         const fn = this.options.createStream;
@@ -178,12 +179,13 @@ class YoutubeSabrExtractor extends BaseExtractor {
                 return this.createResponse(dpPlaylist, plTracks);
             }
 
-            // Otherwise treat as single video
+            // Otherwise treat as single video (including livestreams)
             const videoId = extractVideoId(query);
             if (!videoId) return this.createResponse(null, []);
 
-            const info = await this.innertube.getBasicInfo(videoId);
+            const info = await this.innertube.getInfo(videoId);
             const durationMs = (info.basic_info?.duration ?? 0) * 1000;
+            const isLive = info.basic_info?.is_live || info.live_status === "LIVE";
 
             const trackObj = new Track(context.player, {
                 title: info.basic_info?.title ?? `YouTube:${videoId}`,
@@ -195,7 +197,8 @@ class YoutubeSabrExtractor extends BaseExtractor {
                 requestedBy: context.requestedBy ?? null,
                 raw: {
                     basicInfo: info,
-                    live: info.basic_info?.is_live || false,
+                    live: isLive,
+                    liveStatus: info.live_status,
                 },
             });
 
@@ -211,9 +214,21 @@ class YoutubeSabrExtractor extends BaseExtractor {
             if (!this.innertube) throw new Error("Innertube not initialized; call activate() first");
             const videoId = extractVideoId(track.url || track.raw?.id || "");
             if (!videoId) throw new Error("Unable to extract video id from track.url");
-            // Use the helper to create the SABR stream (returns Node.js readable)
-            const nodeStream = await createSabrStream(videoId, this.cookies, this.logSabrEvents);
-            return  nodeStream;
+            
+            // Auto-detect if video is a livestream
+            const isLive = track.raw?.live || track.raw?.liveStatus === "LIVE";
+            
+            if (isLive) {
+                // Use livestream handler for HLS/DASH manifests
+                if (this.logSabrEvents) console.log(`[Extractor] Detected livestream, using DASH handler for ${videoId}`);
+                const nodeStream = await createLivestream(videoId, this.cookies, this.logSabrEvents);
+                return nodeStream;
+            } else {
+                // Use SABR stream for regular videos
+                if (this.logSabrEvents) console.log(`[Extractor] Using SABR handler for ${videoId}`);
+                const nodeStream = await createSabrStream(videoId, this.cookies, this.logSabrEvents);
+                return nodeStream;
+            }
         } catch (e) {
             console.error(e);
             throw e;
@@ -232,12 +247,19 @@ function isUrl(input) {
 
 function extractVideoId(vid) {
     const YOUTUBE_REGEX =
-    /^https:\/\/(www\.)?youtu(\.be\/.{11}(.+)?|be\.com\/watch\?v=.{11}(&.+)?)/;
+        /^https:\/\/(www\.)?youtu(\.be\/.{11}(.+)?|be\.com\/watch\?v=.{11}(&.+)?|be\.com\/live\/.{11}(.+)?)/;
     if (!YOUTUBE_REGEX.test(vid)) throw new Error("Invalid youtube url");
 
+    // Try standard watch parameter first
     let id = new URL(vid).searchParams.get("v");
-    // VIDEO DETECTED AS YT SHORTS OR youtu.be link
-    if (!id) id = vid.split("/").at(-1)?.split("?").at(0);
+    
+    // If no 'v' parameter, try extracting from URL path (for youtu.be or /live/ format)
+    if (!id) {
+        const pathMatch = vid.split("/").at(-1)?.split("?").at(0);
+        if (pathMatch && pathMatch.length === 11) 
+            id = pathMatch;
+        
+    }
 
     return id;
 }

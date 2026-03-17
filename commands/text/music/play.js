@@ -2,6 +2,7 @@ const { PermissionsBitField } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { getLoopMode } = require("@utils/helpers/playerHelpers");
 const { QueryType, useMainPlayer, useQueue, QueryResolver } = require("discord-player");
+const { AttachmentExtractor } = require("@discord-player/extractor");
 const { SpotifyExtractor } = require("discord-player-spotify");
 const { YoutubeiExtractor } = require("discord-player-youtubei");
 const config = require("@utils/config/configUtils");
@@ -129,11 +130,12 @@ module.exports = {
                     const files = await simpleFolderSearch(musicPath, playerConfig.supportedFileExtensions, string, { minimumScore: 0.4 });
                     if (files.length) {
                         try {
-                            fileTrack = await player.search(files[0], { 
+                            fileTrack = await player.search("file:" + files[0], { 
                                 requestedBy: message.member,
                                 searchEngine: QueryType.FILE,
                             });
-                        } catch {
+                        } catch (error) {
+                            console.error("Error logging fileTrack to file:", error);
                             fileTrack = null;
                         }
                     }
@@ -146,7 +148,8 @@ module.exports = {
                     timestamp: new Date(),
                 });
 
-                if (fileTrack) {
+                if (fileTrack?.tracks?.[0]) {
+                    console.log(fileTrack.tracks);
                     fileTrack.tracks[0].title = "[Local file] " + fileTrack.tracks[0].title;
                     research.tracks.unshift(fileTrack.tracks[0]);
                 }

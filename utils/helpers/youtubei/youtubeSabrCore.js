@@ -1,43 +1,14 @@
 const { Constants, YTNodes } = require("youtubei.js");
 const { EnabledTrackTypes, buildSabrFormat } = require("googlevideo/utils");
 const { SabrStream } = require("googlevideo/sabr-stream");
-const { Readable, PassThrough, once } = require("stream");
 const { getWebPoMinter, invalidateWebPoMinter, generateDataSyncTokens } = require("./poTokenGenerator.js");
 const { getInnertube } = require("./getInnertube.js");
+const { toNodeReadable } = require("./youtubeSharedUtils.js");
 
 const DEFAULT_OPTIONS = {
     audioQuality: "AUDIO_QUALITY_MEDIUM",
     enabledTrackTypes: EnabledTrackTypes.AUDIO_ONLY,
 };
-
-/**
- * Converts a stream to a Node.js Readable stream
- * 
- * @param {ReadableStream} stream - The stream to convert
- * @returns {Readable} The Node.js Readable stream
- */
-function toNodeReadable(stream) {
-    const nodeStream = new PassThrough();
-    const reader = stream.getReader();
-
-    (async () => {
-        try {
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                if (value) {
-                    if (!nodeStream.write(Buffer.from(value))) 
-                        await once(nodeStream, "drain");
-          
-                }
-            }
-        } finally {
-            nodeStream.end();
-        }
-    })();
-
-    return nodeStream;
-}
 
 
 /**

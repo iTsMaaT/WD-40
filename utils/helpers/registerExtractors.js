@@ -51,8 +51,10 @@ async function registerExtractors(player) {
             if (track.extractor.identifier === DeezerExtractor.identifier ||
                 track.extractor.identifier === SoundcloudExtractor.identifier ||
                 track.extractor.identifier === YoutubeiExtractor.identifier ||
+                track.extractor.identifier === YoutubeSabrExtractor.identifier ||
                 track.extractor.identifier === SubsonicExtractor.identifier ||
-                track.extractor.identifier === TTSExtractor.identifier
+                track.extractor.identifier === TTSExtractor.identifier ||
+                track.extractor.identifier === AttachmentExtractor.identifier
             ) return await track.extractor?.stream(track);
             return undefined;
         } catch {
@@ -93,8 +95,9 @@ async function registerExtractors(player) {
 
             const secondYtExt = await player.extractors.register(YoutubeSabrExtractor, {
                 ...getYoutubeExtractorOptions(extractors.Youtubei.config),
+                logSabrEvents: extractors.Youtubei.config.logSabrEvents,
             });
-            secondYtExt.priority = extractors.Youtubei.priority ? extractors.Youtubei.priority - 1 : secordYtExt.priority;
+            secondYtExt.priority = extractors.Youtubei.priority ? extractors.Youtubei.priority - 1 : secondYtExt.priority;
 
             const originalYtStreamMethod = tempYtExt.stream.bind(tempYtExt);
 
@@ -156,6 +159,7 @@ async function registerExtractors(player) {
     if (extractors.Attachment.enabled) {
         logger.info("Loading Attachment extractor...");
         const attachmentExt = await player.extractors.register(AttachmentExtractor, extractors.Attachment.config);
+        attachmentExt.protocols = ["file"];
         attachmentExt.priority = extractors.Attachment.priority ?? attachmentExt.priority;
     }
 }

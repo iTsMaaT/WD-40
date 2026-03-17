@@ -110,7 +110,7 @@
         },
         "extractors": {
             "Subsonic": {
-                "enabled": true,
+                "enabled": false,
                 "canStream": true,
                 "canBridge": false,
                 "priority": 15,
@@ -140,6 +140,7 @@
                     },
                     "useServerAbrStreamFallback": false,               // Use server ABR stream
                     "useServerAbrStream": true,
+                    "logSabrEvents": true,
                     "usePoToken": false,                       // Use TrustedClient token for authentication
                     "useCookie": true,                         // Use cookies for authentication
                     "useYTDL": true                    // Use ytdl-core fallback
