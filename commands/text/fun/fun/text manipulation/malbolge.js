@@ -17,7 +17,17 @@ module.exports = {
     async execute(logger, client, message, args, flags) {
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.error("Please provide a string to translate")] });
 
-         
+        // Security: Input validation
+        const input = args.join(" ");
+        const MAX_INPUT_LENGTH = 50;
+        const MAX_EXECUTION_TIME = 5000; // 5 seconds
+        
+        if (input.length > MAX_INPUT_LENGTH) {
+            return await message.reply({ 
+                embeds: [embedGenerator.error(`Input too long! Maximum ${MAX_INPUT_LENGTH} characters allowed.`)], 
+            });
+        }
+
         const mb = {};
 
         const xlat1 = "+b(29e*j1VMEKLyC})8&m#~W>qxdRp0wkrUo[D7,XTcA\"lI.v%{gJh4G\\-=O@5`_3i<?Z';FNQuY]szf$!BS/|t:Pn6^Ha";
@@ -515,7 +525,7 @@ so update to [] version
             };
             let window = [],
                 gstr = "",
-                str = "",
+                str,
                 vm;
             let t, tt;
 
@@ -700,10 +710,20 @@ so update to [] version
             
         }
 
-        const malbolge = generate(args.join(" "), null, callbackFunction);
-
-        // Tries to send the code
+        // Security: Wrap execution in a timeout to prevent DoS
         try {
+            const malbolge = await Promise.race([
+                Promise.resolve(generate(input, null, callbackFunction)),
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error("Malbolge code generation timed out")), MAX_EXECUTION_TIME),
+                ),
+            ]);
+
+            // Security: Limit output size
+            if (!malbolge) 
+                return await message.reply({ embeds: [embedGenerator.error("Failed to generate Malbolge code")] });
+            
+            // Tries to send the code
             if (malbolge.length < 2000) 
                 await message.reply(`\`\`\`malbolge\n${malbolge}\`\`\``);
             else 
@@ -711,7 +731,10 @@ so update to [] version
             
         } catch (err) {
             logger.error(err);
-            return await message.reply({ embeds: [embedGenerator.error("An error occured")] });
+            const errorMsg = err.message === "Malbolge code generation timed out" 
+                ? "Code generation took too long. Try a shorter input." 
+                : "An error occurred";
+            return await message.reply({ embeds: [embedGenerator.error(errorMsg)] });
         }
     },
 };

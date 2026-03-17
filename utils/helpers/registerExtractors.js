@@ -9,8 +9,9 @@ const { SpotifyExtractor } = require("discord-player-spotify");
 const { AppleMusicExtractor } = require("discord-player-applemusic");
 const { SubsonicExtractor } = require("discord-player-subsonic");
 const { distubePluginToExtractor } = require("@utils/helpers/distubePluginToDiscordPlayerExtractor.js");
-const { YoutubePlugin } = require("./distubeYoutubeExtractor.js");
+const { YoutubeSabrExtractor } = require("@utils/helpers/youtubei/youtubeiExtractor.js");
 const { Innertube, ClientType } = require("youtubei.js");
+const { createSabrStream } = require("@utils/helpers/youtubei/youtubeSabrCore.js");
 const youtubeCookieHandler = require("./youtubeCookieHandler/youtubeCookieHandler");
 const ytdl = require("@distube/ytdl-core");
 const config = require("@utils/config/configUtils");
@@ -86,9 +87,41 @@ async function registerExtractors(player) {
     if (extractors.Youtubei.enabled || extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.useScraping) {
         logger.info("Loading YoutubeiExtractor extractor...");
         try {
-            const ytExt = await player.extractors.register(YoutubeiExtractor, {
+            const tempYtExt = await player.extractors.register(YoutubeiExtractor, {
                 ...getYoutubeExtractorOptions(extractors.Youtubei.config),
             });
+
+            const secondYtExt = await player.extractors.register(YoutubeSabrExtractor, {
+                ...getYoutubeExtractorOptions(extractors.Youtubei.config),
+            });
+            secondYtExt.priority = extractors.Youtubei.priority ? extractors.Youtubei.priority - 1 : secordYtExt.priority;
+
+            const originalYtStreamMethod = tempYtExt.stream.bind(tempYtExt);
+
+            await player.extractors.unregister(YoutubeiExtractor.identifier);
+
+            let ytExt = null;
+            try {
+                ytExt = await player.extractors.register(YoutubeiExtractor, {
+                    ...getYoutubeExtractorOptions(extractors.Youtubei.config),
+                    createStream: async (track, ext) => {
+                        if (extractors.Youtubei.config.useYTDL) {
+                            try {
+                                return await originalYtStreamMethod(track, ext);
+                            } catch (e) {
+                                if (extractors.Youtubei.config.useServerAbrStreamFallback) {
+                                    logger.warn("YTDL fallback failed, trying server ABR stream...");
+                                    return await createSabrStream(track.identifier, process.env.YOUTUBE_COOKIE, false);
+                                }
+                                throw e;
+                            }
+                        }
+                        return null;
+                    },
+                });
+            } catch (e) {
+                logger.error("Failed to register YoutubeiExtractor:", e);
+            }
 
             ytExt.priority = extractors.Youtubei.priority ?? ytExt.priority;
         } catch (e) {
@@ -152,9 +185,6 @@ function getYoutubeExtractorOptions(playerconfig) {
         },
     };
 
-    if (playerconfig?.useTVOAuthLogin)
-        options.authentication = process.env.YOUTUBE_ACCESS_STRING;
-
     if (playerconfig?.useCookie) 
         options.cookie = youtubeCookieHandler();
     
@@ -163,7 +193,7 @@ function getYoutubeExtractorOptions(playerconfig) {
         if (!playerconfig?.usePoToken) playerconfig.usePoToken = true;
     }
 
-    if (playerconfig?.useYTDLFallback) {
+    if (playerconfig?.useYTDL) {
         options.useYoutubeDL = true;
         options.logLevel = "ALL";
     }

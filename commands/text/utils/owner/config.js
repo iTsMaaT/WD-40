@@ -115,6 +115,19 @@ module.exports = {
                 await message.reply({ embeds: [configEmbed] });
                 break;
             }
+            case "help": {
+                const configEmbed = createConfigEmbed("Configuration", "Subcommands:\n```\n" + 
+                    "getall: Get all configuration keys\n" +
+                    "get <key>: Get the value of a specific configuration key\n" +
+                    "set <key> <value>: Set the value of a specific configuration key\n" +
+                    "reset <key>: Reset the value of a specific configuration key\n" +
+                    "resetall: Reset all configuration keys\n" +
+                    "has <key>: Check if a specific configuration key exists\n" +
+                    "delete <key>: Delete a specific configuration key\n" +
+                    "```");
+                await message.reply({ embeds: [configEmbed] });
+                break;
+            }
             default: {
                 const configEmbed = createConfigEmbed("Configuration", "Invalid subcommand");
                 await message.reply({ embeds: [configEmbed] });
