@@ -64,12 +64,10 @@ async function streamM3U8Stream(m3u8Url, options = {}) {
                         }
                     }
 
-                    // Wait before fetching next playlist update (typical HLS polling interval)
                     await new Promise(resolve => setTimeout(resolve, options.updateInterval || 10000));
 
                 } catch (playlistError) {
                     console.error("Error fetching M3U8 playlist:", playlistError.message);
-                    // Retry after delay
                     await new Promise(resolve => setTimeout(resolve, 5000));
                 }
             }
@@ -151,10 +149,10 @@ async function createLivestream(videoId, cookies = [], logEvents = false) {
     if (logEvents) console.log(`[Livestream] Manifest URL extracted: ${manifestUrl.substring(0, 80)}...`);
 
     // === Stream setup ===
-    const manifestUrlWithAuth = manifestUrl; // Manifest URLs typically include auth tokens
+    const manifestUrlWithAuth = manifestUrl;
 
     const stream = await streamM3U8Stream(manifestUrlWithAuth, {
-        updateInterval: 10000, // Update playlist every 10 seconds
+        updateInterval: 10000, 
     });
 
     // === Stream event handling ===
