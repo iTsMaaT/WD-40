@@ -34,6 +34,7 @@
     "@distube/ytdl-core": "^4.16.12",
     "@google/genai": "^1.43.0",
     "@iamtraction/google-translate": "^2.0.1",
+    "@napi-rs/canvas": "^0.1.97",
     "@sentry/node": "^10.41.0",
     "@snazzah/davey": "^0.1.10",
     "axios": "^1.13.6",
@@ -41,7 +42,7 @@
     "chartjs-adapter-date-fns": "^3.0.0",
     "chartjs-node-canvas": "^5.0.0",
     "cron": "^4.4.0",
-    "discord-player": "^7.2.0",
+    "discord-player": "^7.2.0-dev.2",
     "discord-player-applemusic": "^1.0.3",
     "discord-player-deezer": "^2.5.0",
     "discord-player-soundcloud": "^1.0.7",
@@ -62,7 +63,7 @@
     "node-html-parser": "^7.0.2",
     "sharp": "^0.34.5",
     "simple-folder-search": "^2.3.0",
-    "youtubei.js": "^16.0.1"
+    "youtubei.js": "^17.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

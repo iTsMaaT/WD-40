@@ -132,19 +132,17 @@
                 "canBridge": true,
                 "priority": 11,
                 "config": {
-                    "client": "TV_EMBEDDED",                   // Client type for YouTube
+                    "client": "WEB",                   // Client type for YouTube
                     "highWaterMark": 2097152,                  // High water mark for streams
                     "attemptYoutubeSearchEvenIfDisabled": {
                         "usingEmbed": true,                    // Attempt to search using embed
                         "usingScraping": false                 // Attempt to search using scraping
                     },
-                    "useServerAbrStream": false,               // Use server ABR stream
+                    "useServerAbrStreamFallback": false,               // Use server ABR stream
+                    "useServerAbrStream": true,
                     "usePoToken": false,                       // Use TrustedClient token for authentication
-                    "useOnesieRequests": false,                // Use Onesie requests
-                    "useTVOAuthLogin": false,                  // Use TV OAuth login
                     "useCookie": true,                         // Use cookies for authentication
-                    "useDistubeAlternative": false,            // Use Distube alternative
-                    "useYTDLFallback": true                    // Use ytdl-core fallback
+                    "useYTDL": true                    // Use ytdl-core fallback
                 }
             },
             "Soundcloud": {

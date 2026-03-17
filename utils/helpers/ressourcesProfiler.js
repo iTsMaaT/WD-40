@@ -130,12 +130,3 @@ class ResourceProfiler {
 }
 
 module.exports = ResourceProfiler;
-
-const profiler = new ResourceProfiler();
-profiler.start();
-setTimeout(async () => {
-    profiler.stop();
-    console.log(profiler.getLastFiveMinutesUsage());
-    console.log(profiler.getTimedAverageUsage(300000)); // Example: Average usage over the last 5 minutes
-    await profiler.generateUsageGraph(path.join(__dirname, "usageGraph.png"));
-}, 60000);

@@ -60,13 +60,13 @@
         allowedMentions: { repliedUser: false },
     });
 
-    const { registerExtractors, initPlayer } = require("@utils/helpers/registerExtractors");
+    const { registerExtractors, initPlayer, reload } = require("@utils/helpers/registerExtractors");
     const player = await initPlayer(client);
     await registerExtractors(player);
 
     console.log(`Daily reregistering ${config.get("discordPlayer")?.dailyReregister ? "enabled" : "disabled"}`);
     new cron.CronJob(config.get("cronJobs").dailyReregister, async () => {
-        if (config.get("discordPlayer")?.dailyReregister) await registerExtractors(player);
+        if (config.get("discordPlayer")?.dailyReregister) await reload(player);
     }, null, true, config.get("timeZone"));
 
     global.wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

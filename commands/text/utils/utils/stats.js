@@ -12,6 +12,7 @@ const { ChartJSNodeCanvas } = require("chartjs-node-canvas");
 const { AttachmentBuilder } = require("discord.js");
 const config = require("@utils/config/configUtils");
 let totalUserCache = 0;
+const rounding = 200;
 let imageCache = null;
 
 const chartJSNodeCanvas = new ChartJSNodeCanvas({
@@ -182,7 +183,8 @@ async function generateChartBuffer(timestamps) {
     }
 
     
-    if (totalUserCache == Object.values(countPerDay).reduce((acc, count) => acc + count, 0)) return imageCache;
+    const currentTotal = Object.values(countPerDay).reduce((acc, count) => acc + count, 0);
+    if (Math.round(currentTotal / rounding) * rounding === Math.round(totalUserCache / rounding) * rounding) return imageCache;
 
     totalUserCache = Object.values(countPerDay).reduce((acc, count) => acc + count, 0);
 
