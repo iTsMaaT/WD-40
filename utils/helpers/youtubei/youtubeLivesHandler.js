@@ -1,97 +1,149 @@
+/* eslint-disable preserve-caught-error */
 const { Constants, YTNodes } = require("youtubei.js");
 const { Readable, PassThrough, once } = require("stream");
 const { getWebPoMinter, invalidateWebPoMinter, generateDataSyncTokens } = require("./poTokenGenerator.js");
 const { getInnertube } = require("./getInnertube.js");
 const { toNodeReadable, makeRequest, parseM3U8, extractManifestUrl } = require("./youtubeSharedUtils.js");
+const { spawn } = require("child_process");
+
+function createFFmpegStream(input, { isUrl = false, isDash = false, logEvents = false } = {}) {
+    const baseArgs = [
+        "-loglevel", logEvents ? "info" : "error",
+
+        // 🔥 universal fixes
+        "-fflags", "+genpts+discardcorrupt",
+
+        "-analyzeduration", "1M",
+        "-probesize", "1M",
+    ];
+
+    let inputArgs;
+
+    if (isUrl) {
+        if (isDash) {
+            // ✅ DASH (MPD)
+            inputArgs = [
+                "-reconnect", "1",
+                "-reconnect_streamed", "1",
+                "-reconnect_delay_max", "5",
+
+                "-i", input,
+                "-map", "0:a:0",
+                "-rw_timeout", "15000000",
+            ];
+        } else {
+            // ✅ HLS (M3U8)
+            inputArgs = [
+                "-reconnect", "1",
+                "-reconnect_streamed", "1",
+                "-reconnect_delay_max", "5",
+
+                "-rw_timeout", "15000000",
+
+                "-fflags", "+nobuffer",
+                "-flags", "low_delay",
+
+                "-i", input,
+            ];
+        }
+    } else {
+        inputArgs = [
+            "-use_wallclock_as_timestamps", "1",
+            "-i", "pipe:0",
+        ];
+    }
+
+    const outputArgs = [
+        "-vn",
+
+        // 🔥 fix audio glitches
+        "-af", "aresample=async=1:first_pts=0",
+
+        "-c:a", "libopus",
+        "-ar", "48000",
+        "-ac", "2",
+        "-b:a", "128k",
+
+        "-f", "opus",
+        "pipe:1",
+    ];
+
+    const args = [...baseArgs, ...inputArgs, ...outputArgs];
+
+    const ffmpeg = spawn("ffmpeg", args, {
+        stdio: ["pipe", "pipe", "pipe"],
+    });
+
+    if (!isUrl) 
+        input.pipe(ffmpeg.stdin);
+    
+
+    ffmpeg.stderr.on("data", (d) => {
+        // if (logEvents) console.log("[FFmpeg]", d.toString());
+    });
+
+    ffmpeg.on("close", (code) => {
+        if (logEvents) console.log(`[FFmpeg] exited with code ${code}`);
+    });
+
+    return ffmpeg.stdout;
+}
 
 /**
- * Streams an M3U8 playlist as a continuous audio stream
+ * Deciphers and processes manifest URLs for HLS/DASH streams
+ * Based on FreeTube's implementation
  * 
- * @param {string} m3u8Url - The M3U8 playlist URL
- * @param {Object} options - Options for streaming
- * @returns {Promise<Readable>} The audio stream
+ * @param {string} url - The manifest URL to decipher
+ * @param {Object} player - The player instance from innertube
+ * @param {string} poToken - The PO token for authentication
+ * @param {boolean} isDash - Whether this is a DASH manifest (vs HLS)
+ * @returns {Promise<string>} The deciphered and processed manifest URL
  */
-async function streamM3U8Stream(m3u8Url, options = {}) {
-    const outputStream = new PassThrough();
-    let isDestroyed = false;
-    let currentSegmentIndex = 0;
-    const segmentCache = new Map();
-    const maxCacheSize = 5;
+async function decipherManifestUrl(url, player, poToken, isDash) {
+    const urlObject = new URL(url);
 
-    const processStream = async () => {
-        try {
-            while (!isDestroyed) {
-                try {
-                    // Fetch fresh playlist periodically
-                    const m3u8Content = await makeRequest(m3u8Url, {
-                        headers: {
-                            "Cache-Control": "no-cache",
-                            "Pragma": "no-cache",
-                        },
-                    });
+    if (urlObject.searchParams.size > 0) {
+        urlObject.searchParams.set("pot", poToken);
 
-                    const baseUrl = m3u8Url.substring(0, m3u8Url.lastIndexOf("/") + 1);
-                    const segments = parseM3U8(m3u8Content, baseUrl);
-
-                    // Process segments starting from current index
-                    for (let i = currentSegmentIndex; i < segments.length && !isDestroyed; i++) {
-                        const segment = segments[i];
-
-                        try {
-                            let segmentData = segmentCache.get(segment.url);
-
-                            if (!segmentData) {
-                                segmentData = await makeRequest(segment.url);
-                                segmentCache.set(segment.url, segmentData);
-
-                                // Limit cache size
-                                if (segmentCache.size > maxCacheSize) {
-                                    const firstKey = segmentCache.keys().next().value;
-                                    segmentCache.delete(firstKey);
-                                }
-                            }
-
-                            if (isDestroyed) break;
-
-                            if (!outputStream.write(Buffer.from(segmentData))) 
-                                await once(outputStream, "drain");
-                            
-
-                            currentSegmentIndex = i + 1;
-                        } catch (segmentError) {
-                            console.error(`Error downloading segment ${i}:`, segmentError.message);
-                            // Continue to next segment instead of failing
-                        }
-                    }
-
-                    await new Promise(resolve => setTimeout(resolve, options.updateInterval || 10000));
-
-                } catch (playlistError) {
-                    console.error("Error fetching M3U8 playlist:", playlistError.message);
-                    await new Promise(resolve => setTimeout(resolve, 5000));
-                }
-            }
-        } finally {
-            if (!isDestroyed) 
-                outputStream.end();
-            
-        }
-    };
-
-    // Start streaming in background
-    processStream().catch(err => {
-        console.error("Stream processing error:", err);
-        if (!isDestroyed) 
-            outputStream.destroy(err);
+        if (isDash) 
+            urlObject.searchParams.set("mpd_version", "7");
         
-    });
 
-    // Handle stream destruction
-    outputStream.on("close", () => {
-        isDestroyed = true;
-    });
+        return await player.decipher(urlObject.toString());
+    }
 
-    return outputStream;
+    const pathPrefix = isDash ? "/api/manifest/dash" : "/api/manifest/hls_variant";
+
+    // Convert path params to query params
+    const pathParts = urlObject.pathname
+        .replace(pathPrefix, "")
+        .split("/")
+        .filter(part => part.length > 0);
+
+    urlObject.pathname = pathPrefix;
+
+    for (let i = 0; i + 1 < pathParts.length; i += 2) 
+        urlObject.searchParams.set(pathParts[i], decodeURIComponent(pathParts[i + 1]));
+    
+
+    // decipher
+    const deciphered = await player.decipher(urlObject.toString());
+
+    // convert query parameters back to path parameters
+    const decipheredUrlObject = new URL(deciphered);
+
+    for (const [key, value] of decipheredUrlObject.searchParams) 
+        decipheredUrlObject.pathname += `/${key}/${encodeURIComponent(value)}`;
+    
+
+    decipheredUrlObject.search = "";
+    decipheredUrlObject.pathname += `/pot/${encodeURIComponent(poToken)}`;
+
+    if (isDash) 
+        decipheredUrlObject.pathname += "/mpd_version/7";
+    
+
+    return decipheredUrlObject.toString();
 }
 
 /**
@@ -104,6 +156,7 @@ async function streamM3U8Stream(m3u8Url, options = {}) {
  */
 async function createLivestream(videoId, cookies = [], logEvents = false) {
     const innertube = await getInnertube(cookies);
+    const player = innertube.session.player;
     let accountInfo;
 
     // === Mint initial PO token ===
@@ -117,6 +170,7 @@ async function createLivestream(videoId, cookies = [], logEvents = false) {
         ?? innertube.session.context.client.visitorData;
     
     const minter = await getWebPoMinter(innertube);
+    const contentPoToken = await minter.mint(videoId);
     const poToken = await minter.mint(dataSyncId);
 
     // === Player request ===
@@ -130,7 +184,7 @@ async function createLivestream(videoId, cookies = [], logEvents = false) {
                 vis: 0,
                 splay: false,
                 lactMilliseconds: "-1",
-                signatureTimestamp: innertube.session.player?.signature_timestamp,
+                signatureTimestamp: player?.signature_timestamp,
             },
         },
         contentCheckOk: true,
@@ -139,8 +193,17 @@ async function createLivestream(videoId, cookies = [], logEvents = false) {
         parse: true,
     });
 
-    // === Extract manifest URL ===
-    const manifestUrl = extractManifestUrl(playerResponse);
+    // === Extract and decipher manifest URL ===
+    let manifestUrl = null;
+    let isDash = true;
+
+    if (playerResponse.streaming_data?.hls_manifest_url) {
+        manifestUrl = playerResponse.streaming_data.hls_manifest_url;
+        isDash = false;
+    } else if (playerResponse.streaming_data?.dash_manifest_url) {
+        manifestUrl = playerResponse.streaming_data.dash_manifest_url;
+        isDash = true;
+    } 
 
     if (!manifestUrl) 
         throw new Error("No HLS/DASH manifest URL found in player response. Video might not be a livestream or may be streaming restricted.");
@@ -148,11 +211,30 @@ async function createLivestream(videoId, cookies = [], logEvents = false) {
 
     if (logEvents) console.log(`[Livestream] Manifest URL extracted: ${manifestUrl.substring(0, 80)}...`);
 
-    // === Stream setup ===
-    const manifestUrlWithAuth = manifestUrl;
+    // === Decipher manifest URL ===
+    if (!player) 
+        throw new Error("Player not available for deciphering manifest URL");
+    
 
-    const stream = await streamM3U8Stream(manifestUrlWithAuth, {
-        updateInterval: 10000, 
+    let decipheredManifestUrl;
+    try {
+        decipheredManifestUrl = await decipherManifestUrl(
+            manifestUrl,
+            player,
+            contentPoToken,
+            isDash,
+        );
+        if (logEvents) console.log("[Livestream] Manifest URL deciphered successfully");
+    } catch (err) {
+        if (logEvents) console.error("[Livestream] Error deciphering manifest URL:", err);
+        throw new Error(`Failed to decipher manifest URL: ${err.message}`);
+    }
+
+    // === Stream setup ===
+    const stream = createFFmpegStream(decipheredManifestUrl, {
+        isUrl: true,
+        isDash,
+        logEvents,
     });
 
     // === Stream event handling ===
@@ -225,5 +307,4 @@ module.exports = {
     createLivestream,
     isLivestream,
     getLivestreamInfo,
-    streamM3U8Stream,
 };
