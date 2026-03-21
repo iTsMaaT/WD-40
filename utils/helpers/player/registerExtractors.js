@@ -8,11 +8,12 @@ const { SoundcloudExtractor } = require("discord-player-soundcloud");
 const { SpotifyExtractor } = require("discord-player-spotify");
 const { AppleMusicExtractor } = require("discord-player-applemusic");
 const { SubsonicExtractor } = require("discord-player-subsonic");
-const { distubePluginToExtractor } = require("@utils/helpers/distubePluginToDiscordPlayerExtractor.js");
 const { YoutubeSabrExtractor } = require("@utils/helpers/youtubei/youtubeiExtractor.js");
 const { Innertube, ClientType } = require("youtubei.js");
 const { createSabrStream } = require("@utils/helpers/youtubei/youtubeSabrCore.js");
-const youtubeCookieHandler = require("./youtubeCookieHandler/youtubeCookieHandler");
+const { startInterceptor } = require("@utils/helpers/player/interceptor");
+const { downloadTrack } = require("@utils/helpers/player/downloader");
+const youtubeCookieHandler = require("@utils/helpers/youtubeCookieHandler/youtubeCookieHandler");
 const ytdl = require("@distube/ytdl-core");
 const config = require("@utils/config/configUtils");
 const logger = require("@utils/log");
@@ -30,10 +31,12 @@ const extractors = discordPlayerConfig?.extractors || {};
  * @returns 
  */
 async function initPlayer(client) {
-    return new Player(client, {
+    const player = new Player(client, {
         skipFFmpeg: discordPlayerConfig?.skipFFmpeg,
         ffmpegPath: discordPlayerConfig?.ffmpegPath,
     });
+    if (discordPlayerConfig?.downloadStreams) startInterceptor(player);
+    return player;
 }
 
 /**
@@ -97,7 +100,7 @@ async function registerExtractors(player) {
                 ...getYoutubeExtractorOptions(extractors.Youtubei.config),
                 logSabrEvents: extractors.Youtubei.config.logSabrEvents,
             });
-            secondYtExt.priority = extractors.Youtubei.priority ? extractors.Youtubei.priority - 1 : secondYtExt.priority;
+            secondYtExt.priority = extractors.Youtubei.priority ? extractors.Youtubei.priority : secondYtExt.priority;
 
             const originalYtStreamMethod = tempYtExt.stream.bind(tempYtExt);
 
@@ -126,7 +129,7 @@ async function registerExtractors(player) {
                 logger.error("Failed to register YoutubeiExtractor:", e);
             }
 
-            ytExt.priority = extractors.Youtubei.priority ?? ytExt.priority;
+            ytExt.priority = extractors.Youtubei.priority ? extractors.Youtubei.priority - 1 : ytExt.priority;
         } catch (e) {
             logger.error("Failed to register YoutubeiExtractor:", e);
         }
