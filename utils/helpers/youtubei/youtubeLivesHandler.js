@@ -6,7 +6,7 @@ const { getInnertube } = require("./getInnertube.js");
 const { toNodeReadable, makeRequest, parseM3U8, extractManifestUrl } = require("./youtubeSharedUtils.js");
 const { spawn } = require("child_process");
 
-function createFFmpegStream(input, { isUrl = false, isDash = false, logEvents = false } = {}) {
+function createFFmpegStream(input, { isUrl = false, logEvents = false } = {}) {
     const baseArgs = [
         "-loglevel", logEvents ? "info" : "error",
 
@@ -20,32 +20,19 @@ function createFFmpegStream(input, { isUrl = false, isDash = false, logEvents = 
     let inputArgs;
 
     if (isUrl) {
-        if (isDash) {
-            // ✅ DASH (MPD)
-            inputArgs = [
-                "-reconnect", "1",
-                "-reconnect_streamed", "1",
-                "-reconnect_delay_max", "5",
+        // ✅ HLS (M3U8)
+        inputArgs = [
+            "-reconnect", "1",
+            "-reconnect_streamed", "1",
+            "-reconnect_delay_max", "5",
 
-                "-i", input,
-                "-map", "0:a:0",
-                "-rw_timeout", "15000000",
-            ];
-        } else {
-            // ✅ HLS (M3U8)
-            inputArgs = [
-                "-reconnect", "1",
-                "-reconnect_streamed", "1",
-                "-reconnect_delay_max", "5",
+            "-rw_timeout", "15000000",
 
-                "-rw_timeout", "15000000",
+            "-fflags", "+nobuffer",
+            "-flags", "low_delay",
 
-                "-fflags", "+nobuffer",
-                "-flags", "low_delay",
-
-                "-i", input,
-            ];
-        }
+            "-i", input,
+        ];
     } else {
         inputArgs = [
             "-use_wallclock_as_timestamps", "1",
@@ -90,29 +77,24 @@ function createFFmpegStream(input, { isUrl = false, isDash = false, logEvents = 
 }
 
 /**
- * Deciphers and processes manifest URLs for HLS/DASH streams
+ * Deciphers and processes manifest URLs for HLS streams
  * Based on FreeTube's implementation
  * 
  * @param {string} url - The manifest URL to decipher
  * @param {Object} player - The player instance from innertube
  * @param {string} poToken - The PO token for authentication
- * @param {boolean} isDash - Whether this is a DASH manifest (vs HLS)
  * @returns {Promise<string>} The deciphered and processed manifest URL
  */
-async function decipherManifestUrl(url, player, poToken, isDash) {
+async function decipherManifestUrl(url, player, poToken) {
     const urlObject = new URL(url);
 
     if (urlObject.searchParams.size > 0) {
         urlObject.searchParams.set("pot", poToken);
 
-        if (isDash) 
-            urlObject.searchParams.set("mpd_version", "7");
-        
-
         return await player.decipher(urlObject.toString());
     }
 
-    const pathPrefix = isDash ? "/api/manifest/dash" : "/api/manifest/hls_variant";
+    const pathPrefix = "/api/manifest/hls_variant";
 
     // Convert path params to query params
     const pathParts = urlObject.pathname
@@ -139,15 +121,11 @@ async function decipherManifestUrl(url, player, poToken, isDash) {
     decipheredUrlObject.search = "";
     decipheredUrlObject.pathname += `/pot/${encodeURIComponent(poToken)}`;
 
-    if (isDash) 
-        decipheredUrlObject.pathname += "/mpd_version/7";
-    
-
     return decipheredUrlObject.toString();
 }
 
 /**
- * Creates a livestream from a YouTube video ID using DASH/HLS manifest
+ * Creates a livestream from a YouTube video ID using HLS manifest
  * 
  * @param {string} videoId - The video ID
  * @param {Array<string>} cookies - Optional cookies array
@@ -194,19 +172,11 @@ async function createLivestream(videoId, cookies = [], logEvents = false) {
     });
 
     // === Extract and decipher manifest URL ===
-    let manifestUrl = null;
-    let isDash = true;
 
-    if (playerResponse.streaming_data?.hls_manifest_url) {
-        manifestUrl = playerResponse.streaming_data.hls_manifest_url;
-        isDash = false;
-    } else if (playerResponse.streaming_data?.dash_manifest_url) {
-        manifestUrl = playerResponse.streaming_data.dash_manifest_url;
-        isDash = true;
-    } 
+    const manifestUrl = playerResponse.streaming_data.hls_manifest_url;
 
     if (!manifestUrl) 
-        throw new Error("No HLS/DASH manifest URL found in player response. Video might not be a livestream or may be streaming restricted.");
+        throw new Error("No HLS manifest URL found in player response. Video might not be a livestream or may be streaming restricted.");
     
 
     if (logEvents) console.log(`[Livestream] Manifest URL extracted: ${manifestUrl.substring(0, 80)}...`);
@@ -222,7 +192,6 @@ async function createLivestream(videoId, cookies = [], logEvents = false) {
             manifestUrl,
             player,
             contentPoToken,
-            isDash,
         );
         if (logEvents) console.log("[Livestream] Manifest URL deciphered successfully");
     } catch (err) {
@@ -233,7 +202,6 @@ async function createLivestream(videoId, cookies = [], logEvents = false) {
     // === Stream setup ===
     const stream = createFFmpegStream(decipheredManifestUrl, {
         isUrl: true,
-        isDash,
         logEvents,
     });
 
