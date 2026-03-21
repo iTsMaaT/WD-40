@@ -10,7 +10,6 @@ function createFFmpegStream(input, { isUrl = false, logEvents = false } = {}) {
     const baseArgs = [
         "-loglevel", logEvents ? "info" : "error",
 
-        // 🔥 universal fixes
         "-fflags", "+genpts+discardcorrupt",
 
         "-analyzeduration", "1M",
@@ -20,7 +19,6 @@ function createFFmpegStream(input, { isUrl = false, logEvents = false } = {}) {
     let inputArgs;
 
     if (isUrl) {
-        // ✅ HLS (M3U8)
         inputArgs = [
             "-reconnect", "1",
             "-reconnect_streamed", "1",
@@ -43,7 +41,6 @@ function createFFmpegStream(input, { isUrl = false, logEvents = false } = {}) {
     const outputArgs = [
         "-vn",
 
-        // 🔥 fix audio glitches
         "-af", "aresample=async=1:first_pts=0",
 
         "-c:a", "libopus",
