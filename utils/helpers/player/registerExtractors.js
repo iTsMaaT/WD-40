@@ -8,11 +8,12 @@ const { SoundcloudExtractor } = require("discord-player-soundcloud");
 const { SpotifyExtractor } = require("discord-player-spotify");
 const { AppleMusicExtractor } = require("discord-player-applemusic");
 const { SubsonicExtractor } = require("discord-player-subsonic");
-const { distubePluginToExtractor } = require("@utils/helpers/distubePluginToDiscordPlayerExtractor.js");
 const { YoutubeSabrExtractor } = require("@utils/helpers/youtubei/youtubeiExtractor.js");
 const { Innertube, ClientType } = require("youtubei.js");
 const { createSabrStream } = require("@utils/helpers/youtubei/youtubeSabrCore.js");
-const youtubeCookieHandler = require("./youtubeCookieHandler/youtubeCookieHandler");
+const { startInterceptor } = require("@utils/helpers/player/interceptor");
+const { downloadTrack } = require("@utils/helpers/player/downloader");
+const youtubeCookieHandler = require("@utils/helpers/youtubeCookieHandler/youtubeCookieHandler");
 const ytdl = require("@distube/ytdl-core");
 const config = require("@utils/config/configUtils");
 const logger = require("@utils/log");
@@ -30,10 +31,12 @@ const extractors = discordPlayerConfig?.extractors || {};
  * @returns 
  */
 async function initPlayer(client) {
-    return new Player(client, {
+    const player = new Player(client, {
         skipFFmpeg: discordPlayerConfig?.skipFFmpeg,
         ffmpegPath: discordPlayerConfig?.ffmpegPath,
     });
+    if (discordPlayerConfig?.downloadStreams) startInterceptor(player);
+    return player;
 }
 
 /**
@@ -51,8 +54,10 @@ async function registerExtractors(player) {
             if (track.extractor.identifier === DeezerExtractor.identifier ||
                 track.extractor.identifier === SoundcloudExtractor.identifier ||
                 track.extractor.identifier === YoutubeiExtractor.identifier ||
+                track.extractor.identifier === YoutubeSabrExtractor.identifier ||
                 track.extractor.identifier === SubsonicExtractor.identifier ||
-                track.extractor.identifier === TTSExtractor.identifier
+                track.extractor.identifier === TTSExtractor.identifier ||
+                track.extractor.identifier === AttachmentExtractor.identifier
             ) return await track.extractor?.stream(track);
             return undefined;
         } catch {
@@ -93,8 +98,9 @@ async function registerExtractors(player) {
 
             const secondYtExt = await player.extractors.register(YoutubeSabrExtractor, {
                 ...getYoutubeExtractorOptions(extractors.Youtubei.config),
+                logSabrEvents: extractors.Youtubei.config.logSabrEvents,
             });
-            secondYtExt.priority = extractors.Youtubei.priority ? extractors.Youtubei.priority - 1 : secordYtExt.priority;
+            secondYtExt.priority = extractors.Youtubei.priority ? extractors.Youtubei.priority : secondYtExt.priority;
 
             const originalYtStreamMethod = tempYtExt.stream.bind(tempYtExt);
 
@@ -123,7 +129,7 @@ async function registerExtractors(player) {
                 logger.error("Failed to register YoutubeiExtractor:", e);
             }
 
-            ytExt.priority = extractors.Youtubei.priority ?? ytExt.priority;
+            ytExt.priority = extractors.Youtubei.priority ? extractors.Youtubei.priority - 1 : ytExt.priority;
         } catch (e) {
             logger.error("Failed to register YoutubeiExtractor:", e);
         }
@@ -156,6 +162,7 @@ async function registerExtractors(player) {
     if (extractors.Attachment.enabled) {
         logger.info("Loading Attachment extractor...");
         const attachmentExt = await player.extractors.register(AttachmentExtractor, extractors.Attachment.config);
+        attachmentExt.protocols = ["file"];
         attachmentExt.priority = extractors.Attachment.priority ?? attachmentExt.priority;
     }
 }

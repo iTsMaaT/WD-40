@@ -1,7 +1,7 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { useQueue, useTimeline, useHistory, QueueRepeatMode } = require("discord-player");
-const { getLoopMode, getPauseMode } = require("@utils/helpers/playerHelpers");
+const { getLoopMode, getPauseMode } = require("@root/utils/helpers/player/playerHelpers");
 const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
 
 module.exports = {

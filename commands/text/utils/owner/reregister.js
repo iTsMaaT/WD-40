@@ -1,4 +1,4 @@
-const { registerExtractors, reload } = require("@utils/helpers/registerExtractors");
+const { registerExtractors, reload } = require("@root/utils/helpers/player/registerExtractors");
 const { useMainPlayer } = require("discord-player");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 

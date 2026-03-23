@@ -1,5 +1,5 @@
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const { getLoopMode, getPauseMode } = require("@utils/helpers/playerHelpers");
+const { getLoopMode, getPauseMode } = require("@root/utils/helpers/player/playerHelpers");
 const { useQueue, useTimeline, useMainPlayer } = require("discord-player");
 const isURL = require("@utils/functions/isURL");
 
