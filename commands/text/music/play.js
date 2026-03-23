@@ -1,12 +1,12 @@
 const { PermissionsBitField } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const { getLoopMode } = require("@utils/helpers/playerHelpers");
+const { getLoopMode } = require("@root/utils/helpers/player/playerHelpers");
 const { QueryType, useMainPlayer, useQueue, QueryResolver } = require("discord-player");
 const { AttachmentExtractor } = require("@discord-player/extractor");
 const { SpotifyExtractor } = require("discord-player-spotify");
 const { YoutubeiExtractor } = require("discord-player-youtubei");
 const config = require("@utils/config/configUtils");
-const { searchWithPriorities, getProbableBridgeSource } = require("@utils/helpers/playerHelpers");
+const { searchWithPriorities, getProbableBridgeSource } = require("@root/utils/helpers/player/playerHelpers");
 const fs = require("fs");
 const isURL = require("@utils/functions/isURL");
 const { simpleFolderSearch } = require("simple-folder-search");
@@ -159,16 +159,20 @@ module.exports = {
                     choicesEmbed.data.fields.push({ name: `${index + 1} - ${track.title}`, value: `By ${track.author}` });
                 });
 
-                await sentMessage.edit({ embeds: [choicesEmbed] });
+                if (research.tracks.length != 1) {
+                    await sentMessage.edit({ embeds: [choicesEmbed] });
 
-                const filter = (m) => m.author.id === message.author.id && !isNaN(m.content);
-                await message.channel.awaitMessages({ filter, max: 1, time: 10000, errors: ["time", "channelDelete", "guildDelete", "messageDelete"] })
-                    .then((collected) => {
-                        const responseMessage = collected.first();
-                        choice = (parseInt(responseMessage.content)) - 1;
-                        responseMessage.delete().catch(() => null);
-                    })
-                    .catch(() => choice = 0);
+                    const filter = (m) => m.author.id === message.author.id && !isNaN(m.content);
+                    await message.channel.awaitMessages({ filter, max: 1, time: 10000, errors: ["time", "channelDelete", "guildDelete", "messageDelete"] })
+                        .then((collected) => {
+                            const responseMessage = collected.first();
+                            choice = (parseInt(responseMessage.content)) - 1;
+                            responseMessage.delete().catch(() => null);
+                        })
+                        .catch(() => choice = 0);
+                } else {
+                    choice = 0;
+                }
             } else {
                 research = await player.search(string, { requestedBy: message.member });
                 if (!research.hasTracks()) {
@@ -214,6 +218,7 @@ module.exports = {
                             },
                             verifyFallbackStream: false,
                             ...playerConfig.globalPlayerNodeOptions,
+                            enableStreamInterceptor: playerConfig.downloadStreams,
                         },
                     },
                 );

@@ -5,8 +5,8 @@ tinker.js
 tinker2.js
 pnpm-lock.yaml
 utils/reddit/redditConf.json
-./music
 /utils/temp
 /utils/commandManifest.json
 /utils/helpers/youtubeCookieHandler/cookies.txt
 music
+downloads

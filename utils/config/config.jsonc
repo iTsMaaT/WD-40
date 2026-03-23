@@ -35,7 +35,6 @@
         { "type": 4, "name": "nuzzles *breaks your spine*" },
         { "type": 4, "name": "That's the gros sourire message" },
         { "type": 4, "name": "Barbeque bacon burger" },
-        { "type": 4, "name": "Give suggestions! (I'm desperate) | >suggestion" },
         { "type": 4, "name": "Do you know who else suffers from dementia?" },
         { "type": 4, "name": "Fuck Mee6" },
         { "type": 4, "name": "Amongst Us" },
@@ -108,6 +107,7 @@
             "leaveOnEmptyCooldown": 300000, // Cooldown before leaving (in ms)
             "skipOnNoStream": true          // Skip tracks if no stream is available
         },
+        "downloadStreams": false,
         "extractors": {
             "Subsonic": {
                 "enabled": false,
@@ -143,7 +143,7 @@
                     "logSabrEvents": true,
                     "usePoToken": false,                       // Use TrustedClient token for authentication
                     "useCookie": true,                         // Use cookies for authentication
-                    "useYTDL": true                    // Use ytdl-core fallback
+                    "useYTDL": true                 // Use ytdl-core fallback
                 }
             },
             "Soundcloud": {

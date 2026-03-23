@@ -13,6 +13,7 @@ const { StreamType } = require("discord-player");
 
 const DOWNLOAD_ROOT = path.resolve("./downloads");
 const MAX_CONCURRENT = 2;
+const metadataCache = new Map();
 
 /** @type {Set<Promise<void>>} */
 const activeJobs = new Set();
@@ -92,6 +93,91 @@ function fetchThumbnail(url) {
 }
 
 /**
+ * Fetch metadata from MusicBrainz
+ * @param {string} title
+ * @param {string} artist
+ * @returns {Promise<{ album?: string, year?: string } | null>}
+ */
+function fetchMetadata(title, artist) {
+    const query = encodeURIComponent(`recording:${title} AND artist:${artist}`);
+    const url = `https://musicbrainz.org/ws/2/recording?query=${query}&fmt=json&limit=1`;
+
+    return new Promise((resolve) => {
+        https.get(url, {
+            headers: {
+                "User-Agent": "YourBot/1.0 (your@email.com)",
+            },
+        }, (res) => {
+            let data = "";
+
+            res.on("data", (c) => (data += c));
+            res.on("end", () => {
+                try {
+                    const json = JSON.parse(data);
+                    const rec = json.recordings?.[0];
+
+                    if (!rec) return resolve(null);
+
+                    const release = rec.releases?.[0];
+
+                    resolve({
+                        album: release?.title,
+                        year: release?.date?.split("-")[0],
+                    });
+                } catch {
+                    resolve(null);
+                }
+            });
+        }).on("error", () => resolve(null));
+    });
+}
+
+async function fetchMetadataCached(title, artist) {
+    const key = `${title}|${artist}`;
+
+    if (metadataCache.has(key)) 
+        return metadataCache.get(key);
+    
+
+    const data = await fetchMetadata(title, artist);
+    metadataCache.set(key, data);
+
+    return data;
+}
+
+/**
+ * Converts an image buffer (webp/png/etc) to JPEG using FFmpeg
+ * @param {Buffer} input
+ * @returns {Promise<Buffer|null>}
+ */
+function convertToJpeg(input) {
+    return new Promise((resolve) => {
+        const ffmpeg = spawn("ffmpeg", [
+            "-loglevel", "error",
+            "-i", "pipe:0",
+            "-f", "image2",
+            "-vcodec", "mjpeg",
+            "pipe:1",
+        ], {
+            stdio: ["pipe", "pipe", "ignore"],
+        });
+
+        const chunks = [];
+
+        ffmpeg.stdout.on("data", (c) => chunks.push(c));
+        ffmpeg.stdout.on("end", () => {
+            resolve(Buffer.concat(chunks));
+        });
+
+        ffmpeg.on("error", () => resolve(null));
+        ffmpeg.on("close", () => resolve(Buffer.concat(chunks)));
+
+        ffmpeg.stdin.write(input);
+        ffmpeg.stdin.end();
+    });
+}
+
+/**
  * Main entry point for downloading a track.
  * Attempts stream-based download first, falls back to interceptor stream.
  *
@@ -127,7 +213,16 @@ function downloadTrack(track, fallbackData) {
 async function downloadViaStream(track) {
     const title = sanitize(track.title);
     const artist = sanitize(track.author || "Unknown Artist");
-    const album = sanitize(track.metadata?.album || "Unknown Album");
+    let album = track.metadata?.album;
+    let year = null;
+
+    if (!album) {
+        const meta = await fetchMetadataCached(track.title, track.author);
+        album = meta?.album;
+        year = meta?.year || null;
+    }
+
+    album = sanitize(album || "Unknown Album");
 
     const outputDir = path.join(DOWNLOAD_ROOT, artist, album);
     ensureDir(outputDir);
@@ -158,16 +253,45 @@ async function downloadViaStream(track) {
         if (hashing) hash.update(c);
     });
 
-    const thumbBuffer = await fetchThumbnail(
+    let thumbBuffer = await fetchThumbnail(
         track.thumbnail || track.raw?.thumbnails?.[0]?.url,
     );
 
+    // ---- Detect WebP ----
+    const isWebp =
+    thumbBuffer &&
+    thumbBuffer.subarray(0, 4).toString() === "RIFF" &&
+    thumbBuffer.subarray(8, 12).toString() === "WEBP";
+
+    if (isWebp) {
+        console.log("[THUMBNAIL] WebP detected → converting to JPEG");
+
+        const converted = await convertToJpeg(thumbBuffer);
+
+        if (converted && converted.length > 0) {
+            thumbBuffer = converted;
+        } else {
+            console.log("[THUMBNAIL] Conversion failed → skipping");
+            thumbBuffer = null;
+        }
+    }
     const args = ["-loglevel", "error", "-i", "pipe:0"];
 
-    if (thumbBuffer) args.push("-i", "pipe:3");
+    if (thumbBuffer) {
+        args.push(
+            "-f", "image2pipe",
+            "-i", "pipe:3",
+            "-map", "0:a",
+            "-map", "1:v",
+            "-c:v", "mjpeg",
+            "-id3v2_version", "3",
+            "-metadata:s:v", "title=Album cover",
+            "-metadata:s:v", "comment=Cover (front)",
+        );
+    }
 
+    if (!thumbBuffer) args.push("-vn");
     args.push(
-        "-vn",
         "-ar", "44100",
         "-ac", "2",
         "-b:a", "192k",
@@ -176,9 +300,8 @@ async function downloadViaStream(track) {
         "-metadata", `album=${album}`,
     );
 
-    if (thumbBuffer) 
-        args.push("-map", "0:a", "-map", "1:v", "-id3v2_version", "3");
-    
+    if (year) 
+        args.push("-metadata", `date=${year}`);
 
     args.push("-f", "mp3", outputPath);
 
@@ -237,7 +360,16 @@ async function downloadViaStream(track) {
 async function downloadViaRaw(queueCtx, track, format, stream) {
     const title = sanitize(track.title);
     const artist = sanitize(track.author || "Unknown Artist");
-    const album = sanitize(track.metadata?.album || "Unknown Album");
+    let album = track.metadata?.album;
+    let year = null;
+
+    if (!album) {
+        const meta = await fetchMetadataCached(track.title, track.author);
+        album = meta?.album;
+        year = meta?.year || null;
+    }
+
+    album = sanitize(album || "Unknown Album");
 
     const outputDir = path.join(DOWNLOAD_ROOT, artist, album);
     ensureDir(outputDir);
@@ -261,9 +393,28 @@ async function downloadViaRaw(queueCtx, track, format, stream) {
     stream.on("close", () => (aborted = true));
     stream.on("error", () => (aborted = true));
 
-    const thumbBuffer = await fetchThumbnail(
+    let thumbBuffer = await fetchThumbnail(
         track.thumbnail || track.raw?.thumbnails?.[0]?.url,
     );
+
+    // ---- Detect WebP ----
+    const isWebp =
+    thumbBuffer &&
+    thumbBuffer.subarray(0, 4).toString() === "RIFF" &&
+    thumbBuffer.subarray(8, 12).toString() === "WEBP";
+
+    if (isWebp) {
+        console.log("[THUMBNAIL] WebP detected → converting to JPEG");
+
+        const converted = await convertToJpeg(thumbBuffer);
+
+        if (converted && converted.length > 0) {
+            thumbBuffer = converted;
+        } else {
+            console.log("[THUMBNAIL] Conversion failed → skipping");
+            thumbBuffer = null;
+        }
+    }
 
     const inputArgs =
         format === StreamType.Opus
@@ -272,13 +423,32 @@ async function downloadViaRaw(queueCtx, track, format, stream) {
 
     const args = ["-loglevel", "error", ...inputArgs];
 
-    if (thumbBuffer) args.push("-i", "pipe:3");
+    if (thumbBuffer) {
+        args.push(
+            "-f", "image2pipe",
+            "-i", "pipe:3",
+            "-map", "0:a",
+            "-map", "1:v",
+            "-c:v", "mjpeg",
+            "-id3v2_version", "3",
+            "-metadata:s:v", "title=Album cover",
+            "-metadata:s:v", "comment=Cover (front)",
+        );
+    }
 
-    args.push("-vn", "-ar", "44100", "-ac", "2", "-b:a", "192k");
+    if (!thumbBuffer) args.push("-vn");
+    args.push(
+        "-ar", "44100",
+        "-ac", "2",
+        "-b:a", "192k",
+        "-metadata", `title=${title}`,
+        "-metadata", `artist=${artist}`,
+        "-metadata", `album=${album}`,
+    );
 
-    if (thumbBuffer) 
-        args.push("-map", "0:a", "-map", "1:v", "-id3v2_version", "3");
-    
+
+    if (year) 
+        args.push("-metadata", `date=${year}`);
 
     args.push("-f", "mp3", outputPath);
 

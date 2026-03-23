@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require("discord.js");
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { useQueue, useTimeline, useMainPlayer } = require("discord-player");
-const { getPauseMode } = require("@utils/helpers/playerHelpers");
+const { getPauseMode } = require("@root/utils/helpers/player/playerHelpers");
 
 module.exports = {
     name: "pause",

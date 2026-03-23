@@ -60,7 +60,7 @@
         allowedMentions: { repliedUser: false },
     });
 
-    const { registerExtractors, initPlayer, reload } = require("@utils/helpers/registerExtractors");
+    const { registerExtractors, initPlayer, reload } = require("@root/utils/helpers/player/registerExtractors");
     const player = await initPlayer(client);
     await registerExtractors(player);
 

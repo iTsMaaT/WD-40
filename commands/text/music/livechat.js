@@ -1,6 +1,6 @@
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const { useQueue } = require("discord-player");
-const { toggleLiveChat } = require("@utils/helpers/playerLiveChat");
+const { toggleLiveChat } = require("@root/utils/helpers/player/playerLiveChat");
 
 module.exports = {
     name: "livechat",

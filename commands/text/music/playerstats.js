@@ -1,4 +1,4 @@
-const { useStats } = require("@utils/helpers/playerHelpers");
+const { useStats } = require("@root/utils/helpers/player/playerHelpers");
 const { useQueue } = require("discord-player");
 const formatDuration = require("@utils/functions/formatDuration");
 const embedGenerator = require("@utils/helpers/embedGenerator");
