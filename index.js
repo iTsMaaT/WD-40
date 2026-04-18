@@ -1,7 +1,7 @@
 (async () => {
     const Discord = require("discord.js");
     const dotenv = require("dotenv");
-    dotenv.config();
+    dotenv.config({ quiet: true });
     require("module-alias/register");
     const cron = require("cron");
 

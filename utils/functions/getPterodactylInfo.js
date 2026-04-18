@@ -9,18 +9,18 @@ const formatDuration = require("@utils/functions/formatDuration");
 const getPterodactylInfo = async function() {
     if (!process.env.PTERODACTYL_SERVER_ID || !process.env.PTERODACTYL_URL || !process.env.PTERODACTYL_API_KEY) 
         return null;
-    let serverName = "";
-    let RAMlimit = "";
-    let CPUlimit = "";
-    let DISKlimit = "";
-    let IPalias = "";
-    let IPport = "";
-    let RAMusage = "";
-    let CPUusage = "";
-    let DISKusage = "";
-    let NETWORKin = "";
-    let NETWORKout = "";
-    let BOTuptime = "";
+    let serverName;
+    let RAMlimit;
+    let CPUlimit;
+    let DISKlimit;
+    let IPalias;
+    let IPport;
+    let RAMusage;
+    let CPUusage;
+    let DISKusage;
+    let NETWORKin;
+    let NETWORKout;
+    let BOTuptime;
 
     try {
         const [serverResponse, resourcesResponse] = await Promise.all([

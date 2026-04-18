@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
-      "baseUrl": ".",
-      "paths": {
+        "paths": {
         "@root/*": ["./*"],
         "@functions/*": ["./utils/functions/*"],
         "@utils/*": ["./utils/*"],

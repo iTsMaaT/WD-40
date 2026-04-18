@@ -202,7 +202,7 @@ function getYoutubeExtractorOptions(playerconfig) {
 
     if (playerconfig?.useYTDL) {
         options.useYoutubeDL = true;
-        options.logLevel = "ALL";
+        options.logLevel = "NONE";
     }
 
     if (playerconfig?.usePoToken) {
@@ -247,6 +247,10 @@ function getSpotifyExtractorOptions(playerconfig) {
         options.clientId = process.env.SPOTIFY_CLIENT_ID;
         options.clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
     }
+
+    options.anon = {
+        maxPagingQueries: playerconfig?.maxPagingQueries ?? 100,
+    };
 
     return options;
 }
