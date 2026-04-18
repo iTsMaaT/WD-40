@@ -132,18 +132,18 @@
                 "canBridge": true,
                 "priority": 11,
                 "config": {
-                    "client": "WEB",                   // Client type for YouTube
+                    "client": "WEB",                           // Client type for YouTube
                     "highWaterMark": 2097152,                  // High water mark for streams
                     "attemptYoutubeSearchEvenIfDisabled": {
                         "usingEmbed": true,                    // Attempt to search using embed
                         "usingScraping": false                 // Attempt to search using scraping
                     },
-                    "useServerAbrStreamFallback": false,               // Use server ABR stream
+                    "useServerAbrStreamFallback": false,       // Use server ABR stream
                     "useServerAbrStream": true,
                     "logSabrEvents": true,
                     "usePoToken": false,                       // Use TrustedClient token for authentication
                     "useCookie": true,                         // Use cookies for authentication
-                    "useYTDL": true                 // Use ytdl-core fallback
+                    "useYTDL": true                            // Use ytdl-core fallback
                 }
             },
             "Soundcloud": {
@@ -159,7 +159,8 @@
                 "canBridge": true,
                 "priority": 2,
                 "config": {
-                    "useAccount": true // Use app credentials for Spotify
+                    "useAccount": true,             // Use app credentials for Spotify
+                    "maxPagingQueries": 100         // Maximum number of paging queries for Spotify (for playlists, albums, etc.)
                 }
             },
             "AppleMusic": {

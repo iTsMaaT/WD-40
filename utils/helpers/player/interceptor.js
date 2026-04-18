@@ -7,8 +7,7 @@ const { pipeline } = require("node:stream/promises");
 const crypto = require("node:crypto");
 const https = require("node:https");
 const { StreamType } = require("discord-player");
-const { downloadTrack } = require("./downloader");
-const { ensureDir } = require("./downloader");
+const { downloadTrack, ensureDir } = require("./downloader");
 const { AttachmentExtractor } = require("@discord-player/extractor");
 const { TTSExtractor } = require("discord-player-tts");
 const { YoutubeiExtractor, stream } = require("discord-player-youtubei");
@@ -21,6 +20,11 @@ const { SubsonicExtractor } = require("discord-player-subsonic");
 const { YoutubeSabrExtractor } = require("@utils/helpers/youtubei/youtubeiExtractor.js");
 const DOWNLOAD_ROOT = path.resolve("./downloads");
 
+/**
+ * Starts the interceptor for the given player.
+ * 
+ * @param {Player} player - The player instance.
+ */
 function startInterceptor(player) {
     ensureDir(DOWNLOAD_ROOT);
 

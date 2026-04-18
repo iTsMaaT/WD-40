@@ -4,18 +4,10 @@ module.exports = {
         if (!args[0]) return console.log("Argument needed");
 
         const string = args;
-        let result = "";
-
-        for (word of string) {
-            for (char of word) {
-                const asciiCode = char.charCodeAt(0);
-                // Convert ASCII code to binary
-                const binaryASCII = asciiCode.toString(2);
-
-                result += binaryASCII + " ";
-            }
-            result += "/ ";
-        }
+        const binaryWords = string.map(word =>
+            [...word].map(char => char.charCodeAt(0).toString(2)).join(" "),
+        );
+        const result = binaryWords.join(" / ");
         console.log(result);
     },
 };

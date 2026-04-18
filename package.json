@@ -7,7 +7,7 @@
     "start": "node --openssl-legacy-provider --no-deprecation index.js",
     "start:dev": "node --openssl-legacy-provider --trace-deprecation --trace-warnings index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --no-fix .",
+    "lint": "npx eslint --no-fix .",
     "drizzle:generate": "npx drizzle-kit generate:pg --out ./utils/db/ --schema ./schema/schema.js",
     "drizzle:push": "npx drizzle-kit push:mysql --config=drizzle-cli-conf.js",
     "code": "git pull && npm i && code WD-40.code-workspace && eslint --no-fix . && npm run cl",
@@ -47,7 +47,7 @@
     "discord-player-deezer": "^2.5.0",
     "discord-player-soundcloud": "^1.0.7",
     "discord-player-soundgasm": "^1.1.5",
-    "discord-player-spotify": "^1.1.7",
+    "discord-player-spotify": "^1.1.9",
     "discord-player-subsonic": "^1.0.1",
     "discord-player-tts": "^1.0.9",
     "discord-player-youtubei": "^2.0.0-dev.2",
@@ -68,7 +68,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "drizzle-kit": "^0.31.9",
-    "eslint": "^10.0.2",
+    "eslint": "^10.1.0",
     "globals": "^17.4.0"
   },
   "_moduleAliases": {

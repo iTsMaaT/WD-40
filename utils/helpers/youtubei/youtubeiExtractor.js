@@ -66,7 +66,7 @@ class YoutubeSabrExtractor extends BaseExtractor {
             let isPlaylist = false;
             let playlistId = null;
             const urlObj = new URL(query);
-            const hasList = urlObj.searchParams.has("list");
+            const hasList = urlObj.searchParams.has("list") && !urlObj.searchParams.has("v");
             const isShortLink = /(^|\.)youtu\.be$/i.test(urlObj.hostname);
             isPlaylist = hasList && !isShortLink;
             playlistId = isPlaylist ? urlObj.searchParams.get("list") : null;

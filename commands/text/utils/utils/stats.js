@@ -95,8 +95,11 @@ module.exports = {
             }
         }
 
-        const buffer = await generateChartBuffer(timestamps);
-        const attachment = new AttachmentBuilder(buffer, { name: "user_growth.png" });
+        let attachment = null;
+        if (timestamps && timestamps.length > 0) {
+            const buffer = await generateChartBuffer(timestamps);
+            attachment = new AttachmentBuilder(buffer, { name: "user_growth.png" });
+        }
 
         const embed = {
             title: `Stats for ${client.user.username} (v${WDVersion})`,
@@ -157,6 +160,11 @@ module.exports = {
     },
 };
 
+/**
+ * Generates a chart buffer for the given timestamps
+ * @param {Array<{ joinedTimestamp: number, userCount: number }>} timestamps - The timestamps to generate the chart for
+ * @returns {Buffer} The generated chart buffer
+ */
 async function generateChartBuffer(timestamps) {
     const sortedData = timestamps.sort((a, b) => a.joinedTimestamp - b.joinedTimestamp);
 
@@ -184,7 +192,11 @@ async function generateChartBuffer(timestamps) {
 
     
     const currentTotal = Object.values(countPerDay).reduce((acc, count) => acc + count, 0);
-    if (Math.round(currentTotal / rounding) * rounding === Math.round(totalUserCache / rounding) * rounding) return imageCache;
+    if (imageCache &&
+    Math.round(currentTotal / rounding) * rounding ===
+    Math.round(totalUserCache / rounding) * rounding) 
+        return imageCache;
+
 
     totalUserCache = Object.values(countPerDay).reduce((acc, count) => acc + count, 0);
 

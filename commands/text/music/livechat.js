@@ -7,6 +7,7 @@ module.exports = {
     description: "Enables or disables livechat",
     category: "music",
     aliases: ["lc"],
+    private: true,
     inVoiceChannel: true,
     inSameVoiceChannel: true,
     async execute(logger, client, message, args, flags) {
@@ -17,7 +18,7 @@ module.exports = {
 
         if (!currentTrack.raw.live) return await message.reply({ embeds: [embedGenerator.error("The current track is not a live stream.")] });
         
-        let livechatEnabled = false;
+        let livechatEnabled;
         try { 
             livechatEnabled = await toggleLiveChat(currentTrack.url, message.channel);
         } catch (error) {

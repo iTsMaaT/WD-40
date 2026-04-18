@@ -48,7 +48,6 @@ const timeFormatToMS = function(timeString) {
     }
       
     return totalMilliseconds;
-    
 };
 
 /**
