@@ -163,7 +163,7 @@ module.exports = {
 /**
  * Generates a chart buffer for the given timestamps
  * @param {Array<{ joinedTimestamp: number, userCount: number }>} timestamps - The timestamps to generate the chart for
- * @returns {Buffer} The generated chart buffer
+ * @returns {Promise<Buffer>} The generated chart buffer
  */
 async function generateChartBuffer(timestamps) {
     const sortedData = timestamps.sort((a, b) => a.joinedTimestamp - b.joinedTimestamp);
