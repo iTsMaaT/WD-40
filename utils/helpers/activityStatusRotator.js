@@ -78,10 +78,10 @@ const updateActivities = async (client) => {
  * @param {import("discord.js").Client} client - The Discord client.
  * @param {string} server - The server environment.
  */
-const activateRotator = (client, server) => {
+const activateRotator = async (client, server) => {
     if (server !== "dev") {
-        updateActivities(client);
-        new cron.CronJob(config.get("cronJobs").activityStatusRotator, () => updateActivities(client), null, true, config.get("timeZone"));
+        await updateActivities(client);
+        new cron.CronJob(config.get("cronJobs").activityStatusRotator, async () => await updateActivities(client), null, true, config.get("timeZone"));
     } else {
         client.user.setActivity("Under maintenance...", { type: ActivityType.Custom });
     }

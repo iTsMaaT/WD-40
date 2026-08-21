@@ -465,5 +465,15 @@
         "changes": [
             "Multiple bug fixes related to self-hosting"
         ]
+    },
+    {
+        "version": "5.12.6",
+        "date": "2026-07-21",
+        "changes": [
+            "Fixed YouTube playback related to web PoToken minting",
+            "Forced YouTube to use original language for playback",
+            "Added a new command: >invitebot",
+            "Multiple bug and typo fixes"
+        ]
     }
 ]

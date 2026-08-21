@@ -52,7 +52,7 @@ Good luck.
     - Scopes: applications.commands, bot
     - Permissions: Add Reactions, Connect, Create Expressions, Create Instant Invites, Deafen Members, Embed Links, Manage Expressions, Manage Messages, Manage Webhooks, Move Members, Mute Members, Send Messages, Speak, Use External Emojis, Use External Stickers, View Audit Log, View Channels.
 2. Make sure to enable all privileged intents in the bot app if you want full functionality.
-3. Install [Node.js](https://nodejs.org/en/download/) v20.x LTS and latest version of [FFmpeg](https://ffmpeg.org/download.html).
+3. Install [Node.js](https://nodejs.org/en/download/) >v22.22.X LTS and latest version of [FFmpeg](https://ffmpeg.org/download.html).
 4. Clone this repository (make sure to be on the production branch) and run `npm install` (use `npm install --legacy-peer-deps` if errors occur).
 5. Configure `.env` file in the root directory with your bot token and client id (details in `.env.example`).
 

@@ -41,7 +41,10 @@ module.exports = {
         const list = flags["list|l"];
 
         if (list) {
-            const target = await message.guild.members.fetch(id(args[0])) || message.author;
+            let target;
+            if (args[0]) target = await message.guild.members.fetch(id(args[0])); 
+            else target = message.author;
+
             const userBlacklistObject = blacklist.GetPermissions(target.id);
             if (!userBlacklistObject || Object.values(userBlacklistObject).every(arr => arr.length === 0)) 
                 return await message.reply({ embeds: [embedGenerator.warning(`No blacklist for ${target.user.displayName}`)] });
@@ -69,8 +72,8 @@ module.exports = {
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("You did not provide a user.")] });
         if (!args[1]) return await message.reply({ embeds: [embedGenerator.warning("You did not provide the type of command to blacklist.")] });
         if (!args[2]) return await message.reply({ embeds: [embedGenerator.warning("You did not provide the name of the command to blacklist.")] });
-        if (flags["category|cat"] && flags["command|cmd"]) return await message.reply({ embeds: [embedGenerator.warning("You cannot blaclist a command and category at the same time.")] });
-        if (["commands", "slashcommands", "contextcommands"].includes(args[1].toLowerCase())) return await message.reply({ embeds: [embedGenerator.warning("Invalid command / category type.")] });
+        if (flags["category|cat"] && flags["command|cmd"]) return await message.reply({ embeds: [embedGenerator.warning("You cannot blacklist a command and category at the same time.")] });
+        if (!["text", "slash", "context"].includes(args[1].toLowerCase())) return await message.reply({ embeds: [embedGenerator.warning("Invalid command / category type.")] });
         const blacklistCategory = Boolean(flags["category|cat"]);
         const blacklistCommand = Boolean(flags["command|cmd"]) || !blacklistCategory;
         let target, owner;
@@ -112,8 +115,7 @@ module.exports = {
         
         if (target.id == executor.id) return await message.reply({ embeds: [embedGenerator.warning("You cannot blacklist yourself")] });
         if (target.id == owner.id) return await message.reply({ embeds: [embedGenerator.warning("You cannot blacklist the guild's owner")] });
-        if (executor.permissions.has(PermissionsBitField.Flags.Administrator) && target.permissions.has(PermissionsBitField.Flags.Administrator)) 
-            return await message.reply({ embeds: [embedGenerator.warning("You cannot blacklist another server admin")] });
+        if (target.permissions.has(PermissionsBitField.Flags.Administrator)) return await message.reply({ embeds: [embedGenerator.warning("You cannot blacklist another server admin")] });
         
         const embed = {
             color: 0xffffff,
@@ -130,6 +132,6 @@ module.exports = {
             embed.description = `You granted permission for <@${target.id}> (${target.id}) to execute ${isCategory ? `commands in the **${name}** category` : `the **${name}** command`}.`;
         }
 
-        message.reply({ embeds: [embed] });
+        await message.reply({ embeds: [embed] });
     },
 };

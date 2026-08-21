@@ -9,23 +9,25 @@ const GuildManager = require("@guildManager");
 const { useMainPlayer } = require("discord-player");
 const { toEngineerNotation } = require("@functions/formattingFunctions");
 const { ChartJSNodeCanvas } = require("chartjs-node-canvas");
+const { Chart, registerables } = require("chart.js");
+Chart.register(...registerables);
 const { AttachmentBuilder } = require("discord.js");
 const config = require("@utils/config/configUtils");
 let totalUserCache = 0;
 const rounding = 200;
 let imageCache = null;
 
-const chartJSNodeCanvas = new ChartJSNodeCanvas({
-    width: 800,
-    height: 600,
-    backgroundColour: "#222222",
-});
+let isRendering = false;
+const renderQueue = [];
+
 
 module.exports = {
     name: "stats",
     description: "Gives statistics about the bot",
     category: "utils",
+    cooldown: 10,
     async execute(logger, client, message, args, flags) {
+        const startTime = Date.now();
         const player = useMainPlayer();
 
         const addedCommands = new Set();
@@ -64,7 +66,7 @@ module.exports = {
             totalTracks += queue.status.playing ? queue.tracksCount + 1 : queue.tracksCount;
             totalListeners += queue.listeners;
         });
-      
+        
         const fetchedMessages = await message.channel.messages.fetch({ limit: 100 });
         const lastExecutedCommands = Array.from(fetchedMessages.values()).filter(msg => 
             msg.content.startsWith(prefix) && 
@@ -77,13 +79,13 @@ module.exports = {
                 break;
             }
         }
-
+        
         const lastCommandContent = lastExecutedCommand?.content;
         if (lastExecutedCommand) {
             lastCommandLink = `https://discord.com/channels/${lastExecutedCommand.guild.id}/${lastExecutedCommand.channel.id}/${lastExecutedCommand.id}`;
             lastCommandTimeSinceNow = formatDuration(Date.now() - lastExecutedCommand.createdTimestamp);
         }
-
+        
         const timestamps = [];
         for (const [guildId, guild] of client.guilds.cache) {
             try {
@@ -94,17 +96,18 @@ module.exports = {
                 console.error(`Failed to fetch bot member for guild ${guild.name}:`, err);
             }
         }
-
+        
         let attachment = null;
         if (timestamps && timestamps.length > 0) {
             const buffer = await generateChartBuffer(timestamps);
             attachment = new AttachmentBuilder(buffer, { name: "user_growth.png" });
         }
-
+        
+        const executionTime = formatDuration(Date.now() - startTime, false, true);
         const embed = {
             title: `Stats for ${client.user.username} (v${WDVersion})`,
             color: 0xffffff,
-            description: "",
+            description: `Took ${executionTime}`,
             fields: [
                 {
                     name: "Commands count",
@@ -128,7 +131,8 @@ module.exports = {
                     value: 
                     `Total executed commands (approximately): **${totalExecutedCommands}**\n` +
                     `Last executed command (in \`${message.guild.name}\`):\n` + 
-                    `\`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow || "Never"} ago) ${lastCommandLink ? `Link: ${lastCommandLink}` : ""}`,
+                    `\`${lastCommandContent ?? "None"}\` (${lastCommandTimeSinceNow || "Never"} ago) ${lastCommandLink ? `Link: ${lastCommandLink}` : ""}\n` +
+                    `This command execution time: **${executionTime}**`,
                 }, {
                     name: "Hosting",
                     value: 
@@ -160,116 +164,145 @@ module.exports = {
     },
 };
 
+async function generateChartBuffer(timestamps) {
+    return new Promise((resolve, reject) => {
+        renderQueue.push({ timestamps, resolve, reject });
+        processQueue();
+    });
+}
+
 /**
  * Generates a chart buffer for the given timestamps
  * @param {Array<{ joinedTimestamp: number, userCount: number }>} timestamps - The timestamps to generate the chart for
  * @returns {Promise<Buffer>} The generated chart buffer
  */
-async function generateChartBuffer(timestamps) {
-    const sortedData = timestamps.sort((a, b) => a.joinedTimestamp - b.joinedTimestamp);
-
-    const countPerDay = {};
-    sortedData.forEach(({ joinedTimestamp, userCount }) => {
-        const day = new Date(joinedTimestamp).toISOString().split("T")[0];
-        countPerDay[day] = (countPerDay[day] || 0) + userCount;
+async function processQueue() {
+    const chartJSNodeCanvas = new ChartJSNodeCanvas({
+        width: 800,
+        height: 600,
+        backgroundColour: "#222222",
     });
 
-    const startDate = new Date(Object.keys(countPerDay)[0]);
-    const endDate = new Date();
-    const labels = [];
-    const data = [];
-    let totalUsers = 0;
-    for (
-        let date = new Date(startDate.getTime());
-        date <= endDate;
-        date = new Date(date.getTime() + 24 * 60 * 60 * 1000)
-    ) {
-        const day = date.toISOString().split("T")[0];
-        totalUsers += countPerDay[day] || 0; // Add 0 if no new members joined on this day
-        labels.push(day);
-        data.push(totalUsers);
-    }
+    if (isRendering || renderQueue.length === 0) return;
+    
+    isRendering = true;
+    const { timestamps, resolve, reject } = renderQueue.shift();
+    
+    try {
+        const sortedData = timestamps.sort((a, b) => a.joinedTimestamp - b.joinedTimestamp);
+
+        const countPerDay = {};
+        sortedData.forEach(({ joinedTimestamp, userCount }) => {
+            const day = new Date(joinedTimestamp).toISOString().split("T")[0];
+            countPerDay[day] = (countPerDay[day] || 0) + userCount;
+        });
+
+        const startDate = new Date(Object.keys(countPerDay)[0]);
+        const endDate = new Date();
+        const labels = [];
+        const data = [];
+        let totalUsers = 0;
+        for (
+            let date = new Date(startDate.getTime());
+            date <= endDate;
+            date = new Date(date.getTime() + 24 * 60 * 60 * 1000)
+        ) {
+            const day = date.toISOString().split("T")[0];
+            totalUsers += countPerDay[day] || 0; // Add 0 if no new members joined on this day
+            labels.push(day);
+            data.push(totalUsers);
+        }
 
     
-    const currentTotal = Object.values(countPerDay).reduce((acc, count) => acc + count, 0);
-    if (imageCache &&
-    Math.round(currentTotal / rounding) * rounding ===
-    Math.round(totalUserCache / rounding) * rounding) 
-        return imageCache;
+        const currentTotal = Object.values(countPerDay).reduce((acc, count) => acc + count, 0);
+        if (imageCache &&
+            Math.round(currentTotal / rounding) * rounding ===
+            Math.round(totalUserCache / rounding) * rounding) {
+            isRendering = false;
+            resolve(imageCache);
+            processQueue();
+            return;
+        }
 
+        totalUserCache = currentTotal;
 
-    totalUserCache = Object.values(countPerDay).reduce((acc, count) => acc + count, 0);
+        const chartData = labels.map((label, i) => ({
+            x: new Date(label).getTime(), // numeric timestamp
+            y: data[i],
+        }));
 
-    const chartData = labels.map((label, i) => ({
-        x: new Date(label).getTime(), // numeric timestamp
-        y: data[i],
-    }));
+        const lastTimestamp = new Date(labels[labels.length - 1]).getTime();
+        const oneDay = 24 * 60 * 60 * 1000;
 
-    const lastTimestamp = new Date(labels[labels.length - 1]).getTime();
-    const oneDay = 24 * 60 * 60 * 1000;
+        const timeZone = config.get("timeZone") || "UTC";
+        const locale = config.get("locale") || "en-CA";
 
-    const timeZone = config.get("timeZone") || "UTC";
-    const locale = config.get("locale") || "en-CA";
-
-    const configChart = {
-        type: "line",
-        data: {
-            datasets: [{
-                label: "Users Joined Over Time",
-                data: chartData,
-                borderColor: "white",
-                borderWidth: 2,
-                fill: false,
-                tension: 0.1,
-                pointRadius: 0,
-            }],
-        },
-        options: {
-            scales: {
-                x: {
-                    type: "linear",
-                    ticks: {
-                        callback: function(value) {
-                            const date = new Date(value);
-                            return date.toLocaleDateString(locale, { timeZone });
-                        },
-                        color: "white",
+        const configChart = {
+            type: "line",
+            data: {
+                datasets: [{
+                    label: "Users Joined Over Time",
+                    data: chartData,
+                    borderColor: "white",
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.1,
+                    pointRadius: 0,
+                }],
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: "linear",
+                        ticks: {
+                            callback: function(value) {
+                                const date = new Date(value);
+                                return date.toLocaleDateString(locale, { timeZone });
+                            },
+                            color: "white",
                         // maxTicksLimit: 7,
-                    },
-                    title: {
-                        display: true,
-                        text: "Date",
-                        color: "white",
-                    },
-                    min: chartData[0].x,
-                    max: lastTimestamp + oneDay,
+                        },
+                        title: {
+                            display: true,
+                            text: "Date",
+                            color: "white",
+                        },
+                        min: chartData[0].x,
+                        max: lastTimestamp + oneDay,
 
+                    },
+                    y: {
+                        ticks: { color: "white" },
+                        title: {
+                            display: true,
+                            text: "Total Users",
+                            color: "white",
+                        },
+                    },
                 },
-                y: {
-                    ticks: { color: "white" },
+                plugins: {
                     title: {
                         display: true,
-                        text: "Total Users",
+                        text: "Bot User Growth History",
                         color: "white",
+                    },
+                    legend: {
+                        labels: {
+                            color: "white",
+                        },
                     },
                 },
             },
-            plugins: {
-                title: {
-                    display: true,
-                    text: "Bot User Growth History",
-                    color: "white",
-                },
-                legend: {
-                    labels: {
-                        color: "white",
-                    },
-                },
-            },
-        },
-    };
+        };
 
-    const finalBuffer = await chartJSNodeCanvas.renderToBuffer(configChart);
-    imageCache = finalBuffer;
-    return finalBuffer;
+        const finalBuffer = await chartJSNodeCanvas.renderToBuffer(configChart);
+        imageCache = finalBuffer;
+        resolve(finalBuffer);
+    } catch (error) {
+        reject(error);
+    } finally {
+        isRendering = false;
+        processQueue(); // Process next queued request
+    }
+    
 }

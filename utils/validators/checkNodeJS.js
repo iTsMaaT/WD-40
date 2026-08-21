@@ -23,11 +23,12 @@ const checkNodeJsVersion = async function() {
                 if (typeof nodeMajorVersion !== "number" || Number.isNaN(nodeMajorVersion)) 
                     nodeMajorVersion = 0;
                 
-                const LATEST_SUPPORTED_VERSION = 20;
+                const LATEST_SUPPORTED_VERSION = 22;
                 if (nodeMajorVersion < LATEST_SUPPORTED_VERSION) {
                     logger.warning(
                         `Node.js version is below supported version ${LATEST_SUPPORTED_VERSION}. Please consider upgrading to LTS version.`,
                     );
+                    reject(new Error("Node.js version is below supported version"));
                 }
             }
             resolve();

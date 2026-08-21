@@ -92,42 +92,46 @@ async function registerExtractors(player) {
     if (extractors.Youtubei.enabled || extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.useScraping) {
         logger.info("Loading YoutubeiExtractor extractor...");
         try {
-            const tempYtExt = await player.extractors.register(YoutubeiExtractor, {
+            const ytExt = await player.extractors.register(YoutubeSabrExtractor, {
                 ...getYoutubeExtractorOptions(extractors.Youtubei.config),
             });
 
-            const secondYtExt = await player.extractors.register(YoutubeSabrExtractor, {
-                ...getYoutubeExtractorOptions(extractors.Youtubei.config),
-                logSabrEvents: extractors.Youtubei.config.logSabrEvents,
-            });
-            secondYtExt.priority = extractors.Youtubei.priority ? extractors.Youtubei.priority : secondYtExt.priority;
-
-            const originalYtStreamMethod = tempYtExt.stream.bind(tempYtExt);
-
-            await player.extractors.unregister(YoutubeiExtractor.identifier);
-
-            let ytExt = null;
-            try {
-                ytExt = await player.extractors.register(YoutubeiExtractor, {
-                    ...getYoutubeExtractorOptions(extractors.Youtubei.config),
-                    createStream: async (track, ext) => {
-                        if (extractors.Youtubei.config.useYTDL) {
-                            try {
-                                return await originalYtStreamMethod(track, ext);
-                            } catch (e) {
-                                if (extractors.Youtubei.config.useServerAbrStreamFallback) {
-                                    logger.warn("YTDL fallback failed, trying server ABR stream...");
-                                    return await createSabrStream(track.identifier, process.env.YOUTUBE_COOKIE, false);
-                                }
-                                throw e;
-                            }
-                        }
-                        return null;
-                    },
-                });
-            } catch (e) {
-                logger.error("Failed to register YoutubeiExtractor:", e);
-            }
+            // const tempYtExt = await player.extractors.register(YoutubeiExtractor, {
+            //    ...getYoutubeExtractorOptions(extractors.Youtubei.config),
+            // });
+            //
+            // const secondYtExt = await player.extractors.register(YoutubeSabrExtractor, {
+            //    ...getYoutubeExtractorOptions(extractors.Youtubei.config),
+            //    logSabrEvents: extractors.Youtubei.config.logSabrEvents,
+            // });
+            // secondYtExt.priority = extractors.Youtubei.priority ? extractors.Youtubei.priority : secondYtExt.priority;
+            //
+            // const originalYtStreamMethod = tempYtExt.stream.bind(tempYtExt);
+            //
+            // await player.extractors.unregister(YoutubeiExtractor.identifier);
+            //
+            // let ytExt = null;
+            // try {
+            //    ytExt = await player.extractors.register(YoutubeiExtractor, {
+            //        ...getYoutubeExtractorOptions(extractors.Youtubei.config),
+            //        createStream: async (track, ext) => {
+            //            if (extractors.Youtubei.config.useYTDL) {
+            //                try {
+            //                    return await originalYtStreamMethod(track, ext);
+            //                } catch (e) {
+            //                    if (extractors.Youtubei.config.useServerAbrStreamFallback) {
+            //                        logger.warn("YTDL fallback failed, trying server ABR stream...");
+            //                        return await createSabrStream(track.identifier, process.env.YOUTUBE_COOKIE, false);
+            //                    }
+            //                    throw e;
+            //                }
+            //            }
+            //            return null;
+            //        },
+            //    });
+            // } catch (e) {
+            //    logger.error("Failed to register YoutubeiExtractor:", e);
+            // }
 
             ytExt.priority = extractors.Youtubei.priority ? extractors.Youtubei.priority - 1 : ytExt.priority;
         } catch (e) {

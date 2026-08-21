@@ -74,10 +74,10 @@ module.exports = {
 
         try {
             const FullClientStatus = target?.presence?.clientStatus;
-            let ClientSatus = "";
+            let ClientStatus = "";
             for (const key in FullClientStatus) {
                 if (Object.prototype.hasOwnProperty.call(FullClientStatus, key))
-                    ClientSatus += `${prettyString(key, "first", false)}: \`${prettyString(FullClientStatus[key], "first", false)}\n\``;
+                    ClientStatus += `${prettyString(key, "first", false)}: \`${prettyString(FullClientStatus[key], "first", false)}\n\``;
             }
 
             const userInfoEmbed = {
@@ -103,7 +103,7 @@ module.exports = {
             await interaction.editReply({ embeds: [userInfoEmbed] });
         } catch (err) {
             logger.error(err);
-            return await interaction.editReply({ embeds: [embedGenerator.error("An error occured.")] });
+            return await interaction.editReply({ embeds: [embedGenerator.error("An error occurred.")] });
         }
     },
 };
