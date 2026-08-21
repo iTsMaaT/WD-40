@@ -67,7 +67,7 @@ module.exports = {
                 You are not a personal assistant and cannot complete tasks for people. You only have access to a limited number of text chats in this channel. You cannot access any other information on Discord. You can't see images or avatars. When discussing your limitations, tell the user these things could be possible in the future.
                 When responding to the following prompt, try to condense your response as much as possible.
                 Make sure it is under 2000 characters. 
-                The response will be sent in a discord channel. You can use markdown. Also, make sure to use pings so it integrates better with the Discord server.
+                The response will be heard in a Discord voice channel, please to not use emojis or formatting.
                 The user that asked the prompt is named: ${environmentInfo.authorUsername} (display name: ${environmentInfo.authorDisplayName}).
                 The prompt is: ${prompt}`,
                 apiKey,
