@@ -2,22 +2,27 @@ const { BG, GOOG_API_KEY, USER_AGENT, buildURL } = require("bgutils-js");
 const { JSDOM } = require("jsdom");
 const { createCanvas, ImageData: CanvasImageData } = require("@napi-rs/canvas");
 
-const REQUEST_KEY = "O43z0dpjhgX20SCx4KAo";
+const TV_USER_AGENT = "Mozilla/5.0 (Linux arm64-v8a; Android 10) Cobalt/25.lts.30.1034958-gold (unlike Gecko) v8/8.8.278.17-jit gles Starboard/15, Sony_ATV_sdm845_13140765/52.1.C.0.268 (KDDI, SOV38) com.google.android.youtube.tv/5.30.301";
 
 let domWindow;
 let initializationPromise = null;
 let botguardClient;
 let webPoMinter;
 let activeScriptId = null;
-let canvasPatched = false;
+let CanvasPatched = false;
 
+/**
+ * Patches the jsdom canvas implementation so YouTube's BotGuard scripts can
+ * create and serialize 2D canvases in this Node.js environment.
+ *
+ * @param {Window} window
+ * @returns {void}
+ */
 function patchCanvasSupport(window) {
-    if (canvasPatched)
-        return;
+    if (CanvasPatched) return;
 
-    const HTMLCanvasElement = window?.HTMLCanvasElement;
-    if (!HTMLCanvasElement)
-        return;
+    const HTMLCanvasElement = window.HTMLCanvasElement;
+    if (!HTMLCanvasElement) return;
 
     Object.defineProperty(HTMLCanvasElement.prototype, "_napiCanvasState", {
         configurable: true,
@@ -26,9 +31,8 @@ function patchCanvasSupport(window) {
         value: null,
     });
 
-    HTMLCanvasElement.prototype.getContext = function getContext(type, options) {
-        if (type !== "2d")
-            return null;
+    HTMLCanvasElement.prototype.getContext = function(type, options) {
+        if (type !== "2d") return null;
 
         const width = Number.isFinite(this.width) && this.width > 0 ? this.width : 300;
         const height = Number.isFinite(this.height) && this.height > 0 ? this.height : 150;
@@ -47,7 +51,7 @@ function patchCanvasSupport(window) {
         return state.context;
     };
 
-    HTMLCanvasElement.prototype.toDataURL = function toDataURL(...args) {
+    HTMLCanvasElement.prototype.toDataURL = function(...args) {
         if (!this._napiCanvasState?.canvas) {
             const width = Number.isFinite(this.width) && this.width > 0 ? this.width : 300;
             const height = Number.isFinite(this.height) && this.height > 0 ? this.height : 150;
@@ -60,9 +64,7 @@ function patchCanvasSupport(window) {
         return this._napiCanvasState.canvas.toDataURL(...args);
     };
 
-    if (!window.ImageData) 
-        window.ImageData = CanvasImageData;
-	
+    if (!window.ImageData) window.ImageData = CanvasImageData;
 
     if (!Reflect.has(globalThis, "ImageData")) {
         Object.defineProperty(globalThis, "ImageData", {
@@ -73,13 +75,17 @@ function patchCanvasSupport(window) {
         });
     }
 
-    canvasPatched = true;
+    CanvasPatched = true;
 }
 
+/**
+ * Creates and caches the DOM globals required by the BotGuard runtime.
+ *
+ * @param {string} userAgent
+ * @returns {Window}
+ */
 function ensureDomEnvironment(userAgent) {
-    if (domWindow) 
-        return domWindow;
-	
+    if (domWindow) return domWindow;
 
     const dom = new JSDOM("<!DOCTYPE html><html><head></head><body></body></html>", {
         url: "https://www.youtube.com/",
@@ -102,7 +108,7 @@ function ensureDomEnvironment(userAgent) {
         performance: domWindow.performance,
     };
 
-    for (const [ key, value ] of Object.entries(globalAssignments)) {
+    for (const [key, value] of Object.entries(globalAssignments)) {
         if (!Reflect.has(globalThis, key)) {
             Object.defineProperty(globalThis, key, {
                 configurable: true,
@@ -127,16 +133,21 @@ function ensureDomEnvironment(userAgent) {
     return domWindow;
 }
 
-function resetBotguardState() {
+/**
+ * Clears the cached BotGuard client state and removes the injected script.
+ *
+ * @returns {void}
+ */
+function resetBotGuardState() {
     if (botguardClient?.shutdown) {
         try {
             botguardClient.shutdown();
-        } catch { /* no-op */ }
+        } finally {
+            // No actions needed
+        }
     }
 
-    if (activeScriptId && domWindow?.document) 
-        domWindow.document.getElementById(activeScriptId)?.remove();
-	
+    if (activeScriptId && domWindow?.document) domWindow.document.getElementById(activeScriptId)?.remove();
 
     botguardClient = undefined;
     webPoMinter = undefined;
@@ -144,33 +155,43 @@ function resetBotguardState() {
     initializationPromise = null;
 }
 
-async function initializeBotguard(innertube, { forceRefresh } = {}) {
-    if (forceRefresh) 
-        resetBotguardState();
-	
-
-    if (webPoMinter) 
-        return webPoMinter;
-	
-
-    if (initializationPromise) 
-        return await initializationPromise;
-	
+/**
+ * Initializes or refreshes the BotGuard WebPo minter for an Innertube session.
+ *
+ * @param {import("youtubei.js").default} innertube
+ * @param {{ forceRefresh?: boolean }} [options]
+ * @returns {Promise<WebMinter>}
+ */
+async function initializeBotGuard(innertube, { forceRefresh } = {}) {
+    if (forceRefresh) resetBotGuardState();
+    if (webPoMinter) return webPoMinter;
+    if (initializationPromise) return await initializationPromise;
 
     const userAgent = innertube.session.context.client.userAgent || USER_AGENT;
     ensureDomEnvironment(userAgent);
 
     initializationPromise = (async () => {
-        const challengeResponse = await innertube.getAttestationChallenge("ENGAGEMENT_TYPE_UNBOUND");
-        const challenge = challengeResponse?.bg_challenge;
+        // YouTube now binds the initial attestation challenge to yt.config_.EVENT_ID for WEB/MWEB
+        // TV client challenges aren't part of that experiment (yet)
+        const tvConfigResponse = await fetch("https://www.youtube.com/tv_config?action_get_config=true&client=lb4&theme=cl", {
+            headers: {
+                "accept": "*/*",
+                "user-agent": TV_USER_AGENT,
+            },
+            referrer: "https://www.youtube.com/tv",
+        });
 
-        if (!challenge)
-            throw new Error("Failed to retrieve Botguard challenge.");
+        const tvConfigText = await tvConfigResponse.text();
+        if (!tvConfigText.startsWith(")]}'")) throw new Error("Invalid response from YouTube TV config endpoint.");
 
-        const interpreterUrl = challenge.interpreter_url?.private_do_not_access_or_else_trusted_resource_url_wrapped_value;
+        const tvConfigJson = JSON.parse(tvConfigText.slice(4));
+        const challenge = JSON.parse(tvConfigJson.challengeParams.R)?.bgChallenge;
 
-        if (!interpreterUrl)
-            throw new Error("Botguard challenge did not provide an interpreter URL.");
+        if (!challenge) throw new Error("Failed to retrieve BotGuard challenge.");
+
+        const interpreterUrl = challenge.interpreterUrl?.privateDoNotAccessOrElseTrustedResourceUrlWrappedValue;
+
+        if (!interpreterUrl) throw new Error("BotGuard challenge did not provide an interpreter URL.");
 
         if (!domWindow.document.getElementById(interpreterUrl)) {
             const interpreterResponse = await fetch(`https:${interpreterUrl}`, {
@@ -181,8 +202,7 @@ async function initializeBotguard(innertube, { forceRefresh } = {}) {
 
             const interpreterJavascript = await interpreterResponse.text();
 
-            if (!interpreterJavascript)
-                throw new Error("Failed to download Botguard interpreter script.");
+            if (!interpreterJavascript) throw new Error("Failed to download BotGuard interpreter script.");
 
             const script = domWindow.document.createElement("script");
             script.type = "text/javascript";
@@ -197,7 +217,7 @@ async function initializeBotguard(innertube, { forceRefresh } = {}) {
 
         botguardClient = await BG.BotGuardClient.create({
             program: challenge.program,
-            globalName: challenge.global_name,
+            globalName: challenge.globalName,
             globalObj: globalThis,
         });
 
@@ -212,21 +232,19 @@ async function initializeBotguard(innertube, { forceRefresh } = {}) {
                 "x-user-agent": "grpc-web-javascript/0.1",
                 "user-agent": userAgent,
             },
-            body: JSON.stringify([ REQUEST_KEY, botguardSnapshot ]),
+            body: JSON.stringify([ tvConfigJson.challengeRequestKey, botguardSnapshot ]),
         });
 
-        const integrityPayload = await integrityResponse.json();
-        const integrityToken = integrityPayload?.[0];
+        const [integrityToken, estimatedTtlSecs, mintRefreshThreshold, websafeFallbackToken] = await integrityResponse.json();
 
-        if (typeof integrityToken !== "string")
-            throw new Error("Botguard integrity token generation failed.");
+        if (typeof integrityToken !== "string") throw new Error("BotGuard integrity token generation failed.");
 
-        webPoMinter = await BG.WebPoMinter.create({ integrityToken }, webPoSignalOutput);
+        webPoMinter = await BG.WebPoMinter.create({ integrityToken, estimatedTtlSecs, mintRefreshThreshold, websafeFallbackToken }, webPoSignalOutput);
 
         return webPoMinter;
     })()
         .catch((error) => {
-            resetBotguardState();
+            resetBotGuardState();
             throw error;
         })
         .finally(() => {
@@ -236,14 +254,30 @@ async function initializeBotguard(innertube, { forceRefresh } = {}) {
     return await initializationPromise;
 }
 
+/**
+ * Ensures a content binding exists before generating or minting a token.
+ *
+ * @param {string | undefined | null} binding
+ * @returns {string}
+ */
 function requireBinding(binding) {
-    if (!binding)
-        throw new Error("Content binding is required to mint a WebPO token.");
+    if (!binding) throw new Error("Content binding is required to mint a WebPo Token");
     return binding;
 }
 
+/**
+ * @typedef {Object} WebMinter
+ * @property {(binding: string | undefined | null) => string} generatePlaceholder
+ * @property {(binding: string | undefined | null) => Promise<string>} mint
+ */
+
+/**
+ * @param {import("youtubei.js").default} innertube
+ * @param {{ forceRefresh?: boolean }} [options]
+ * @returns {Promise<WebMinter>}
+ */
 async function getWebPoMinter(innertube, options = {}) {
-    const minter = await initializeBotguard(innertube, options);
+    const minter = await initializeBotGuard(innertube, options);
 
     return {
         generatePlaceholder(binding) {
@@ -256,44 +290,10 @@ async function getWebPoMinter(innertube, options = {}) {
 }
 
 function invalidateWebPoMinter() {
-    resetBotguardState();
-}
-
-/**
- * Generates Data Sync tokens required for content PO token minting.
- *  
- * @param {Innertube} innertube - The Innertube instance.
- * @returns {Promise<{dataSyncId: string, fullToken: string}>} The Data Sync ID and full token.
- */
-async function generateDataSyncTokens(innertube) {
-    try {
-        const accountInfo = await innertube.account.getInfo();
-        console.log(accountInfo);
-        const dataSyncId = accountInfo.contents.contents[0].endpoint.payload.supportedTokens[2].datasyncIdToken.datasyncIdToken;
-
-        if (!dataSyncId) 
-            throw new Error("Data Sync ID not found in account info");
-    
-
-        console.log("Data Sync ID:", dataSyncId);
-        const minter = await getWebPoMinter(innertube);
-
-        const fullToken = await minter.mint(dataSyncId);
-        console.log("Full Token:", fullToken);
-
-        return {
-            dataSyncId,
-            fullToken,
-        };
-
-    } catch (error) {
-        console.error("Error generating Data Sync tokens:", error);
-        throw error;
-    }
+    resetBotGuardState();
 }
 
 module.exports = {
     getWebPoMinter,
     invalidateWebPoMinter,
-    generateDataSyncTokens,
 };
