@@ -7,10 +7,8 @@ const config = require("@utils/config/configUtils");
  */
 const checkConfigFile = function() {
     try {
-        // Config is already loaded and parsed by configUtils
         const baseConfig = config.getAllBaseConfig();
         
-        // Validate required fields
         const requiredFields = ["defaultPrefix", "activities"];
         const missingFields = [];
         
@@ -24,7 +22,6 @@ const checkConfigFile = function() {
             logger.warning("Some bot features may not work as expected.");
         }
 
-        // Validate activities array structure
         if (Array.isArray(baseConfig.activities)) {
             for (let i = 0; i < baseConfig.activities.length; i++) {
                 const activity = baseConfig.activities[i];
