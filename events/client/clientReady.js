@@ -37,7 +37,7 @@ module.exports = {
         logger.info(`Bot starting on [${process.env.SERVER}]...`);
         
         console.log("Activating activity status rotator...");
-        activateRotator(client, process.env.SERVER);
+        await activateRotator(client, process.env.SERVER);
         console.log("Activity status rotator activated.");
 
         console.log("Initializing Reddit conf file...");
