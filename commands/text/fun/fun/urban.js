@@ -12,6 +12,7 @@ module.exports = {
     examples: ["amogus"],
     async execute(logger, client, message, args, flags) {
         try {
+            if (!args.length) return await message.reply({ embeds: [embedGenerator.error("No arguments provided.")] });
             const urban = await (await fetch(`https://api.urbandictionary.com/v0/define?term=${encodeURIComponent(args.slice(0).join(" "))}`)).json();
 
             if (!urban.list[0]) 
