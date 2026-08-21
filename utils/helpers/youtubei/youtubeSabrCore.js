@@ -60,7 +60,7 @@ async function createSabrStream(videoId, cookies, logSabrEvents = false) {
     if (!videoPlaybackUstreamerConfig) throw new Error("ustreamerConfig not found");
     if (!serverAbrStreamingUrl) throw new Error("serverAbrStreamingUrl not found");
 
-    const sabrFormats = playerResponse.streaming_data?.adaptive_formats.map(buildSabrFormat) || [];
+    const sabrFormats = playerResponse.streaming_data?.adaptive_formats.map(buildSabrFormat).filter(f => f.isOriginal ?? true) || [];
 
     const serverAbrStream = new SabrStream({
         formats: sabrFormats,
