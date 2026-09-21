@@ -1,4 +1,6 @@
-const { BG, GOOG_API_KEY, USER_AGENT, buildURL } = require("bgutils-js");
+const { BotGuardClient } = require("bgutils-js/botguard");
+const { WebPoMinter, createColdStartToken } = require("bgutils-js/webpo");
+const { GOOG_API_KEY, USER_AGENT, buildURL } = require("bgutils-js/utils");
 const { JSDOM } = require("jsdom");
 const { createCanvas, ImageData: CanvasImageData } = require("@napi-rs/canvas");
 
@@ -215,10 +217,10 @@ async function initializeBotGuard(innertube, { forceRefresh } = {}) {
             executeInterpreter.call(domWindow);
         }
 
-        botguardClient = await BG.BotGuardClient.create({
+        botguardClient = await BotGuardClient.create({
             program: challenge.program,
             globalName: challenge.globalName,
-            globalObj: globalThis,
+            globalObject: globalThis,
         });
 
         const webPoSignalOutput = [];
@@ -239,7 +241,7 @@ async function initializeBotGuard(innertube, { forceRefresh } = {}) {
 
         if (typeof integrityToken !== "string") throw new Error("BotGuard integrity token generation failed.");
 
-        webPoMinter = await BG.WebPoMinter.create({ integrityToken, estimatedTtlSecs, mintRefreshThreshold, websafeFallbackToken }, webPoSignalOutput);
+        webPoMinter = await WebPoMinter.create({ integrityToken, estimatedTtlSecs, mintRefreshThreshold, websafeFallbackToken }, webPoSignalOutput);
 
         return webPoMinter;
     })()
@@ -281,7 +283,7 @@ async function getWebPoMinter(innertube, options = {}) {
 
     return {
         generatePlaceholder(binding) {
-            return BG.PoToken.generateColdStartToken(requireBinding(binding));
+            return createColdStartToken(requireBinding(binding));
         },
         async mint(binding) {
             return await minter.mintAsWebsafeString(requireBinding(binding));

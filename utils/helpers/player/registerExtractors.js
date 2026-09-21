@@ -1,6 +1,6 @@
 const { Player, AudioFilters, onBeforeCreateStream } = require("discord-player");
 const { AttachmentExtractor } = require("@discord-player/extractor");
-const { YoutubeiExtractor, stream } = require("discord-player-youtubei");
+const { YoutubeExtractor, stream } = require("discord-player-youtubei");
 const { DeezerExtractor, NodeDecryptor, JSDecryptor } = require("discord-player-deezer");
 const { SoundgasmExtractor } = require("discord-player-soundgasm");
 const { TTSExtractor } = require("discord-player-tts");
@@ -53,7 +53,7 @@ async function registerExtractors(player) {
         try {
             if (track.extractor.identifier === DeezerExtractor.identifier ||
                 track.extractor.identifier === SoundcloudExtractor.identifier ||
-                track.extractor.identifier === YoutubeiExtractor.identifier ||
+                track.extractor.identifier === YoutubeExtractor.identifier ||
                 track.extractor.identifier === YoutubeSabrExtractor.identifier ||
                 track.extractor.identifier === SubsonicExtractor.identifier ||
                 track.extractor.identifier === TTSExtractor.identifier ||
@@ -92,7 +92,7 @@ async function registerExtractors(player) {
     if (extractors.Youtubei.enabled || extractors.Youtubei.config.attemptYoutubeSearchEvenIfDisabled.useScraping) {
         logger.info("Loading YoutubeiExtractor extractor...");
         try {
-            const ytExt = await player.extractors.register(YoutubeSabrExtractor, {
+            const ytExt = await player.extractors.register(YoutubeExtractor, {
                 ...getYoutubeExtractorOptions(extractors.Youtubei.config),
             });
 
