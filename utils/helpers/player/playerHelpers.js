@@ -2,7 +2,7 @@ const { useQueue } = require("discord-player");
 const { toggleLiveChat } = require("./playerLiveChat");
 const { distubePluginToExtractor } = require("./distubePluginToDiscordPlayerExtractor");
 const { AttachmentExtractor } = require("@discord-player/extractor");
-const { YoutubeiExtractor } = require("discord-player-youtubei");
+const { YoutubeExtractor } = require("discord-player-youtubei");
 const { DeezerExtractor } = require("discord-player-deezer");
 const { SoundgasmExtractor } = require("discord-player-soundgasm");
 const { TTSExtractor } = require("discord-player-tts");
@@ -11,7 +11,7 @@ const { SpotifyExtractor } = require("discord-player-spotify");
 const { AppleMusicExtractor } = require("discord-player-applemusic");
 
 const identifierMap = {
-    "youtubei": YoutubeiExtractor.identifier,
+    "youtubei": YoutubeExtractor.identifier,
     "deezer": DeezerExtractor.identifier,
     "soundcloud": SoundcloudExtractor.identifier,
     "spotify": SpotifyExtractor.identifier,
