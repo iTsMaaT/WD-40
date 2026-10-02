@@ -14,10 +14,14 @@ module.exports = {
         const text = reference.content;
 
         try {
-            const [enTr, localeTr] = await Promise.all([
-                translate(text, { to: "en" }),
-                translate(text, { to: LanguageCode }),
-            ]);
+            const isEnglish = LanguageCode === "en";
+
+            const [enTr, localeTr] = isEnglish
+                ? [await translate(text, { to: "en" }), null]
+                : await Promise.all([
+                    translate(text, { to: "en" }),
+                    translate(text, { to: LanguageCode }),
+                ]);
 
             if (enTr.text.replace(" ", "") == "" || !enTr.text) throw new Error("Invalid text to translate");
 
@@ -33,7 +37,7 @@ module.exports = {
             };
 
             try {
-                if (LanguageCode !== "en") embed.fields.push({ name:"**Server language: **", value: limitString(localeTr.text, 1000) });
+                if (!isEnglish) embed.fields.push({ name:"**Server language: **", value: limitString(localeTr.text, 1000) });
             } catch (err) {
                 logger.error(err);
             }
