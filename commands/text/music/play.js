@@ -53,12 +53,9 @@ module.exports = {
         // } })) return;
 
         const attachment = message.attachments.first()?.attachment;
-        let string = args.join(" ") || "Never gonna give you up";
+        let string = args.join(" ") || attachment || "Never gonna give you up";
+        const isDirectFile = !!attachment || (isURL(string) && /^https?:\/\/(cdn|media)\.discordapp\.(com|net)\/attachments\//i.test(string));
 
-        
-        if (!string && !attachment) 
-            return await message.reply({ embeds: [embedGenerator.warning("Please enter a song URL or query to search.")] });
-        
         const queryType = await awareQueryResolver(string, player, playerConfig);
         if (!isURL(string)) {
             queryType.canStream = false;
@@ -90,7 +87,16 @@ module.exports = {
         try {
             let research, specificSearch, choice = null;
 
-            if (!queryType.canStream && queryType.type !== "playlist") {
+            if (isDirectFile) {
+                research = await player.search(string, {
+                    requestedBy: message.member,
+                    searchEngine: QueryType.ARBITRARY,
+                    blockExtractors: player.extractors.store
+                        .filter(e => e.identifier !== AttachmentExtractor.identifier)
+                        .map(e => e.identifier),
+                });
+                if (!research.hasTracks()) return await sentMessage.edit({ embeds: [embedGenerator.warning("No results found (the file must be an audio/video file)")] });
+            } else if (!queryType.canStream && queryType.type !== "playlist") {
                 if (
                     queryType.extractor?.identifier === SpotifyExtractor.identifier 
                     && queryType.type === "track" 
@@ -206,7 +212,7 @@ module.exports = {
             } else {
                 const playResult = await player.play(
                     message.member.voice.channel.id,
-                    attachment ?? (choice !== null ? research.tracks[choice] : research),
+                    choice !== null ? research.tracks[choice] : research,
                     {
                         nodeOptions: {
                             metadata: {
