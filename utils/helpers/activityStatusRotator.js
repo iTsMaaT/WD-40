@@ -56,8 +56,7 @@ const updateActivities = async (client) => {
         throw new Error("Activities configuration is missing or invalid.");
     }
 
-    const guilds = await client.guilds.fetch();
-    const guildCount = guilds.size;
+    const guildCount = client.guilds.cache.size;
 
     const ipAddress = generateIpAddress();
 

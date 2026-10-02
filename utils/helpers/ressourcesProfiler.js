@@ -1,7 +1,8 @@
 const os = require("os");
 const fs = require("fs");
 const path = require("path");
-const { ChartJSNodeCanvas } = require("chartjs-node-canvas");
+const Chart = require("chart.js/auto");
+const { createCanvas } = require("@napi-rs/canvas");
 
 class ResourceProfiler {
     constructor() {
@@ -76,9 +77,11 @@ class ResourceProfiler {
         const memoryUsage = this.data.map(entry => parseFloat(entry.memoryUsage));
         const cpuUsage = this.data.map(entry => parseFloat(entry.cpuUsage[0])); // Average CPU usage for simplicity
 
-        const chartJSNodeCanvas = new ChartJSNodeCanvas({ width: 800, height: 400 });
+        const canvas = createCanvas(800, 400);
+        const context = canvas.getContext("2d");
         const configuration = {
             type: "line",
+            platform: Chart.BasicPlatform,
             data: {
                 labels: timestamps,
                 datasets: [
@@ -99,7 +102,8 @@ class ResourceProfiler {
                 ],
             },
             options: {
-                responsive: true,
+                responsive: false,
+                animation: false,
                 plugins: {
                     legend: {
                         position: "top",
@@ -124,8 +128,12 @@ class ResourceProfiler {
             },
         };
 
-        const imageBuffer = await chartJSNodeCanvas.renderToBuffer(configuration);
-        fs.writeFileSync(outputPath, imageBuffer);
+        const chart = new Chart(context, configuration);
+        try {
+            fs.writeFileSync(outputPath, canvas.toBuffer("image/png"));
+        } finally {
+            chart.destroy();
+        }
     }
 }
 
