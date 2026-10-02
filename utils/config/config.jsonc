@@ -86,12 +86,10 @@
     "defaultGeminiModel": "gemini-3-flash-preview",
 
     "discordPlayer": {
-        // Supported file extensions for the player (in the ./music folder)
-        "supportedFileExtensions": ["mp3", "m4a"],
         "dailyReregister": false,
         "logPlayerEvents": false,
         "logQueueEvents": false,
-        "skipFFmpeg": false,
+        "skipFFmpeg": true,
         // Path to FFmpeg binary, null if global
         "ffmpegPath": null,
         "globalPlayerNodeOptions": {
@@ -107,6 +105,8 @@
             "leaveOnEmptyCooldown": 300000, // Cooldown before leaving (in ms)
             "skipOnNoStream": true          // Skip tracks if no stream is available
         },
+        // Supported file extensions for the player (in the ./music folder)
+        "supportedFileExtensions": ["mp3", "m4a"],
         "downloadStreams": false,
         "extractors": {
             "Subsonic": {
@@ -132,18 +132,10 @@
                 "canBridge": true,
                 "priority": 11,
                 "config": {
-                    "client": "WEB",                           // Client type for YouTube
-                    "highWaterMark": 2097152,                  // High water mark for streams
                     "attemptYoutubeSearchEvenIfDisabled": {
-                        "usingEmbed": true,                    // Attempt to search using embed
                         "usingScraping": false                 // Attempt to search using scraping
                     },
-                    "useServerAbrStreamFallback": false,       // Use server ABR stream
-                    "useServerAbrStream": true,
-                    "logSabrEvents": true,
-                    "usePoToken": false,                       // Use TrustedClient token for authentication
-                    "useCookie": true,                         // Use cookies for authentication
-                    "useYTDL": true                            // Use ytdl-core fallback
+                    "useCookie": true                          // Use cookies for authentication
                 }
             },
             "Soundcloud": {
@@ -199,12 +191,66 @@
             }
         },
         "ffmpegFilters": {
-            "earrape": "earwax,equalizer=f=1000:t=q:w=1:g=48,bass=g=40,dynaudnorm=f=400",
-            "rickroll": "bass=g=33,apulsator=hz=0.06,vibrato=f=2.5,tremolo,asetrate=48000*0.8",
-            "8bit": "asetrate=22050*1.5,aresample=22050,volume=1.5",
-            "chipmunk": "atempo=1.5,asetrate=44100*1.25",
-            "lofi": "aecho=0.8:0.88:60:0.4,volume=0.5,asetrate=22050",
-            "8D": "apulsator=hz=0.08"
+            "Surround": [
+                "apulsator=hz=0.09"
+            ],
+            "8D": [
+                "apulsator=mode=sine:hz=0.125:amount=0.6",
+                "crossfeed=strength=0.4",
+                "aecho=0.9:0.9:40|70:0.15|0.1"
+            ],
+            "16D": [
+                "apulsator=mode=sine:hz=0.2:amount=0.7",
+                "stereotools=mlev=0.8:slev=1.8",
+                "crossfeed=strength=0.4",
+                "aecho=0.9:0.9:40|70:0.15|0.1"
+            ],
+            "Earrape": [
+                "earwax",
+                "equalizer=f=1000:t=q:w=1:g=48",
+                "bass=g=40",
+                "dynaudnorm=f=400"
+            ],
+            "Vaporwave": [
+                "asetrate=38400",
+                "aresample=48000",
+                "aecho=0.8:0.88:60:0.4"
+            ],
+            "Nightcore": [
+                "asetrate=60000",
+                "aresample=48000"
+            ],
+            "LoFi": [
+                "asetrate=43200",
+                "aresample=48000",
+                "extrastereo=m=2.5:c=disabled"
+            ],
+            "Underwater": [
+                "lowpass=f=600",
+                "aecho=0.8:0.7:40:0.5"
+            ],
+            "Chipmunk": [
+                "asetrate=48000*1.25",
+                "aresample=48000"
+            ],
+            "Reverb": [
+                "aecho=0.8:0.9:1000|1800:0.3|0.25"
+            ],
+            "Radio": [
+                "highpass=f=200",
+                "lowpass=f=5000",
+                "acompressor"
+            ],
+            "8-bit": [
+                "acrusher=bits=8:mode=log:aa=1",
+                "aresample=22050"
+            ],
+            "ReverseEcho": [
+                "aecho=0.6:0.3:500:0.5"
+            ],
+            "Wide": [
+                "extrastereo=m=3"
+            ]
         }
     }
 }
