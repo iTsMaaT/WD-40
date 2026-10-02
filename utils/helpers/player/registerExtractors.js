@@ -1,4 +1,5 @@
-const { Player, AudioFilters, onBeforeCreateStream } = require("discord-player");
+/* eslint-disable no-shadow */
+const { Player, AudioFilters, onBeforeCreateStream, onStreamExtracted } = require("discord-player");
 const { AttachmentExtractor } = require("@discord-player/extractor");
 const { YoutubeExtractor, stream } = require("discord-player-youtubei");
 const { DeezerExtractor, NodeDecryptor, JSDecryptor } = require("discord-player-deezer");
@@ -15,6 +16,8 @@ const { startInterceptor } = require("@utils/helpers/player/interceptor");
 const { downloadTrack } = require("@utils/helpers/player/downloader");
 const youtubeCookieHandler = require("@utils/helpers/youtubeCookieHandler/youtubeCookieHandler");
 const ytdl = require("@distube/ytdl-core");
+const { PassThrough, Readable } = require("stream");
+const NodeAV = require("node-av");
 const config = require("@utils/config/configUtils");
 const logger = require("@utils/log");
 
@@ -31,11 +34,132 @@ const extractors = discordPlayerConfig?.extractors || {};
  * @returns 
  */
 async function initPlayer(client) {
+    const [mediabunny, mediabunnyServer] = await Promise.all([
+        import("mediabunny"),
+        import("@mediabunny/server"),
+    ]);
+    const { ALL_FORMATS, AudioSample, AudioSampleSink, Input, ReadableStreamSource } = mediabunny;
+    const { registerMediabunnyServer, toAvFrame, AvFrameAudioSampleResource } = mediabunnyServer;
+
     const player = new Player(client, {
         skipFFmpeg: discordPlayerConfig?.skipFFmpeg,
         ffmpegPath: discordPlayerConfig?.ffmpegPath,
     });
     if (discordPlayerConfig?.downloadStreams) startInterceptor(player);
+
+    registerMediabunnyServer();
+
+    onStreamExtracted(async (stream, _, queue) => {
+        if (queue.filters.ffmpeg.filters.length > 0) return stream;
+        let webStream;
+        let abortController;
+
+        if (typeof stream === "string") {
+            abortController = new AbortController();
+            const response = await fetch(stream, {
+                signal: abortController.signal,
+            });
+            if (!response.ok || !response.body) {
+                const player = useMainPlayer();
+
+                player.debug(`[Mediabunny]: Failed to fetch web stream using fetch. Status code ${response.status}`);
+
+                return stream;
+            }
+
+            webStream = response.body;
+        } else {
+            const inputStream = stream instanceof Readable ? stream : stream.stream;
+
+            webStream = Readable.toWeb(inputStream);
+        }
+
+        const input = new Input({
+            source: new ReadableStreamSource(webStream),
+            formats: ALL_FORMATS,
+        });
+
+        const audioTrack = await input.getPrimaryAudioTrack();
+        const passThrough = new PassThrough({
+            destroy(error, callback) {
+                abortController?.abort();
+                callback(error);
+            },
+        });
+
+        const sink = new AudioSampleSink(audioTrack);
+
+        let filterApi = NodeAV.FilterAPI.create([...queue.metadata.filters, "aformat=sample_fmts=s16"].join(","));
+        let currentFilterString = "";
+
+        function changeFilter(filterString) {
+            const filterStringFmt = !filterString ? "aformat=sample_fmts=s16" : `${filterString},aformat=sample_fmts=s16`;
+            if (currentFilterString === filterStringFmt) return;
+            const old = filterApi;
+            currentFilterString = filterStringFmt;
+            filterApi = NodeAV.FilterAPI.create(filterStringFmt);
+
+            setTimeout(() => {
+                old?.close();
+            }, 200);
+        };
+
+        queue.metadata.changeFilter = changeFilter;
+
+        (async () => {
+            try {
+                for await (const sample of sink.samples()) {
+                    if (passThrough.destroyed) {
+                        sample.close();
+                        break;
+                    }
+
+                    const frame = new NodeAV.Frame();
+                    frame.alloc();
+
+                    try {
+                        await toAvFrame(sample, frame);
+
+                        for await (const processedFrame of filterApi.frames(frame)) {
+                            const mSample = new AudioSample(new AvFrameAudioSampleResource(processedFrame));
+                            const pcmBuffer = new Int16Array(mSample.numberOfFrames * mSample.numberOfChannels);
+                            try {
+                                mSample.copyTo(pcmBuffer, {
+                                    planeIndex: 0,
+                                    format: "s16",
+                                });
+                            } finally {
+                                mSample.close();
+                            }
+
+                            const isWriteable = passThrough.write(
+                                Buffer.from(pcmBuffer.buffer, pcmBuffer.byteOffset, pcmBuffer.byteLength),
+                            );
+
+                            if (!isWriteable) 
+                                await new Promise((res) => passThrough.once("drain", res));
+                        
+                        }
+                    } catch (err) {
+                        frame?.unref();
+                    } finally {
+                        sample.close();
+                    }
+                }
+            } catch (error) {
+                passThrough.destroy(error);
+            } finally {
+                passThrough.end();
+                filterApi?.close();
+            }
+        })();
+
+        return {
+            stream: passThrough,
+            $fmt: StreamType.Raw,
+        };
+    });
+    
     return player;
 }
 
@@ -189,30 +313,13 @@ async function reload(player) {
  * @returns 
  */
 function getYoutubeExtractorOptions(playerconfig) {
-    const options = {
-        streamOptions: {
-            useClient: playerconfig?.client || "IOS",
-            highWaterMark: playerconfig?.highWaterMark || 1024 * 1024,
-        },
-    };
+    /** @type {import("discord-player-youtubei").YoutubeOptions} */
+    const options = {};
 
-    if (playerconfig?.useCookie) 
-        options.cookie = youtubeCookieHandler();
-    
-    if (playerconfig?.useServerAbrStream) {
-        options.useServerAbrStream = true;
-        if (!playerconfig?.usePoToken) playerconfig.usePoToken = true;
-    }
-
-    if (playerconfig?.useYTDL) {
-        options.useYoutubeDL = true;
-        options.logLevel = "NONE";
-    }
-
-    if (playerconfig?.usePoToken) {
-        if (!["WEB", "WEB_EMBEDDED"].includes(playerconfig?.client))
-            options.streamOptions.useClient = "WEB";
-        options.generateWithPoToken = true;
+    if (playerconfig?.useCookie) {
+        const { cookiePath, cookieHeader } = youtubeCookieHandler.getYoutubeCookies();
+        if (cookieHeader) options.cookie = cookieHeader;
+        if (cookiePath) options.downloads = { ytdlp: { cookiePath } };
     }
 
     return options;
@@ -277,12 +384,10 @@ function tokenToObject(token) {
         "token_type",
         "client",
     ];
-    // @ts-ignore
     const finalObject = {};
     for (const kv of kvPair) {
         const [key, value] = kv.split("=");
         if (!validKeys.includes(key)) continue;
-        // @ts-expect-error
         finalObject[key] = Number.isNaN(Number(value))
             ? value
             : Number(value);
