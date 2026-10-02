@@ -8,9 +8,8 @@ const DB = require("@root/utils/db/databaseManager");
 const GuildManager = require("@guildManager");
 const { useMainPlayer } = require("discord-player");
 const { toEngineerNotation } = require("@functions/formattingFunctions");
-const { ChartJSNodeCanvas } = require("chartjs-node-canvas");
-// const { Chart, registerables } = require("chart.js");
-// Chart.register(...registerables);
+const Chart = require("chart.js/auto");
+const { createCanvas } = require("@napi-rs/canvas");
 const { AttachmentBuilder } = require("discord.js");
 const config = require("@utils/config/configUtils");
 let totalUserCache = 0;
@@ -89,7 +88,7 @@ module.exports = {
         const timestamps = [];
         for (const [guildId, guild] of client.guilds.cache) {
             try {
-                const botMember = await guild.members.fetch(client.user.id);
+                const botMember = guild.members.cache.get(client.user.id) ?? await guild.members.fetch(client.user.id);
                 const userCount = guild.memberCount;
                 timestamps.push({ joinedTimestamp: botMember.joinedTimestamp, userCount });
             } catch (err) {
@@ -177,12 +176,6 @@ async function generateChartBuffer(timestamps) {
  * @returns {Promise<Buffer>} The generated chart buffer
  */
 async function processQueue() {
-    const chartJSNodeCanvas = new ChartJSNodeCanvas({
-        width: 800,
-        height: 600,
-        backgroundColour: "#222222",
-    });
-
     if (isRendering || renderQueue.length === 0) return;
     
     isRendering = true;
@@ -239,6 +232,9 @@ async function processQueue() {
 
         const configChart = {
             type: "line",
+            // A jsdom window is installed by the YouTube token helper in production.
+            // Force Chart.js to use its non-DOM platform with the native canvas below.
+            platform: Chart.BasicPlatform,
             data: {
                 datasets: [{
                     label: "Users Joined Over Time",
@@ -295,7 +291,19 @@ async function processQueue() {
             },
         };
 
-        const finalBuffer = await chartJSNodeCanvas.renderToBuffer(configChart);
+        const canvas = createCanvas(800, 600);
+        const context = canvas.getContext("2d");
+        context.fillStyle = "#222222";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+
+        const chart = new Chart(context, configChart);
+        let finalBuffer;
+        try {
+            finalBuffer = canvas.toBuffer("image/png");
+        } finally {
+            chart.destroy();
+        }
+
         imageCache = finalBuffer;
         resolve(finalBuffer);
     } catch (error) {
