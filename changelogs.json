@@ -484,8 +484,17 @@
             "Changed stream conversion pipeline for faster playback",
             "Hopefully fixed >stats for good",
             "Fixed Currently in X guilds status count being wrong",
-            "Temporarily disabled >filter",
             "Improved >translate",
+            "Multiple bug fixes and optimisations"
+        ]
+    },
+    {
+        "version": "5.12.8",
+        "date": "2026-10-02",
+        "changes": [
+            "Fixed Deezer and SoundCloud playback issues.",
+            "Filters now change instantly.",
+            "Added channel count to >stats.",
             "Multiple bug fixes and optimisations"
         ]
     }

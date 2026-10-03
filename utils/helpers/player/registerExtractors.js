@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-const { Player, AudioFilters, onBeforeCreateStream, onStreamExtracted } = require("discord-player");
+const { Player, AudioFilters, onBeforeCreateStream, onStreamExtracted, StreamType } = require("discord-player");
 const { AttachmentExtractor } = require("@discord-player/extractor");
 const { YoutubeExtractor, stream } = require("discord-player-youtubei");
 const { DeezerExtractor, NodeDecryptor, JSDecryptor } = require("discord-player-deezer");
@@ -15,7 +15,9 @@ const { createSabrStream } = require("@utils/helpers/youtubei/youtubeSabrCore.js
 const { startInterceptor } = require("@utils/helpers/player/interceptor");
 const { downloadTrack } = require("@utils/helpers/player/downloader");
 const youtubeCookieHandler = require("@utils/helpers/youtubeCookieHandler/youtubeCookieHandler");
+const { FilterManager } = require("@utils/helpers/player/filterManager");
 const ytdl = require("@distube/ytdl-core");
+const fs = require("fs");
 const { PassThrough, Readable } = require("stream");
 const NodeAV = require("node-av");
 const config = require("@utils/config/configUtils");
@@ -48,6 +50,8 @@ async function initPlayer(client) {
     if (discordPlayerConfig?.downloadStreams) startInterceptor(player);
 
     registerMediabunnyServer();
+
+    const OUTPUT_FORMAT = "aformat=sample_fmts=s16:sample_rates=48000:channel_layouts=stereo";
 
     onStreamExtracted(async (stream, _, queue) => {
         if (queue.filters.ffmpeg.filters.length > 0) return stream;
@@ -87,13 +91,35 @@ async function initPlayer(client) {
             },
         });
 
+        if (!queue.metadata.filterManager) {
+            queue.setMetadata({
+                ...(queue.metadata),
+                filterManager: new FilterManager(queue, discordPlayerConfig?.ffmpegFilters || {}),
+            });
+        }
+
         const sink = new AudioSampleSink(audioTrack);
 
-        let filterApi = NodeAV.FilterAPI.create([...queue.metadata.filters, "aformat=sample_fmts=s16"].join(","));
-        let currentFilterString = "";
+        const initialFilters = [];
+
+        try {
+            initialFilters.push((queue.metadata.filterManager)._buildFilterChain());
+        } catch {
+        // no-op
+        } finally {
+            initialFilters.push(OUTPUT_FORMAT);
+        }
+
+        const init = initialFilters.join(",");
+
+        let filterApi = NodeAV.FilterAPI.create(init);
+
+        let currentFilterString = init;
 
         function changeFilter(filterString) {
-            const filterStringFmt = !filterString ? "aformat=sample_fmts=s16" : `${filterString},aformat=sample_fmts=s16`;
+            const filterStringFmt = !filterString ?
+                OUTPUT_FORMAT :
+                `${filterString},${OUTPUT_FORMAT}`;
             if (currentFilterString === filterStringFmt) return;
             const old = filterApi;
             currentFilterString = filterStringFmt;
@@ -104,9 +130,32 @@ async function initPlayer(client) {
             }, 200);
         };
 
-        queue.metadata.changeFilter = changeFilter;
+        queue.setMetadata({
+            ...queue.metadata,
+            changeFilter,
+        });
+
+        function waitForDrainOrClose() {
+            if (passThrough.destroyed || passThrough.writableEnded) return Promise.resolve();
+
+            return new Promise((resolve) => {
+                const finish = () => {
+                    passThrough.off("drain", finish);
+                    passThrough.off("close", finish);
+                    passThrough.off("error", finish);
+                    resolve();
+                };
+
+                passThrough.once("drain", finish);
+                passThrough.once("close", finish);
+                passThrough.once("error", finish);
+            
+                if (passThrough.destroyed || passThrough.writableEnded) finish();
+            });
+        }
 
         (async () => {
+            let bufferCache = [];
             try {
                 for await (const sample of sink.samples()) {
                     if (passThrough.destroyed) {
@@ -122,33 +171,56 @@ async function initPlayer(client) {
 
                         for await (const processedFrame of filterApi.frames(frame)) {
                             const mSample = new AudioSample(new AvFrameAudioSampleResource(processedFrame));
-                            const pcmBuffer = new Int16Array(mSample.numberOfFrames * mSample.numberOfChannels);
+                            let finalBuffer;
                             try {
+                                const pcmBuffer = new Int16Array(mSample.numberOfFrames * mSample.numberOfChannels);
                                 mSample.copyTo(pcmBuffer, {
                                     planeIndex: 0,
                                     format: "s16",
                                 });
+                                finalBuffer = Buffer.from(pcmBuffer.buffer, pcmBuffer.byteOffset, pcmBuffer.byteLength);
                             } finally {
                                 mSample.close();
                             }
 
-                            const isWriteable = passThrough.write(
-                                Buffer.from(pcmBuffer.buffer, pcmBuffer.byteOffset, pcmBuffer.byteLength),
-                            );
+                            if (passThrough.destroyed) break;
 
-                            if (!isWriteable) 
-                                await new Promise((res) => passThrough.once("drain", res));
-                        
+                            bufferCache.push(finalBuffer);
+
+                            if (bufferCache.length >= 3) {
+                                const concatBuffer = Buffer.concat(bufferCache);
+                                bufferCache = [];
+
+                                const isWriteable = passThrough.write(
+                                    concatBuffer,
+                                );
+
+                                if (!isWriteable) {
+                                    await waitForDrainOrClose();
+                                    if (passThrough.destroyed) break;
+                                }
+                            }
                         }
                     } catch (err) {
-                        frame?.unref();
+                        console.error("[Mediabunny Filter Error]", err);
+                        console.error("Filter:", currentFilterString);
+                        console.error("Frame:", {
+                            sampleRate: frame.sampleRate,
+                            channels: frame.channels,
+                            format: frame.format,
+                            pts: frame.pts,
+                        });
                     } finally {
+                        frame?.unref();
                         sample.close();
                     }
                 }
             } catch (error) {
                 passThrough.destroy(error);
             } finally {
+                if (bufferCache.length > 0) 
+                    passThrough.write(Buffer.concat(bufferCache));
+                
                 passThrough.end();
                 filterApi?.close();
             }
@@ -177,12 +249,14 @@ async function registerExtractors(player) {
         try {
             if (track.extractor.identifier === DeezerExtractor.identifier ||
                 track.extractor.identifier === SoundcloudExtractor.identifier ||
-                track.extractor.identifier === YoutubeExtractor.identifier ||
                 track.extractor.identifier === YoutubeSabrExtractor.identifier ||
                 track.extractor.identifier === SubsonicExtractor.identifier ||
                 track.extractor.identifier === TTSExtractor.identifier ||
                 track.extractor.identifier === AttachmentExtractor.identifier
-            ) return await track.extractor?.stream(track);
+            ) {
+                const rawStream = await track.extractor?.stream(track);
+                return rawStream;
+            }
             return undefined;
         } catch {
             return undefined;

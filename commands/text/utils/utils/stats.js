@@ -13,6 +13,7 @@ const { createCanvas } = require("@napi-rs/canvas");
 const { AttachmentBuilder } = require("discord.js");
 const config = require("@utils/config/configUtils");
 let totalUserCache = 0;
+let totalChannelCache = 0;
 const rounding = 200;
 let imageCache = null;
 
@@ -26,6 +27,7 @@ module.exports = {
     category: "utils",
     cooldown: 10,
     async execute(logger, client, message, args, flags) {
+        await message.channel.sendTyping();
         const startTime = Date.now();
         const player = useMainPlayer();
 
@@ -90,7 +92,8 @@ module.exports = {
             try {
                 const botMember = guild.members.cache.get(client.user.id) ?? await guild.members.fetch(client.user.id);
                 const userCount = guild.memberCount;
-                timestamps.push({ joinedTimestamp: botMember.joinedTimestamp, userCount });
+                const channelCount = guild.channels.cache.size;
+                timestamps.push({ joinedTimestamp: botMember.joinedTimestamp, userCount, channelCount });
             } catch (err) {
                 console.error(`Failed to fetch bot member for guild ${guild.name}:`, err);
             }
@@ -172,7 +175,7 @@ async function generateChartBuffer(timestamps) {
 
 /**
  * Generates a chart buffer for the given timestamps
- * @param {Array<{ joinedTimestamp: number, userCount: number }>} timestamps - The timestamps to generate the chart for
+ * @param {Array<{ joinedTimestamp: number, userCount: number, channelCount: number }>} timestamps - The timestamps to generate the chart for
  * @returns {Promise<Buffer>} The generated chart buffer
  */
 async function processQueue() {
@@ -185,16 +188,20 @@ async function processQueue() {
         const sortedData = timestamps.sort((a, b) => a.joinedTimestamp - b.joinedTimestamp);
 
         const countPerDay = {};
-        sortedData.forEach(({ joinedTimestamp, userCount }) => {
+        const channelsPerDay = {};
+        sortedData.forEach(({ joinedTimestamp, userCount, channelCount }) => {
             const day = new Date(joinedTimestamp).toISOString().split("T")[0];
             countPerDay[day] = (countPerDay[day] || 0) + userCount;
+            channelsPerDay[day] = (channelsPerDay[day] || 0) + channelCount;
         });
 
         const startDate = new Date(Object.keys(countPerDay)[0]);
         const endDate = new Date();
         const labels = [];
         const data = [];
+        const channelData = [];
         let totalUsers = 0;
+        let totalChannels = 0;
         for (
             let date = new Date(startDate.getTime());
             date <= endDate;
@@ -202,15 +209,19 @@ async function processQueue() {
         ) {
             const day = date.toISOString().split("T")[0];
             totalUsers += countPerDay[day] || 0; // Add 0 if no new members joined on this day
+            totalChannels += channelsPerDay[day] || 0;
             labels.push(day);
             data.push(totalUsers);
+            channelData.push(totalChannels);
         }
 
     
         const currentTotal = Object.values(countPerDay).reduce((acc, count) => acc + count, 0);
+        const currentChannelTotal = Object.values(channelsPerDay).reduce((acc, count) => acc + count, 0);
         if (imageCache &&
             Math.round(currentTotal / rounding) * rounding ===
-            Math.round(totalUserCache / rounding) * rounding) {
+            Math.round(totalUserCache / rounding) * rounding &&
+            currentChannelTotal === totalChannelCache) {
             isRendering = false;
             resolve(imageCache);
             processQueue();
@@ -218,10 +229,15 @@ async function processQueue() {
         }
 
         totalUserCache = currentTotal;
+        totalChannelCache = currentChannelTotal;
 
         const chartData = labels.map((label, i) => ({
             x: new Date(label).getTime(), // numeric timestamp
             y: data[i],
+        }));
+        const channelChartData = labels.map((label, i) => ({
+            x: new Date(label).getTime(),
+            y: channelData[i],
         }));
 
         const lastTimestamp = new Date(labels[labels.length - 1]).getTime();
@@ -240,6 +256,16 @@ async function processQueue() {
                     label: "Users Joined Over Time",
                     data: chartData,
                     borderColor: "white",
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.1,
+                    pointRadius: 0,
+                }, {
+                    label: "Channels Over Time",
+                    data: channelChartData,
+                    yAxisID: "channels",
+                    borderColor: "white",
+                    borderDash: [5, 5],
                     borderWidth: 2,
                     fill: false,
                     tension: 0.1,
@@ -273,6 +299,18 @@ async function processQueue() {
                             display: true,
                             text: "Total Users",
                             color: "white",
+                        },
+                    },
+                    channels: {
+                        position: "right",
+                        ticks: { color: "white" },
+                        title: {
+                            display: true,
+                            text: "Channel Amount",
+                            color: "white",
+                        },
+                        grid: {
+                            drawOnChartArea: false,
                         },
                     },
                 },

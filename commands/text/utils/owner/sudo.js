@@ -38,12 +38,17 @@ module.exports = {
         try {
             const messageLink = args.shift();
             const sudoMessage = args.join(" ");
-            const [guildID, channelID, messageID] = extractMessageInfo(messageLink).catch(() => null);
 
             if (!flags["send|s"] && !flags["reply|r"] && !flags["emote|e"] && !flags["clear|c"] && !flags["dm|d"]) {
-                await message.reply({ embed : [embedGenerator.error({ title: "Missing parameter", description: "You must specify a parameter" })] });
+                await message.reply({ embeds: [embedGenerator.error({ title: "Missing parameter", description: "You must specify a parameter" })] });
                 return;
             }
+
+            let guildID;
+            let channelID;
+            let messageID;
+            if (!flags["dm|d"])
+                ({ guildId: guildID, channelId: channelID, messageId: messageID } = extractMessageInfo(messageLink));
 
             if (flags["send|s"]) {
                 await client.channels.cache.get(channelID).send(sudoMessage);
