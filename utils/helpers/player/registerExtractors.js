@@ -56,7 +56,7 @@ async function initPlayer(client) {
     onStreamExtracted(async (stream, _, queue) => {
         if (queue.filters.ffmpeg.filters.length > 0) return stream;
 
-        const currentIndex = (queueIndexTracker.get(queue) ?? 0) + 1
+        const currentIndex = (queueIndexTracker.get(queue) ?? 0) + 1;
         queueIndexTracker.set(queue, currentIndex);
 
         let webStream;
@@ -147,7 +147,7 @@ async function initPlayer(client) {
             if (passThrough.destroyed || passThrough.writableEnded) return Promise.resolve();
             const isStale = () => {
                 return passThrough.destroyed || passThrough.writableEnded || queueIndexTracker.get(queue) !== currentIndex;
-            }
+            };
 
             return new Promise((resolve) => {
                 const finish = () => {
@@ -159,11 +159,11 @@ async function initPlayer(client) {
                 };
 
                 const poll = setInterval(() => {
-                    if(isStale) {
+                    if (isStale) {
                         isNaturalFinish = false;
                         finish();
                     }
-                }, 250)
+                }, 250);
 
                 passThrough.once("drain", finish);
                 passThrough.once("close", finish);
@@ -242,19 +242,19 @@ async function initPlayer(client) {
 
                 abortController?.abort();
 
-                if (isNaturalFinish) {
+                if (isNaturalFinish) 
                     passThrough.end();
-                } else if (passThrough.destroyed) {
+                else if (passThrough.destroyed) 
                     passThrough.destroy();
-                }
+                
 
-                if(inputStream && !inputStream.destroyed) {
+                if (inputStream && !inputStream.destroyed) 
                     inputStream.destroy();
-                }
+                
 
-                if(!input.disposed) {
+                if (!input.disposed) 
                     input.dispose();
-                }
+                
 
                 filterApi?.close();
             }
