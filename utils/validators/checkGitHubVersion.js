@@ -14,7 +14,18 @@ const checkGitHubVersion = async function() {
     const githubVersion = JSON.parse(Buffer.from(result.content, "base64").toString("utf-8")).version; 
     logger.debug(`Current version is ${version}`);
 
-    if (githubVersion !== version) {
+    const parse = v => v.split(/[-+]/)[0].split(".").map(n => parseInt(n, 10) || 0);
+    const isNewer = (a, b) => {
+        const pa = parse(a), pb = parse(b);
+        for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+            const diff = (pa[i] || 0) - (pb[i] || 0);
+            if (diff !== 0) return diff > 0;
+        }
+        return false;
+    };
+
+    // A local version higher than GitHub's means it's awaiting a push
+    if (isNewer(githubVersion, version)) {
         logger.warning(`New version available: ${githubVersion}`);
         logger.warning(`You are currently using version: ${version}`);
         if (githubVersion.split(".")[0] !== version.split(".")[0]) logger.severe("Major version mismatch");
