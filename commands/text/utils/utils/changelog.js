@@ -16,6 +16,7 @@ module.exports = {
                     const changeList = changes.map(change => `- ${change}`).join("\n").substring(0, 1000) + "...";
                     return `**Version: ${version}** (${date}):\n${changeList}\n`;
                 })
+                .reverse()
                 .join("\n"),
             color: 0xffffff, 
             timestamp: new Date(),
