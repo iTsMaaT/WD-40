@@ -1,7 +1,16 @@
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const { Client } = require("discord.js");
+const { Logger } = require("@utils/log");
 
+/**
+ * Updates the application's commands by comparing the current command manifest with the new one.
+ * If changes are detected, it deploys the new commands and updates the manifest.
+ * 
+ * @param {Client} client - The Discord client instance.
+ * @param {Logger} logger - The logger instance for logging messages.
+ */
 async function updateCommands(client, logger) {
     const manifestPath = path.join(process.cwd(), "utils/commandManifest.json");
     if (!fs.existsSync(manifestPath)) {
