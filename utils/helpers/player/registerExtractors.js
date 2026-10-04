@@ -1,8 +1,8 @@
 /* eslint-disable no-shadow */
 const { Player, AudioFilters, onBeforeCreateStream, onStreamExtracted, StreamType } = require("discord-player");
 const { AttachmentExtractor } = require("@discord-player/extractor");
-const { YoutubeExtractor, stream } = require("discord-player-youtubei");
-const { DeezerExtractor, NodeDecryptor, JSDecryptor } = require("discord-player-deezer");
+const { YoutubeExtractor } = require("discord-player-youtubei");
+const { DeezerExtractor, NodeDecryptor } = require("discord-player-deezer");
 const { SoundgasmExtractor } = require("discord-player-soundgasm");
 const { TTSExtractor } = require("discord-player-tts");
 const { SoundcloudExtractor } = require("discord-player-soundcloud");
@@ -10,14 +10,9 @@ const { SpotifyExtractor } = require("discord-player-spotify");
 const { AppleMusicExtractor } = require("discord-player-applemusic");
 const { SubsonicExtractor } = require("discord-player-subsonic");
 const { YoutubeSabrExtractor } = require("@utils/helpers/youtubei/youtubeiExtractor.js");
-const { Innertube, ClientType } = require("youtubei.js");
-const { createSabrStream } = require("@utils/helpers/youtubei/youtubeSabrCore.js");
 const { startInterceptor } = require("@utils/helpers/player/interceptor");
-const { downloadTrack } = require("@utils/helpers/player/downloader");
 const youtubeCookieHandler = require("@utils/helpers/youtubeCookieHandler/youtubeCookieHandler");
 const { FilterManager } = require("@utils/helpers/player/filterManager");
-const ytdl = require("@distube/ytdl-core");
-const fs = require("fs");
 const { PassThrough, Readable } = require("stream");
 const NodeAV = require("node-av");
 const config = require("@utils/config/configUtils");
@@ -51,12 +46,23 @@ async function initPlayer(client) {
 
     registerMediabunnyServer();
 
+    /**
+     * @type {WeakMap<import("discord-player").GuildQueue, number>}
+     */
+    const queueIndexTracker = new WeakMap();
+
     const OUTPUT_FORMAT = "aformat=sample_fmts=s16:sample_rates=48000:channel_layouts=stereo";
 
     onStreamExtracted(async (stream, _, queue) => {
         if (queue.filters.ffmpeg.filters.length > 0) return stream;
+
+        const currentIndex = (queueIndexTracker.get(queue) ?? 0) + 1;
+        queueIndexTracker.set(queue, currentIndex);
+
         let webStream;
         let abortController;
+        /** @type {Readable|null} */
+        let inputStream = null;
 
         if (typeof stream === "string") {
             abortController = new AbortController();
@@ -73,7 +79,7 @@ async function initPlayer(client) {
 
             webStream = response.body;
         } else {
-            const inputStream = stream instanceof Readable ? stream : stream.stream;
+            inputStream = stream instanceof Readable ? stream : stream.stream;
 
             webStream = Readable.toWeb(inputStream);
         }
@@ -105,7 +111,7 @@ async function initPlayer(client) {
         try {
             initialFilters.push((queue.metadata.filterManager)._buildFilterChain());
         } catch {
-        // no-op
+            // no-op
         } finally {
             initialFilters.push(OUTPUT_FORMAT);
         }
@@ -135,21 +141,34 @@ async function initPlayer(client) {
             changeFilter,
         });
 
+        let isNaturalFinish = true;
+
         function waitForDrainOrClose() {
             if (passThrough.destroyed || passThrough.writableEnded) return Promise.resolve();
+            const isStale = () => {
+                return passThrough.destroyed || passThrough.writableEnded || queueIndexTracker.get(queue) !== currentIndex;
+            };
 
             return new Promise((resolve) => {
                 const finish = () => {
+                    clearInterval(poll);
                     passThrough.off("drain", finish);
                     passThrough.off("close", finish);
                     passThrough.off("error", finish);
                     resolve();
                 };
 
+                const poll = setInterval(() => {
+                    if (isStale) {
+                        isNaturalFinish = false;
+                        finish();
+                    }
+                }, 250);
+
                 passThrough.once("drain", finish);
                 passThrough.once("close", finish);
                 passThrough.once("error", finish);
-            
+
                 if (passThrough.destroyed || passThrough.writableEnded) finish();
             });
         }
@@ -202,9 +221,9 @@ async function initPlayer(client) {
                             }
                         }
                     } catch (err) {
-                        console.error("[Mediabunny Filter Error]", err);
-                        console.error("Filter:", currentFilterString);
-                        console.error("Frame:", {
+                        logger.error("[Mediabunny Filter Error]", err);
+                        logger.error("Filter:", currentFilterString);
+                        logger.error("Frame:", {
                             sampleRate: frame.sampleRate,
                             channels: frame.channels,
                             format: frame.format,
@@ -218,10 +237,25 @@ async function initPlayer(client) {
             } catch (error) {
                 passThrough.destroy(error);
             } finally {
-                if (bufferCache.length > 0) 
+                if (bufferCache.length > 0)
                     passThrough.write(Buffer.concat(bufferCache));
+
+                abortController?.abort();
+
+                if (isNaturalFinish) 
+                    passThrough.end();
+                else if (passThrough.destroyed) 
+                    passThrough.destroy();
                 
-                passThrough.end();
+
+                if (inputStream && !inputStream.destroyed) 
+                    inputStream.destroy();
+                
+
+                if (!input.disposed) 
+                    input.dispose();
+                
+
                 filterApi?.close();
             }
         })();
@@ -231,7 +265,7 @@ async function initPlayer(client) {
             $fmt: StreamType.Raw,
         };
     });
-    
+
     return player;
 }
 
@@ -274,7 +308,7 @@ async function registerExtractors(player) {
         });
         subsonicExt.priority = extractors.Subsonic.priority ?? subsonicExt.priority;
     }
-    
+
     if (extractors.Soundgasm.enabled) {
         logger.info("Loading SoundgasmExtractor extractor...");
         const soundgasmExt = await player.extractors.register(SoundgasmExtractor, extractors.Soundgasm.config);
