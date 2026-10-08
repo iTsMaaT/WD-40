@@ -13,6 +13,13 @@ module.exports = {
             required: true,
         },
     ],
+
+    /**
+     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("discord.js").ChatInputCommandInteraction} interaction The interaction that triggered the command
+     * @param {import("discord.js").Client} client The Discord client instance
+     * @returns {Promise<void>}
+     */
     async execute(logger, interaction, client) {
 
         if (!process.env.SUGGESTION_CHANNEL_ID) return await interaction.reply({ embeds: [embedGenerator.error("No suggestion channel has been set by the owner.")], flags: MessageFlags.Ephemeral });

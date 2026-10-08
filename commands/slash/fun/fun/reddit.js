@@ -24,6 +24,13 @@ module.exports = {
             required: true,
         },
     ],
+
+    /**
+     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("discord.js").ChatInputCommandInteraction} interaction The interaction that triggered the command
+     * @param {import("discord.js").Client} client The Discord client instance
+     * @returns {Promise<void>}
+     */
     async execute(logger, interaction, client) {
         const option = interaction.options.get("option").value;
         const optiondata = interaction.options.get("data").value.split(" ")[0];

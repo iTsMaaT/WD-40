@@ -14,6 +14,15 @@ module.exports = {
     admin: true,
     permissions: [PermissionsBitField.Flags.MoveMembers],
     aliases: ["mova"],
+
+    /**
+     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("discord.js").Client} client The Discord client instance
+     * @param {import("discord.js").Message} message The message object that triggered the command
+     * @param {string[]} args The command arguments
+     * @param {Object} flags The command flags
+     * @returns {Promise<void>}
+     */
     async execute(logger, client, message, args, flags) {
   
         // Check if the user is in a voice channel

@@ -9,6 +9,13 @@ module.exports = {
     name: "Add / Play Links",
     type: ApplicationCommandType.Message,
     ephemeral: true,
+
+    /**
+     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("discord.js").MessageContextMenuCommandInteraction} interaction The interaction that triggered the command
+     * @param {import("discord.js").Client} client The Discord client instance
+     * @returns {Promise<void>}
+     */
     async execute(logger, interaction, client) {
         const playerConfig = config.get("discordPlayer");
         const player = useMainPlayer();

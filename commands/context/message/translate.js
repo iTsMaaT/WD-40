@@ -5,6 +5,13 @@ const translate = require("@iamtraction/google-translate");
 module.exports = {
     name: "Translate",
     type: ApplicationCommandType.Message,
+
+    /**
+     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("discord.js").MessageContextMenuCommandInteraction} interaction The interaction that triggered the command
+     * @param {import("discord.js").Client} client The Discord client instance
+     * @returns {Promise<void>}
+     */
     execute: async (logger, interaction, client) => {
         const LanguageCode = interaction.guild.preferredLocale.split("-")[0].toString().toLowerCase();
         const text = interaction.targetMessage.content;

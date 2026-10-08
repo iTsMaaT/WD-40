@@ -6,6 +6,15 @@ module.exports = {
     name: "source",
     description: "Gives the source code of a command",
     category: "utils",
+
+    /**
+     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("discord.js").Client} client The Discord client instance
+     * @param {import("discord.js").Message} message The message object that triggered the command
+     * @param {string[]} args The command arguments
+     * @param {Object} flags The command flags
+     * @returns {Promise<void>}
+     */
     async execute(logger, client, message, args, flags) {
         if (args[0]) {
             const commandName = args[0];

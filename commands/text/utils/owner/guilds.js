@@ -5,6 +5,15 @@ module.exports = {
     category: "owner",
     description: "Makes a list of the guilds the bot is in",
     private: true,
+
+    /**
+     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("discord.js").Client} client The Discord client instance
+     * @param {import("discord.js").Message} message The message object that triggered the command
+     * @param {string[]} args The command arguments
+     * @param {Object} flags The command flags
+     * @returns {Promise<void>}
+     */
     async execute(logger, client, message, args, flags) {
         
         const guilds = client.guilds.cache.sort((a, b) => b.joinedTimestamp - a.joinedTimestamp);

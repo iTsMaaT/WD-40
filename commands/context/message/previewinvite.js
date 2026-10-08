@@ -4,6 +4,13 @@ const embedGenerator = require("@utils/helpers/embedGenerator");
 module.exports = {
     name: "Preview Invite",
     type: ApplicationCommandType.Message,
+
+    /**
+     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("discord.js").MessageContextMenuCommandInteraction} interaction The interaction that triggered the command
+     * @param {import("discord.js").Client} client The Discord client instance
+     * @returns {Promise<void>}
+     */
     async execute(logger, interaction, client) {
         const regex = /(https?:\/\/|http?:\/\/)?(www.)?(discord.(gg|io|me|li)|discordapp.com\/invite|discord.com\/invite)\/[^\s/]+?(?=\b)/g;
         const text = interaction.targetMessage.content;

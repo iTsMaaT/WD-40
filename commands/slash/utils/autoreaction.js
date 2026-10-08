@@ -75,6 +75,13 @@ module.exports = {
             type: ApplicationCommandOptionType.Subcommand,
         },
     ],
+
+    /**
+     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("discord.js").ChatInputCommandInteraction} interaction The interaction that triggered the command
+     * @param {import("discord.js").Client} client The Discord client instance
+     * @returns {Promise<void>}
+     */
     async execute(logger, interaction, client) {
         const subcommand = interaction.options.getSubcommand();
         const ChannelPromptInput = interaction.options.get("channel-prompt")?.value;

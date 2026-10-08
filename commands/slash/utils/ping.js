@@ -5,6 +5,13 @@ module.exports = {
     name: "ping",
     description: "Shows bot latency",
     type: ApplicationCommandType.ChatInput,
+
+    /**
+     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("discord.js").ChatInputCommandInteraction} interaction The interaction that triggered the command
+     * @param {import("discord.js").Client} client The Discord client instance
+     * @returns {Promise<void>}
+     */
     async execute(logger, interaction, client) {
         const sent = await interaction.editReply({ content: "Pinging..." });
 

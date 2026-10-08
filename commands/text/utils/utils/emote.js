@@ -24,6 +24,15 @@ module.exports = {
     examples: ["-e sus", "greatStickerName -s", "-e -s stickerAndEmoteName"],
     permissions: [PermissionsBitField.Flags.CreateGuildExpressions],
     admin: true,
+
+    /**
+     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("discord.js").Client} client The Discord client instance
+     * @param {import("discord.js").Message} message The message object that triggered the command
+     * @param {string[]} args The command arguments
+     * @param {Object} flags The command flags
+     * @returns {Promise<void>}
+     */
     async execute(logger, client, message, args, flags) {
         const emoteArg = flags["emote|e"];
         const stickerArg = flags["sticker|s"];
