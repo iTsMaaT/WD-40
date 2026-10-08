@@ -3,26 +3,31 @@ const formatDuration = require("@utils/functions/formatDuration");
 
 module.exports = {
     name: "steaminfo",
-    description: "Gives info about a steam account",
+    description: "Gives info about a Steam account by username or profile URL",
     category: "info",
     aliases: ["steam"],
     usage: {
         required: {
-            "steamID": "the steam ID of the profile",
+            "username": "the Steam custom URL name or profile URL",
         },
     },
-    examples: ["76561198868461949"],
+    examples: ["GabeNewell", "steamcommunity.com/id/GabeNewell"],
     requiredENVs: ["STEAM_API_KEY"],
     async execute(logger, client, message, args, flags) {
         if (!args[0]) {
             return await message.reply({
-                embeds: [embedGenerator.warning("You must provide a Steam ID.")],
+                embeds: [embedGenerator.warning("You must provide a Steam username or profile URL.")],
             });
         }
 
-        const steamID = args[0];
         let steamInfo;
         try {
+            const steamID = await resolveSteamID(args[0]);
+            if (!steamID) {
+                return await message.reply({
+                    embeds: [embedGenerator.warning("Couldn't find that Steam profile. Use its custom profile URL name, such as the part after `/id/` in its Steam profile URL.")],
+                });
+            }
             steamInfo = await getSteamInfo(steamID);
         } catch (err) {
             logger.error(err);
@@ -33,7 +38,7 @@ module.exports = {
 
         if (!steamInfo.userProfile) {
             return await message.reply({
-                embeds: [embedGenerator.warning("No profile found for the provided Steam ID. Ensure the profile is public.")],
+                embeds: [embedGenerator.warning("No profile found. Ensure the profile is public.")],
             });
         }
 
@@ -77,12 +82,35 @@ module.exports = {
     },
 };
 
+const resolveSteamID = async (input) => {
+    const profileURL = input.match(/^(?:https?:\/\/)?(?:www\.)?steamcommunity\.com\/(id|profiles)\/([^/?#]+)\/?$/i);
+    const profileType = profileURL?.[1].toLowerCase();
+    const identifier = profileURL ? decodeURIComponent(profileURL[2]) : input;
+
+    if (/^\d+$/.test(identifier))
+        return identifier;
+
+    if (profileType === "profiles")
+        return null;
+
+    const url = new URL("https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/");
+    url.searchParams.set("key", process.env.STEAM_API_KEY);
+    url.searchParams.set("vanityurl", identifier);
+
+    const response = await fetch(url);
+    if (!response.ok)
+        throw new Error(`Steam profile lookup failed with status ${response.status}.`);
+
+    const result = await response.json();
+    return result.response?.success === 1 ? result.response.steamid : null;
+};
+
 const getSteamInfo = async (steamID) => {
-    const baseURL = "http://api.steampowered.com/";
+    const baseURL = "https://api.steampowered.com/";
     const [allGames, recentGames, profile] = await Promise.all([
-        await (await fetch(`${baseURL}IPlayerService/GetOwnedGames/v0001/?key=${process.env.STEAM_API_KEY}&steamid=${steamID}&format=json`)).json(),
-        await (await fetch(`${baseURL}IPlayerService/GetRecentlyPlayedGames/v0001/?key=${process.env.STEAM_API_KEY}&steamid=${steamID}&count=3&format=json`)).json(),
-        await (await fetch(`${baseURL}ISteamUser/GetPlayerSummaries/v0002/?key=${process.env.STEAM_API_KEY}&steamids=${steamID}&format=json`)).json(),
+        await (await fetch(`${baseURL}IPlayerService/GetOwnedGames/v1/?key=${process.env.STEAM_API_KEY}&steamid=${steamID}&format=json`)).json(),
+        await (await fetch(`${baseURL}IPlayerService/GetRecentlyPlayedGames/v1/?key=${process.env.STEAM_API_KEY}&steamid=${steamID}&count=3&format=json`)).json(),
+        await (await fetch(`${baseURL}ISteamUser/GetPlayerSummaries/v2/?key=${process.env.STEAM_API_KEY}&steamids=${steamID}&format=json`)).json(),
     ]);
 
     const gameCount = allGames.response?.game_count || 0;
