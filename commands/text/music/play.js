@@ -63,9 +63,14 @@ module.exports = {
 
         const attachment = message.attachments.first()?.attachment;
         let string = args.join(" ") || attachment || "Never gonna give you up";
-        const isDirectFile = !!attachment || (isURL(string) && /^https?:\/\/(cdn|media)\.discordapp\.(com|net)\/attachments\//i.test(string));
+        if (!attachment && isURL(string) && /\.(m3u8?|pls)(\?.*)?$/i.test(string)) string = await resolvePlaylistFile(string);
 
         const queryType = await awareQueryResolver(string, player, playerConfig);
+        const isDirectFile = !!attachment
+            || (isURL(string) && (
+                /^https?:\/\/(cdn|media)\.discordapp\.(com|net)\/attachments\//i.test(string)
+                || await isDirectMediaStream(string)
+            ));
         if (!isURL(string)) {
             queryType.canStream = false;
             queryType.type = "search";
@@ -104,7 +109,7 @@ module.exports = {
                         .filter(e => e.identifier !== AttachmentExtractor.identifier)
                         .map(e => e.identifier),
                 });
-                if (!research.hasTracks()) return await sentMessage.edit({ embeds: [embedGenerator.warning("No results found (the file must be an audio/video file)")] });
+                if (!research.hasTracks()) return await sentMessage.edit({ embeds: [embedGenerator.warning("No results found (the link must be a direct audio/video file or stream)")] });
             } else if (!queryType.canStream && queryType.type !== "playlist") {
                 if (
                     queryType.extractor?.identifier === SpotifyExtractor.identifier 
@@ -311,6 +316,48 @@ async function awareQueryResolver(query, player, playerConfig) {
     }
 
     return result;
+}
+
+/**
+ * Checks whether a URL serves audio/video directly (file or live stream) by reading its response headers
+ *
+ * @param {string} url
+ * @returns {Promise<boolean>}
+ */
+async function isDirectMediaStream(url) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const response = await fetch(url, { signal: controller.signal, redirect: "follow" });
+        const type = response.headers.get("content-type") || "";
+        return /^(audio\/|video\/|application\/ogg|application\/vnd\.apple\.mpegurl|raw\/pcm)/i.test(type);
+    } catch {
+        return false;
+    } finally {
+        clearTimeout(timeout);
+        controller.abort();
+    }
+}
+
+/**
+ * Resolves an .m3u/.pls file to the first stream URL it contains
+ *
+ * @param {string} url
+ * @returns {Promise<string>} The first stream URL, or the original URL on failure
+ */
+async function resolvePlaylistFile(url) {
+    try {
+        const response = await fetch(url, { signal: AbortSignal.timeout(7000) });
+        if (!response.ok) return url;
+        const text = await response.text();
+        for (const line of text.split(/\r?\n/)) {
+            const match = line.trim().match(/^(?:File\d+=)?(https?:\/\/\S+)$/i);
+            if (match) return match[1];
+        }
+    } catch (error) {
+        console.error("Failed to resolve playlist file:", error.message);
+    }
+    return url;
 }
 
 /**
