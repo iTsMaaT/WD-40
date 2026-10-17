@@ -1,4 +1,4 @@
-const DB = require('../../utils/db/databaseManager.js');
+const DB = require("../../utils/db/databaseManager.js");
 module.exports = {
     name: "SIGTERM",
     async execute(client, logger, err) {
