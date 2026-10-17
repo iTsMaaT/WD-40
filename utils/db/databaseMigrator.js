@@ -25,7 +25,7 @@ function migrateSqlite(db) {
 async function migrateMysql(db) {
     const [countMigrationTable] = await db.query("SELECT COUNT(TABLE_NAME) AS `count` FROM information_schema.TABLES WHERE TABLE_NAME = 'Migrations';");
     if (countMigrationTable[0].count == 0) 
-        await db.query("CREATE TABLE `Migrations` (`Name` VARCHAR(255) NOT NULL, `Ran` INT(11) NOT NULL) ENGINE = InnoDB COLLATE = utf8mb4_unicode_ci;");
+        await db.query("CREATE TABLE `Migrations` (`Name` VARCHAR(255) NOT NULL, `Ran` BIGINT NOT NULL) ENGINE = InnoDB COLLATE = utf8mb4_unicode_ci;");
     
 
     const files = fs.readdirSync(__dirname + "/../../migrations/mysql");
