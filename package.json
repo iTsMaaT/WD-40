@@ -39,6 +39,7 @@
     "@sentry/node": "^10.75.3",
     "@snazzah/davey": "^0.1.12",
     "axios": "^1.20.0",
+    "better-sqlite3": "^13.0.3",
     "bgutils-js": "^4.0.3",
     "chart.js": "^4.5.1",
     "chartjs-adapter-date-fns": "^3.0.0",

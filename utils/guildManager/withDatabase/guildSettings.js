@@ -1,8 +1,7 @@
 const { eq, and } = require("drizzle-orm");
 const logger = require("@utils/log");
-const { repositories } = require("../../db/tableManager.js");
-const schema = require("../../../schema/schema.js");
 const config = require("@utils/config/configUtils");
+const { repositories, schema } = require("../../db/tableManager.js");
 
 const prefixes = {};
 const responses = {};
@@ -27,7 +26,7 @@ async function init(guilds, client) {
     const DBguildIDs = (await repositories.guildsettings.select()).map(item => item.guildId);
     const botGuildIds = guilds.map(g => g.id);
     const notInGuildIds = DBguildIDs.filter(id => !botGuildIds.includes(id));
-    for (const notInGuildId of notInGuildIds) 
+    for (const notInGuildId of notInGuildIds)
         await SetActiveOrCreate({ id: notInGuildId }, false);
 }
 
@@ -43,7 +42,7 @@ async function SetActiveOrCreate(guild, status = true) {
     else
         await AddGuildToDatabase(guild);
 }
-    
+
 /**
  * Checks if a guild exists in the database.
  * @async
@@ -54,7 +53,7 @@ async function CheckIfGuildExists(guild) {
     const result = await repositories.guildsettings.select().where(eq(schema.guildsettings.guildId, guild.id));
     return result.length > 0;
 }
-    
+
 /**
  * Adds a guild to the database and initializes its default settings.
  * @async
@@ -72,7 +71,7 @@ async function AddGuildToDatabase(guild) {
     responses[guild.id] = false;
     personality[guild.id] = config.get("defaultPersonality");
 }
-    
+
 /**
  * Retrieves the settings for a given guild.
  * @async
@@ -82,7 +81,7 @@ async function AddGuildToDatabase(guild) {
 async function GetGuildSettings(guild) {
     return (await repositories.guildsettings.select().where(eq(schema.guildsettings.guildId, guild.id)).limit(1))[0] ?? {};
 }
-    
+
 /**
  * Updates the settings for a given guild in the database.
  * @async
