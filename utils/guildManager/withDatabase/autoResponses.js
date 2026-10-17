@@ -149,11 +149,11 @@ async function autoResponseFn(guildId) {
                         channelString: ChannelPrompt,
                         string: String,
                     },
-                        and(
-                            eq(schema.responses.guildId, guildId),
-                            eq(schema.responses.channelString, ChannelPrompt),
-                            eq(schema.responses.string, String),
-                        ));
+                    and(
+                        eq(schema.responses.guildId, guildId),
+                        eq(schema.responses.channelString, ChannelPrompt),
+                        eq(schema.responses.string, String),
+                    ));
                 }
             } else {
                 // Delete all entries for this channel prompt

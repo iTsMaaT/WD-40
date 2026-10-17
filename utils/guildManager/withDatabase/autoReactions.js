@@ -139,11 +139,11 @@ async function autoReactFn(guildId) {
                         channelString: ChannelPrompt,
                         string: String,
                     },
-                        and(
-                            eq(schema.reactions.guildId, guildId),
-                            eq(schema.reactions.channelString, ChannelPrompt),
-                            eq(schema.reactions.string, String),
-                        ));
+                    and(
+                        eq(schema.reactions.guildId, guildId),
+                        eq(schema.reactions.channelString, ChannelPrompt),
+                        eq(schema.reactions.string, String),
+                    ));
                 }
             } else {
                 // Delete all entries for this channel prompt
