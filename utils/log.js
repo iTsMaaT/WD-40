@@ -88,7 +88,6 @@ class Logger {
         if (!allowed || allowed.includes(type)) 
             process.stdout.write(getColorByType(`${header} ${formattedMessage}`, type) + "\n");
         
-
         if (type == "CONSOLE" || type == "EVENT") return;
 
         if (databaseManager.dbExists()) {
@@ -116,6 +115,8 @@ class Logger {
     console(message, ...args) {
         this.logCounts.console++;
         this.writeLogToFile(message, this.types.console, ...args);
+        if (process.env.SERVER == "prod" && process.env.SENTRY_DSN)
+            Sentry.logger.debug(message);
     }
 
     warning(message, ...args) {
@@ -149,11 +150,15 @@ class Logger {
     debug(message, ...args) {
         this.writeLogToFile(message, this.types.debug, ...args);
         this.logCounts.debug++;
+        if (process.env.SERVER == "prod" && process.env.SENTRY_DSN)
+            Sentry.logger.debug(message);
     }
 
     info(message, ...args) {
         this.writeLogToFile(message, this.types.info, ...args);
         this.logCounts.info++;
+        if (process.env.SERVER == "prod" && process.env.SENTRY_DSN)
+            Sentry.logger.info(message);
     }
 
     severe(message, ...args) {
@@ -177,16 +182,22 @@ class Logger {
     music(message, ...args) {
         this.logCounts.music++;
         this.writeLogToFile(message, this.types.music, ...args);
+        if (process.env.SERVER == "prod" && process.env.SENTRY_DSN)
+            Sentry.logger.info(message);
     }
 
     event(message, ...args) {
         this.logCounts.event++;
         this.writeLogToFile(message, this.types.event, ...args);
+        if (process.env.SERVER == "prod" && process.env.SENTRY_DSN)
+            Sentry.logger.info(message);
     }
 
     command(message, ...args) {
         this.logCounts.command++;
         this.writeLogToFile(message, this.types.command, ...args);
+        if (process.env.SERVER == "prod" && process.env.SENTRY_DSN)
+            Sentry.logger.info(message);
     }
 
     async getAllTimeLogCount(type) {
