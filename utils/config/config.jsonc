@@ -90,6 +90,10 @@
     // Default local AI model file in utils/helpers/aiModels
     "defaultLocalAIModel": "granite-4.0-350m-Q4_K_M.gguf",
 
+    // Where to download defaultLocalAIModel from on startup if the file is missing
+    // Supports "hf:<user>/<repo>/<file>.gguf" (Hugging Face) or a direct https:// link
+    "localAIModelURL": "hf:ibm-granite/granite-4.0-350m-GGUF/granite-4.0-350m-Q4_K_M.gguf",
+
     "discordPlayer": {
         "dailyReregister": false,
         "logPlayerEvents": false,

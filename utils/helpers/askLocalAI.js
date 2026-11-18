@@ -1,6 +1,4 @@
-const fs = require("node:fs");
-const path = require("node:path");
-const config = require("@utils/config/configUtils");
+const { ensureLocalAIModel } = require("@utils/helpers/ensureLocalAIModel");
 
 const sessions = new Map();
 const sessionPromises = new Map();
@@ -68,14 +66,8 @@ async function initAI(systemPrompt = SYSTEM_PROMPT) {
                 debug: false,
             });
 
-            const modelsDir = path.join(__dirname, "aiModels");
-            fs.mkdirSync(modelsDir, { recursive: true });
-
             const model = await llama.loadModel({
-                modelPath: path.join(
-                    modelsDir,
-                    config.get("defaultLocalAIModel"),
-                ),
+                modelPath: await ensureLocalAIModel(),
                 gpuLayers: 0,
             });
 

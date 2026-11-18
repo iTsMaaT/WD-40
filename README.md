@@ -97,7 +97,7 @@ Good luck.
 
 ## AI model (local or external)
 
-By default, `aiModelProvider` in `utils/config/config.jsonc` is set to `local`, which runs a GGUF model on your machine. You must provide the model file yourself: download a `.gguf` model and place it in `utils/helpers/aiModels/`, then set `defaultLocalAIModel` in the config to its file name.
+By default, `aiModelProvider` in `utils/config/config.jsonc` is set to `local`, which runs a GGUF model on your machine. The model file `defaultLocalAIModel` is loaded from `utils/helpers/aiModels/`. If it's missing, it is downloaded automatically on startup from `localAIModelURL` (a Hugging Face `hf:` URI or a direct link). To use a different model, change both keys, or drop your own `.gguf` file in that folder and set `defaultLocalAIModel` to its file name.
 
 If you don't want to provide a model file, set `aiModelProvider` to `"external"` in `utils/config/config.jsonc` and set `GEMINI_API_KEY` in your `.env` file. Commands that always require accurate answers (like `playai` and `asktts`) use Gemini regardless of this setting, so they need `GEMINI_API_KEY` too.
 
