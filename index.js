@@ -37,6 +37,7 @@
         intents: [
             GatewayIntentBits.Guilds,
             GatewayIntentBits.GuildMembers,
+            GatewayIntentBits.GuildPresences,
             GatewayIntentBits.GuildModeration,
             GatewayIntentBits.GuildExpressions,
             GatewayIntentBits.GuildIntegrations,
@@ -57,7 +58,7 @@
     const client = new Client({
         ...neededIntents,
         shards: "auto",
-        allowedMentions: { repliedUser: false },
+        allowedMentions: { parse: ["users"], repliedUser: false },
     });
 
     const { registerExtractors, initPlayer, reload } = require("@root/utils/helpers/player/registerExtractors");
