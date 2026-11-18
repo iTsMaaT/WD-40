@@ -8,6 +8,7 @@ module.exports = {
     name: "prefix",
     description: "Changes the prefix to do commands",
     dbNeeded: false,
+    admin: true,
     type :ApplicationCommandType.ChatInput,
     options: [
         {
