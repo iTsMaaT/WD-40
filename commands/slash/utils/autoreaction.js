@@ -92,7 +92,7 @@ module.exports = {
         const reactions = await autoreactions.getReactions();
 
         if ((subcommand == "add" || subcommand == "remove" || subcommand == "removeall") && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) 
-            return await interaction.reply({ embeds: [embedGenerator.warning("You must be a administrator to execute this action")], flags: MessageFlags.Ephemeral });
+            return await interaction.editReply({ embeds: [embedGenerator.warning("You must be a administrator to execute this action")], flags: MessageFlags.Ephemeral });
 
         switch (subcommand) {
             case "list": {
@@ -130,7 +130,7 @@ module.exports = {
                     timestamp: new Date(),
                 };
 
-                interaction.reply({ embeds: [embed] });
+                interaction.editReply({ embeds: [embed] });
                 break;
             }
             case "removeall": {

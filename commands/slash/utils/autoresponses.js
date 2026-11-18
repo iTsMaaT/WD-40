@@ -119,7 +119,7 @@ module.exports = {
             }
             
             case "remove": {
-                if (!responses[ChannelPromptInput]) return await interaction.editReplyeply({ embeds: [embedGenerator.warning("There is no entry for that channel prompt")], flags: MessageFlags.Ephemeral });
+                if (!responses[ChannelPromptInput]) return await interaction.editReply({ embeds: [embedGenerator.warning("There is no entry for that channel prompt")], flags: MessageFlags.Ephemeral });
 
                 autoresponses.removeResponse(ChannelPromptInput, StringInput);
                 const embed = {
