@@ -94,9 +94,29 @@ module.exports = {
                 break;
             }
             case "set": {
-                config.set(key, value);
+                // Match the existing value's type so arrays (whitelists/blacklists) don't become strings
+                const current = config.get(key);
+                let parsed = value;
+                if (Array.isArray(current)) {
+                    try {
+                        const json = JSON.parse(value);
+                        parsed = Array.isArray(json) ? json : null;
+                    } catch {
+                        parsed = value.split(",").map(s => s.trim()).filter(Boolean);
+                    }
+                } else if (typeof current === "boolean") {
+                    parsed = value.trim().toLowerCase() === "true" ? true : value.trim().toLowerCase() === "false" ? false : null;
+                } else if (typeof current === "number") {
+                    parsed = value.trim() !== "" && !Number.isNaN(Number(value)) ? Number(value) : null;
+                }
+                if (parsed === null) {
+                    return await message.reply({
+                        embeds: [embedGenerator.error(`Invalid value for **${key}**: expected ${Array.isArray(current) ? "array" : typeof current}`)],
+                    });
+                }
+                config.set(key, parsed);
                 const configEmbed = createConfigEmbed("Configuration", `Set value for key: ${key}`);
-                configEmbed.fields = createFields({ [key]: value });
+                configEmbed.fields = createFields({ [key]: parsed });
                 await message.reply({ embeds: [configEmbed] });
                 break;
             }
