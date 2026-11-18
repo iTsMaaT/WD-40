@@ -7,6 +7,12 @@ module.exports = {
     name: Events.GuildDelete,
     once: false,
     log: true,
+    /**
+     * Updates guild activity records and announces when the bot leaves an available guild.
+     * @param {import("discord.js").Client} client The Discord client.
+     * @param {object} logger The application logger.
+     * @param {import("discord.js").Guild} guild The guild the bot left or lost access to.
+     */
     async execute(client, logger, guild) {
         if (dbManager.dbExists()) {
             try {

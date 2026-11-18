@@ -3,6 +3,11 @@ const formatDuration = require("@utils/functions/formatDuration.js");
 
 module.exports = {
     name: "info",
+    /**
+     * Prints the bot version, connection, uptime, guild, and member statistics.
+     * @param {import("discord.js").Client} client The Discord client.
+     * @param {object} logger The application logger.
+     */
     execute(client, logger) {
         const uptime = formatDuration(client.uptime, false, true);
         const WDVersion = changelog.slice(-1).map(({ version }) => { return version; }).join();

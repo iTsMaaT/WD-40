@@ -14,6 +14,11 @@ module.exports = {
     name: Events.ClientReady,
     once: false,
     log: true,
+    /**
+     * Initializes bot services and commands after the Discord client becomes ready.
+     * @param {import("discord.js").Client} client The connected Discord client.
+     * @param {object} logger The application logger.
+     */
     async execute(client, logger) {
         console.log(player.scanDeps());
         console.log("Extractors ordered by priority:");

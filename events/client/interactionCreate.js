@@ -11,11 +11,35 @@ const dbManager = require("@root/utils/db/databaseManager");
 const { useMainPlayer } = require("discord-player");
 const { getPermissionArrayNames } = require("@functions/discordFunctions");
 const config = require("@utils/config/configUtils");
+const pruneCooldowns = require("@functions/pruneCooldowns");
+
+// Returns a refusal message if the user may not run the command, otherwise null
+async function getBlacklistError(interaction, type, command) {
+    const userId = interaction.user.id;
+    if (config.get("defaultSuperuserState") && !config.get("SUPERUSER_WHITELIST").includes(userId)) return "The bot is currently restricted to superusers.";
+    if (config.get("GLOBAL_BLACKLIST").includes(userId)) return "You are blacklisted from using this bot.";
+
+    const userBlacklist = await GuildManager.GetBlacklist(interaction.guild.id);
+    if (command.category && !userBlacklist.CheckPermission(userId, `cat:${type}`, command.category)) 
+        return `You are blacklisted from executing commands in the **${command.category}** category.`;
+    
+    const name = command.name ?? interaction.commandName;
+    if (!userBlacklist.CheckPermission(userId, `cmd:${type}`, name)) 
+        return `You are blacklisted from executing the **${name}** command.`;
+    
+    return null;
+}
 
 module.exports = {
     name: Events.InteractionCreate,
     once: false,
     log: false,
+    /**
+     * Handles incoming guild interactions, including slash and context-menu commands.
+     * @param {import("discord.js").Client} client The Discord client.
+     * @param {object} logger The application logger.
+     * @param {import("discord.js").Interaction} interaction The interaction to process.
+     */
     async execute(client, logger, interaction) {
         // Block bot usage in DMs
         if (!interaction.guild) return;
@@ -27,6 +51,13 @@ module.exports = {
             const slash = interaction.client.slashcommands.get(interaction.commandName);
 
             if (!slash) return;
+
+            if (slash.admin && !interaction.memberPermissions?.has(PermissionsBitField.Flags.Administrator)) {
+                return await interaction.reply({
+                    embeds: [embedGenerator.error("You are not an administrator.")],
+                    flags: MessageFlags.Ephemeral,
+                });
+            }
 
             // Bot's Channel-Specific Permissions Check
             const botMember = interaction.guild.members.me;
@@ -83,18 +114,10 @@ module.exports = {
             }
 
             // Blacklist Check
-            const userBlacklist = await GuildManager.GetBlacklist(interaction.guild.id);
-            if (!userBlacklist.CheckPermission(interaction.user.id, "cat:text", slash.category)) {
-                return await interaction.editReply({
-                    embeds: [embedGenerator.error(`You are blacklisted from executing commands in the **${slash.category}** category.`)],
-                });
-            }
+            const blacklistError = await getBlacklistError(interaction, "slash", slash);
+            if (blacklistError) 
+                return await interaction.editReply({ embeds: [embedGenerator.error(blacklistError)] });
             
-            if (!userBlacklist.CheckPermission(interaction.user.id, "cmd:text", slash.name)) {
-                return await interaction.editReply({
-                    embeds: [embedGenerator.error(`You are blacklisted from executing the **${slash.name}** command.`)],
-                });
-            }
 
             // Database Dependency Check
             if (slash.dbNeeded && !dbManager.dbExists()) {
@@ -166,12 +189,8 @@ module.exports = {
                     `from  [${interaction.guild.name.padEnd(maxLengths.names)} (${interaction.guild.id.padEnd(maxLengths.ids)})]`);
 
                 // Additional Bot Permission Check (for required permissions)
-                const requiredPermissions = slash.permissions || [];
-                requiredPermissions.push(PermissionsBitField.Flags.ReadMessageHistory);
-
                 if (!botMember.permissions.has(PermissionsBitField.Flags.Administrator)) {
-                    const commandPerms = slash.permissions || [];
-                    commandPerms.push(PermissionsBitField.Flags.ReadMessageHistory);
+                    const commandPerms = [...(slash.permissions || []), PermissionsBitField.Flags.ReadMessageHistory];
 
                     const missingPermissions = commandPerms.filter(perm => !effectivePermissions.has(perm));
 
@@ -195,6 +214,7 @@ module.exports = {
                         userCooldowns[`group:${slash.cooldownGroup}`] = Date.now() + cooldownDuration;
 
                     SlashCooldowns.set(interaction.user.id, userCooldowns);
+                    pruneCooldowns(SlashCooldowns);
                 }
 
                 await player.context.provide({ guild: interaction.guild }, async () => await slash.execute(logger, interaction, client));
@@ -213,6 +233,7 @@ module.exports = {
             if (!command || !command.autocomplete) return;
 
             try {
+                if (await getBlacklistError(interaction, "slash", command)) return await interaction.respond([]);
                 await command.autocomplete(interaction, client);
             } catch (error) {
                 logger.error(`Error handling autocomplete for command ${interaction.commandName}:`, error);
@@ -225,6 +246,14 @@ module.exports = {
             if (!context) return logger.error(`No command matching ${interaction.commandName} was found.`);
 
             try {
+                const blacklistError = await getBlacklistError(interaction, "context", context);
+                if (blacklistError) {
+                    return await interaction.reply({
+                        embeds: [embedGenerator.error(blacklistError)],
+                        flags: MessageFlags.Ephemeral,
+                    });
+                }
+
                 const maxLengths = {
                     names: Math.max(interaction.user.tag.length, interaction.channel.name.length, interaction.guild.name.length),
                     ids: Math.max(interaction.user.id.length, interaction.channel.id.length, interaction.guild.id.length),

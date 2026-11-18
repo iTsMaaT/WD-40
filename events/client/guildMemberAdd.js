@@ -3,6 +3,12 @@ const { Events } = require("discord.js");
 module.exports = {
     name: Events.GuildMemberAdd,
     once: false,
+    /**
+     * Logs a member joining a guild and posts the update when configured.
+     * @param {import("discord.js").Client} client The Discord client.
+     * @param {object} logger The application logger.
+     * @param {import("discord.js").GuildMember} member The member who joined.
+     */
     execute(client, logger, member) {
         logger.info(`${member.user.tag} (${member.id}) joined \`${member.guild.name}\``);
         if (!process.env.MEMBERS_UPDATE_ID) return;

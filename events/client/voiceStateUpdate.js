@@ -4,6 +4,13 @@ module.exports = {
     name: Events.VoiceStateUpdate,
     once: false,
     disabled: true,
+    /**
+     * Detects voice-state changes and related moderation actions; currently disabled.
+     * @param {import("discord.js").Client} client The Discord client.
+     * @param {object} logger The application logger.
+     * @param {import("discord.js").VoiceState} oldState The member's previous voice state.
+     * @param {import("discord.js").VoiceState} newState The member's updated voice state.
+     */
     async execute(client, logger, oldState, newState) {
         if (this.disabled) return;
         const userVoiceStateEvents = {};

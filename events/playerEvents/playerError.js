@@ -3,6 +3,13 @@ const embedGenerator = require("@utils/helpers/embedGenerator");
 module.exports = {
     name: "playerError",
     once: false,
+    /**
+     * Notifies the queue's text channel of a playback error and logs its details.
+     * @param {import("discord.js").Client} client The Discord client.
+     * @param {object} logger The application logger.
+     * @param {*} queue The queue where playback failed.
+     * @param {Error} error The playback error.
+     */
     async execute(client, logger, queue, error) {
         const embed = embedGenerator.error({
             title: "Player error",

@@ -9,6 +9,7 @@ const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch")
 const { initConfFile } = require("@utils/reddit/fetchRedditToken.js");
 const countCommonChars = require("@utils/functions/countCommonChars.js");
 const config = require("@utils/config/configUtils");
+const pruneCooldowns = require("@functions/pruneCooldowns");
 const dbManager = require("@root/utils/db/databaseManager");
 const { getPermissionArrayNames } = require("@functions/discordFunctions");
 
@@ -16,10 +17,16 @@ module.exports = {
     name: Events.MessageCreate,
     once: false,
     log: false,
+    /**
+     * Processes new messages for text commands and automatic responses.
+     * @param {import("discord.js").Client} client The Discord client.
+     * @param {object} logger The application logger.
+     * @param {import("discord.js").Message} msg The newly created message.
+     */
     async execute(client, logger, msg) {
         if (!client.clientInitialized) return;
         const TextCooldowns = client.TextCooldowns;
-        const autoCorrectCooldowns = new Map();
+        const autoCorrectCooldowns = client.autoCorrectCooldowns ??= new Map();
         await Promise.allSettled([
             handleCommand(msg),
             handleAutoResponses(msg).catch(error => logger.error(error)),
@@ -39,7 +46,7 @@ module.exports = {
                 message.reply({ embeds: [embed] });
             }
 
-            if (config.get("defaultSuperuserState") && (message.author.id != process.env.OWNER_ID && config.get("SUPERUSER_WHITELIST").includes(message.author.id))) return;
+            if (config.get("defaultSuperuserState") && (message.author.id != process.env.OWNER_ID && !config.get("SUPERUSER_WHITELIST").includes(message.author.id))) return;
             if (config.get("GLOBAL_BLACKLIST").includes(message.author.id)) return;
 
             const autoreactions = await GuildManager.getAutoReactions(message.guild.id);
@@ -161,6 +168,8 @@ Step 5 - Send the downloaded media to your favorite social media!
                 if (Date.now() - lastCorrection < 10000) return; // 10-second cooldown
 
                 autoCorrectCooldowns.set(message.author.id, Date.now());
+                for (const [id, ts] of autoCorrectCooldowns) 
+                    if (Date.now() - ts >= 10000) autoCorrectCooldowns.delete(id);
 
                 const commandSet = new Set(client.commands.filter(cmd => !cmd.private).map(cmd => cmd.name));
                 const commandArray = Array.from(commandSet);
@@ -329,6 +338,7 @@ Step 5 - Send the downloaded media to your favorite social media!
 
 
                     TextCooldowns.set(message.author.id, userCooldowns);
+                    pruneCooldowns(TextCooldowns);
                 }
 
                 await player.context.provide({ guild: message.guild }, async () => {
