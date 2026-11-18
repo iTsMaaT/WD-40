@@ -40,7 +40,8 @@ function ensureDir(dir) {
  * @returns {string}
  */
 function sanitize(str = "Unknown") {
-    return str.replace(/[<>:"/\\|?*\x00-\x1F]/g, "").trim() || "Unknown";
+    const cleaned = str.replace(/[<>:"/\\|?*\x00-\x1F]/g, "").trim().replace(/^\.+|[. ]+$/g, "");
+    return cleaned || "Unknown";
 }
 
 /**
