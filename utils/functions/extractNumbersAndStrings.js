@@ -18,4 +18,4 @@ const extractNumbersAndStrings = (input) => {
     return result;
 };
 
-module.exports = extractNumbersAndStrings;
+export default extractNumbersAndStrings;

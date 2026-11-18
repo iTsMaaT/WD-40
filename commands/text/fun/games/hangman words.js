@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     loadFileIgnore: true,
     words: [
         "discord",

@@ -1,5 +1,8 @@
-const fs = require("fs");
-const axios = require("axios");
+import fs from "fs";
+import axios from "axios";
+import packageJson from "#root/package.json" with { type: "json" };
+
+const REDDIT_CONF_PATH = process.cwd() + "/utils/reddit/redditConf.json";
 
 /**
  * Fetches the Reddit token from the Reddit API
@@ -7,7 +10,7 @@ const axios = require("axios");
  * @returns {Promise<{baseUrl: string, headers: {User-Agent: string, Accept: string, Accept-Encoding: string, Authorization: string}}>} The base URL and headers
  */
 async function getRedditToken() {    
-    const { version, homepage } = require("@root/package.json");
+    const { version, homepage } = packageJson;
     const UserAgent = `web:${homepage}:${version} (by /u/${process.env.REDDIT_USERNAME || "unknown"})`;
     let baseUrl;
     const headers = {
@@ -17,7 +20,7 @@ async function getRedditToken() {
     };
 
     try {
-        let { access_token, expires_at } = require("./redditConf.json");
+        let { access_token, expires_at } = JSON.parse(fs.readFileSync(REDDIT_CONF_PATH, "utf8"));
 
         if (Date.now() >= expires_at) {
             // Needs to refresh the tokens
@@ -39,7 +42,7 @@ async function getRedditToken() {
                         access_token: res_body.access_token,
                         expires_at: Date.now() + (parseInt(res_body.expires_in) * 1000),
                     };
-                    fs.writeFileSync(process.cwd() + "/utils/reddit/redditConf.json", JSON.stringify(toSave), { encoding: "UTF-8" });
+                    fs.writeFileSync(REDDIT_CONF_PATH, JSON.stringify(toSave), { encoding: "UTF-8" });
                     access_token = toSave.access_token;
                     expires_at = toSave.expires_at;
                 } else {
@@ -66,7 +69,7 @@ async function getRedditToken() {
  * @returns {Promise<void>}
  */
 async function initConfFile() {    
-    const confFile = process.cwd() + "/utils/reddit/redditConf.json";
+    const confFile = REDDIT_CONF_PATH;
     if (!fs.existsSync(confFile)) {
         const conf = {
             access_token: "",
@@ -93,4 +96,4 @@ async function makeRequest(url, headers) {
     return await response.json();
 }
 
-module.exports = { getRedditToken, initConfFile, makeRequest };
+export { getRedditToken, initConfFile, makeRequest };

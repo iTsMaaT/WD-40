@@ -3,6 +3,7 @@
   "version": "5.13.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node --openssl-legacy-provider --no-deprecation index.js",
     "start:dev": "node --openssl-legacy-provider --trace-deprecation --trace-warnings index.js",
@@ -61,7 +62,6 @@
     "googlevideo": "^4.1.1",
     "heapdump": "^0.3.15",
     "mediabunny": "^1.61.0",
-    "module-alias": "^2.3.4",
     "mysql2": "^3.24.4",
     "node-av": "^6.1.1",
     "node-html-parser": "^8.0.4",
@@ -78,11 +78,11 @@
     "eslint": "^10.11.0",
     "globals": "^17.12.0"
   },
-  "_moduleAliases": {
-    "@root": ".",
-    "@functions": "./utils/functions",
-    "@utils": "./utils",
-    "@config": "./utils/config",
-    "@guildManager": "./utils/guildManager/guildManager.js"
+  "imports": {
+    "#root/*": "./*",
+    "#utils/*": "./utils/*",
+    "#functions/*": "./utils/functions/*",
+    "#config/*": "./utils/config/*",
+    "#guildManager": "./utils/guildManager/guildManager.js"
   }
 }

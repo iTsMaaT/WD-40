@@ -1,13 +1,13 @@
-const { ApplicationCommandType } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const translate = require("@iamtraction/google-translate");
+import { ApplicationCommandType } from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import translate from "@iamtraction/google-translate";
 
-module.exports = {
+export default {
     name: "Translate",
     type: ApplicationCommandType.Message,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").MessageContextMenuCommandInteraction} interaction The interaction that triggered the command
      * @param {import("discord.js").Client} client The Discord client instance
      * @returns {Promise<void>}

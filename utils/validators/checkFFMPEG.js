@@ -1,5 +1,5 @@
-const { exec } = require("child_process");
-const logger = require("@utils/log");
+import { exec } from "child_process";
+import logger from "#utils/log.js";
 
 /**
  * Check if FFmpeg is installed on the system
@@ -23,4 +23,4 @@ const checkFFmpegInstalled = async function() {
     });
 };
 
-module.exports = { execute: checkFFmpegInstalled };
+export default { execute: checkFFmpegInstalled };

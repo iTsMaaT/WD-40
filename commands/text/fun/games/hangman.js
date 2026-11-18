@@ -1,15 +1,16 @@
-const { MessageFlags } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const GuildManager = require("@guildManager");
-const words = require("./hangman words.js").words;
+import { MessageFlags } from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import GuildManager from "#guildManager";
+import hangmanWords from "./hangman words.js";
+const words = hangmanWords.words;
 
-module.exports = {
+export default {
     name: "hangman",
     description: "Play a game of Hangman!",
     category: "games",
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments
@@ -31,7 +32,7 @@ module.exports = {
         const getWordDisplay = () => {
             let filledWord = "";
 
-            for (letter of word) {
+            for (const letter of word) {
                 if (guessedLetters.includes(letter)) 
                     filledWord += letter;
                 else 

@@ -1,8 +1,7 @@
-require("module-alias/register");
-const fs = require("fs");
-const path = require("path");
-const changelog = require("@root/changelogs.json");
-const packageJson = require("@root/package.json");
+import fs from "fs";
+import path from "path";
+import changelog from "#root/changelogs.json" with { type: "json" };
+import packageJson from "#root/package.json" with { type: "json" };
 
 /**
  * Formats the date string to a readable format.

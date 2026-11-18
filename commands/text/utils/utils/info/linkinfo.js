@@ -1,11 +1,11 @@
-const { safeFetch, requestOnce, resolvePublicAddresses } = require("@utils/helpers/safeFetch");
-const fs = require("fs/promises");
+import { safeFetch, requestOnce, resolvePublicAddresses } from "#utils/helpers/safeFetch.js";
+import fs from "fs/promises";
 // const puppeteer = require("puppeteer");
-const { parse } = require("node-html-parser");
-const path = require("path");
-const embedGenerator = require("@utils/helpers/embedGenerator");
+import { parse } from "node-html-parser";
+import path from "path";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
 
-module.exports = {
+export default {
     name: "linkinfo",
     description: "Gives info about a link",
     usage: {
@@ -19,7 +19,7 @@ module.exports = {
     cooldown: 10000,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

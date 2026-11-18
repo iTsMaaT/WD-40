@@ -1,7 +1,7 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const setChannelStatus = require("@utils/helpers/setChannelStatus");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import setChannelStatus from "#utils/helpers/setChannelStatus.js";
 
-module.exports = {
+export default {
     name: "setchannelstatus",
     description: "Sets the status of the current voice channel",
     category: "music",
@@ -11,7 +11,7 @@ module.exports = {
     inSameVoiceChannel: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

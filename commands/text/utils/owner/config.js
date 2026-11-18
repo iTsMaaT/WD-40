@@ -1,15 +1,15 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { createPaginatedMessage } = require("@utils/helpers/createPaginatedMessage");
-const config = require("@utils/config/configUtils");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { createPaginatedMessage } from "#utils/helpers/createPaginatedMessage.js";
+import config from "#utils/config/configUtils.js";
 
-module.exports = {
+export default {
     name: "config",
     description: "Manage the current configuration",
     category: "owner",
     private: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

@@ -1,6 +1,6 @@
-const logger = require("@utils/log");
-const config = require("@utils/config/configUtils");
-const { ensureLocalAIModel } = require("@utils/helpers/ensureLocalAIModel");
+import logger from "#utils/log.js";
+import config from "#utils/config/configUtils.js";
+import { ensureLocalAIModel } from "#utils/helpers/ensureLocalAIModel.js";
 
 /**
  * Start downloading the local AI model in the background if it is missing.
@@ -18,4 +18,4 @@ const checkLocalAIModel = function() {
         });
 };
 
-module.exports = { execute: checkLocalAIModel };
+export default { execute: checkLocalAIModel };

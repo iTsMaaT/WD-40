@@ -2,14 +2,14 @@
 /* eslint-disable no-empty */
 /* eslint-disable no-empty-function */
 /* eslint-disable no-control-regex */
-const fs = require("node:fs");
-const path = require("node:path");
-const { spawn } = require("node:child_process");
-const crypto = require("node:crypto");
-const https = require("node:https");
-const { PassThrough } = require("node:stream");
-const { pipeline } = require("node:stream/promises");
-const { StreamType } = require("discord-player");
+import fs from "node:fs";
+import path from "node:path";
+import { spawn } from "node:child_process";
+import crypto from "node:crypto";
+import https from "node:https";
+import { PassThrough } from "node:stream";
+import { pipeline } from "node:stream/promises";
+import { StreamType } from "discord-player";
 
 const DOWNLOAD_ROOT = path.resolve("./downloads");
 const MAX_CONCURRENT = 2;
@@ -501,4 +501,4 @@ async function downloadViaRaw(queueCtx, track, format, stream) {
     console.log(`[DONE RAW] ${outputPath}`);
 }
 
-module.exports = { downloadTrack, ensureDir };
+export { downloadTrack, ensureDir };

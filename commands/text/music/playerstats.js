@@ -1,16 +1,16 @@
-const { useStats } = require("@root/utils/helpers/player/playerHelpers");
-const { useQueue } = require("discord-player");
-const formatDuration = require("@utils/functions/formatDuration");
-const embedGenerator = require("@utils/helpers/embedGenerator");
+import { useStats } from "#root/utils/helpers/player/playerHelpers.js";
+import { useQueue } from "discord-player";
+import formatDuration from "#utils/functions/formatDuration.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
 
-module.exports = {
+export default {
     name: "playerstats",
     description: "Get the stats of the current queue",
     category: "music",
     private: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

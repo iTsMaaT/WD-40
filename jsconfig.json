@@ -1,13 +1,10 @@
 {
     "compilerOptions": {
-        "paths": {
-        "@root/*": ["./*"],
-        "@functions/*": ["./utils/functions/*"],
-        "@utils/*": ["./utils/*"],
-        "@config/*": ["./utils/config/*"],
-        "@guildManager": ["./utils/guildManager/guildManager.js"],
-      }
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
+        "target": "es2022",
+        "resolveJsonModule": true
     },
-    "include": ["./**/*"]
-  }
-  
+    "include": ["./**/*"],
+    "exclude": ["node_modules"]
+}

@@ -1,7 +1,7 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const lda = require("@utils/algorithms/lda/lda.js");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import lda from "#utils/algorithms/lda/lda.js";
 
-module.exports = {
+export default {
     name: "topic",
     description: "Uses Latent Dirichlet allocation to get the topic of the last X messages.",
     usage: {
@@ -13,7 +13,7 @@ module.exports = {
     examples: ["50"],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

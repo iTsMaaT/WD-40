@@ -1,14 +1,14 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const GuildManager = require("@guildManager");
-const { fetchAIResponse } = require("@utils/helpers/fetchAIResponse");
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField } = require("discord.js");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import GuildManager from "#guildManager";
+import { fetchAIResponse } from "#utils/helpers/fetchAIResponse.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField } from "discord.js";
 
 const PLAY_AI_SYSTEM_PROMPT = `You identify songs accurately from descriptions.
 Respond with only the verified song title and artist in this exact format: [Title] - [Artist].
 Do not guess when the description is ambiguous; provide your best supported match.
 Do not include explanations, quotes, Markdown, or any other text.`;
 
-module.exports = {
+export default {
     name: "playai",
     description: "Give a song description, and AI will try to find the song for you",
     usage: {
@@ -26,7 +26,7 @@ module.exports = {
     requiredENVs: ["GEMINI_API_KEY"],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

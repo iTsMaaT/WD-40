@@ -46,4 +46,4 @@ stemmer.among = function among(word, offset, replace) {
     return word.replace(/ /g, "");
 };
 
-module.exports = stemmer;
+export default stemmer;

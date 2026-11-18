@@ -1,8 +1,8 @@
-const { createOrUseWebhook, id } = require("@functions/discordFunctions");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { PermissionsBitField } = require("discord.js");
+import { createOrUseWebhook, id } from "#functions/discordFunctions.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { PermissionsBitField } from "discord.js";
 
-module.exports = {
+export default {
     name: "fakemessage",
     description: "Create a fake message using webhooks",
     usage: {
@@ -17,7 +17,7 @@ module.exports = {
     cooldown: 5000,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

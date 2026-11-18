@@ -1,5 +1,5 @@
-const withDbManager = require("./withDatabase/withDbGuildManager");
-const withoutDbManager = require("./withoutDatabase/withoutDbGuildManager");
+import withDbManager from "./withDatabase/withDbGuildManager.js";
+import withoutDbManager from "./withoutDatabase/withoutDbGuildManager.js";
 
 /**
  * The guildManager module exports a manager for guild-related operations,
@@ -12,4 +12,4 @@ const withoutDbManager = require("./withoutDatabase/withoutDbGuildManager");
  */
 const guildManager = process.env.DATABASE_URL ? withDbManager : withoutDbManager;
 
-module.exports = guildManager;
+export default guildManager;

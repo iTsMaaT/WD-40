@@ -1,13 +1,13 @@
-const { StringSelectMenuBuilder, ActionRowBuilder } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { useQueue } = require("discord-player");
-const config = require("@utils/config/configUtils");
-const { prettyString } = require("@functions/formattingFunctions");
+import { StringSelectMenuBuilder, ActionRowBuilder } from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { useQueue } from "discord-player";
+import config from "#utils/config/configUtils.js";
+import { prettyString } from "#functions/formattingFunctions.js";
 
 // Discord allows at most 25 options in a select menu (2 are used by Clear and List)
 const MAX_FILTER_OPTIONS = 23;
 
-module.exports = {
+export default {
     name: "filter",
     description: "Apply or clear audio filters (multiple filters can be toggled at once)",
     category: "music",
@@ -16,7 +16,7 @@ module.exports = {
     inSameVoiceChannel: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

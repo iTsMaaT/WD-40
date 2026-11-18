@@ -1,17 +1,17 @@
-const { ApplicationCommandType, MessageFlags } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { useMainPlayer } = require("discord-player");
-const getURLs = require("@functions/getURLs");
-const config = require("@utils/config/configUtils");
-const { createPaginatedMessage } = require("@utils/helpers/createPaginatedMessage");
+import { ApplicationCommandType, MessageFlags } from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { useMainPlayer } from "discord-player";
+import getURLs from "#functions/getURLs.js";
+import config from "#utils/config/configUtils.js";
+import { createPaginatedMessage } from "#utils/helpers/createPaginatedMessage.js";
 
-module.exports = {
+export default {
     name: "Add / Play Links",
     type: ApplicationCommandType.Message,
     ephemeral: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").MessageContextMenuCommandInteraction} interaction The interaction that triggered the command
      * @param {import("discord.js").Client} client The Discord client instance
      * @returns {Promise<void>}

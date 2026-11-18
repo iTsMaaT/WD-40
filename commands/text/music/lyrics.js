@@ -1,9 +1,9 @@
-const { useQueue, useMainPlayer } = require("discord-player");
-const { lyricsExtractor } = require("@discord-player/extractor");
-const { EmbedBuilder } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
+import { useQueue, useMainPlayer } from "discord-player";
+import { lyricsExtractor } from "@discord-player/extractor";
+import { EmbedBuilder } from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
 
-module.exports = {
+export default {
     name: "lyrics",
     description: "Gives lyrics for the currently playing song",
     category: "music",
@@ -11,7 +11,7 @@ module.exports = {
     inSameVoiceChannel: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

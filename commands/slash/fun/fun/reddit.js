@@ -1,8 +1,8 @@
-const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const FetchReddit = require("@utils/reddit/fetchReddit.js");
+import { ApplicationCommandType, ApplicationCommandOptionType } from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import FetchReddit from "#utils/reddit/fetchReddit.js";
 
-module.exports = {
+export default {
     name: "reddit",
     description: "Finds an image or post from *any* subreddit or user",
     type: ApplicationCommandType.ChatInput,
@@ -26,7 +26,7 @@ module.exports = {
     ],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").ChatInputCommandInteraction} interaction The interaction that triggered the command
      * @param {import("discord.js").Client} client The Discord client instance
      * @returns {Promise<void>}

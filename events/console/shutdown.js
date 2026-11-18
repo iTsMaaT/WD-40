@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     name: "shutdown",
     /**
      * Exits the bot process.

@@ -1,7 +1,7 @@
-const { extractMessageInfo } = require("@functions/discordFunctions");
-const embedGenerator = require("@utils/helpers/embedGenerator");
+import { extractMessageInfo } from "#functions/discordFunctions.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
 
-module.exports = {
+export default {
     name: "sudo",
     description: "Make the bot send a custom message / reply",
     category: "owner",
@@ -36,7 +36,7 @@ module.exports = {
     private: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments
@@ -75,7 +75,7 @@ module.exports = {
             if (flags["emote|e"]) {
                 const sudoMessageNoSpace = sudoMessage.replace(/\s/g, "").toUpperCase();
                 const toReply = await client.channels.cache.get(channelID).messages.fetch({ cache: false, message: messageID });
-                for (i = 0; i < sudoMessageNoSpace.length; i++) {
+                for (let i = 0; i < sudoMessageNoSpace.length; i++) {
                     if (sudoMessageNoSpace[i] === " ") continue;
                     const letter = sudoMessageNoSpace[i];
                     await toReply.react(String.fromCodePoint(letter.codePointAt(0) - 65 + 0x1f1e6)).catch(() => null);

@@ -1,17 +1,18 @@
-const getPterodactylInfo = require("@root/utils/functions/getPterodactylInfo");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { toEngineerNotation } = require("@functions/formattingFunctions");
-const formatDuration = require("@utils/functions/formatDuration");
-const { name } = require("@root/package.json");
+import getPterodactylInfo from "#root/utils/functions/getPterodactylInfo.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { toEngineerNotation } from "#functions/formattingFunctions.js";
+import formatDuration from "#utils/functions/formatDuration.js";
+import packageJson from "#root/package.json" with { type: "json" };
+const { name } = packageJson;
 
-module.exports = {
+export default {
     name: "botinfo",
     description: "Gives info about the Pterodactyl server",
     category: "info",
     aliases: ["binfo"],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

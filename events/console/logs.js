@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     name: "logs",
     /**
      * Displays or changes the console log output mode.

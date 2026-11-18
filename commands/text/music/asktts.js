@@ -1,11 +1,11 @@
-const { PermissionsBitField } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { useQueue, useMainPlayer } = require("discord-player");
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("discord-voip");
-const { Readable } = require("stream");
-const { fetchAIResponse } = require("@utils/helpers/fetchAIResponse");
-const getExactDate = require("@functions/getExactDate");
-const config = require("@utils/config/configUtils");
+import { PermissionsBitField } from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { useQueue, useMainPlayer } from "discord-player";
+import { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } from "discord-voip";
+import { Readable } from "stream";
+import { fetchAIResponse } from "#utils/helpers/fetchAIResponse.js";
+import getExactDate from "#functions/getExactDate.js";
+import config from "#utils/config/configUtils.js";
 
 const ASK_TTS_SYSTEM_PROMPT = `You are a helpful, conversational assistant answering a question for a Discord voice channel.
 Answer directly and concisely in plain text. Do not use Markdown, emojis, bullets, or other formatting.
@@ -13,7 +13,7 @@ Keep your response suitable for being read aloud and under 2000 characters.
 Do not claim to have access to information beyond the details included in the user's prompt.
 Avoid assisting with actionable real-world harm or crime.`;
 
-module.exports = {
+export default {
     name: "asktts",
     description: "Ask a question to the external AI, then play the response in the VC",
     usage: {
@@ -31,7 +31,7 @@ module.exports = {
     requiredENVs: ["GEMINI_API_KEY"],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

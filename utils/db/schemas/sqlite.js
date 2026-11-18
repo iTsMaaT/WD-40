@@ -1,5 +1,5 @@
-const { sqliteTable, primaryKey, text, unique, integer, customType } = require("drizzle-orm/sqlite-core");
-const { sql } = require("drizzle-orm");
+import { sqliteTable, primaryKey, text, unique, integer, customType } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
 
 const datetime = customType({
     dataType() {
@@ -89,11 +89,4 @@ const snowflake = sqliteTable("Snowflake", {
     };
 });
 
-module.exports = {
-    blacklist,
-    guildsettings,
-    logs,
-    reactions,
-    responses,
-    snowflake,
-};
+export { blacklist, guildsettings, logs, reactions, responses, snowflake };

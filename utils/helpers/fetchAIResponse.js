@@ -1,6 +1,6 @@
-const { GoogleGenAI, HarmCategory, HarmBlockThreshold } = require("@google/genai");
-const config = require("@utils/config/configUtils");
-const { askLocalAI } = require("@utils/helpers/askLocalAI");
+import { GoogleGenAI, HarmCategory, HarmBlockThreshold } from "@google/genai";
+import config from "#utils/config/configUtils.js";
+import { askLocalAI } from "#utils/helpers/askLocalAI.js";
 
 const DEFAULT_SAFETY_SETTINGS = [
     {
@@ -81,4 +81,4 @@ async function fetchAIResponse(
     }
 }
 
-module.exports = { fetchAIResponse };
+export { fetchAIResponse };

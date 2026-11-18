@@ -1,9 +1,10 @@
-const { Constants, YTNodes } = require("youtubei.js");
-const { EnabledTrackTypes, buildSabrFormat } = require("googlevideo/utils");
-const { SabrStream } = require("googlevideo/sabr-stream");
-const { getWebPoMinter, invalidateWebPoMinter, generateDataSyncTokens } = require("./poTokenGenerator.js");
-const { getInnertube } = require("./getInnertube.js");
-const { toNodeReadable } = require("./youtubeSharedUtils.js");
+import { Constants, YTNodes } from "youtubei.js";
+import { EnabledTrackTypes, buildSabrFormat } from "googlevideo/utils";
+import { SabrStream } from "googlevideo/sabr-stream";
+import * as poTokenGenerator from "./poTokenGenerator.js";
+const { getWebPoMinter, invalidateWebPoMinter, generateDataSyncTokens } = poTokenGenerator;
+import { getInnertube } from "./getInnertube.js";
+import { toNodeReadable } from "./youtubeSharedUtils.js";
 
 const DEFAULT_OPTIONS = {
     audioQuality: "AUDIO_QUALITY_MEDIUM",
@@ -116,6 +117,4 @@ async function createSabrStream(videoId, cookies, logSabrEvents = false) {
     return nodeStream;
 }
 
-module.exports = {
-    createSabrStream,
-};
+export { createSabrStream };

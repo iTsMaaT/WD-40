@@ -1,10 +1,12 @@
 /* eslint-disable preserve-caught-error */
-const { Constants, YTNodes } = require("youtubei.js");
-const { Readable, PassThrough, once } = require("stream");
-const { getWebPoMinter, invalidateWebPoMinter, generateDataSyncTokens } = require("./poTokenGenerator.js");
-const { getInnertube } = require("./getInnertube.js");
-const { toNodeReadable, makeRequest, parseM3U8, extractManifestUrl } = require("./youtubeSharedUtils.js");
-const { spawn } = require("child_process");
+import { Constants, YTNodes } from "youtubei.js";
+import stream2 from "stream";
+const { Readable, PassThrough, once } = stream2;
+import * as poTokenGenerator from "./poTokenGenerator.js";
+const { getWebPoMinter, invalidateWebPoMinter, generateDataSyncTokens } = poTokenGenerator;
+import { getInnertube } from "./getInnertube.js";
+import { toNodeReadable, makeRequest, parseM3U8, extractManifestUrl } from "./youtubeSharedUtils.js";
+import { spawn } from "child_process";
 
 function createFFmpegStream(input, { isUrl = false, logEvents = false } = {}) {
     const baseArgs = [
@@ -268,8 +270,4 @@ async function getLivestreamInfo(videoId, cookies = []) {
     };
 }
 
-module.exports = {
-    createLivestream,
-    isLivestream,
-    getLivestreamInfo,
-};
+export { createLivestream, isLivestream, getLivestreamInfo };

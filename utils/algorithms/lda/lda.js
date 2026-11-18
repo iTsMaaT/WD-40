@@ -1,4 +1,8 @@
-const stem = require("../stemmer/stemExports.js");
+import stem from "../stemmer/stemExports.js";
+import * as stopwordsEn from "./stopwords_en.js";
+import * as stopwordsFr from "./stopwords_fr.js";
+
+const STOPWORDS = { en: stopwordsEn, fr: stopwordsFr };
 
 //
 // Based on javascript implementation https://github.com/awaisathar/lda.js
@@ -20,7 +24,8 @@ const process = (sentences, numberOfTopics, numberOfTermsPerTopic, languages = [
         let stopwords = [];
 
         languages.forEach(language => {
-            const stopwordsLang = require(`./stopwords_${language}.js`);
+            const stopwordsLang = STOPWORDS[language];
+            if (!stopwordsLang) throw new Error(`No stopwords available for language "${language}"`);
             stopwords = stopwords.concat(stopwordsLang.stop_words);
         });
 
@@ -267,4 +272,4 @@ class LDA {
     }
 }
 
-module.exports = process;
+export default process;

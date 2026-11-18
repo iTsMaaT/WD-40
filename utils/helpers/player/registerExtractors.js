@@ -1,24 +1,26 @@
 /* eslint-disable no-shadow */
-const { Player, AudioFilters, onBeforeCreateStream, onStreamExtracted, StreamType } = require("discord-player");
-const { AttachmentExtractor } = require("@discord-player/extractor");
-const { YoutubeExtractor } = require("discord-player-youtubei");
-const { DeezerExtractor, NodeDecryptor } = require("discord-player-deezer");
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+import { Player, AudioFilters, onBeforeCreateStream, onStreamExtracted, StreamType } from "discord-player";
+import { AttachmentExtractor } from "@discord-player/extractor";
+import { YoutubeExtractor } from "discord-player-youtubei";
+import { DeezerExtractor, NodeDecryptor } from "discord-player-deezer";
 const { SoundgasmExtractor } = require("discord-player-soundgasm");
-const { TTSExtractor } = require("discord-player-tts");
-const { SoundcloudExtractor } = require("discord-player-soundcloud");
-const { SpotifyExtractor } = require("discord-player-spotify");
-const { AppleMusicExtractor } = require("discord-player-applemusic");
-const { SubsonicExtractor } = require("discord-player-subsonic");
-const { YoutubeSabrExtractor } = require("@utils/helpers/youtubei/youtubeiExtractor.js");
-const { startInterceptor } = require("@utils/helpers/player/interceptor");
-const youtubeCookieHandler = require("@utils/helpers/youtubeCookieHandler/youtubeCookieHandler");
-const { FilterManager } = require("@utils/helpers/player/filterManager");
-const { PassThrough, Readable } = require("stream");
-const NodeAV = require("node-av");
-const config = require("@utils/config/configUtils");
-const logger = require("@utils/log");
+import { TTSExtractor } from "discord-player-tts";
+import { SoundcloudExtractor } from "discord-player-soundcloud";
+import { SpotifyExtractor } from "discord-player-spotify";
+import { AppleMusicExtractor } from "discord-player-applemusic";
+import { SubsonicExtractor } from "discord-player-subsonic";
+import { YoutubeSabrExtractor } from "#utils/helpers/youtubei/youtubeiExtractor.js";
+import { startInterceptor } from "#utils/helpers/player/interceptor.js";
+import youtubeCookieHandler from "#utils/helpers/youtubeCookieHandler/youtubeCookieHandler.js";
+import { FilterManager } from "#utils/helpers/player/filterManager.js";
+import { PassThrough, Readable } from "stream";
+import * as NodeAV from "node-av";
+import config from "#utils/config/configUtils.js";
+import logger from "#utils/log.js";
 
-const { Log } = require("youtubei.js");
+import { Log } from "youtubei.js";
 Log.setLevel(Log.Level.NONE);
 
 const discordPlayerConfig = config.get("discordPlayer");
@@ -515,4 +517,4 @@ function tokenToObject(token) {
     return finalObject;
 }
 
-module.exports = { initPlayer, registerExtractors, reload };
+export { initPlayer, registerExtractors, reload };

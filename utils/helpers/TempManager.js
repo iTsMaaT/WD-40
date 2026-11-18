@@ -1,6 +1,6 @@
-const fs = require("fs");
-const path = require("path");
-const logger = require("../log.js");
+import fs from "fs";
+import path from "path";
+import logger from "../log.js";
 
 /**
  * Manages temporary files and directories with automatic cleanup
@@ -116,4 +116,4 @@ class TempManager {
     }
 }
 
-module.exports = TempManager;
+export default TempManager;

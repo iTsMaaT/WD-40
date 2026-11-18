@@ -1,8 +1,8 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { prettyString } = require("@functions/formattingFunctions");
-const { ActivityType } = require("discord.js");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { prettyString } from "#functions/formattingFunctions.js";
+import { ActivityType } from "discord.js";
 
-module.exports = {
+export default {
     name: "userinfo",
     description: "Gives info of a user",
     usage: {
@@ -14,7 +14,7 @@ module.exports = {
     aliases: ["uinfo"],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

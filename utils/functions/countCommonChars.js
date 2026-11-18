@@ -10,4 +10,4 @@ function countCommonChars(...strings) {
         .length;
 }
 
-module.exports = countCommonChars;
+export default countCommonChars;

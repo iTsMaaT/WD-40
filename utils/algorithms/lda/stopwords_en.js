@@ -1,4 +1,4 @@
-exports.stop_words = [
+export const stop_words = [
     "a",
     "able",
     "about",

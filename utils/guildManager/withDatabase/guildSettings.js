@@ -1,7 +1,7 @@
-const { eq, and } = require("drizzle-orm");
-const logger = require("@utils/log");
-const config = require("@utils/config/configUtils");
-const { repositories, schema } = require("../../db/tableManager.js");
+import { eq, and } from "drizzle-orm";
+import logger from "#utils/log.js";
+import config from "#utils/config/configUtils.js";
+import { repositories, schema } from "../../db/tableManager.js";
 
 const prefixes = {};
 const responses = {};
@@ -166,7 +166,7 @@ function GetPersonality(guild) {
     return personality[guild.id];
 }
 
-module.exports = {
+export {
     init,
     ToggleResponses,
     TogglePrefix,

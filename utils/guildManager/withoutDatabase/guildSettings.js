@@ -1,4 +1,4 @@
-const config = require("@utils/config/configUtils");
+import config from "#utils/config/configUtils.js";
 
 const prefixes = {};
 const responses = {};
@@ -142,7 +142,7 @@ function GetPersonality(guild) {
     return personality[guild.id];
 }
 
-module.exports = {
+export {
     init,
     ToggleResponses,
     TogglePrefix,

@@ -1,17 +1,17 @@
-const formatDuration = require("@utils/functions/formatDuration");
-const os = require("os");
-const changelogs = require("@root/changelogs.json");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const getPterodactylInfo = require("@root/utils/functions/getPterodactylInfo");
-const { sql } = require("drizzle-orm");
-const DB = require("@root/utils/db/databaseManager");
-const GuildManager = require("@guildManager");
-const { useMainPlayer } = require("discord-player");
-const { toEngineerNotation } = require("@functions/formattingFunctions");
-const Chart = require("chart.js/auto");
-const { createCanvas } = require("@napi-rs/canvas");
-const { AttachmentBuilder } = require("discord.js");
-const config = require("@utils/config/configUtils");
+import formatDuration from "#utils/functions/formatDuration.js";
+import os from "os";
+import changelogs from "#root/changelogs.json" with { type: "json" };
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import getPterodactylInfo from "#root/utils/functions/getPterodactylInfo.js";
+import { sql } from "drizzle-orm";
+import DB from "#root/utils/db/databaseManager.js";
+import GuildManager from "#guildManager";
+import { useMainPlayer } from "discord-player";
+import { toEngineerNotation } from "#functions/formattingFunctions.js";
+import Chart from "chart.js/auto";
+import { createCanvas } from "@napi-rs/canvas";
+import { AttachmentBuilder } from "discord.js";
+import config from "#utils/config/configUtils.js";
 let totalUserCache = 0;
 let totalChannelCache = 0;
 const rounding = 200;
@@ -21,14 +21,14 @@ let isRendering = false;
 const renderQueue = [];
 
 
-module.exports = {
+export default {
     name: "stats",
     description: "Gives statistics about the bot",
     category: "utils",
     cooldown: 10,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

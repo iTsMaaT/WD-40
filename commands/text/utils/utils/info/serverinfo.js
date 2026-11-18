@@ -1,14 +1,14 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { ChannelType } = require("discord.js");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { ChannelType } from "discord.js";
 
-module.exports = {
+export default {
     name: "serverinfo",
     description: "Gives info about the server",
     category: "info",
     aliases: ["sinfo"],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

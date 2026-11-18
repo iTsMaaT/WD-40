@@ -1,4 +1,4 @@
-const logger = require("@utils/log");
+import logger from "#utils/log.js";
 
 /**
  * Map to hold multiple queues with their operations.
@@ -74,7 +74,4 @@ const clearQueue = (queueName) => {
     
 };
 
-module.exports = {
-    addToQueue,
-    clearQueue,
-};
+export { addToQueue, clearQueue };

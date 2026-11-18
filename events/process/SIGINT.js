@@ -1,5 +1,5 @@
-const DB = require("../../utils/db/databaseManager.js");
-module.exports = {
+import DB from "../../utils/db/databaseManager.js";
+export default {
     name: "SIGINT",
     /**
      * Closes the database and exits after receiving SIGINT.

@@ -1,4 +1,4 @@
-const logger = require("@utils/log");
+import logger from "#utils/log.js";
 
 /**
  * Creates and manages a blacklist for a given guild.
@@ -92,6 +92,4 @@ async function GetBlacklist(guildId) {
     return blacklist[guildId];
 }
 
-module.exports = {
-    GetBlacklist, 
-};
+export { GetBlacklist };

@@ -1,6 +1,6 @@
-const { PermissionsBitField } = require("discord.js");
-const { prettyString } = require("@functions/formattingFunctions");
-const { WebhookClient } = require("discord.js");
+import { PermissionsBitField } from "discord.js";
+import { prettyString } from "#functions/formattingFunctions.js";
+import { WebhookClient } from "discord.js";
 
 /**
  * Creates a webhook if it doesn't exist, or returns a new one with a valid token.
@@ -62,7 +62,7 @@ const id = function(mention) {
 const stringReact = function(client, ChannelID, MessageID, string) {
     const letters = string.toUpperCase().toString();
 
-    for (i = 0; i < letters.length; i++) {
+    for (let i = 0; i < letters.length; i++) {
         if (letters[i] === " ") continue;
         const letter = letters[i];
         client.channels.cache.get(ChannelID).messages.fetch({ cache: false, message: MessageID })
@@ -198,12 +198,12 @@ async function fetchAllGuildsPaginated() {
     return allGuilds;
 }
 
-module.exports = { 
+export {
     createOrUseWebhook,
     id,
     stringReact,
     extractMessageInfo,
-    editOrSend, 
+    editOrSend,
     multipleImageEmbed,
     getPermissionArrayNames,
     fetchAllGuildsPaginated,

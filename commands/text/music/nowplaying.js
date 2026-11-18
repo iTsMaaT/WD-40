@@ -1,16 +1,16 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { getLoopMode, getPauseMode } = require("@root/utils/helpers/player/playerHelpers");
-const { useQueue, useTimeline, useMainPlayer } = require("discord-player");
-const isURL = require("@utils/functions/isURL");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { getLoopMode, getPauseMode } from "#root/utils/helpers/player/playerHelpers.js";
+import { useQueue, useTimeline, useMainPlayer } from "discord-player";
+import isURL from "#utils/functions/isURL.js";
 
-module.exports = {
+export default {
     name: "nowplaying",
     description: "See what song is currently playing",
     category: "music",
     aliases: ["np", "playing"],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

@@ -1,14 +1,14 @@
-const { prettyString } = require("@functions/formattingFunctions");
-const embedGenerator = require("@utils/helpers/embedGenerator");
+import { prettyString } from "#functions/formattingFunctions.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
 
-module.exports = {
+export default {
     name: "tetesaclaque",
     description: "Tells you which tetes a claque you are",
     category: "fun",
     aliases: ["tac"],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     name: "uncaughtException",
     /**
      * Logs an uncaught exception.

@@ -1,8 +1,8 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const GuildManager = require("@guildManager");
-const dbManager = require("@root/utils/db/databaseManager");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import GuildManager from "#guildManager";
+import dbManager from "#root/utils/db/databaseManager.js";
 
-module.exports = {
+export default {
     name: "prefix",
     description: "Changes the prefix used to do commands",
     dbNeeded: false,
@@ -16,7 +16,7 @@ module.exports = {
     examples: ["!"],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

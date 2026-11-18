@@ -1,9 +1,7 @@
-const stemmer = require("./stem.js");
+import stemmer from "./stem.js";
+import english from "./english.js";
 
+english.among = stemmer.among;
+english.except = stemmer.except;
 
-exports = module.exports = require("./english.js");
-
-
-exports.among = stemmer.among;
-
-exports.except = stemmer.except;
+export default english;

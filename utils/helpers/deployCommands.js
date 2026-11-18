@@ -1,8 +1,9 @@
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto");
-const { Client } = require("discord.js");
-const { Logger } = require("@utils/log");
+import fs from "fs";
+import path from "path";
+import crypto from "crypto";
+import { Client } from "discord.js";
+import log from "#utils/log.js";
+const { Logger } = log;
 
 /**
  * Updates the application's commands by comparing the current command manifest with the new one.
@@ -58,4 +59,4 @@ async function updateCommands(client, logger) {
     logger.info("Commands deployed and manifest updated");
 }
 
-module.exports = { updateCommands };
+export { updateCommands };

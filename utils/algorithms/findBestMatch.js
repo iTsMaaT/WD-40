@@ -443,4 +443,4 @@ function fzyStyleMatchAlgorithm(input, values) {
     };
 }
 
-module.exports = { findBestMatch, algorithms };
+export { findBestMatch, algorithms };

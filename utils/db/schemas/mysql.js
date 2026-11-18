@@ -1,5 +1,16 @@
-const { mysqlTable, primaryKey, varchar, datetime, text, unique, int, bigint, tinyint, mysqlEnum } = require("drizzle-orm/mysql-core");
-const { sql } = require("drizzle-orm");
+import {
+    mysqlTable,
+    primaryKey,
+    varchar,
+    datetime,
+    text,
+    unique,
+    int,
+    bigint,
+    tinyint,
+    mysqlEnum,
+} from "drizzle-orm/mysql-core";
+import { sql } from "drizzle-orm";
 
 const blacklist = mysqlTable("Blacklist", {
     id: bigint("ID", { mode: "number" }).autoincrement().notNull(),
@@ -79,11 +90,4 @@ const snowflake = mysqlTable("Snowflake", {
     };
 });
 
-module.exports = {
-    blacklist,
-    guildsettings,
-    logs,
-    reactions,
-    responses,
-    snowflake,
-};
+export { blacklist, guildsettings, logs, reactions, responses, snowflake };

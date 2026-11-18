@@ -1,5 +1,6 @@
-const logger = require("@utils/log");
-const { version, repository } = require("@root/package.json");
+import logger from "#utils/log.js";
+import packageJson from "#root/package.json" with { type: "json" };
+const { version, repository } = packageJson;
 
 /**
  * Check if the application version is up to date between github and package.json
@@ -35,4 +36,4 @@ const checkGitHubVersion = async function() {
     logger.info("Successfully checked application version.");
 };
 
-module.exports = { execute: checkGitHubVersion };
+export default { execute: checkGitHubVersion };

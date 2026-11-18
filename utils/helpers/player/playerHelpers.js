@@ -1,14 +1,16 @@
-const { useQueue } = require("discord-player");
-const { toggleLiveChat } = require("./playerLiveChat");
-const { distubePluginToExtractor } = require("./distubePluginToDiscordPlayerExtractor");
-const { AttachmentExtractor } = require("@discord-player/extractor");
-const { YoutubeExtractor } = require("discord-player-youtubei");
-const { DeezerExtractor } = require("discord-player-deezer");
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+import { useQueue } from "discord-player";
+import { toggleLiveChat } from "./playerLiveChat.js";
+import { distubePluginToExtractor } from "./distubePluginToDiscordPlayerExtractor.js";
+import { AttachmentExtractor } from "@discord-player/extractor";
+import { YoutubeExtractor } from "discord-player-youtubei";
+import { DeezerExtractor } from "discord-player-deezer";
 const { SoundgasmExtractor } = require("discord-player-soundgasm");
-const { TTSExtractor } = require("discord-player-tts");
-const { SoundcloudExtractor } = require("discord-player-soundcloud");
-const { SpotifyExtractor } = require("discord-player-spotify");
-const { AppleMusicExtractor } = require("discord-player-applemusic");
+import { TTSExtractor } from "discord-player-tts";
+import { SoundcloudExtractor } from "discord-player-soundcloud";
+import { SpotifyExtractor } from "discord-player-spotify";
+import { AppleMusicExtractor } from "discord-player-applemusic";
 
 const identifierMap = {
     "youtubei": YoutubeExtractor.identifier,
@@ -109,7 +111,7 @@ const getProbableBridgeSource = function(playerConfig, providesStream) {
     return streamProviders.length > 0 ? streamProviders.join(" \\▶ ") : "N/A";
 };
 
-module.exports = {
+export {
     getLoopMode,
     getPauseMode,
     getFormattedSource,

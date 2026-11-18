@@ -1,10 +1,10 @@
-const path = require("path");
-const { Worker } = require("worker_threads");
-const embedGenerator = require("@utils/helpers/embedGenerator");
+import path from "path";
+import { Worker } from "worker_threads";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
 
-const WORKER_PATH = path.join(__dirname, "..", "..", "..", "..", "..", "utils", "helpers", "malbolgeWorker.js");
+const WORKER_PATH = path.join(import.meta.dirname, "..", "..", "..", "..", "..", "utils", "helpers", "malbolgeWorker.js");
 
-module.exports = {
+export default {
     name: "malbolge",
     description: "Translates a string to malbolge, the hardest programming language",
     category: "text manipulation",
@@ -19,7 +19,7 @@ module.exports = {
     cooldownGroup: "malbolge",
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

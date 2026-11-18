@@ -1,8 +1,8 @@
-const { Events } = require("discord.js");
-const config = require("@utils/config/configUtils");
-const GuildManager = require("@guildManager");
+import { Events } from "discord.js";
+import config from "#utils/config/configUtils.js";
+import GuildManager from "#guildManager";
 
-module.exports = {
+export default {
     name: Events.GuildCreate,
     once: false,
     log: true,

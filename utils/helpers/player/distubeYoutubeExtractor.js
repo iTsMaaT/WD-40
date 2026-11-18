@@ -1,13 +1,7 @@
-const { tokenToObject } = require("discord-player-youtubei");
-const { DisTubeError, ExtractorPlugin, Playlist, Song } = require("distube");
-const {
-    Innertube,
-    UniversalCache,
-    Log,
-    ClientType,
-    Platform,
-    YTNodes,
-} = require("youtubei.js");
+import * as discordPlayerYoutubei from "discord-player-youtubei";
+const { tokenToObject } = discordPlayerYoutubei;
+import { DisTubeError, ExtractorPlugin, Playlist, Song } from "distube";
+import { Innertube, UniversalCache, Log, ClientType, Platform, YTNodes } from "youtubei.js";
 
 async function getPlaylist(id) {
     const yt = await Innertube.create();
@@ -224,6 +218,4 @@ class YoutubePlaylist extends Playlist {
     }
 }
 
-module.exports = {
-    YoutubePlugin,
-};
+export { YoutubePlugin };

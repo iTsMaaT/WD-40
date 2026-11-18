@@ -1,6 +1,6 @@
-const { EmbedBuilder } = require("discord.js");
-const { client } = require("@root/index");
-const config = require("@utils/config/configUtils");
+import { EmbedBuilder } from "discord.js";
+import { client } from "#utils/client.js";
+import config from "#utils/config/configUtils.js";
 const colors = config.get("defaultEmbedColors");
 
 /**
@@ -99,4 +99,4 @@ class EmbedGenerator extends EmbedBuilder {
  */
 const embedGenerator = new EmbedGenerator();
 Object.freeze(embedGenerator);
-module.exports = embedGenerator;
+export default embedGenerator;

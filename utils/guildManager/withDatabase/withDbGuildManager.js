@@ -1,9 +1,9 @@
-const guildSettings = require("./guildSettings");
-const blacklist = require("./blacklist");
-const autoReactions = require("./autoReactions");
-const autoResponses = require("./autoResponses");
+import * as guildSettings from "./guildSettings.js";
+import * as blacklist from "./blacklist.js";
+import * as autoReactions from "./autoReactions.js";
+import * as autoResponses from "./autoResponses.js";
 
-module.exports = {
+export default {
     ...guildSettings,
     ...blacklist,
     ...autoReactions,

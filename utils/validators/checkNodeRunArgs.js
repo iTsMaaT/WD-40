@@ -1,4 +1,4 @@
-const logger = require("@utils/log");
+import logger from "#utils/log.js";
 
 /**
  * Checks if the proper arguments are passed to the node.js run command
@@ -21,4 +21,4 @@ const checkNodeRunArgs = function() {
         
 };
 
-module.exports = { execute: checkNodeRunArgs };
+export default { execute: checkNodeRunArgs };

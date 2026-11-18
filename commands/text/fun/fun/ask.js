@@ -1,5 +1,5 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { fetchAIResponse } = require("@utils/helpers/fetchAIResponse");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { fetchAIResponse } from "#utils/helpers/fetchAIResponse.js";
 
 const MAX_REPLIES = 5;
 const MAX_HISTORY_TURNS = 6;
@@ -10,7 +10,7 @@ For a list request, output only the list.
 Keep replies under 2000 characters.
 Avoid assisting with actionable real-world harm or crime.`;
 
-module.exports = {
+export default {
     name: "ask",
     description: "Ask a question to the configured AI model",
     usage: {
@@ -23,7 +23,7 @@ module.exports = {
     cooldown: 20000,
     cooldownGroup: "AI",
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

@@ -1,5 +1,5 @@
-const path = require("node:path");
-const fs = require("node:fs");
+import path from "node:path";
+import fs from "node:fs";
 
 /**
  * Check if a folder exists at the given path. If not, create it.
@@ -104,4 +104,4 @@ class SaveFile {
 
 }
 
-module.exports = SaveFile;
+export default SaveFile;

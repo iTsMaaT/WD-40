@@ -1,9 +1,9 @@
-const fs = require("node:fs");
-const path = require("node:path");
-const config = require("@utils/config/configUtils");
-const logger = require("@utils/log");
+import fs from "node:fs";
+import path from "node:path";
+import config from "#utils/config/configUtils.js";
+import logger from "#utils/log.js";
 
-const MODELS_DIR = path.join(__dirname, "aiModels");
+const MODELS_DIR = path.join(import.meta.dirname, "aiModels");
 const PROGRESS_LOG_STEP = 10; // Log every 10%
 
 // One shared download per model file, so startup and the first >ask don't download twice
@@ -75,4 +75,4 @@ function formatMB(bytes) {
     return (bytes / 1024 / 1024).toFixed(1);
 }
 
-module.exports = { ensureLocalAIModel };
+export { ensureLocalAIModel };

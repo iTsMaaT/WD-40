@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
 /**
  * Represents the base configuration object.
@@ -8,7 +8,7 @@ const path = require("path");
  */
 class Config {
     constructor() {
-        this.configFilePath = process.env.CONFIG_FILEPATH || path.resolve(__dirname, "../../utils/config/config.jsonc");
+        this.configFilePath = process.env.CONFIG_FILEPATH || path.resolve(import.meta.dirname, "../../utils/config/config.jsonc");
         
         this.envConfig = {
             OWNER_ID: process.env.OWNER_ID,
@@ -96,8 +96,6 @@ class Config {
      * @returns {Config}
      */
     reload() {
-        delete require.cache[require.resolve(this.configFilePath)];
-    
         this.loadBaseConfig();
         return this;
     }
@@ -192,4 +190,4 @@ class Config {
 // Singleton instance
 const configInstance = new Config();
 
-module.exports = configInstance;
+export default configInstance;

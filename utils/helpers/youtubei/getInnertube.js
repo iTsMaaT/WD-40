@@ -1,4 +1,4 @@
-const { Innertube, UniversalCache, Platform } = require("youtubei.js");
+import { Innertube, UniversalCache, Platform } from "youtubei.js";
 
 let ineerTubeInstance = null;
 
@@ -33,4 +33,4 @@ async function getInnertube(cookies) {
     return ineerTubeInstance; 
 }
 
-module.exports = { getInnertube };
+export { getInnertube };

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     name: "ascii",
     /**
      * Converts each supplied word to binary character codes and prints the result.

@@ -1,6 +1,7 @@
-const { getLiveChat, LiveChatEvents, ChatMessageType } = require("discord-player-youtubei");
-const { useQueue } = require("discord-player");
-const embedGenerator = require("@utils/helpers/embedGenerator");
+import * as discordPlayerYoutubei from "discord-player-youtubei";
+const { getLiveChat, LiveChatEvents, ChatMessageType } = discordPlayerYoutubei;
+import { useQueue } from "discord-player";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
 
 const liveChatEnabled = new Set();
 const activeChats = new Map();
@@ -158,7 +159,4 @@ const toggleLiveChat = async function(url, channel) {
     return enabled;
 };
 
-module.exports = {
-    toggleLiveChat,
-    disableLiveChat,
-};
+export { toggleLiveChat, disableLiveChat };

@@ -1,11 +1,10 @@
-require("module-alias/register");
-const { execSync } = require("child_process");
-const { fetchAIResponse } = require("./fetchAIResponse");
-const changelog = require("@root/changelogs.json");
-const config = require("@root/utils/config/configUtils");
-require("dotenv").config();
-const logger = require("@utils/log");
-const fs = require("fs");
+import "dotenv/config";
+import { execSync } from "child_process";
+import { fetchAIResponse } from "./fetchAIResponse.js";
+import changelog from "#root/changelogs.json" with { type: "json" };
+import config from "#root/utils/config/configUtils.js";
+import logger from "#utils/log.js";
+import fs from "fs";
 
 async function generateChangelogEntry() {
     const MODEL = "gemini-1.5-pro";

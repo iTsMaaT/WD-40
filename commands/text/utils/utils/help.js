@@ -1,9 +1,15 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, MessageFlags } = require("discord.js");
-const { prettyString } = require("@functions/formattingFunctions");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const GuildManager = require("@guildManager");
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    StringSelectMenuBuilder,
+    MessageFlags,
+} from "discord.js";
+import { prettyString } from "#functions/formattingFunctions.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import GuildManager from "#guildManager";
 
-module.exports = {
+export default {
     name: "help",
     description: "Lists commands",
     category: "utils",
@@ -15,7 +21,7 @@ module.exports = {
     },
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

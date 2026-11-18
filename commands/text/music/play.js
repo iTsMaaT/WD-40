@@ -1,18 +1,21 @@
-const { PermissionsBitField } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { getLoopMode } = require("@root/utils/helpers/player/playerHelpers");
-const { QueryType, useMainPlayer, useQueue, QueryResolver } = require("discord-player");
-const { AttachmentExtractor } = require("@discord-player/extractor");
-const { SpotifyExtractor } = require("discord-player-spotify");
-const { YoutubeiExtractor } = require("discord-player-youtubei");
-const config = require("@utils/config/configUtils");
-const { searchWithPriorities, getProbableBridgeSource } = require("@root/utils/helpers/player/playerHelpers");
-const fs = require("fs");
-const isURL = require("@utils/functions/isURL");
-const { safeFetch } = require("@utils/helpers/safeFetch");
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+import { PermissionsBitField } from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { getLoopMode } from "#root/utils/helpers/player/playerHelpers.js";
+import { QueryType, useMainPlayer, useQueue, QueryResolver } from "discord-player";
+import { AttachmentExtractor } from "@discord-player/extractor";
+import { SpotifyExtractor } from "discord-player-spotify";
+import * as discordPlayerYoutubei from "discord-player-youtubei";
+const { YoutubeiExtractor } = discordPlayerYoutubei;
+import config from "#utils/config/configUtils.js";
+import { searchWithPriorities, getProbableBridgeSource } from "#root/utils/helpers/player/playerHelpers.js";
+import fs from "fs";
+import isURL from "#utils/functions/isURL.js";
+import { safeFetch } from "#utils/helpers/safeFetch.js";
 const { simpleFolderSearch } = require("simple-folder-search");
 
-module.exports = {
+export default {
     name: "play",
     description: "Play a song (works best with Deezer or Soundcloud links (YouTube breaks often))", 
     aliases: ["p"],
@@ -38,7 +41,7 @@ module.exports = {
     inVoiceChannel: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments
@@ -249,7 +252,7 @@ module.exports = {
 
             logger.music(`Playing [${finalTrack.title}] in [${message.member.voice.channel.name}]`);
 
-            embed = embedGenerator.info({
+            const embed = embedGenerator.info({
                 title: `${finalSearchResult.hasPlaylist() ? "Playlist" : "Track"} ${!queue?.currentTrack ? "now playing!" : "enqueued!"}`,
                 thumbnail: { url: finalTrack.thumbnail },
                 description: isURL(finalTrack.url) ? `[${finalTrack.title}](${finalTrack.url})` : finalTrack.title,

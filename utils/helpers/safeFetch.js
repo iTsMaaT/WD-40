@@ -1,7 +1,7 @@
-const https = require("https");
-const http = require("http");
-const dns = require("dns/promises");
-const net = require("net");
+import https from "https";
+import http from "http";
+import dns from "dns/promises";
+import net from "net";
 
 const DEFAULT_MAX_BYTES = 1024 * 1024;
 const DEFAULT_MAX_REDIRECTS = 5;
@@ -232,4 +232,4 @@ async function requestOnce(input, options = {}) {
     return await requestURL(new URL(input), { method, maxBytes, timeoutMs, headersOnly, headers });
 }
 
-module.exports = { safeFetch, requestOnce, assertPublicURL, resolvePublicAddresses, isPublicAddress };
+export { safeFetch, requestOnce, assertPublicURL, resolvePublicAddresses, isPublicAddress };

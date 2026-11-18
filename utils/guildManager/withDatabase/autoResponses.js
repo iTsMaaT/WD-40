@@ -1,7 +1,7 @@
 /* eslint-disable no-shadow */
-const { eq, and } = require("drizzle-orm");
-const logger = require("@utils/log");
-const { repositories, schema } = require("../../db/tableManager.js");
+import { eq, and } from "drizzle-orm";
+import logger from "#utils/log.js";
+import { repositories, schema } from "../../db/tableManager.js";
 
 /**
  * Initializes the auto response system for a guild.
@@ -182,6 +182,4 @@ async function getAutoResponses(guildId) {
     return autoResponses[guildId];
 }
 
-module.exports = {
-    getAutoResponses,
-};
+export { getAutoResponses };

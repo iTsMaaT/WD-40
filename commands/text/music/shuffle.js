@@ -1,7 +1,7 @@
-const { useQueue, useMainPlayer } = require("discord-player");
-const embedGenerator = require("@root/utils/helpers/embedGenerator");
+import { useQueue, useMainPlayer } from "discord-player";
+import embedGenerator from "#root/utils/helpers/embedGenerator.js";
 
-module.exports = {
+export default {
     name: "shuffle",
     description: "Shuffles the playlist",
     category: "music",
@@ -9,7 +9,7 @@ module.exports = {
     inSameVoiceChannel: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

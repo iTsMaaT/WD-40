@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     name: "restart",
     /**
      * Exits the process with a failure code to trigger a bot restart.

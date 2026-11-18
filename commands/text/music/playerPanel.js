@@ -1,10 +1,16 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { useQueue, useTimeline, useHistory, QueueRepeatMode } = require("discord-player");
-const { getLoopMode, getPauseMode } = require("@root/utils/helpers/player/playerHelpers");
-const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    EmbedBuilder,
+    StringSelectMenuBuilder,
+} from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { useQueue, useTimeline, useHistory, QueueRepeatMode } from "discord-player";
+import { getLoopMode, getPauseMode } from "#root/utils/helpers/player/playerHelpers.js";
+import { findBestMatch, algorithms } from "#utils/algorithms/findBestMatch.js";
 
-module.exports = {
+export default {
     name: "playerpanel",
     description: "Show the player panel with controls",
     aliases: ["pp"],
@@ -14,7 +20,7 @@ module.exports = {
     inSameVoiceChannel: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

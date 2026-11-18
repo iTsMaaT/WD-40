@@ -1,6 +1,7 @@
-const { Readable, PassThrough, once } = require("stream");
-const https = require("https");
-const http = require("http");
+import stream2 from "stream";
+const { Readable, PassThrough, once } = stream2;
+import https from "https";
+import http from "http";
 
 /**
  * Converts a web stream to a Node.js Readable stream
@@ -130,9 +131,4 @@ function extractManifestUrl(playerResponse) {
     return null;
 }
 
-module.exports = {
-    toNodeReadable,
-    makeRequest,
-    parseM3U8,
-    extractManifestUrl,
-};
+export { toNodeReadable, makeRequest, parseM3U8, extractManifestUrl };

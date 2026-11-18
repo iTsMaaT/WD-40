@@ -1,7 +1,7 @@
-const changelog = require("@root/changelogs.json");
-const formatDuration = require("@utils/functions/formatDuration.js");
+import changelog from "#root/changelogs.json" with { type: "json" };
+import formatDuration from "#utils/functions/formatDuration.js";
 
-module.exports = {
+export default {
     name: "info",
     /**
      * Prints the bot version, connection, uptime, guild, and member statistics.

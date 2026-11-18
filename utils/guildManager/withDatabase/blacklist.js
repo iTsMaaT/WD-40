@@ -1,6 +1,6 @@
-const { eq, and } = require("drizzle-orm");
-const logger = require("@utils/log");
-const { repositories, schema } = require("../../db/tableManager.js");
+import { eq, and } from "drizzle-orm";
+import logger from "#utils/log.js";
+import { repositories, schema } from "../../db/tableManager.js";
 
 /**
  * Creates and manages a blacklist for a given guild.
@@ -124,6 +124,4 @@ async function GetBlacklist(guildId) {
     return blacklist[guildId];
 }
 
-module.exports = {
-    GetBlacklist,
-};
+export { GetBlacklist };

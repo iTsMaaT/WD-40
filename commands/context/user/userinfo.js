@@ -1,13 +1,13 @@
-const { ApplicationCommandType, ActivityType } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { prettyString } = require("@functions/formattingFunctions");
+import { ApplicationCommandType, ActivityType } from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { prettyString } from "#functions/formattingFunctions.js";
 
-module.exports = {
+export default {
     name: "User information",
     type: ApplicationCommandType.User,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").UserContextMenuCommandInteraction} interaction The interaction that triggered the command
      * @param {import("discord.js").Client} client The Discord client instance
      * @returns {Promise<void>}

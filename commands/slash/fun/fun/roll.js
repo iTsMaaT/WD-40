@@ -1,7 +1,7 @@
-const { ApplicationCommandType, ApplicationCommandOptionType } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
+import { ApplicationCommandType, ApplicationCommandOptionType } from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
 
-module.exports = {
+export default {
     name: "roll",
     description: "Roll between 1 and 250 dices of up to 250 sides. Defaults to rolling 1d6.",
     type: ApplicationCommandType.ChatInput,
@@ -37,7 +37,7 @@ module.exports = {
         const rolls = Array.from({ length: numDices }, () => Math.floor(Math.random() * numSides) + 1);
         const total = rolls.reduce((acc, cur) => acc + cur, 0);
 
-        RollEmbed = {
+        const RollEmbed = {
             color: 0xffffff,
             title: `Rolling **${numDices}d${numSides}**...`,
             fields: [

@@ -1,7 +1,7 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { disableLiveChat } = require("@root/utils/helpers/player/playerLiveChat");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { disableLiveChat } from "#root/utils/helpers/player/playerLiveChat.js";
 
-module.exports = {
+export default {
     name: "playerFinish",
     once: false,
     /**

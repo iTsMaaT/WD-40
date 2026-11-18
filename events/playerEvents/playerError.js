@@ -1,6 +1,6 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
 
-module.exports = {
+export default {
     name: "playerError",
     once: false,
     /**

@@ -1,4 +1,4 @@
-const config = require("../config/configUtils");
+import config from "../config/configUtils.js";
 
 /**
  * Get the exact date and time using the configured locale
@@ -25,4 +25,4 @@ const getExactDate = function() {
         .replace(",", "");
 };
 
-module.exports = getExactDate;
+export default getExactDate;

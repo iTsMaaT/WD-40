@@ -1,9 +1,9 @@
-const { EmbedBuilder } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { QueueRepeatMode, useQueue, useMainPlayer } = require("discord-player");
-const { getLoopMode } = require("@root/utils/helpers/player/playerHelpers");
+import { EmbedBuilder } from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { QueueRepeatMode, useQueue, useMainPlayer } from "discord-player";
+import { getLoopMode } from "#root/utils/helpers/player/playerHelpers.js";
 
-module.exports = {
+export default {
     name: "loop",
     description: "Loop a desired song or queue",
     usage: {
@@ -18,7 +18,7 @@ module.exports = {
     inSameVoiceChannel: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

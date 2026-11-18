@@ -1,4 +1,4 @@
-const stemmer = require("./stem.js");
+import stemmer from "./stem.js";
 
 const alphabet = "abcdefghijklmnopqrstuvwxyz";
 const vowels = "aeiouy";
@@ -37,7 +37,7 @@ const exceptions2 = [
     "proceed", "exceed", "succeed",
 ];
 
-module.exports = function(word) {
+export default function(word) {
     // Exceptions 1
     let stop = stemmer.except(word, exceptions1);
     if (stop) return stop;

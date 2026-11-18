@@ -1,9 +1,10 @@
-const fs = require("fs/promises");
-const formatDuration = require("@utils/functions/formatDuration");
-const { repositories } = require("@root/utils/db/tableManager");
-const { usage } = require("./activity");
+import fs from "fs/promises";
+import formatDuration from "#utils/functions/formatDuration.js";
+import { repositories } from "#root/utils/db/tableManager.js";
+import activity from "./activity.js";
+const { usage } = activity;
 
-module.exports = {
+export default {
     name: "db",
     description: "Gives db info of a table",
     category: "owner",
@@ -19,7 +20,7 @@ module.exports = {
     private: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

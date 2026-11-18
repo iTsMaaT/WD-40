@@ -1,8 +1,8 @@
-const { BotGuardClient } = require("bgutils-js/botguard");
-const { WebPoMinter, createColdStartToken } = require("bgutils-js/webpo");
-const { GOOG_API_KEY, USER_AGENT, buildURL } = require("bgutils-js/utils");
-const { JSDOM } = require("jsdom");
-const { createCanvas, ImageData: CanvasImageData } = require("@napi-rs/canvas");
+import { BotGuardClient } from "bgutils-js/botguard";
+import { WebPoMinter, createColdStartToken } from "bgutils-js/webpo";
+import { GOOG_API_KEY, USER_AGENT, buildURL } from "bgutils-js/utils";
+import { JSDOM } from "jsdom";
+import { createCanvas, ImageData as CanvasImageData } from "@napi-rs/canvas";
 
 const TV_USER_AGENT = "Mozilla/5.0 (Linux arm64-v8a; Android 10) Cobalt/25.lts.30.1034958-gold (unlike Gecko) v8/8.8.278.17-jit gles Starboard/15, Sony_ATV_sdm845_13140765/52.1.C.0.268 (KDDI, SOV38) com.google.android.youtube.tv/5.30.301";
 
@@ -295,7 +295,4 @@ function invalidateWebPoMinter() {
     resetBotGuardState();
 }
 
-module.exports = {
-    getWebPoMinter,
-    invalidateWebPoMinter,
-};
+export { getWebPoMinter, invalidateWebPoMinter };

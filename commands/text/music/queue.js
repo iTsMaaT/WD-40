@@ -1,10 +1,10 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const { useQueue, useMainPlayer, useHistory } = require("discord-player");
-const formatDuration = require("@utils/functions/formatDuration");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { useQueue, useMainPlayer, useHistory } from "discord-player";
+import formatDuration from "#utils/functions/formatDuration.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { findBestMatch, algorithms } from "#utils/algorithms/findBestMatch.js";
 
-module.exports = {
+export default {
     name: "queue",
     description: "Shows the current queue and / or history",
     usage: {
@@ -18,7 +18,7 @@ module.exports = {
     aliases: ["q"],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

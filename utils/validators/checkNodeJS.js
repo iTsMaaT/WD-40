@@ -1,5 +1,5 @@
-const { exec } = require("child_process");
-const logger = require("@utils/log");
+import { exec } from "child_process";
+import logger from "#utils/log.js";
 
 /**
  * Check if Node.js is up to date on the system
@@ -36,4 +36,4 @@ const checkNodeJsVersion = async function() {
     });
 };
 
-module.exports = { execute: checkNodeJsVersion };
+export default { execute: checkNodeJsVersion };

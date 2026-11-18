@@ -1,9 +1,9 @@
-const sharp = require("sharp");
-const { AttachmentBuilder } = require("discord.js");
-const { PermissionFlagsBits } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
+import sharp from "sharp";
+import { AttachmentBuilder } from "discord.js";
+import { PermissionFlagsBits } from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
 
-module.exports = {
+export default {
     name: "imagefuck",
     description: "Transform a string into imagefuck",
     usage: {
@@ -16,7 +16,7 @@ module.exports = {
     permission: [PermissionFlagsBits.AttachFiles],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

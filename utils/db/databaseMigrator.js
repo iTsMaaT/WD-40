@@ -1,4 +1,4 @@
-const fs = require("node:fs");
+import fs from "node:fs";
 
 function migrateSqlite(db) {
     const migrationTableExists = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='Migrations';");
@@ -7,7 +7,7 @@ function migrateSqlite(db) {
         db.exec("CREATE TABLE `Migrations` (`Name` TEXT NOT NULL, `Ran` INTEGER NOT NULL);");
     
 
-    const files = fs.readdirSync(__dirname + "/../../migrations/sqlite");
+    const files = fs.readdirSync(import.meta.dirname + "/../../migrations/sqlite");
     const migrationWasRan = db.prepare("SELECT `Ran` FROM `Migrations` WHERE `Name` = @name LIMIT 1;");
     const addMigration = db.prepare("INSERT INTO `Migrations` (`Name`, `Ran`) VALUES (@name, @ran);");
 
@@ -15,7 +15,7 @@ function migrateSqlite(db) {
         // eslint-disable-next-line no-shadow
         const result = migrationWasRan.get({ name: f });
         if (result === undefined) {
-            const content = fs.readFileSync(__dirname + "/../../migrations/sqlite/" + f, "utf8");
+            const content = fs.readFileSync(import.meta.dirname + "/../../migrations/sqlite/" + f, "utf8");
             db.exec(content);
             addMigration.run({ name: f, ran: Date.now() });
         }
@@ -28,14 +28,14 @@ async function migrateMysql(db) {
         await db.query("CREATE TABLE `Migrations` (`Name` VARCHAR(255) NOT NULL, `Ran` BIGINT NOT NULL) ENGINE = InnoDB COLLATE = utf8mb4_unicode_ci;");
     
 
-    const files = fs.readdirSync(__dirname + "/../../migrations/mysql");
+    const files = fs.readdirSync(import.meta.dirname + "/../../migrations/mysql");
     const migrationWasRan = await db.prepare("SELECT `Ran` FROM `Migrations` WHERE `Name` = ? LIMIT 1;");
     const addMigration = await db.prepare("INSERT INTO `Migrations` (`Name`, `Ran`) VALUES (?, ?);");
 
     for (const f of files) {
         const [result] = await migrationWasRan.execute([f]);
         if (result.length == 0) {
-            const content = fs.readFileSync(__dirname + "/../../migrations/mysql/" + f, "utf8");
+            const content = fs.readFileSync(import.meta.dirname + "/../../migrations/mysql/" + f, "utf8");
             const queries = content.split(";").map(v => v.trim());
             for (const q of queries) {
                 if (q == "") continue;
@@ -47,4 +47,4 @@ async function migrateMysql(db) {
 
 }
 
-module.exports = { migrateMysql, migrateSqlite };
+export { migrateMysql, migrateSqlite };

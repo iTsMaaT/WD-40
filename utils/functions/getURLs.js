@@ -24,4 +24,4 @@ const getURLs = (str, lower = false) => {
     }
 };
 
-module.exports = getURLs;
+export default getURLs;

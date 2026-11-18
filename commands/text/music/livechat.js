@@ -1,8 +1,8 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { useQueue } = require("discord-player");
-const { toggleLiveChat } = require("@root/utils/helpers/player/playerLiveChat");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { useQueue } from "discord-player";
+import { toggleLiveChat } from "#root/utils/helpers/player/playerLiveChat.js";
 
-module.exports = {
+export default {
     name: "livechat",
     description: "Enables or disables livechat",
     category: "music",
@@ -12,7 +12,7 @@ module.exports = {
     inSameVoiceChannel: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

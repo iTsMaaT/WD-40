@@ -1,22 +1,23 @@
-const randomMinMax = require("@utils/functions/randomMinMax.js");
-const getExactDate = require("@functions/getExactDate.js");
-const { prettyString } = require("@functions/formattingFunctions");
-const { StringReact } = require("@functions/discordFunctions.js");
-const getPterodactylInfo = require("@utils/functions/getPterodactylInfo.js");
-const getUniqueValues = require("@utils/functions/getUniqueValues.js");
-const EmbedGenerator = require("@utils/helpers/embedGenerator");
-const { repositories } = require("@utils/db/tableManager.js");
-const guildSettings = require("@utils/guildManager/withDatabase/guildSettings.js");
-const GuildManager = require("@guildManager");
+import randomMinMax from "#utils/functions/randomMinMax.js";
+import getExactDate from "#functions/getExactDate.js";
+import { prettyString } from "#functions/formattingFunctions.js";
+import * as discordFunctions from "#functions/discordFunctions.js";
+const { StringReact } = discordFunctions;
+import getPterodactylInfo from "#utils/functions/getPterodactylInfo.js";
+import getUniqueValues from "#utils/functions/getUniqueValues.js";
+import EmbedGenerator from "#utils/helpers/embedGenerator.js";
+import { repositories } from "#utils/db/tableManager.js";
+import * as guildSettings from "#utils/guildManager/withDatabase/guildSettings.js";
+import GuildManager from "#guildManager";
 
-module.exports = {
+export default {
     name: "test",
     description: "Test command",
     category: "fun",
     private: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

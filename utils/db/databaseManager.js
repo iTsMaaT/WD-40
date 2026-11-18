@@ -1,4 +1,12 @@
-const { migrateMysql, migrateSqlite } = require("./databaseMigrator.js");
+import Database from "better-sqlite3";
+import mysql from "mysql2/promise";
+import { drizzle as drizzleSqlite } from "drizzle-orm/better-sqlite3";
+import { drizzle as drizzleMysql } from "drizzle-orm/mysql2";
+import { migrateMysql, migrateSqlite } from "./databaseMigrator.js";
+import * as sqliteSchema from "./schemas/sqlite.js";
+import * as mysqlSchema from "./schemas/mysql.js";
+
+const SCHEMAS = { sqlite: sqliteSchema, mysql: mysqlSchema };
 
 let instance;
 
@@ -23,7 +31,7 @@ class DatabaseManager {
         if (process.env.DATABASE_URL.startsWith("sqlite:")) {
             // Set driver to SQLITE & configure drizzle to use sqlite database
             this.driver = "sqlite";
-            this._dbPool = require("better-sqlite3")(process.env.DATABASE_URL.substring(7), { fileMustExist: false });
+            this._dbPool = new Database(process.env.DATABASE_URL.substring(7), { fileMustExist: false });
             this._dbPool.pragma("journal_mode = WAL"); // Recommened for performance
 
             // Run migration that needs to be run
@@ -31,11 +39,10 @@ class DatabaseManager {
             console.info("Database migrations were executed successfully.");
 
             // Get the necessary drizzle driver for SQLITE
-            drizzle = require("drizzle-orm/better-sqlite3").drizzle;
+            drizzle = drizzleSqlite;
         } else {
             // Set driver to MYSQL & configure drizzle to use MySQL database
             this.driver = "mysql";
-            const mysql = require("mysql2/promise");
             this._dbPool = mysql.createPool({
                 uri: process.env.DATABASE_URL,
                 waitForConnections: true,
@@ -51,7 +58,7 @@ class DatabaseManager {
             })().then(console.info("Database migrations were executed successfully."));
 
             // Get the necessary drizzle driver for MYSQL
-            drizzle = require("drizzle-orm/mysql2").drizzle;
+            drizzle = drizzleMysql;
         }
 
 
@@ -110,7 +117,7 @@ class DatabaseManager {
     }
 
     getSchema() {
-        return require(__dirname + "/schemas/" + this.driver + ".js");
+        return SCHEMAS[this.driver];
     }
 
     close() {
@@ -126,4 +133,4 @@ class DatabaseManager {
 const dbManager = new DatabaseManager();
 Object.freeze(dbManager);
 
-module.exports = dbManager;
+export default dbManager;

@@ -1,5 +1,5 @@
-const logger = require("@utils/log");
-const { getRedditToken, makeRequest } = require("./fetchRedditToken.js");
+import logger from "#utils/log.js";
+import { getRedditToken, makeRequest } from "./fetchRedditToken.js";
 
 /**
  * Fetch a post from Reddit
@@ -120,4 +120,4 @@ const fetchReddit = async function(ChannelNSFW, subreddits, limit, type = "sub",
     }
 };
 
-module.exports = fetchReddit;
+export default fetchReddit;

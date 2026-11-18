@@ -1,9 +1,9 @@
-const {  id } = require("@functions/discordFunctions");
-const { PermissionsBitField } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const GuildManager = require("@guildManager");
+import { id } from "#functions/discordFunctions.js";
+import { PermissionsBitField } from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import GuildManager from "#guildManager";
 
-module.exports = {
+export default {
     name: "blacklist",
     description: "Blacklist a user from using commands (defaults to blacklisting the command)",
     extendedDescription: "Blacklist a user from using commands, if category or command option is not provided, will blacklist the command",
@@ -38,7 +38,7 @@ module.exports = {
     dbNeeded: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

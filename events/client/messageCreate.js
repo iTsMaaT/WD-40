@@ -1,19 +1,19 @@
-const { Events, PermissionsBitField } = require("discord.js");
-const { useMainPlayer } = require("discord-player");
-const GuildManager = require("@guildManager");
-const { repositories } = require("@utils/db/tableManager.js");
-const getExactDate = require("@functions/getExactDate");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const randomMinMax = require("@root/utils/functions/randomMinMax");
-const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
-const { initConfFile } = require("@utils/reddit/fetchRedditToken.js");
-const countCommonChars = require("@utils/functions/countCommonChars.js");
-const config = require("@utils/config/configUtils");
-const pruneCooldowns = require("@functions/pruneCooldowns");
-const dbManager = require("@root/utils/db/databaseManager");
-const { getPermissionArrayNames } = require("@functions/discordFunctions");
+import { Events, PermissionsBitField } from "discord.js";
+import { useMainPlayer } from "discord-player";
+import GuildManager from "#guildManager";
+import { repositories } from "#utils/db/tableManager.js";
+import getExactDate from "#functions/getExactDate.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import randomMinMax from "#root/utils/functions/randomMinMax.js";
+import { findBestMatch, algorithms } from "#utils/algorithms/findBestMatch.js";
+import { initConfFile } from "#utils/reddit/fetchRedditToken.js";
+import countCommonChars from "#utils/functions/countCommonChars.js";
+import config from "#utils/config/configUtils.js";
+import pruneCooldowns from "#functions/pruneCooldowns.js";
+import dbManager from "#root/utils/db/databaseManager.js";
+import { getPermissionArrayNames } from "#functions/discordFunctions.js";
 
-module.exports = {
+export default {
     name: Events.MessageCreate,
     once: false,
     log: false,

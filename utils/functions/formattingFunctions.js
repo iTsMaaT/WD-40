@@ -137,7 +137,7 @@ const numberToWord = function(numberString) {
     if (decimalIndex != numberString.length) {
         const decimalPartLength = numberString.length;
         wordString += "point ";
-        for (i = decimalIndex + 1; i < decimalPartLength; i++)
+        for (let i = decimalIndex + 1; i < decimalPartLength; i++)
             wordString += digits[numberArray[i]] + " ";
     }
 
@@ -172,10 +172,4 @@ function generateProgressBar(options) {
     return `[${filledBar}${emptyBar}]${withPercentage ? ` ${percentage.toFixed(2)}%` : ""}`;
 }
 
-module.exports = { 
-    numberToWord, 
-    prettyString, 
-    timeFormatToMS, 
-    toEngineerNotation, 
-    generateProgressBar,
-};
+export { numberToWord, prettyString, timeFormatToMS, toEngineerNotation, generateProgressBar };

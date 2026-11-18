@@ -33,4 +33,4 @@ const getUniqueValues = function(input) {
 
     return uniqueValues;
 };
-module.exports = getUniqueValues;
+export default getUniqueValues;

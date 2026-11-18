@@ -1,10 +1,10 @@
-const { useQueue } = require("discord-player");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
-const extractNumbersAndStrings = require("@utils/functions/extractNumbersAndStrings");
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+import { useQueue } from "discord-player";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { findBestMatch, algorithms } from "#utils/algorithms/findBestMatch.js";
+import extractNumbersAndStrings from "#utils/functions/extractNumbersAndStrings.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 
-module.exports = {
+export default {
     name: "remove",
     description: "Removes a given track from the queue",
     usage: {
@@ -18,7 +18,7 @@ module.exports = {
     inSameVoiceChannel: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

@@ -1,5 +1,5 @@
-const logger = require("@utils/log");
-const config = require("@utils/config/configUtils");
+import logger from "#utils/log.js";
+import config from "#utils/config/configUtils.js";
 
 /**
  * Check if config file exists and is valid
@@ -41,4 +41,4 @@ const checkConfigFile = function() {
     }
 };
 
-module.exports = { execute: checkConfigFile };
+export default { execute: checkConfigFile };

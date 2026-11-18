@@ -1,12 +1,12 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
 
-module.exports = {
+export default {
     name: "joke",
     description: "le funny",
     category: "fun",
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments
@@ -28,7 +28,7 @@ module.exports = {
 
             if (trueFlags.length === 0) trueFlags = ["None"];
 
-            FactEmbed = embedGenerator.info({
+            const FactEmbed = embedGenerator.info({
                 title: "The joke:",
                 description: `Catagory: ${joke.category}\nFlags: ${trueFlags.join(", ")}\n\n${joke.setup ?? joke.joke}\n${joke.delivery ?? ""}`,
                 footer: { text: `ID : ${joke.id}` },
@@ -37,7 +37,7 @@ module.exports = {
 
             message.reply({ embeds: [FactEmbed] });
         } catch (err) {
-            FactEmbed = {
+            const FactEmbed = {
                 color: 0xff0000,
                 title: "An error occured",
                 description: err,

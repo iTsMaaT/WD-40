@@ -1,14 +1,14 @@
-const changelog = require("@root/changelogs.json");
-const GuildManager = require("@guildManager");
+import changelog from "#root/changelogs.json" with { type: "json" };
+import GuildManager from "#guildManager";
 
-module.exports = {
+export default {
     name: "changelog",
     description: "Displays the latest changes to the bot",
     category: "utils",
     aliases: ["changelogs", "cl"],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

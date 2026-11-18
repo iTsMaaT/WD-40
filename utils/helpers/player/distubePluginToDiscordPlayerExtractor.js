@@ -1,10 +1,11 @@
-const {
+import {
     PlayableExtractorPlugin,
     ExtractorPlugin,
     InfoExtractorPlugin,
     Song,
-    Playlist: DistubePlaylist,
-} = require("distube");
+    Playlist as DistubePlaylist,
+} from "distube";
+import discordPlayer from "discord-player";
 const {
     BaseExtractor,
     ExtractorSearchContext,
@@ -14,8 +15,8 @@ const {
     Player,
     GuildQueueHistory,
     ExtractorExecutionContext,
-} = require("discord-player");
-const { Readable } = require("stream");
+} = discordPlayer;
+import { Readable } from "stream";
 
 /**
  * Convert a Distube plugin to a discord-player extractor
@@ -185,4 +186,4 @@ function timeFormatToMs(time) {
     }, 0);
 }
 
-module.exports = { distubePluginToExtractor };
+export { distubePluginToExtractor };

@@ -23,4 +23,4 @@ const combineCollections = function(col1, col2) {
   
     return combinedArray;
 };
-module.exports = combineCollections;
+export default combineCollections;

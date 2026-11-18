@@ -1,7 +1,7 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { useQueue, useHistory } = require("discord-player");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { useQueue, useHistory } from "discord-player";
 
-module.exports = {
+export default {
     name: "back",
     description: "Go back to the last played song",
     category: "music",
@@ -10,7 +10,7 @@ module.exports = {
     inSameVoiceChannel: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

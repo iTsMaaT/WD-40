@@ -1,17 +1,18 @@
-const { version: discordjsVersion } = require("discord.js");
-const { dependencies, name } = require("@root/package.json");
-const changelogs = require("@root/changelogs.json");
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const { createPaginatedMessage } = require("@utils/helpers/createPaginatedMessage");
+import { version as discordjsVersion } from "discord.js";
+import packageJson from "#root/package.json" with { type: "json" };
+const { dependencies, name } = packageJson;
+import changelogs from "#root/changelogs.json" with { type: "json" };
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { createPaginatedMessage } from "#utils/helpers/createPaginatedMessage.js";
 
-module.exports = {
+export default {
     name: "packages",
     description: "Lists the packages and versions",
     category: "owner",
     private: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

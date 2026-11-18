@@ -1,4 +1,4 @@
-const { ensureLocalAIModel } = require("@utils/helpers/ensureLocalAIModel");
+import { ensureLocalAIModel } from "#utils/helpers/ensureLocalAIModel.js";
 
 const sessions = new Map();
 const sessionPromises = new Map();
@@ -179,4 +179,4 @@ function fitToDiscordLimit(text, limit = DISCORD_MESSAGE_LIMIT) {
     return slice.slice(0, lastBreak > 0 ? lastBreak : limit).trim();
 }
 
-module.exports = { askLocalAI };
+export { askLocalAI };

@@ -1,5 +1,5 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, EmbedBuilder } = require("discord.js");
-const embedGenerator = require("./embedGenerator");
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, EmbedBuilder } from "discord.js";
+import embedGenerator from "./embedGenerator.js";
 
 /**
  * Creates a paginated message with buttons for pagination
@@ -196,6 +196,4 @@ const createPaginatedMessage = async function(messageOrInteraction, options) {
     });
 };
 
-module.exports = {
-    createPaginatedMessage,
-};
+export { createPaginatedMessage };

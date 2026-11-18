@@ -1,6 +1,7 @@
-const changelog = require("@root/changelogs.json");
-const logger = require("@utils/log");
-const { version } = require("@root/package.json");
+import changelog from "#root/changelogs.json" with { type: "json" };
+import logger from "#utils/log.js";
+import packageJson from "#root/package.json" with { type: "json" };
+const { version } = packageJson;
 
 /**
  * Check if the bot version is up to date between the changelog and package.json
@@ -37,4 +38,4 @@ const checkBotVersion = function() {
     logger.info("Bot version is up to date");
 };
 
-module.exports = { execute: checkBotVersion };
+export default { execute: checkBotVersion };

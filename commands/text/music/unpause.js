@@ -1,9 +1,9 @@
-const { EmbedBuilder } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { useQueue, useTimeline, useMainPlayer } = require("discord-player");
-const { getPauseMode } = require("@root/utils/helpers/player/playerHelpers");
+import { EmbedBuilder } from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { useQueue, useTimeline, useMainPlayer } from "discord-player";
+import { getPauseMode } from "#root/utils/helpers/player/playerHelpers.js";
 
-module.exports = {
+export default {
     name: "unpause",
     description: "Unpauses currently playing music",
     category: "music",
@@ -11,7 +11,7 @@ module.exports = {
     inSameVoiceChannel: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

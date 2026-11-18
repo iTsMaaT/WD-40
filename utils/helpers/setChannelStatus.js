@@ -1,4 +1,4 @@
-const { Routes, REST } = require("discord.js");
+import { Routes, REST } from "discord.js";
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
 
@@ -18,4 +18,4 @@ async function setChannelStatus(channelid, status) {
     });
 }
 
-module.exports = setChannelStatus;
+export default setChannelStatus;

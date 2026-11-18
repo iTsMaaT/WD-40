@@ -1,6 +1,6 @@
-const { toEngineerNotation } = require("@functions/formattingFunctions");
-const logger = require("@utils/log");
-const formatDuration = require("@utils/functions/formatDuration");
+import { toEngineerNotation } from "#functions/formattingFunctions.js";
+import logger from "#utils/log.js";
+import formatDuration from "#utils/functions/formatDuration.js";
 
 /**
  * Get Pterodactyl server info
@@ -123,4 +123,4 @@ const getPterodactylInfo = async function() {
     // console.log(info)
     return info;
 };
-module.exports = getPterodactylInfo;
+export default getPterodactylInfo;

@@ -1,8 +1,8 @@
-const cron = require("cron");
-const randomMinMax = require("@root/utils/functions/randomMinMax");
-const config = require("@utils/config/configUtils");
-const { ActivityType } = require("discord.js");
-const logger = require("@utils/log");
+import cron from "cron";
+import randomMinMax from "#root/utils/functions/randomMinMax.js";
+import config from "#utils/config/configUtils.js";
+import { ActivityType } from "discord.js";
+import logger from "#utils/log.js";
 
 /**
  * Generates a random public IPv4 address.
@@ -86,7 +86,4 @@ const activateRotator = async (client, server) => {
     }
 };
 
-module.exports = {
-    activateRotator,
-    updateActivities,
-};
+export { activateRotator, updateActivities };

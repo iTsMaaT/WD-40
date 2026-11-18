@@ -89,4 +89,4 @@ class FilterManager {
     }
 }
 
-module.exports = { FilterManager };
+export { FilterManager };

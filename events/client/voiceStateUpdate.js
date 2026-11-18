@@ -1,6 +1,6 @@
-const { Events, AuditLogEvent } = require("discord.js");
+import { Events, AuditLogEvent } from "discord.js";
 
-module.exports = {
+export default {
     name: Events.VoiceStateUpdate,
     once: false,
     disabled: true,

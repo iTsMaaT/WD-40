@@ -1,5 +1,5 @@
-const DB = require("../../utils/db/databaseManager.js");
-module.exports = {
+import DB from "../../utils/db/databaseManager.js";
+export default {
     name: "SIGTERM",
     /**
      * Logs SIGTERM, closes the database, and exits the process.

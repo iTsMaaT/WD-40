@@ -1,18 +1,18 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const formatDuration = require("@utils/functions/formatDuration");
-const logger = require("@utils/log");
-const os = require("os");
-const changelogs = require("@root/changelogs.json");
-const getPterodactylInfo = require("@root/utils/functions/getPterodactylInfo");
-const { sql, desc } = require("drizzle-orm");
-const DB = require("@root/utils/db/databaseManager");
-const GuildManager = require("@guildManager");
-const { useMainPlayer } = require("discord-player");
-const cron = require("cron");
-const { toEngineerNotation } = require("@functions/formattingFunctions");
-const config = require("@utils/config/configUtils");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import formatDuration from "#utils/functions/formatDuration.js";
+import logger from "#utils/log.js";
+import os from "os";
+import changelogs from "#root/changelogs.json" with { type: "json" };
+import getPterodactylInfo from "#root/utils/functions/getPterodactylInfo.js";
+import { sql, desc } from "drizzle-orm";
+import DB from "#root/utils/db/databaseManager.js";
+import GuildManager from "#guildManager";
+import { useMainPlayer } from "discord-player";
+import cron from "cron";
+import { toEngineerNotation } from "#functions/formattingFunctions.js";
+import config from "#utils/config/configUtils.js";
 const timeZone = config.get("timeZone");
-const getExactDate = require("@functions/getExactDate");
+import getExactDate from "#functions/getExactDate.js";
 
 /**
  * LiveUpdatingBotStats class.
@@ -183,4 +183,4 @@ class LiveUpdatingBotStats {
     }
 }
 
-module.exports = LiveUpdatingBotStats;
+export default LiveUpdatingBotStats;

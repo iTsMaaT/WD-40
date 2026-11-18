@@ -1,17 +1,17 @@
-const { Events, PermissionsBitField, MessageFlags } = require("discord.js");
-const GuildManager = require("@guildManager");
-const { repositories } = require("@utils/db/tableManager.js");
-const getExactDate = require("@functions/getExactDate");
-const randomMinMax = require("@root/utils/functions/randomMinMax");
-const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
-const { initConfFile } = require("@utils/reddit/fetchRedditToken.js");
-const countCommonChars = require("@utils/functions/countCommonChars.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const dbManager = require("@root/utils/db/databaseManager");
-const { useMainPlayer } = require("discord-player");
-const { getPermissionArrayNames } = require("@functions/discordFunctions");
-const config = require("@utils/config/configUtils");
-const pruneCooldowns = require("@functions/pruneCooldowns");
+import { Events, PermissionsBitField, MessageFlags } from "discord.js";
+import GuildManager from "#guildManager";
+import { repositories } from "#utils/db/tableManager.js";
+import getExactDate from "#functions/getExactDate.js";
+import randomMinMax from "#root/utils/functions/randomMinMax.js";
+import { findBestMatch, algorithms } from "#utils/algorithms/findBestMatch.js";
+import { initConfFile } from "#utils/reddit/fetchRedditToken.js";
+import countCommonChars from "#utils/functions/countCommonChars.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import dbManager from "#root/utils/db/databaseManager.js";
+import { useMainPlayer } from "discord-player";
+import { getPermissionArrayNames } from "#functions/discordFunctions.js";
+import config from "#utils/config/configUtils.js";
+import pruneCooldowns from "#functions/pruneCooldowns.js";
 
 // Returns a refusal message if the user may not run the command, otherwise null
 async function getBlacklistError(interaction, type, command) {
@@ -30,7 +30,7 @@ async function getBlacklistError(interaction, type, command) {
     return null;
 }
 
-module.exports = {
+export default {
     name: Events.InteractionCreate,
     once: false,
     log: false,

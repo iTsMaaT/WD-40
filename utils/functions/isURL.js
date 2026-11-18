@@ -11,4 +11,4 @@ const isURL = function(string) {
     }
 };
 
-module.exports = isURL;
+export default isURL;

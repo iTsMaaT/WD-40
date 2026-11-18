@@ -1,12 +1,12 @@
-const { PermissionsBitField } = require("discord.js");
-const { Readable } = require("stream");
-const { useQueue, useMainPlayer, QueryType, Track } = require("discord-player");
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("discord-voip");
-const config = require("@utils/config/configUtils");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { probeStream } = require("mediaplex");
+import { PermissionsBitField } from "discord.js";
+import { Readable } from "stream";
+import { useQueue, useMainPlayer, QueryType, Track } from "discord-player";
+import { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } from "discord-voip";
+import config from "#utils/config/configUtils.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { probeStream } from "mediaplex";
 
-module.exports = {
+export default {
     name: "tts",
     description: "Play a text-to-speech message in the voice channel",
     usage: {
@@ -22,7 +22,7 @@ module.exports = {
     inSameVoiceChannel: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

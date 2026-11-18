@@ -1,6 +1,6 @@
-const fs = require("fs");
-const path = require("path");
-const logger = require("@utils/log");
+import fs from "fs";
+import path from "path";
+import logger from "#utils/log.js";
 
 /**
  * Handles YouTube cookies by reading from environment variables,
@@ -22,7 +22,7 @@ function youtubeCookieHandler() {
             return null;
         }
 
-        const cookiePath = path.join(__dirname, "cookies.txt");
+        const cookiePath = path.join(import.meta.dirname, "cookies.txt");
 
         // Write cookies to file
         fs.writeFileSync(cookiePath, cookies, "utf8");
@@ -77,5 +77,7 @@ function getYoutubeCookies() {
     }
 }
 
-module.exports = youtubeCookieHandler;
-module.exports.getYoutubeCookies = getYoutubeCookies;
+youtubeCookieHandler.getYoutubeCookies = getYoutubeCookies;
+
+export { getYoutubeCookies };
+export default youtubeCookieHandler;

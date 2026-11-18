@@ -1,14 +1,14 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const fetchReddit = require("@root/utils/reddit/fetchReddit.js");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import fetchReddit from "#root/utils/reddit/fetchReddit.js";
 
-module.exports = {
+export default {
     name: "scary",
     description: "Good luck",
     category: "posts",
     aliases: ["twosentencehorror"],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

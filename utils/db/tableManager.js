@@ -1,4 +1,4 @@
-const DB = require("./databaseManager");
+import DB from "./databaseManager.js";
 
 /**
  * Generates repository functions for a given table.
@@ -87,4 +87,4 @@ function generateRepositories(schema) {
 
 const schema = DB.getSchema();
 const repositories = generateRepositories(schema);
-module.exports = { repositories, schema };
+export { repositories, schema };

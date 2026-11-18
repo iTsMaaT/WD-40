@@ -1,6 +1,6 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
 
-module.exports = {
+export default {
     name: "mcping",
     description: "Ping a Minecraft server",
     usage: {
@@ -13,7 +13,7 @@ module.exports = {
     examples: ["Hypixel.net"],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

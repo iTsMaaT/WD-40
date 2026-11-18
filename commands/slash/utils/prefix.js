@@ -1,10 +1,11 @@
-const { ApplicationCommandType, ApplicationCommandOptionType, MessageFlags } = require("discord.js");
-const { SendErrorEmbed } = require("@functions/discordFunctions");
-const GuildManager = require("@guildManager");
-const dbManager = require("@root/utils/db/databaseManager");
-const embedGenerator = require("@utils/helpers/embedGenerator");
+import { ApplicationCommandType, ApplicationCommandOptionType, MessageFlags } from "discord.js";
+import * as discordFunctions from "#functions/discordFunctions.js";
+const { SendErrorEmbed } = discordFunctions;
+import GuildManager from "#guildManager";
+import dbManager from "#root/utils/db/databaseManager.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
 
-module.exports = {
+export default {
     name: "prefix",
     description: "Changes the prefix to do commands",
     dbNeeded: false,
@@ -20,7 +21,7 @@ module.exports = {
     ],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").ChatInputCommandInteraction} interaction The interaction that triggered the command
      * @param {import("discord.js").Client} client The Discord client instance
      * @returns {Promise<void>}

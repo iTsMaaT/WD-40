@@ -27,4 +27,4 @@ const splitIntoChunks = function(code, chunkSize = 1900) {
   
     return chunks;
 };
-module.exports = splitIntoChunks;
+export default splitIntoChunks;

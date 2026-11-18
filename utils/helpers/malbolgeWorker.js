@@ -2,7 +2,7 @@
 /* eslint-disable no-var */
 /* eslint-disable no-shadow */
 // Runs in a worker thread so heavy generation can't block the bot's event loop.
-const { parentPort, workerData } = require("worker_threads");
+import { parentPort, workerData } from "worker_threads";
 
 function run(input) {
     const mb = {};

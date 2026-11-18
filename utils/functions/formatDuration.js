@@ -44,4 +44,4 @@ function formatDuration(ms, longFormat = false, includeMs = false) {
     return parts.join(" ") || (longFormat ? "0 seconds" : "0s");
 }
 
-module.exports = formatDuration;
+export default formatDuration;

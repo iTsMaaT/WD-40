@@ -1,6 +1,6 @@
-const config = require("@utils/config/configUtils");
+import config from "#utils/config/configUtils.js";
 
-module.exports = {
+export default {
     name: "rateLimited",
     once: false,
     /**

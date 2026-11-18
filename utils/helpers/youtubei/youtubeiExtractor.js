@@ -1,8 +1,8 @@
 // YoutubeSabrExtractor.js
-const { BaseExtractor, Track, Playlist, Util } = require("discord-player");
-const { createSabrStream } = require("./youtubeSabrCore");
-const { createLivestream } = require("./youtubeLivesHandler");
-const { getInnertube } = require("./getInnertube.js");
+import { BaseExtractor, Track, Playlist, Util } from "discord-player";
+import { createSabrStream } from "./youtubeSabrCore.js";
+import { createLivestream } from "./youtubeLivesHandler.js";
+import { getInnertube } from "./getInnertube.js";
 
 /**
  * Discord-player extractor using only helpers from youtubeSabrCore.js.
@@ -302,4 +302,4 @@ async function resolveFinalUrl(input) {
     }
 }
 
-module.exports = { YoutubeSabrExtractor };
+export { YoutubeSabrExtractor };

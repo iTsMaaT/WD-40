@@ -1,10 +1,18 @@
-const { ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField, MessageFlags } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const emoteList = require("@utils/emojis.json");
-const { findBestMatch, algorithms } = require("@utils/algorithms/findBestMatch");
-const GuildManager = require("@guildManager");
+import {
+    ApplicationCommandType,
+    ApplicationCommandOptionType,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    PermissionsBitField,
+    MessageFlags,
+} from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import emoteList from "#utils/emojis.json" with { type: "json" };
+import { findBestMatch, algorithms } from "#utils/algorithms/findBestMatch.js";
+import GuildManager from "#guildManager";
 
-module.exports = {
+export default {
     name: "autoreaction",
     description: "Adds reactions to chosen messages in chosen channels",
     dbNeeded: true,
@@ -77,7 +85,7 @@ module.exports = {
     ],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").ChatInputCommandInteraction} interaction The interaction that triggered the command
      * @param {import("discord.js").Client} client The Discord client instance
      * @returns {Promise<void>}

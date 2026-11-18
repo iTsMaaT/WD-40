@@ -1,9 +1,9 @@
-const { Events } = require("discord.js");
-const GuildManager = require("@guildManager");
-const { repositories } = require("@utils/db/tableManager.js");
-const dbManager = require("@utils/db/databaseManager");
+import { Events } from "discord.js";
+import GuildManager from "#guildManager";
+import { repositories } from "#utils/db/tableManager.js";
+import dbManager from "#utils/db/databaseManager.js";
 
-module.exports = {
+export default {
     name: Events.GuildDelete,
     once: false,
     log: true,

@@ -1,10 +1,10 @@
-const { repositories } = require("./db/tableManager.js");
-const { editOrSend } = require("./functions/discordFunctions.js");
-const { colorText, foregroundColor, backgroundColor, textStyle } = require("./functions/consoleColor.js");
-const Sentry = require("@sentry/node");
-const databaseManager = require("@root/utils/db/databaseManager");
-const util = require("util");
-const getExactDate = require("@functions/getExactDate");
+import { repositories } from "./db/tableManager.js";
+import { editOrSend } from "./functions/discordFunctions.js";
+import { colorText, foregroundColor, backgroundColor, textStyle } from "./functions/consoleColor.js";
+import * as Sentry from "@sentry/node";
+import databaseManager from "#root/utils/db/databaseManager.js";
+import util from "util";
+import getExactDate from "#functions/getExactDate.js";
 
 class Logger {
 
@@ -250,4 +250,4 @@ class Logger {
  * @property {function} event - Log an event-related message.
  */
 const logger = new Logger();
-module.exports = logger;
+export default logger;

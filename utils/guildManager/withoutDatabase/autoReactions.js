@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-const logger = require("@utils/log");
+import logger from "#utils/log.js";
 
 /**
  * Initializes the auto reaction system for a guild.
@@ -119,6 +119,4 @@ async function getAutoReactions(guildId) {
     return reactions[guildId];
 }
 
-module.exports = {
-    getAutoReactions,
-};
+export { getAutoReactions };

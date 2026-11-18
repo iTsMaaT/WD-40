@@ -1,4 +1,4 @@
-const logger = require("@utils/log");
+import logger from "#utils/log.js";
 
 /**
  * Validate the environment variables
@@ -40,4 +40,4 @@ const validateEnvironmentVariables = function() {
     logger.info("Successfully validated environment variables.");
 };
 
-module.exports = { execute: validateEnvironmentVariables };
+export default { execute: validateEnvironmentVariables };

@@ -1,13 +1,13 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 
-module.exports = {
+export default {
     name: "guilds",
     category: "owner",
     description: "Makes a list of the guilds the bot is in",
     private: true,
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

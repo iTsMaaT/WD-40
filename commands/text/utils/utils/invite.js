@@ -1,7 +1,7 @@
-const embedGenerator = require("@utils/helpers/embedGenerator");
-const { ChannelType, PermissionsBitField } = require("discord.js");
+import embedGenerator from "#utils/helpers/embedGenerator.js";
+import { ChannelType, PermissionsBitField } from "discord.js";
 
-module.exports = {
+export default {
     name: "invite",
     category: "utils",
     description: "Creates a invite to the rules or announcements channel",
@@ -10,7 +10,7 @@ module.exports = {
     permissions: [PermissionsBitField.Flags.CreateInstantInvite],
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

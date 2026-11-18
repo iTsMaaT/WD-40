@@ -1,5 +1,5 @@
-const { PermissionsBitField } = require("discord.js");
-const embedGenerator = require("@utils/helpers/embedGenerator");
+import { PermissionsBitField } from "discord.js";
+import embedGenerator from "#utils/helpers/embedGenerator.js";
 
 const requiredPermissions = [
     PermissionsBitField.Flags.AddReactions,
@@ -21,14 +21,14 @@ const requiredPermissions = [
     PermissionsBitField.Flags.ViewChannel,
 ];
 
-module.exports = {
+export default {
     name: "invitebot",
     aliases: ["addbot", "botinvite"],
     description: "Generates a link to invite the bot to another server",
     category: "utils",
 
     /**
-     * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
+     * @param {import("#utils/log.js")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
      * @param {import("discord.js").Message} message The message object that triggered the command
      * @param {string[]} args The command arguments

@@ -1,8 +1,8 @@
-const os = require("os");
-const fs = require("fs");
-const path = require("path");
-const Chart = require("chart.js/auto");
-const { createCanvas } = require("@napi-rs/canvas");
+import os from "os";
+import fs from "fs";
+import path from "path";
+import Chart from "chart.js/auto";
+import { createCanvas } from "@napi-rs/canvas";
 
 class ResourceProfiler {
     constructor() {
@@ -137,4 +137,4 @@ class ResourceProfiler {
     }
 }
 
-module.exports = ResourceProfiler;
+export default ResourceProfiler;

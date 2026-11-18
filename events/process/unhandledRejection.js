@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     name: "unhandledRejection",
     /**
      * Logs an unhandled promise rejection, suppressing known Discord API errors.

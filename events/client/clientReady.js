@@ -1,16 +1,16 @@
-const { Events, ActivityType } = require("discord.js");
-const config = require("@utils/config/configUtils");
-const GuildManager = require("@guildManager");
-const randomMinMax = require("@root/utils/functions/randomMinMax");
-const { initConfFile } = require("@root/utils/reddit/fetchRedditToken.js");
-const { useMainPlayer } = require("discord-player");
-const { activateRotator } = require("@utils/helpers/activityStatusRotator");
+import { Events, ActivityType, version as discordjsVersion } from "discord.js";
+import config from "#utils/config/configUtils.js";
+import GuildManager from "#guildManager";
+import randomMinMax from "#root/utils/functions/randomMinMax.js";
+import { initConfFile } from "#root/utils/reddit/fetchRedditToken.js";
+import { useMainPlayer } from "discord-player";
+import { activateRotator } from "#utils/helpers/activityStatusRotator.js";
 const player = useMainPlayer();
-const { toEngineerNotation } = require("@utils/functions/formattingFunctions");
-const { updateCommands } = require("@utils/helpers/deployCommands");
-const LiveUpdatingBotStats = require("@utils/helpers/liveUpdatingBotStats");
+import { toEngineerNotation } from "#utils/functions/formattingFunctions.js";
+import { updateCommands } from "#utils/helpers/deployCommands.js";
+import LiveUpdatingBotStats from "#utils/helpers/liveUpdatingBotStats.js";
 
-module.exports = {
+export default {
     name: Events.ClientReady,
     once: false,
     log: true,
@@ -63,7 +63,7 @@ module.exports = {
         console.log(`${client.commands.size} (text) commands (including aliases)`);
         console.log("commands setup done.");
 
-        console.log("Discord.js version: " + require("discord.js").version);
+        console.log("Discord.js version: " + discordjsVersion);
         console.log(`There is ${client.options.shardCount} shard${client.options.shardCount > 1 ? "s" : ""} spawned`);
         config.set("SUPERUSER_WHITELIST", [...config.get("SUPERUSER_WHITELIST"), process.env.OWNER_ID]);
         console.log(`Whitelisted users: ${config.get("SUPERUSER_WHITELIST").join(", ")}`);
