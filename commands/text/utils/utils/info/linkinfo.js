@@ -1,7 +1,4 @@
-const https = require("https");
-const http = require("http");
-const dns = require("dns/promises");
-const net = require("net");
+const { safeFetch, requestOnce, resolvePublicAddresses } = require("@utils/helpers/safeFetch");
 const fs = require("fs/promises");
 // const puppeteer = require("puppeteer");
 const { parse } = require("node-html-parser");
@@ -33,9 +30,7 @@ module.exports = {
         if (!args[0]) return await message.reply({ embeds: [embedGenerator.warning("Please provide a URL")] });
         const link = args[0];
         const MAX_FIELD_LENGTH = 1000;
-        const MAX_RESPONSE_BYTES = 1024 * 1024;
         const MAX_REDIRECTS = 5;
-        const REQUEST_TIMEOUT_MS = 5000;
 
         try {
             if (!await validateURL(link)) return await message.reply({ embeds: [embedGenerator.error("Invalid URL")] });
@@ -330,7 +325,7 @@ module.exports = {
                     ? currentURL.origin + currentURL.pathname
                     : currentURL.href);
 
-                const response = await requestURL(currentURL, { method: "HEAD" });
+                const response = await requestOnce(currentURL, { method: "HEAD" });
                 const location = response.headers.get("location");
                 if (response.status < 300 || response.status >= 400 || !location) break;
                 if (count === MAX_REDIRECTS) throw new Error("Too many redirects");
@@ -340,176 +335,6 @@ module.exports = {
             return redirects;
         }
 
-        async function safeFetch(input, options = {}) {
-            let currentURL = new URL(input);
-            const method = options.method || "GET";
-
-            for (let count = 0; count <= MAX_REDIRECTS; count += 1) {
-                const response = await requestURL(currentURL, { method });
-                const location = response.headers.get("location");
-                if (response.status < 300 || response.status >= 400 || !location) {
-                    response.url = currentURL.href;
-                    return response;
-                }
-                if (count === MAX_REDIRECTS) throw new Error("Too many redirects");
-                currentURL = new URL(location, currentURL);
-            }
-
-            throw new Error("Too many redirects");
-        }
-
-        async function requestURL(url, { method }) {
-            if (!["http:", "https:"].includes(url.protocol) || url.username || url.password) throw new Error("Only HTTP(S) URLs without credentials are allowed");
-
-            const hostname = url.hostname.replace(/^\[|\]$/g, "");
-            const addresses = await resolvePublicAddresses(hostname);
-            const address = addresses[0];
-            const transport = url.protocol === "https:" ? https : http;
-            const requestPath = `${url.pathname}${url.search}`;
-
-            return new Promise((resolve, reject) => {
-                let settled = false;
-                const request = transport.request({
-                    protocol: url.protocol,
-                    hostname,
-                    port: url.port || (url.protocol === "https:" ? 443 : 80),
-                    path: requestPath,
-                    method,
-                    headers: { "Accept-Encoding": "identity" },
-                    lookup: (_hostname, lookupOptions, callback) => {
-                        if (lookupOptions?.all) callback(null, [address]);
-                        else callback(null, address.address, address.family);
-                    },
-                    servername: net.isIP(hostname) ? undefined : hostname,
-                    rejectUnauthorized: true,
-                }, (response) => {
-                    const chunks = [];
-                    let size = 0;
-
-                    response.on("data", (chunk) => {
-                        size += chunk.length;
-                        if (size > MAX_RESPONSE_BYTES) {
-                            request.destroy(new Error("Response exceeds the 1 MiB limit"));
-                            return;
-                        }
-                        chunks.push(chunk);
-                    });
-                    response.on("end", () => {
-                        if (settled) return;
-                        settled = true;
-                        clearTimeout(timeout);
-                        const body = Buffer.concat(chunks);
-                        resolve({
-                            status: response.statusCode,
-                            statusText: response.statusMessage,
-                            headers: { get: (name) => response.headers[name.toLowerCase()] ?? null },
-                            text: async () => body.toString("utf8"),
-                        });
-                    });
-                    response.on("error", (error) => {
-                        if (settled) return;
-                        settled = true;
-                        clearTimeout(timeout);
-                        reject(error);
-                    });
-                });
-
-                const timeout = setTimeout(() => request.destroy(new Error("Request timed out")), REQUEST_TIMEOUT_MS);
-                request.on("error", (error) => {
-                    if (settled) return;
-                    settled = true;
-                    clearTimeout(timeout);
-                    reject(error);
-                });
-                request.end();
-            });
-        }
-
-        async function resolvePublicAddresses(hostname) {
-            const family = net.isIP(hostname);
-            const addresses = family
-                ? [{ address: hostname, family }]
-                : (await Promise.all([
-                    resolveDNSRecords(hostname, 4),
-                    resolveDNSRecords(hostname, 6),
-                ])).flat();
-
-            if (!addresses.length) throw new Error("URL has no IP addresses");
-            if (addresses.some(({ address }) => !isPublicAddress(address))) {
-                const error = new Error("URL resolves to a non-public IP address");
-                error.code = "PRIVATE_URL";
-                throw error;
-            }
-            return addresses;
-        }
-
-        async function resolveDNSRecords(hostname, family) {
-            try {
-                const records = family === 4
-                    ? await dns.resolve4(hostname)
-                    : await dns.resolve6(hostname);
-                return records.map((address) => ({ address, family }));
-            } catch (error) {
-                if (["ENODATA", "ENOTFOUND", "EAI_NODATA"].includes(error.code)) return [];
-                throw error;
-            }
-        }
-
-        function isPublicAddress(address) {
-            const family = net.isIP(address);
-            if (family === 4) {
-                const value = address.split(".").reduce((result, octet) => (result * 256) + Number(octet), 0);
-                const blockedRanges = [
-                    ["0.0.0.0", 8], ["10.0.0.0", 8], ["100.64.0.0", 10], ["127.0.0.0", 8],
-                    ["169.254.0.0", 16], ["172.16.0.0", 12], ["192.0.0.0", 24], ["192.0.2.0", 24],
-                    ["192.88.99.0", 24], ["192.168.0.0", 16], ["198.18.0.0", 15], ["198.51.100.0", 24],
-                    ["203.0.113.0", 24], ["224.0.0.0", 4], ["240.0.0.0", 4],
-                ];
-
-                return !blockedRanges.some(([network, prefix]) => {
-                    const networkValue = network.split(".").reduce((result, octet) => (result * 256) + Number(octet), 0);
-                    const mask = (0xffffffff << (32 - prefix)) >>> 0;
-                    return (value & mask) === (networkValue & mask);
-                });
-            }
-            if (family !== 6) return false;
-
-            const groups = parseIPv6(address);
-            if (!groups) return false;
-            if (groups.slice(0, 5).every((group) => group === 0) && groups[5] === 0xffff) {
-                const mappedIPv4 = groups.slice(6).flatMap((group) => [group >> 8, group & 0xff]).join(".");
-                return isPublicAddress(mappedIPv4);
-            }
-
-            const first = groups[0];
-            const second = groups[1];
-            return first >= 0x2000 && first <= 0x3fff
-                && !(first === 0x2001 && (second <= 0x01ff || second === 0x0db8))
-                && first !== 0x2002
-                && first !== 0x3fff;
-        }
-
-        function parseIPv6(address) {
-            let value = address.toLowerCase();
-            const ipv4Tail = value.match(/(?:^|:)(\d{1,3}(?:\.\d{1,3}){3})$/);
-            if (ipv4Tail) {
-                const octets = ipv4Tail[1].split(".").map(Number);
-                if (octets.some((octet) => octet > 255)) return null;
-                const replacement = `${((octets[0] << 8) | octets[1]).toString(16)}:${((octets[2] << 8) | octets[3]).toString(16)}`;
-                value = value.slice(0, value.length - ipv4Tail[1].length) + replacement;
-            }
-
-            const halves = value.split("::");
-            if (halves.length > 2) return null;
-            const left = halves[0] ? halves[0].split(":") : [];
-            const right = halves[1] ? halves[1].split(":") : [];
-            const missing = 8 - left.length - right.length;
-            if ((halves.length === 1 && missing !== 0) || (halves.length === 2 && missing < 1)) return null;
-            const groups = [...left, ...Array(missing).fill("0"), ...right].map((group) => Number.parseInt(group, 16));
-            return groups.length === 8 && groups.every((group) => Number.isInteger(group) && group >= 0 && group <= 0xffff)
-                ? groups
-                : null;
-        }
     },
 };
 

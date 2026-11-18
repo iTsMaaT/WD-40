@@ -9,6 +9,7 @@ const config = require("@utils/config/configUtils");
 const { searchWithPriorities, getProbableBridgeSource } = require("@root/utils/helpers/player/playerHelpers");
 const fs = require("fs");
 const isURL = require("@utils/functions/isURL");
+const { safeFetch } = require("@utils/helpers/safeFetch");
 const { simpleFolderSearch } = require("simple-folder-search");
 
 module.exports = {
@@ -325,17 +326,12 @@ async function awareQueryResolver(query, player, playerConfig) {
  * @returns {Promise<boolean>}
  */
 async function isDirectMediaStream(url) {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
     try {
-        const response = await fetch(url, { signal: controller.signal, redirect: "follow" });
+        const response = await safeFetch(url, { headersOnly: true, timeoutMs: 5000 });
         const type = response.headers.get("content-type") || "";
         return /^(audio\/|video\/|application\/ogg|application\/vnd\.apple\.mpegurl|raw\/pcm)/i.test(type);
     } catch {
         return false;
-    } finally {
-        clearTimeout(timeout);
-        controller.abort();
     }
 }
 
@@ -347,7 +343,7 @@ async function isDirectMediaStream(url) {
  */
 async function resolvePlaylistFile(url) {
     try {
-        const response = await fetch(url, { signal: AbortSignal.timeout(7000) });
+        const response = await safeFetch(url, { timeoutMs: 7000, maxBytes: 64 * 1024 });
         if (!response.ok) return url;
         const text = await response.text();
         for (const line of text.split(/\r?\n/)) {
@@ -368,11 +364,7 @@ async function resolvePlaylistFile(url) {
  */
 async function unshortenURL(url) {
     try {
-        const response = await fetch(url, {
-            method: "GET",
-            redirect: "follow",
-            signal: AbortSignal.timeout(7000),
-        });
+        const response = await safeFetch(url, { headersOnly: true, timeoutMs: 7000 });
 
         const { origin, pathname } = new URL(response.url);
         return origin + pathname;
