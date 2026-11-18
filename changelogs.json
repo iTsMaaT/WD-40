@@ -497,5 +497,26 @@
             "Added channel count to >stats.",
             "Multiple bug fixes and optimisations"
         ]
+    },
+    {
+        "version": "5.13.0",
+        "date": "2026-11-18",
+        "changes": [
+            "Added SQLite support: self-hosters can now use a local database file with no setup (DATABASE_URL=sqlite:./bot.db)",
+            "Database migrations are now applied automatically on startup",
+            "Added local AI support: >ask can now run on a local GGUF model (configurable with aiModelProvider and defaultLocalAIModel)",
+            ">ask now remembers the conversation when replying to follow-ups",
+            ">playai and >asktts always use the external AI (Gemini) for accurate answers",
+            "Blacklists are now properly enforced on slash commands, context menus and autocomplete",
+            "Fixed superuser mode blocking whitelisted users instead of everyone else",
+            "/prefix now requires administrator permissions",
+            "Fixed /autoreaction and /autoresponses failing to reply",
+            ">config now validates values and supports arrays, booleans and numbers",
+            ">malbolge no longer freezes the bot and now has a cooldown",
+            "Bot replies can no longer ping roles, @everyone or @here",
+            "Improved link safety checks in >play and >linkinfo",
+            "Fixed downloads failing for song titles with trailing dots or spaces",
+            "Multiple bug fixes and optimisations"
+        ]
     }
 ]
