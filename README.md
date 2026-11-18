@@ -95,6 +95,12 @@ Good luck.
 
 > If Reddit client secret, ID, and token are not configured, it will use the normal API instead of going through OAUTH if not specified.
 
+## AI model (local or external)
+
+By default, `aiModelProvider` in `utils/config/config.jsonc` is set to `local`, which runs a GGUF model on your machine. You must provide the model file yourself: download a `.gguf` model and place it in `utils/helpers/aiModels/`, then set `defaultLocalAIModel` in the config to its file name.
+
+If you don't want to provide a model file, set `aiModelProvider` to `"external"` in `utils/config/config.jsonc` and set `GEMINI_API_KEY` in your `.env` file. Commands that always require accurate answers (like `playai` and `asktts`) use Gemini regardless of this setting, so they need `GEMINI_API_KEY` too.
+
 ## Add your own music library
 
 If you wish to add your own library, make a music folder in the root of the project and add your files there, they will be used for query and spotify search and will be given as the first choice in the 10 choices list.
@@ -105,9 +111,33 @@ You can also configure the file extensions in the config file.
 
 # Database
 
-The bot uses a MySQL database to store data. You can create a database by running the following command:
+The bot supports two database backends: a local SQLite file (easiest) or a MySQL server.
 
-> TODO (For more details : https://github.com/iTsMaaT/WD-40/tree/database-docs-and-sqlite)
+## Local SQLite (recommended for self-hosting)
+
+No server or manual setup is required, the database file and its tables are created automatically on startup.
+
+1. Make sure dependencies are installed (`npm install`), `better-sqlite3` is included.
+2. Add this line to your `.env` file:
+
+    ```env
+    DATABASE_URL=sqlite:./bot.db
+    ```
+
+    The part after `sqlite:` is the path of the database file (relative to the project root). The file will be created if it doesn't exist.
+3. Start the bot. The migrations in `migrations/sqlite` are applied automatically.
+
+To back up your data, copy the `.db` file while the bot is stopped.
+
+## MySQL
+
+Create an empty database and a user with access to it, then set the connection URL in your `.env` file:
+
+```env
+DATABASE_URL=mysql://user:password@host:port/database
+```
+
+Migrations are applied automatically on startup.
 
 ## No Database Mode
 
