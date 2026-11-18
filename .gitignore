@@ -10,6 +10,9 @@ utils/reddit/redditConf.json
 /utils/helpers/youtubeCookieHandler/cookies.txt
 music
 downloads
+/utils/helpers/aiModels
+/training/
+settings.json
 
 ## SQLite databases files
 *.db

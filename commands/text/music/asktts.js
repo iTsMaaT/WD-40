@@ -3,16 +3,22 @@ const embedGenerator = require("@utils/helpers/embedGenerator");
 const { useQueue, useMainPlayer } = require("discord-player");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require("discord-voip");
 const { Readable } = require("stream");
-const { fetchGeminiResponse } = require("@utils/helpers/fetchGeminiResponse");
+const { fetchAIResponse } = require("@utils/helpers/fetchAIResponse");
 const getExactDate = require("@functions/getExactDate");
 const config = require("@utils/config/configUtils");
 
+const ASK_TTS_SYSTEM_PROMPT = `You are a helpful, conversational assistant answering a question for a Discord voice channel.
+Answer directly and concisely in plain text. Do not use Markdown, emojis, bullets, or other formatting.
+Keep your response suitable for being read aloud and under 2000 characters.
+Do not claim to have access to information beyond the details included in the user's prompt.
+Avoid assisting with actionable real-world harm or crime.`;
+
 module.exports = {
     name: "asktts",
-    description: "Ask a question to Gemini, then play the response in the VC",
+    description: "Ask a question to the external AI, then play the response in the VC",
     usage: {
         required: {
-            "prompt": "The prompt to ask Gemini",
+            "prompt": "The prompt to ask the AI",
         },
     },
     category: "music",
@@ -45,7 +51,7 @@ module.exports = {
             if (!prompt) return await message.reply({ embeds: [embedGenerator.warning("Please provide a prompt.")] });
             const owner = await message.guild.fetchOwner();
 
-            sent = await message.reply({ embeds: [embedGenerator.info("Asking Gemini...")] });
+            sent = await message.reply({ embeds: [embedGenerator.info("Asking AI...")] });
 
             const environmentInfo = {
                 guildName: message.guild.name,
@@ -59,8 +65,7 @@ module.exports = {
                 authorId: message.author.id,
             };
 
-            // Fetch Gemini's response using the helper function
-            geminiResponse = await fetchGeminiResponse(
+            geminiResponse = await fetchAIResponse(
                 `Consider the following in your responses:
                 - Be conversational
                 - Do not use emojis nor markdown, as you will be heard in a discord voice chat.
@@ -79,6 +84,11 @@ module.exports = {
                 The user that asked the prompt is named: ${environmentInfo.authorUsername} (display name: ${environmentInfo.authorDisplayName}).
                 The prompt is: ${prompt}`,
                 apiKey,
+                undefined,
+                undefined,
+                undefined,
+                "external",
+                ASK_TTS_SYSTEM_PROMPT,
             );
 
         } catch (err) {

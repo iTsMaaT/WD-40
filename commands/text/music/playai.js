@@ -1,7 +1,12 @@
 const embedGenerator = require("@utils/helpers/embedGenerator");
 const GuildManager = require("@guildManager");
-const { fetchGeminiResponse } = require("@utils/helpers/fetchGeminiResponse");
+const { fetchAIResponse } = require("@utils/helpers/fetchAIResponse");
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField } = require("discord.js");
+
+const PLAY_AI_SYSTEM_PROMPT = `You identify songs accurately from descriptions.
+Respond with only the verified song title and artist in this exact format: [Title] - [Artist].
+Do not guess when the description is ambiguous; provide your best supported match.
+Do not include explanations, quotes, Markdown, or any other text.`;
 
 module.exports = {
     name: "playai",
@@ -73,7 +78,15 @@ module.exports = {
                 if (wrongSongs.length > 0) 
                     prompt += `\n\nPrevious incorrect answers (this is a list of answers that the user already refuted as incorrect):\n${wrongSongs.join("\n")}`;
 
-                const aiResponse = await fetchGeminiResponse(prompt, process.env.GEMINI_API_KEY);
+                const aiResponse = await fetchAIResponse(
+                    prompt,
+                    process.env.GEMINI_API_KEY,
+                    undefined,
+                    undefined,
+                    undefined,
+                    "external",
+                    PLAY_AI_SYSTEM_PROMPT,
+                );
                 const regex = /^(.*?)\s*-\s*(.*?)$/;
                 const match = aiResponse.trim().replace(/\s+/g, " ").match(regex);
 

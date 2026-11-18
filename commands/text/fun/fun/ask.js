@@ -1,24 +1,27 @@
 const embedGenerator = require("@utils/helpers/embedGenerator");
-const GuildManager = require("@guildManager");
-const { fetchGeminiResponse } = require("@utils/helpers/fetchGeminiResponse");
-const getExactDate = require("@functions/getExactDate");
+const { fetchAIResponse } = require("@utils/helpers/fetchAIResponse");
 
 const MAX_REPLIES = 5;
+const MAX_HISTORY_TURNS = 6;
+const ASK_SYSTEM_PROMPT = `Answer the user's latest message directly and briefly, in plain text.
+You are a Discord bot. You can answer questions, explain things, write short texts and make lists or tier lists.
+If the user asks what you can do or how you can help, tell them those things.
+For a list request, output only the list.
+Keep replies under 2000 characters.
+Avoid assisting with actionable real-world harm or crime.`;
 
 module.exports = {
     name: "ask",
-    description: "Ask a question to Gemini",
+    description: "Ask a question to the configured AI model",
     usage: {
         required: {
-            "question": "The question to ask Gemini",
+            "question": "The question to ask the AI",
         },
     },
     category: "fun",
     examples: ["what are you used for?"],
     cooldown: 20000,
     cooldownGroup: "AI",
-    requiredENVs: ["GEMINI_API_KEY"],
-
     /**
      * @param {import("@utils/log")} logger The logger instance for logging errors and warnings
      * @param {import("discord.js").Client} client The Discord client instance
@@ -29,100 +32,80 @@ module.exports = {
      */
     execute: async (logger, client, message, args, flags) => {
         try {
-            const apiKey = process.env.GEMINI_API_KEY;
-            
-            const prompt = args.join(" ");
-            if (!prompt) return await message.reply({ embeds: [embedGenerator.warning("Please provide a prompt.")] });
+            const prompt = args.join(" ").trim();
+            if (!prompt)
+                return await message.reply({ embeds: [embedGenerator.warning("Please provide a prompt.")] });
 
-            const owner = await message.guild.fetchOwner();
-            const environmentInfo = {
-                guildName: message.guild.name,
-                ownerDisplayName: owner.displayName,
-                ownerId: owner.id,
-                channelId: message.channel.id,
-                channelName: message.channel.name,
-                currentTime: getExactDate(),
-                authorUsername: message.author.username,
-                authorDisplayName: message.author.displayName,
-                authorId: message.author.id,
-            };
+            const response = await fetchAIResponse(
+                prompt,
+                process.env.GEMINI_API_KEY,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                ASK_SYSTEM_PROMPT,
+            );
 
-            const fullPrompt = `
-                Consider the following in your responses:
-                - Be conversational
-                - Add unicode emoji to be more playful in your responses
-                - Write spoilers using spoiler tags.
-                - Format text using markdown.
-        
-                Information about your environment:
-                - The server you are in is called: ${environmentInfo.guildName}
-                - The server is owned by: ${environmentInfo.ownerDisplayName} (To ping on discord, type: <@${environmentInfo.ownerId}>)
-                - The channel you are in is called: <#${environmentInfo.channelId}> (Or ${environmentInfo.channelName} if you only want the raw name)
-                - Discord uses a system to specify channels, which is what you see as what the channel is called, always use that and not the raw name, and always send it directly, without formatting, so it gets sent correctly on discord.
-                - Current time (UTC): ${environmentInfo.currentTime}
-        
-                You are not a personal assistant and cannot complete tasks for people. You only have access to a limited number of text chats in this channel. You cannot access any other information on Discord. You can't see images or avatars. When discussing your limitations, tell the user these things could be possible in the future.
-                When responding to the following prompt, try to condense your response as much as possible.
-                Make sure it is under 2000 characters. 
-                The response will be sent in a discord channel. You can use markdown. Also, make sure to use pings so it integrates better with the Discord server.
-                The user that asked the prompt is named: ${environmentInfo.authorUsername} (display name: ${environmentInfo.authorDisplayName}) (To ping on discord, type: <@${environmentInfo.authorId}>).
-                The prompt is: ${prompt}`;
-
-            const response = await fetchGeminiResponse(fullPrompt, apiKey);
-
-            if (response) {
-                const firstReply = await message.reply(limitString(response, 2000));
-                await handleFollowup(firstReply, environmentInfo, apiKey);
-            } else {
+            if (!response)
                 throw new Error("Unexpected response from the API.");
-            }
 
+            const firstReply = await message.reply(limitString(response, 2000));
+            await handleFollowup(firstReply, [
+                { role: "user", content: prompt },
+                { role: "assistant", content: response },
+            ]);
         } catch (err) {
             logger.error(err);
-            if (err.message.includes("API key is invalid")) 
+            if (err.message.includes("API key is invalid"))
                 return await message.reply({ embeds: [embedGenerator.error("Invalid API key. Please check your configuration.")] });
-            else 
-                return await message.reply({ embeds: [embedGenerator.error("An error occurred.")] });
-            
+            return await message.reply({ embeds: [embedGenerator.error("An error occurred.")] });
         }
 
         function limitString(string, limit) {
-            if (string.length <= limit) 
+            if (string.length <= limit)
                 return string;
-            else 
-                return string.substring(0, limit - 3) + "...";
+            return string.substring(0, limit - 3) + "...";
         }
 
-        async function handleFollowup(firstReply, environmentInfo, apiKey) {
+        async function handleFollowup(firstReply, history) {
             let replyCount = 1;
             let currentReply = firstReply;
-            
+
             while (replyCount < MAX_REPLIES) {
-                const filter = (m) => m.author.id === message.author.id;
-                const reply = (await message.channel.awaitMessages({ filter, max: 1, time: 30000, errors: [] })).first();
+                const filter = (reply) => reply.author.id === message.author.id;
+                const reply = (await message.channel.awaitMessages({
+                    filter,
+                    max: 1,
+                    time: 30000,
+                    errors: [],
+                })).first();
                 if (!reply || !reply.reference) return;
 
                 const reference = await message.channel.messages.fetch(reply.reference.messageId);
                 if (reference.id !== currentReply.id) return;
 
-                const prefix = GuildManager.GetPrefix(message.guild.id);
-                const replyContent = reply.content;
                 await reply.channel.sendTyping();
+                const response = await fetchAIResponse(
+                    reply.content,
+                    process.env.GEMINI_API_KEY,
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
+                    ASK_SYSTEM_PROMPT,
+                    history.slice(-MAX_HISTORY_TURNS),
+                );
 
-                const newPrompt = `
-                    You now are replying to someone's reply that he told you, the original thing the person asked is: ${message.content.replace(`${prefix}ask`, "")}
-                    To which you replied: ${currentReply.content}
-                    You then need to respond to this user's reply, which was: ${replyContent}
-                    You will not be able to respond afterwards`;
-
-                const response = await fetchGeminiResponse(newPrompt, apiKey);
-
-                if (response) {
-                    currentReply = await reply.reply(limitString(response, 2000));
-                    replyCount++;
-                } else {
+                if (!response)
                     throw new Error("Unexpected response from the API.");
-                }
+
+                history.push(
+                    { role: "user", content: reply.content },
+                    { role: "assistant", content: response },
+                );
+
+                currentReply = await reply.reply(limitString(response, 2000));
+                replyCount++;
             }
         }
     },

@@ -19,10 +19,9 @@
         { "type": 2, "name": "your freaky playlists" },
         { "type": 4, "name": ">help | Time to be annoying!" },
         { "type": 4, "name": "Do >help for SEX!" },
-        { "type": 5, "name": "I am the best, you cannot even compare" },
+        { "type": 5, "name": "I am the best, you cannot even compete" },
         { "type": 4, "name": "I think, therefore I think" },
         { "type": 4, "name": "Anon, 'tis time to annoy!" },
-        { "type": 4, "name": "Nitro is kinda mid ngl" },
         { "type": 4, "name": "Me omw (on my way) to do >help" },
         { "type": 4, "name": "You have a {statusChance}% chance to see this" },
         { "type": 4, "name": "There is {statusCount} other statuses" },
@@ -82,8 +81,14 @@
     // Log rate-limited events
     "logRateLimited": false,
 
+    // AI provider to use for AI responses: "local" or "external"
+    "aiModelProvider": "local",
+
     // Default Gemini model for AI interactions
     "defaultGeminiModel": "gemini-3-flash-preview",
+
+    // Default local AI model file in utils/helpers/aiModels
+    "defaultLocalAIModel": "granite-4.0-350m-Q4_K_M.gguf",
 
     "discordPlayer": {
         "dailyReregister": false,
