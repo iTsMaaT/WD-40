@@ -1,6 +1,6 @@
 require("module-alias/register");
 const { execSync } = require("child_process");
-const { fetchGeminiResponse } = require("./fetchGeminiResponse");
+const { fetchAIResponse } = require("./fetchAIResponse");
 const changelog = require("@root/changelogs.json");
 const config = require("@root/utils/config/configUtils");
 require("dotenv").config();
@@ -79,7 +79,7 @@ async function generateChangelogEntry() {
         
         `.split("\n").map(line => line.trim()).join("\n");
 
-        const response = await fetchGeminiResponse(prompt, process.env.GEMINI_API_KEY, MODEL);
+        const response = await fetchAIResponse(prompt, process.env.GEMINI_API_KEY, MODEL);
 
         const changesArray = response.split("\n")
             .filter(line => line.trim());        
@@ -104,7 +104,7 @@ async function generateChangelogEntry() {
                 - Keep the same style as the input
                 `.trimStart();
 
-            const consolidatedResponse = await fetchGeminiResponse(
+            const consolidatedResponse = await fetchAIResponse(
                 consolidationPrompt, 
                 process.env.GEMINI_API_KEY,
                 MODEL,
